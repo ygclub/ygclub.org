@@ -2,21 +2,21 @@
 answer/config.php
 
 bbs/config.inc.php
-bbs/forumdata/cache/
-bbs/forumdata/feedcaches/
-bbs/forumdata/imagecaches/
-bbs/forumdata/imagecaches/
-bbs/forumdata/logs/
-bbs/forumdata/party/
-bbs/forumdata/plugins/
-bbs/forumdata/templates/
-bbs/forumdata/threadcaches/
+#bbs/forumdata/cache/
+#bbs/forumdata/feedcaches/
+#bbs/forumdata/imagecaches/
+#bbs/forumdata/imagecaches/
+#bbs/forumdata/logs/
+#bbs/forumdata/party/
+#bbs/forumdata/plugins/
+#bbs/forumdata/templates/
+#bbs/forumdata/threadcaches/
 
-uc/data/
+#uc/data/
 
 wiki/api/ucconfig.inc.php
 wiki/config.php
-wiki/data/
+#wiki/data/
 wiki/plugins/ucenter/ucconfig.inc.php
 
 wp/wp-config.php
