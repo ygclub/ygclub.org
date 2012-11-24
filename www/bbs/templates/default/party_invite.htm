@@ -1,0 +1,46 @@
+<div class="signup">
+	<h4>活动召集人管理功能：邀请好友 / 分工</h4>
+	<form id="signupform" name="signupform" method="POST" action="party.php?act=party_invite">
+	<input type="hidden" name="formhash" value="{FORMHASH}" />
+	<input type="hidden" name="tid" value="$tid" />
+	<input type="hidden" name="fid" value="$fid" />
+	<table cellspacing="0" cellpadding="0">	
+		<tr>
+			<td style="padding-left:12px;">1、邀请其他人员加入到活动：如果指定人员尚未申请，直接加入到已确认的名单中，并可以承担指定角色。<br />2、指定已报名人员担任指定角色：如果指定的人员为未通过的话，则直接通过报名。<br /><font color='red'>3、"召集人"可以查看报名者联系电话和确认活动参加人员。</font><br />4、“点击邀请好友”则进行好友邀请，如果存在备注选项及加几个随行人员时，必须填写。“点击设置分工”则进行已通过报名的会员设置分工，只需填写名字及分工即可。</td>
+		</tr>
+	</table>
+	<table cellspacing="0" cellpadding="0"><tr><td height='10'></td></tr></table>
+	<table cellspacing="0" cellpadding="0">	
+		<tr>
+			<th width='24%' style='padding-left:12px;' height='30'>名字：(指论坛用户名称) <font color='red'>(*)</font></th>
+			<td><input type="text" class='txt' name="username"></td>
+		</tr>
+		<!--{if $party['doworker']}-->
+		<tr>
+			<th width='24%' style='padding-left:12px;' height='30'>分工：</th>
+			<td><input type="text" class='txt' name="usertask"> 可以填写的分工有：$party[doworker]。</td>
+		</tr>
+		<!--{/if}-->
+		<!--{if !empty($party['marks'])}-->
+		<tr>
+			<th style='padding-left:12px;' height='30'>备注选项 <font color='red'>(*)</font></th>
+			<td><!--{loop $ex_marks $k $v}--><input name="marks" type="radio" value="$k"/>$v<!--{/loop}--></td>
+		</tr>
+		<!--{/if}-->
+		<!--{if $party['followed']}-->
+		<tr>
+			<th style='padding-left:12px;' height='30'>随行人员(加几) <font color='red'>(*)</font></th>
+			<td><input type='text' name='followed' class='txt' onkeyup="value=value.replace(/[^0123456789-]/g,'')" value='0' maxlength='4' size='4'> <font color='#666666'>请输入数字</font></td>
+		</tr>
+		<!--{/if}-->
+		<tr>
+			<th></th>
+			<td>
+				<input type="submit" value='点击邀请好友' name='invitesubmit'/>
+				<input type="submit" value='点击设置分工' name='invitesubmit'/>
+			</td>
+		</tr>
+	</table>
+	<table cellspacing="0" cellpadding="0"><tr><td height='10'></td></tr></table>
+	</form>
+</div>

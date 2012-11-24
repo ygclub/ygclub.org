@@ -1,0 +1,189 @@
+HTML {
+	MARGIN-BOTTOM: 1px
+}
+HTML {
+	HEIGHT: 100%
+}
+BODY {
+	HEIGHT: 100%
+}
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: url(bg_main.jpg) fixed left top; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 400 0.8em/180% georgia, sans-serif; COLOR: #53504d; PADDING-TOP: 0px
+}
+H1 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H3 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H4 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H5 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H6 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+P {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+DL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; MARGIN: 0px; PADDING-TOP: 10px
+}
+H1 {
+	CLEAR: both; FONT: 400 1.9em georgia, serif; COLOR: #532406
+}
+H2 {
+	CLEAR: both; FONT: 400 1.3em georgia, serif; COLOR: #61804e
+}
+H3 {
+	FONT: 700 1.1em georgia, serif; COLOR: #8f512a
+}
+H4 {
+	FONT: 400 0.9em georgia, serif; TEXT-TRANSFORM: uppercase
+}
+A {
+	COLOR: #5e9040; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #532406
+}
+A:hover {
+	COLOR: #3c5d29; TEXT-DECORATION: underline
+}
+OL {
+	PADDING-RIGHT: 30px; PADDING-LEFT: 30px; FONT-SIZE: 1em; PADDING-BOTTOM: 0px; MARGIN: 10px 30px; PADDING-TOP: 0px; BACKGROUND-COLOR: #fff
+}
+OL:hover {
+	
+}
+OL SPAN {
+	FONT-SIZE: 0.7em; COLOR: #6d6864
+}
+UL {
+	PADDING-RIGHT: 20px; PADDING-LEFT: 5px; PADDING-BOTTOM: 0px; MARGIN: 10px 20px; PADDING-TOP: 0px; LIST-STYLE-TYPE: none
+}
+UL LI {
+	PADDING-LEFT: 25px; BACKGROUND: url(bullet.gif) no-repeat 0px 3px
+}
+UL LI:hover {
+	BACKGROUND: url(bullethover.gif) no-repeat 0px 3px
+}
+ACRONYM {
+	CURSOR: help; BORDER-BOTTOM: #ddd 1px solid
+}
+BLOCKQUOTE {
+	MARGIN: 10px 0px; BORDER-BOTTOM: #b8e78b 1px solid; BACKGROUND-COLOR: #f1ffe3
+}
+BLOCKQUOTE P {
+	MARGIN: 0.4em 0.8em
+}
+DEL {
+	COLOR: #aaa
+}
+CODE {
+	PADDING-RIGHT: 10px; DISPLAY: block; PADDING-LEFT: 10px; BACKGROUND: #f4f4f4; PADDING-BOTTOM: 10px; MARGIN: 15px 0px; FONT: 400 1em/120% courier, monospace; OVERFLOW: auto; WIDTH: 450px; PADDING-TOP: 10px; BORDER-BOTTOM: #d3d3d3 1px solid; WHITE-SPACE: pre
+}
+FIELDSET {
+	BORDER-RIGHT: #cccccc 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: #cccccc 1px solid; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: #cccccc 1px solid; PADDING-TOP: 4px; BORDER-BOTTOM: #cccccc 1px solid
+}
+FIELDSET LEGEND {
+	COLOR: #6d6864
+}
+TABLE {
+	FONT-SIZE: 1em; MARGIN-BOTTOM: 10px; WIDTH: 100%; LINE-HEIGHT: 150%; BORDER-COLLAPSE: collapse
+}
+TABLE CAPTION {
+	PADDING-RIGHT: 0px; MARGIN-TOP: 10px; PADDING-LEFT: 3px; PADDING-BOTTOM: 0.5em; FONT: 400 0.8em georgia, sans-serif; PADDING-TOP: 0px; TEXT-ALIGN: left
+}
+TABLE TH {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 6px; VERTICAL-ALIGN: top; PADDING-TOP: 6px; TEXT-ALIGN: left
+}
+TABLE TD {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 6px; VERTICAL-ALIGN: top; PADDING-TOP: 6px; TEXT-ALIGN: left
+}
+THEAD TH {
+	BORDER-BOTTOM: #b8e78b 1px solid; BACKGROUND-COLOR: #f1ffe3
+}
+TBODY TR.dark {
+	BACKGROUND-COLOR: #f5f5f5
+}
+TBODY TD {
+	BORDER-BOTTOM: #ddd 1px solid
+}
+TBODY TR:hover {
+	BACKGROUND-COLOR: #fbfedf
+}
+LABEL {
+	PADDING-RIGHT: 1em; FLOAT: left; WIDTH: 7em
+}
+UNKNOWN {
+	HEIGHT: 19px
+}
+INPUT {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #fff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+TEXTAREA {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #fff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+SELECT {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #fff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+INPUT:hover {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #e5feff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+TEXTAREA:hover {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #e5feff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+SELECT:hover {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #888 1px solid; PADDING-LEFT: 0px; BACKGROUND: #e5feff; PADDING-BOTTOM: 0px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #888 1px solid; COLOR: #666; PADDING-TOP: 0px; BORDER-BOTTOM: #ddd 1px solid
+}
+INPUT:unknown {
+	BORDER-TOP-WIDTH: 2px; PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BORDER-LEFT-WIDTH: 2px; BACKGROUND: #f1ffe3; BORDER-BOTTOM-WIDTH: 2px; PADDING-BOTTOM: 0px; COLOR: #000; PADDING-TOP: 0px; BORDER-RIGHT-WIDTH: 2px
+}
+TEXTAREA:unknown {
+	BORDER-TOP-WIDTH: 2px; PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BORDER-LEFT-WIDTH: 2px; BACKGROUND: #f1ffe3; BORDER-BOTTOM-WIDTH: 2px; PADDING-BOTTOM: 0px; COLOR: #000; PADDING-TOP: 0px; BORDER-RIGHT-WIDTH: 2px
+}
+SELECT:unknown {
+	BORDER-TOP-WIDTH: 2px; PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BORDER-LEFT-WIDTH: 2px; BACKGROUND: #f1ffe3; BORDER-BOTTOM-WIDTH: 2px; PADDING-BOTTOM: 0px; COLOR: #000; PADDING-TOP: 0px; BORDER-RIGHT-WIDTH: 2px
+}
+INPUT.button {
+	BORDER-RIGHT: #2d5018 1px solid; PADDING-RIGHT: 10px; BORDER-TOP: #b8e78b 1px solid; PADDING-LEFT: 10px; BACKGROUND: #508231; PADDING-BOTTOM: 1px; FONT: 400 1em georgia, sans-serif; BORDER-LEFT: #b8e78b 1px solid; CURSOR: pointer; COLOR: #fff; PADDING-TOP: 1px; BORDER-BOTTOM: #2d5018 1px solid
+}
+INPUT.button:hover {
+	BORDER-LEFT-COLOR: #8be7df; BACKGROUND: #318182; BORDER-BOTTOM-COLOR: #18504b; BORDER-TOP-COLOR: #8be7df; BORDER-RIGHT-COLOR: #18504b
+}
+.required {
+	CURSOR: help; BORDER-BOTTOM: #ccc 1px solid
+}
+IMG.floatRight {
+	MARGIN: 5px 0px 10px 15px
+}
+IMG.floatLeft {
+	MARGIN: 5px 15px 10px 0px
+}
+A IMG {
+	BORDER-RIGHT: #d5c9c2 4px solid; BORDER-TOP: #d5c9c2 4px solid; BORDER-LEFT: #d5c9c2 4px solid; BORDER-BOTTOM: #d5c9c2 4px solid
+}
+A:hover IMG {
+	BORDER-RIGHT: #baaaa1 4px solid; BORDER-TOP: #baaaa1 4px solid; BORDER-LEFT: #baaaa1 4px solid; BORDER-BOTTOM: #baaaa1 4px solid
+}
+UL LI P {
+	COLOR: #666666; TEXT-INDENT: 25px
+}
+.pad_box {
+	BORDER-RIGHT: #ccc 1px solid; PADDING-RIGHT: 1px; BORDER-TOP: #ccc 1px solid; DISPLAY: block; PADDING-LEFT: 1px; BACKGROUND: url(pbg_line.jpg) repeat-x; PADDING-BOTTOM: 1px; MARGIN: 0px auto; BORDER-LEFT: #ccc 1px solid; WIDTH: 488px; PADDING-TOP: 1px; BORDER-BOTTOM: #ccc 1px solid; HEIGHT: 249px
+}
+.pad_box SPAN {
+	DISPLAY: block; PADDING-LEFT: 10px; FONT-WEIGHT: bold; FONT-SIZE: 14px; PADDING-BOTTOM: 5px; PADDING-TOP: 3px
+}
+#waiting {
+  FONT-WEIGHT: normal; FONT-SIZE: 12px;display: inline;
+}
+#success {
+  FONT-WEIGHT: normal; FONT-SIZE: 12px;display: inline;
+}

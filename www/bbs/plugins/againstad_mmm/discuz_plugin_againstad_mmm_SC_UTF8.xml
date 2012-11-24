@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root>
+	<item id="Title"><![CDATA[Discuz! Plugin]]></item>
+	<item id="Version"><![CDATA[7.2]]></item>
+	<item id="Time"><![CDATA[2010-01-02 16:50]]></item>
+	<item id="From"><![CDATA[Discuz! Board (http://localhost:1108/bbs/)]]></item>
+	<item id="Data">
+		<item id="plugin">
+			<item id="available"><![CDATA[1]]></item>
+			<item id="adminid"><![CDATA[1]]></item>
+			<item id="name"><![CDATA[反恶意注册]]></item>
+			<item id="identifier"><![CDATA[againstad_mmm]]></item>
+			<item id="description"><![CDATA[]]></item>
+			<item id="datatables"><![CDATA[]]></item>
+			<item id="directory"><![CDATA[againstad_mmm/]]></item>
+			<item id="copyright"><![CDATA[米米猫]]></item>
+			<item id="version"><![CDATA[1.3]]></item>
+			<item id="__modules">
+				<item id="0">
+					<item id="name"><![CDATA[hook]]></item>
+					<item id="type"><![CDATA[11]]></item>
+					<item id="adminid"><![CDATA[0]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+				</item>
+				<item id="1">
+					<item id="name"><![CDATA[update]]></item>
+					<item id="menu"><![CDATA[版本更新检查]]></item>
+					<item id="type"><![CDATA[3]]></item>
+					<item id="adminid"><![CDATA[1]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+				</item>
+			</item>
+		</item>
+		<item id="version"><![CDATA[7.2]]></item>
+<item id="intro"><![CDATA[
+    反恶意注册 V1.3
+
+    本插件采用插件新内核，全面支持Discuz!7.1/7.2。
+    通过使用本插件，您可以完美封杀恶意广告机的注册，营造和谐干净的社区环境。
+    下个版本增加更多功能，建议可投至 [url=http://topfg.91.tc/hack]Top站长平台[/url]
+
+    [align=center]Version: againstad_mmm_1.3   米米猫 Powered by [url=http://topfg.91.tc/hack]Top站长平台[/url] (c)2009[/align]
+			]]></item>
+                <item id="installfile"><![CDATA[install.php]]></item>
+		<item id="uninstallfile"><![CDATA[uninstall.php]]></item>
+               
+	</item>
+</root>

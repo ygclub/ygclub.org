@@ -1,0 +1,161 @@
+<style type="text/css">
+@import url(forumdata/cache/party.css);
+</style>
+
+<div id="info">
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed; border:none;">
+		<tr>
+			<td rowspan="8" class="postauthor" valign="top" style="border:1px solid #CBCBCB; border-right:none;">
+				<cite>
+					<label>
+					<!--{if $vtonlinestatus && $post['authorid']}-->
+						<!--{if ($vtonlinestatus == 2 && $onlineauthors[$post[authorid]]) || ($vtonlinestatus == 1 && ($timestamp - $post['lastactivity'] <= 10800) && !$post['invisible'])}-->
+						<em><!--{if $post[gender]==1}--><img src='images/default/Male.gif' title='帅哥({lang online})' /><!--{elseif $post[gender]==2}--><img src='images/default/FeMale.gif' title='美女({lang online})' /><!--{else}--><img src='images/default/Bm.gif' title='保密({lang online})' /><!--{/if}--></em>
+						<!--{else}-->
+						<em><!--{if $post[gender]==1}--><img src='images/default/ofMale.gif' title='帅哥({lang offline})' /><!--{elseif $post[gender]==2}--><img src='images/default/ofFeMale.gif' title='美女({lang offline})' /><!--{else}--><img src='images/default/ofBm.gif' title='保密({lang offline})' /><!--{/if}--></em>
+						<!--{/if}-->
+					<!--{/if}-->
+					</label>
+					<span style="font-weight: normal;color:#666;">召集:</span>
+					<a href="space.php?uid=$post[authorid]" target="_blank" style="border:0;color:#09c;">$post[author]</a>
+				</cite>
+				<div class="avatar">{echo discuz_uc_avatar($post[authorid], 'middle')}</div>	
+			</td>
+			<td style="padding:0; border:none;" valign="top">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed; table-layout:fixed; ">
+					<tr>
+						<th style="border-bottom:none;">活动主题:</th>
+						<td colspan="3" style="font-size: 14px; color:red; font-weight: bold; border-bottom:none;">$thread[subject] 
+						<!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
+						<a href="post.php?action=edit&fid=$fid&tid=$tid&pid=$post[pid]" title='编辑' style="font-weight:normal;font-size:12px;">[编辑帖子]</a>  
+						<a href="party.php?act=complete&tid=$tid" style="font-weight:normal;font-size:12px;">[编辑活动资料]</a>  
+						<a href='party.php?act=onoff&for=on&tid=$tid' class='openorclose'>[开]</a></span>  
+						<a href='party.php?act=onoff&for=off&tid=$tid' class='openorclose'>[关]</a></span>
+						<!--{/if}--></td>
+						<td width='20' align='right'><a title="{lang emailfriend_url_copy}" id="postnum$post[pid]" href="javascript:;" onclick="setcopy('{$boardurl}viewthread.php?tid=$tid&amp;page=$page$fromuid#pid$post[pid]', '{lang post_copied}')"><em><font color='red'>1</font></em><sup>#</sup></a></td>
+					</tr>
+				</table>
+
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed; table-layout:fixed;">
+					<tr>
+						<th>召集人电话:</th>
+						<td><!--{if $joined==1}--><font color='blue'>$party[phone]</font><!--{else}-->已通过人员可见<!--{/if}-->
+						&nbsp;(<!--{if $party[isjoin]==1}-->参与活动<!--{else}-->不参与活动<!--{/if}-->)</td>
+						<th>活动类型:</th>
+						<td>$party[class]</td>
+					</tr>
+					<tr>
+						<th>活动时间:</th>
+						<td>
+										<cite>$party[showtime]</cite>
+										</td>
+						<th style="width:110px;word-break:break-all;table-layout:fixed;">发起时间:</th>
+						<td>$party[starttimefrom]</td>
+					</tr>
+					<tr>
+						<th>报名截止:</th>
+						<td>$party[starttimeto]</td>
+						<th rowspan="3" style="width:110px;word-break:break-all;table-layout:fixed;">活动状态:</th>
+						<td rowspan="3">
+						<img src="images/default/party_{$party_img}.gif" />				
+						</td>
+					</tr>
+					<tr>
+						<th>活动限制人数:</th>
+						<td><cite><!--{if $party[number]}-->$party[number]<!--{else}-->不限<!--{/if}--></cite> $party_xb</td>
+					</tr>
+					<tr>
+						<th>已确认/报名:</th>
+						<td><strong>$passPartyers_count<!--{if $party[followed]}-->+{$passFolloweder}<!--{/if}--></strong> / $allPartyers_count<!--{if $party[followed]}-->+{$allFolloweder}<!--{/if}--></td>
+					</tr>
+					<tr>
+						<th>通过人员:</th>
+						<td colspan="3">
+							<!--{loop $passList $v}-->
+							<a href="space.php?uid=$v[uid]" class='gender$v[gender]'>$v[username]</a>&nbsp;,&nbsp;
+							<!--{/loop}--></td>
+					</tr>
+					<!--{if !empty($party['marks'])}-->
+					<tr>
+						<th>通过人员统计:</th>
+						<td colspan="3">$countMarksHtml</td>
+					</tr>
+					<!--{/if}-->
+					<!-- 自定义部分 -->
+					<!--{if $sc_data['optionfield'] && $sc_data['optionform']==1}-->
+						<!--{loop $sc_data['optionfield'] $v}-->
+						<tr>
+							<th>{$v[name]}:</th>
+							<td colspan="3" style="<!--{if $v['bold']=='on'}-->font-weight:bold;<!--{/if}--><!--{if $v['color']}-->color:$v[color];<!--{/if}-->">$v[value]</td>
+						</tr>
+						<!--{/loop}-->
+					<!--{/if}-->
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<div id="detail">
+		<h2>活动说明：$thread[subject]</h2>
+
+		<!--{if $party['picurl']}--><img src='$party[picurl]' /><br /><br /><!--{/if}-->
+
+		$post[message]
+
+		<!--{if $post['attachment']}-->
+			<div class="locked">{lang attachment}: <em>{lang attach_nopermission}</em></div>
+		<!--{elseif $hideattach[$post[pid]] && $post['attachments']}-->
+			<div class="locked">{lang attachment}: <em>{lang attachment_reply_show}</em></div>
+		<!--{elseif $post['imagelist'] || $post['attachlist']}-->
+			<div class="postattachlist">
+				<!--{if $post['imagelist']}-->
+					$post['imagelist']
+				<!--{/if}-->
+				<!--{if $post['attachlist']}-->
+					$post[attachlist]
+				<!--{/if}-->
+			</div>
+		<!--{/if}-->
+
+		<!--{if $aimgs[$post[pid]]}-->
+		<script type="text/javascript" reload="1">aimgcount[{$post[pid]}] = [{echo implode(',', $aimgs[$post[pid]]);}];attachimgshow($post[pid]);</script>
+		<!--{/if}-->
+
+		<br />
+		<br />
+		<table width='92%' cellSpacing='1' cellPadding='8'  border='0' align='center' bgcolor='#E0E0E0' >
+			<tr>
+				<td bgcolor='#FFFFEE' style='line-height:180%;color:#444;'><B>免责声明：</B>活动中可能存在意外的因素，参加者纯属自愿行为，一旦报名参加，则视为愿意自行承担活动中可能出现的意外伤害及经济损失，组织者及其他成员概不承担任何法律或者经济上的责任，请慎重报名参加。</td>
+			</tr>
+		</table>
+
+		<!--{if $mPerm==1 || $adminid==1}-->
+		<br />
+		<div style="text-align:center;">
+			<a href="party.php?act=print&tid=$tid"><font color='red'><u>打印名单</u></font></a>
+			<img src='images/default/buddy_sendpm.gif' align='absmiddle'/> <b>发送短信息To：</b><a href="party.php?act=pm&for=passed&tid=$tid"><font color='red'>已通过人员</font></a> | <a href="party.php?act=pm&for=nopassed&tid=$tid"><font color='green'>未通过人员</font></a>
+			<!--{if $sc_data['sms']==1}-->
+			<img src='images/default/mobile.gif' align='absmiddle'/> <b>发送手机信息To：</b><a href="party.php?act=sms&for=passed&tid=$tid"><font color='red'>已通过人员</font></a> | <a href="party.php?act=sms&for=nopassed&tid=$tid"><font color='green'>未通过人员</font></a>
+			<!--{/if}-->
+		</div>
+		<!--{/if}-->
+
+	</div>
+</div>
+
+<!--{if $passPartyers_count > 0}-->
+<div id="ptpassed$timestamp"></div>
+<script type="text/javascript">ajaxget('party.php?tid=$tid&act=list&step=PassUsers','ptpassed$timestamp');</script>
+<!--{/if}-->
+
+<!--{if $nopassPartyers_count > 0}-->
+<div id="ptnopass$timestamp"></div>
+<script type="text/javascript">ajaxget('party.php?tid=$tid&act=list&step=noPassUsers','ptnopass$timestamp');</script>
+<!--{/if}-->
+
+
+{template party_sign}
+
+<!--{if $mPerm==1 || $adminid==1}-->
+{template party_invite}
+<!--{/if}-->

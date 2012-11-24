@@ -1,0 +1,425 @@
+﻿/*
+Template Name: Pure Sunshine
+Site URI: http://www.ygclub.org/
+Description: Special design for YG Club. 阳光志愿者——让教育成就梦想！
+Author: Beta Interface
+Author URI: http://betainterface.com/
+Version: 1.0
+*/
+
+/******Reset Browser Default Style******/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: baseline;
+	background: transparent;
+	font:12px/1.6em Verdana,Helvetica,Arial,sans-serif;}
+body {
+	line-height: 1;
+	font-size:14px;
+	color:#333;
+	background:#f3f3f3;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-weight: normal;
+	clear: both;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote {
+	quotes: none;
+}
+blockquote:before, blockquote:after {
+	content: '';
+	content: none;
+}
+del {
+	text-decoration: line-through;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+a:link, a:visited{
+	color:#338800;
+	text-decoration:none;
+	}
+a:hover{}
+a img { border: none; }
+
+/******Structure******/
+
+#top{
+	width:960px;
+	height:14px;
+	margin:0 auto;
+	background:url(images/border_header2.png) no-repeat center;
+}
+#bottom{
+	width:960px;
+	height:14px;
+	margin:0 auto 10px;
+	background:url(images/border_footer2.png) no-repeat center;
+}
+#wrapper{
+	width:960px;
+	margin:0 auto;
+	padding:0 0 20px;
+	background:url(images/bg_body.png) repeat-y;
+	}
+#container{
+	width:900px;
+	margin:0 auto;
+	overflow:hidden;
+	}
+	#header{
+		width:900px;
+		height:auto;
+		margin:0 auto;
+		overflow:inherit;
+		}
+	#banner{
+		width:900px;
+		height:222px;
+		margin:10px auto;
+		background:url(images/banner.jpg) no-repeat;
+		}
+	#content{
+		width:620px;
+		float:left;
+		margin:10px 0;
+		}
+	#sidebar{
+		width:260px;
+		float:right;
+		margin:10px 0;
+		}
+
+#footer{
+	}
+
+#copyright{
+	margin:10px auto 20px;
+	font-size:12px;
+	line-height:16px;
+	text-align:center;
+	color:#999;
+	}
+
+/******Header******/
+#statu_bar{
+	height:31px;
+	float:right;
+	clear:both;
+	line-height:31px;
+	overflow:hidden;
+	}
+
+h1#logo{
+	width:280px;
+	height:100px;
+	background:url(images/logo.png) no-repeat left;
+	text-indent:-1000em;
+	}
+#nav{
+	width:898px;
+	height:30px;
+	margin-top:14px;
+	border:solid 1px #ccc;
+	overflow:hidden;
+	}
+	#nav_l, #nav_r{
+		width:7px;
+		height:30px;
+		float:left;
+		}
+	#nav_l{
+		background:url(images/border_menu_l.png) no-repeat;
+		}
+	#nav_r{
+		background:url(images/border_menu_r.png) no-repeat;
+		}
+	ul#menu_l, ul#menu_r{
+		background:url(images/bg_menu.png) repeat-x;
+		height:inherit;
+		float:left;
+		}
+	ul#menu_l{
+		width:882px;
+		padding-left:2px;
+		}
+	ul#menu_r{
+		width:300px;
+		text-align:right;
+		}
+		ul#menu_l li, ul#menu_r li{
+			display:inline;
+			line-height:30px;
+			font-weight:bold;
+			}
+		ul#menu_l li a, ul#menu_r li a{
+			padding:0 10px;
+			text-shadow:0 1px #f3f3f3;
+			line-height:30px;
+			font-weight:bold;
+			}
+		ul#menu_l li a{
+			color:#338800;
+			}
+		ul#menu_l li a:hover, ul#menu_l li.current_page_item a{
+			color: #FF6600;
+			}
+
+/*******Content********/
+#ygclub_about{
+	background: none repeat scroll 0 0 #F3F3F3;
+	border: 2px solid #EEEEEE;
+	border-radius: 10px 10px 0 0;
+	line-height: 1.5em;
+	overflow: hidden;
+	padding: 10px;
+	text-indent: 2em;
+	width: 590px;
+	}
+
+	#ygclub_about_c span{font-size:10px;}
+
+#ygclub_projects, #ygclub_activities{
+	width:300px;
+	margin:10px 0;
+	float:left;
+	}
+#ygclub_activities{
+	margin-left:12px;
+	}
+	#ygclub_projects h3, #ygclub_activities h3{
+		background:url(images/bg_h3.png) no-repeat;
+		line-height:30px;
+		padding:0 10px;
+		color:#666;
+		font-weight:bold;
+		}
+	#ygclub_projects ul, #ygclub_activities ul{
+		width:286px;
+
+		padding:5px;
+		border:2px solid #f3f3f3;
+		overflow:hidden;
+		}
+	#ygclub_projects ul li a, #ygclub_activities ul li a{
+		color:#666;}
+	#ygclub_projects ul li:hover a, #ygclub_activities ul li:hover a{
+		color:#339900;
+		}
+	#ygclub_projects ul li{
+		width:133px;
+		height:60px;
+		margin:5px;
+		_margin:5px 3px;
+		display:block;
+		float:left;
+		text-align:center;
+		background:#eee;
+		}
+	#ygclub_projects ul li span.project_add{
+		font-size:12px;
+		padding:10px 0 5px;
+		display:block;
+		}
+	#ygclub_projects ul li span.project_name{
+		font-size:16px;
+		font-weight:bold;
+		padding:0 0 10px;
+		display:block;
+		}
+	#ygclub_projects ul li span.project_more{
+		margin:20px 0 0;
+		display:block;
+		}
+
+	#ygclub_activities ul li{
+		height:24px;
+		margin:5px;
+		padding-left:5px;
+		line-height:24px;
+		display:block;
+		background:#eee;
+		overflow:hidden;
+		}
+
+/*********************************/
+/*****     Content Style     *****/
+/*********************************/
+#content #archiveList{
+	text-align:center;
+	}
+
+#content .archiveList{
+	border-bottom:1px solid #ddd;
+	}
+
+#content .entry{
+	padding:10px;
+	border-radius:10px 10px 0 0;
+	}
+
+#content .entry-head h2 {
+	color: #333333;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	}
+
+#content .entry-head h2 a:link, #content .entry-head h2 a:visited, #indexMid h3{
+
+	}
+
+#content .entry-head h2 a:hover {
+
+	}
+
+#content .entry-head{
+	border-bottom:1px solid #ddd;
+	}
+
+#content .entry-copyright{
+	margin:2px 10px;
+	color:#CCC;
+	}
+
+#content .entry-copyright a{
+
+	}
+
+#content .entry-content{
+	margin:10px;
+	line-height:16px;
+	}
+
+#content .entry-content p{
+	margin:5px 0;
+	padding:5px 0;
+	line-height:20px;
+	}
+
+#content .entry-content img {
+	text-align:center;
+	display:block;
+	border:0;
+	}
+
+#content .entry-meta{
+	margin:0;
+	padding:5px 10px;
+	border-top:1px solid #ccc;
+	color: #666;
+	font-size:12px;
+	}
+
+#content .entry-meta a:link, #content .entry-meta a:visited{
+	color:#380;
+	}
+
+#content .entry-meta a:hover{
+	color:#F30;
+	}
+
+#navigation{
+	margin:5px 10px;
+	overflow:hidden;
+	}
+
+#navigation .nav-previous{
+	float:left;
+	}
+
+#navigation .nav-next{
+	float:right;
+	}
+
+/*******Sidebar******/
+#sidebar h3{
+	background:url(images/arrow_h3.png) no-repeat left;
+	padding-left:20px;
+	}
+	#register{
+		width:133px;
+		margin:20px auto;
+		}
+	#register span{
+		width:133px;
+		height:29px;
+		display:block;
+		background:url(images/btn_register.png) no-repeat;
+		text-indent:-1000em;
+		}
+
+	hr#or{
+		background:url(images/bg_hr_or.png) no-repeat;
+		width:210px;
+		height:19px;
+		display:block;
+		margin:0 auto;
+		border:1px solid #FFF;
+		}
+
+	#sina_weibo{
+		margin:10px auto;
+		border:1px solid #ddd;
+		}
+		#login_field p{
+			margin:10px 0;
+			}
+		#login_field p#user_login{
+			font-weight:bold;
+			text-align:center;
+			}
+		#login_field p#login_btn{
+			text-align:center;
+			}
+		input#user_id, input#user_pwd{
+			width:150px;
+			height:16px;
+			}
+		input#user_pwd{
+			font-size:8px;
+			}
+	#ygclub_elsewhere{
+		margin:20px 0;
+		}
+	#social_site{
+		width:200px;
+		margin:10px auto;
+		}
+	#social_site ul li{
+		float:left;
+		margin:3px;
+		text-indent:-1000em;
+		background:#f00;
+		}
+	#social_site ul li a{
+		width:32px;
+		height:32px;
+		display:block;
+		}
+	#social_site ul li#douban a, #social_site ul li#twitter a, #social_site ul li#facebook a, #social_site ul li#flickr a, #social_site ul li#kaixin a{
+		background-image:url(images/icons.png);
+		background-repeat:no-repeat;
+		}
+	#social_site ul li#douban a{
+		background-position:0 0;
+		}
+	#social_site ul li#twitter a{
+		background-position:-128px 0;
+		}
+	#social_site ul li#facebook a{
+		background-position:-96px 0;
+		}
+	#social_site ul li#flickr a{
+		background-position:-64px 0;
+		}
+	#social_site ul li#kaixin a{
+		background-position:-32px 0;
+		}

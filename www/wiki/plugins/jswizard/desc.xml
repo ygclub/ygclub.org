@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+<author><![CDATA[互动在线]]></author>
+<authorurl><![CDATA[http://kaiyuan.hudong.com]]></authorurl>
+<name><![CDATA[数据调用]]></name>
+<tag><![CDATA[hdwiki5.0 数据调用 js调用]]></tag>
+<desc><![CDATA[JS数据调用插件能够方便其它系统调用HDWiki的数据。]]></desc>
+<weburl><![CDATA[http://]]></weburl>
+<version><![CDATA[3.0]]></version>
+<hdversion><![CDATA[5.0]]></hdversion>
+<copyright><![CDATA[hudong.com]]></copyright>
+<charset><![CDATA[UTF-8]]></charset>
+</theme>

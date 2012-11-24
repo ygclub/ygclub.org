@@ -1,0 +1,287 @@
+{template header}
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#tpbk img,#tjct img").each(function(i){
+		var w = this.width;
+		var h = this.height;
+		if(w > 100 || h > 75){
+			if(w/h>4/3){
+				this.style.width = "100px"
+			}else{
+				this.style.height = "75px"
+			}
+		}
+	});
+	
+	$("input[name*='searchtext']") .focus();
+	$("#notice h2 a").click(function(){
+		var id = $(this).attr('href');
+		$("#zxdt, #zngg").hide();
+		$("#notice h2  a").toggleClass('on');
+		$(id).show();
+		return false;
+	});
+	
+	if($("#zxdt").height()>440){
+		$("#zxdt").height(440);
+		$("#zxdt").css("overflow","hidden");
+		var scroll=new s('zxdt',2000,30);
+		scroll.bind();
+		scroll.start();
+	}
+});
+
+function s(zxdt, delay, speed){
+    this.rotator = $("#"+zxdt);
+	this.delay = delay || 1000;
+	this.speed = speed || 20;
+	this.tid = this.tid2 = this.firstp = null;
+	this.pause = false;
+	this.num=0;
+	this.p_length=$("#zxdt p").length;
+}
+s.prototype = {
+	bind:function(){
+		var o = this;
+		this.rotator.hover(function(){o.end();},function(){o.start();});
+	},
+	start:function(){
+		this.pause=false;
+		if($("#zxdt p").length==this.p_length){
+			this.firstp=$("#zxdt p:first-child");
+			this.rotator.append(this.firstp.clone());
+		}
+		var o = this;
+		this.tid = setInterval(function(){o.rotation();}, this.speed);
+	},
+	end:function(){
+		this.pause=true;
+		clearInterval(this.tid);
+		clearTimeout(this.tid2);
+	},
+	rotation:function(){
+		if(this.pause)return;
+		var o=this;
+		var firstp=$("#zxdt p:first-child");
+		this.num++;
+		this.rotator[0].scrollTop=this.num;
+		if (this.num == this.firstp[0].scrollHeight+8){
+			clearInterval(this.tid);
+			this.firstp.remove();
+			this.num = 0;
+			this.rotator[0].scrollTop = 0;
+			this.tid2 = setTimeout(function m(){o.start();},this.delay);
+		}
+	}
+}
+
+</script>
+<script type="text/javascript">
+var indexlogin = 1;
+var loginTip1 = '{lang loginTip1}';
+var loginTip2 = '{$loginTip2}';
+var loginTip3 = '{lang loginTip3}';
+var logincodewrong = '{lang logincodewrong}';
+var name_max_length = $name_max_length;
+var name_min_length = $name_min_length;
+var editPassTip1 = '{lang editPassTip1}';
+var loginTip4 = '{lang loginTip4}';
+var checkcode = '{$checkcode}';
+</script> 
+
+<style>
+#notice h2 a{background:#454545 none repeat scroll 0 0;	color:#DEDEDE;font-size:12px;height:24px;overflow:hidden;padding:0 31px;text-align:center;}
+</style>
+<div class="l w-710 o-v">
+	<div id="reci" class="col01 w-238 l">
+		<h2>{lang hotDoc}<span>HOT entry word</span></h2><a href="{url list-focus-2}" class="more">{lang more}</a>
+		<!--{loop $indexcache['hotdocs'] $key $hotdoc}-->
+			<dl class="col-dl">
+				<dt><a href="{url doc-view-$hotdoc['did']}"  title="{$hotdoc['title']}">{$hotdoc['shorttitle']}</a></dt>
+				<dd>{$hotdoc['summary']}[<a href="{url doc-view-$hotdoc['did']}"  class="entry blue">{lang detail}</a>]</dd>
+			</dl>
+		<!--{/loop}-->
+	</div>
+	<div id="jcct" class="col02 w-460 r">
+		<h2>{lang wonderDoc}<span>best entry word</span></h2><a href="{url list-focus-3}" class="more">{lang more}</a>
+		<!--{if isset($indexcache['fistwonderdoc'])}-->
+			<div class="jcct">
+				<a href="{url doc-view-$indexcache['fistwonderdoc']['did']}"><img class="img01" title="{$indexcache['fistwonderdoc']['title']}" src="{$indexcache['fistwonderdoc']['image']}"/></a>
+				<h3><a href="{url doc-view-$indexcache['fistwonderdoc']['did']}" title="{{$indexcache['fistwonderdoc']['title']}" >{$indexcache['fistwonderdoc']['shorttitle']}</a></h3>
+				<p>{$indexcache['fistwonderdoc']['summary']}...<a class="blue" href="{url doc-view-$indexcache['fistwonderdoc']['did']}" >{lang readFullText}&gt;&gt;</a></p>
+			</div>
+			<ul class="c-b">
+				<!--{loop $indexcache['wonderdocs'] $wondoc}-->
+					<li><a href="{url doc-view-$wondoc['did']}" >{$wondoc['title']}</a>: {$wondoc['summary']}</li>
+				<!--{/loop}-->
+			</ul>
+		<!--{/if}-->
+		</div>
+<!--ad start -->
+
+<!--{if isset($advlist[2]) && isset($setting[advmode]) && '1'==$setting[advmode]}-->
+<div class="ad" id="advlist_2">
+{$advlist[2][code]}
+</div>
+<!--{elseif isset($advlist[2]) && (!isset($setting[advmode]) || !$setting[advmode])}-->
+<div class="ad" id="advlist_2">
+</div>
+<!--{/if}-->
+
+<!--ad end -->	
+	<div class="l w-238">
+		<div id="zjgx" class="col01 spa5">
+			<h2>{lang recentUpdate}<span>today update</span></h2><a href="{url list-recentupdate}" class="more">{lang more}</a>
+			<ul class="col-ul">
+			   <!--{loop $indexcache['recentupdatelist'] $doc}-->
+					<li class="list03"><span>$doc['lastedit']</span><a href="{url doc-view-$doc['did']}"  title="{$doc['title']}">{$doc['shorttitle']}</a></li>
+			   <!--{/loop}-->
+			</ul>
+		</div>
+		<div id="zjpl" class="col01">
+			<h2 class="col-h2">{lang recentComment}<span>NEW comment</span></h2>
+			<!--{loop $indexcache['recentcommentlist'] $comment}-->
+				<div class="unit">
+					<a href="{url user-space-$comment['authorid']}"><img class="img02" alt="" src="<!--{if $comment['image'] }-->{$comment['image']}<!--{else}--><!--{/if}-->" width="36px" height="36px" /></a>
+					<p><a href="{url comment-view-$comment['did']}" title="{$comment['comment']}"  class="block">{$comment['tipcomment']}</a><span>{$comment['time']}</span></p>
+				</div>
+			<!--{/loop}-->
+		</div>	
+	</div>
+	<div class="r w-460">
+		<div id="tjct" class="col02">
+			<h2>{lang focusDoc}<span>recommended entry word</span></h2><a href="{url list-focus}" class="more">{lang more}</a>
+            <ol>
+			<!--{loop $indexcache['commenddocs'] $key $fistcomdoc}-->
+				<!--{if $key<6}-->
+				<li class="list01">
+					<a href="{url doc-view-$fistcomdoc['did']}"><img width="122" height="77" class="img01" alt="{$fistcomdoc['title']}" title="{$fistcomdoc['title']}" src="{$fistcomdoc['image']}"/></a>
+					<p><a href="{url doc-view-$fistcomdoc['did']}"  title="{$fistcomdoc['title']}">{$fistcomdoc['shorttitle']}</a></p>
+				</li>
+				<!--{/if}-->
+			<!--{/loop}-->
+            </ol>
+            <ol>
+            	<!--{loop $indexcache['commenddocs'] $key $commenddoc}-->
+					<!--{if $key>=3}-->
+					<li class="list02"><a href="{url doc-view-$commenddoc['did']}"  title="{$commenddoc['title']}">{$commenddoc['shorttitle']}</a></li>
+					<!--{/if}-->
+				<!--{/loop}-->
+            </ol>
+		</div>
+		<div id="tpbk" class="col02 c-b">
+			<h2>{lang picture}<span>photo gallery</span></h2><a href="{url pic-piclist}"  class="more">{lang more}</a>
+            	<marquee style="height:120px; overflow:hidden;">
+                <ol>
+			<!--{loop $indexcache['piclist'] $picname}-->
+				<li class="list01">
+					<a href="{url pic-view-{$picname['id']}-{$picname['did']}}"><img idth="122" height="77" class="img01" title="{$picname['description']}"  src="{$picname['attachment']}"/></a>
+				</li>
+			<!--{/loop}-->
+           		</ol>
+            	</marquee>
+		</div>
+	</div>
+</div>
+<div class="r w-245 spa10">
+	<div class="col03 spa5">
+    	<div class="up"></div>
+        <div id="login-static" class="content">
+            <!--{if $user['groupid']=='1'}-->
+            	<h3>用户登录</h3>
+                <!--{if $passport}-->
+                <span class="red error">已开启通行证,请直接点击<a href="index.php?user-login">登录</a></span>
+                <!--{else}-->
+                <span class="error" id="logintip"></span>
+                <form action="" onsubmit="return docheck();">
+                <table id="nologin" style="display:block">
+                  <tr>
+                    <td>用户名：</td>
+                    <td><input name="username" id="username" tabindex="3" type="text" class="inp_txt" onblur="check_username()" maxlength="32" /></td>
+                    <td rowspan="2"><input name="submit" type="submit" value="" class="btn_login" tabindex="6" /></td>
+                  </tr>
+                  <tr>
+                    <td>密&nbsp;&nbsp;码：</td>
+                    <td><input name="password" id="password"  tabindex="4" type="password" class="inp_txt" onblur="check_passwd()" maxlength="32" /></td>
+                  </tr>
+                  <!--{if $checkcode != "3"}-->
+                  <tr>
+                    <td>验证码：</td>
+                    <td colspan="2" class="yzm"><input name="code" id="code"  tabindex="5" type="text" onblur="check_code()" maxlength="4" /><label class="m-lr8"><img id="verifycode" src="{url user-code}" onclick="updateverifycode();" /></label><a href="javascript:updateverifycode();">换一个</a></td>
+                  </tr>
+                  <!--{/if}-->
+                </table>
+                <h6 class="a-c"><a class="red bold m-lr8" href="javascript:;" onclick="location.href='{url user-register}';">我要注册</a><a class="red bold m-lr8" href="index.php?doc-innerlink-{eval echo urlencode('{lang help}')}">帮助指南</a></h6>
+          </form>
+                <!--{/if}-->
+            <!--{else}-->
+            <h3>用户信息</h3>
+            <dl id="islogin" class="userinfo">
+            	<dt>
+                <a href="{url user-space-$user['uid']}"><img class="img02" alt="点击进入用户中心" src="<!--{if $user['image']}-->$user['image']<!--{else}-->style/default/user_l.jpg<!--{/if}-->" width="36"/></a>
+                <p class="title"><a href="{url user-space-$user['uid']}" class="blue">{$user['username']}</a><img title="您现在拥有{$user['credit1']}金币 " src="style/default/jb.gif" class="sign"/></p>
+                <p><strong>头衔：</strong>{$user['grouptitle']}</p>
+                </dt>
+
+                <dd><span><strong>经验：</strong>{$user['credit2']}</span><strong>人气指数：</strong>{$user['views']}</dd>		
+                <dd><span><strong>创建词条：</strong>{$user['creates']}</span><span><strong>编辑词条：</strong>{$user['edits']}</span></dd>
+                <dd class="a-c"><a href="{url user-space-{$user['uid']}}" class="red bold m-lr8">查看我的百科</a><a href="index.php?user-logout{$referer}" class="red bold m-lr8">退出登录</a></dd>
+            </dl>
+            <!--{/if}-->
+		</div>
+        <div class="content novice">
+            <a class="link01" href="index.php?doc-innerlink-{eval echo urlencode('初来乍到，了解一下')}" >初来乍到，了解一下</a>
+            <a class="link02" href="index.php?doc-innerlink-{eval echo urlencode('我是新手，怎样编写词条')}" >我是新手，怎样编写词条</a>
+            <a class="link03" href="index.php?doc-innerlink-{eval echo urlencode('我要成为词条达人')}" >我要成为词条达人</a>
+        </div>
+        <div class="bom"></div>
+    </div>
+	
+	<div id="notice" class="spa5">
+		<h2><a class="l" href="#zngg" target="_self">{lang webnotice}</a><a class="r on" href="#zxdt" target="_self">{lang news}</a></h2>
+		<div id="zxdt">
+			<!--{loop $indexnewscache['newslist'] $newslist}-->
+				<p>{$newslist}</p>
+			<!--{/loop}-->
+		</div>
+		<div id="zngg" class='none'><p>$setting[site_notice]</p></div>
+	</div>
+    
+	<div class="col03 spa5">
+    	<div class="up"></div>
+        <div id="dwsct" class="content i6-ff">
+            <h3>{lang cooperatedoc}</h3><a href="{url doc-cooperate}" class="more">{lang more}</a>
+            <ul>
+                <!--{loop $indexcache['cooperatedocs'] $coopdoc}-->
+                    <li class="list02"><a href="index.php?doc-innerlink-{eval echo urlencode({$coopdoc['title']})}"  title="{$coopdoc['title']}">{$coopdoc['shorttitle']}</a></li>
+                <!--{/loop}-->
+            </ul>
+        </div>
+        <div class="bom"></div>
+    </div>
+</div>
+
+<div id="rmbq" class="c-b col01 i6-ff">
+	<h2>{lang hotTag}<span>hot tags</span></h2>
+	<ul class="col-ul list-s">
+	<!--{loop $indexcache['hottag']	 $tag}-->
+		<!--{if $tag['tagcolor']=='red'}-->
+			<li><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" class="red">{$tag['tagname']}</a></li>
+		<!--{else}-->
+			<li><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" >{$tag['tagname']}</a></li>
+	    <!--{/if}-->
+    <!--{/loop}-->
+	</ul>
+</div>
+
+<!--{if count($indexcache['friendlink'])!=0}-->
+<div  id="yqlj" class="c-b col01 i6-ff">
+	<ul class="col-ul list-s">
+	<li><span class="bold">{lang friendLink}:</span></li>
+	<!--{loop $indexcache['friendlink'] $link}-->
+	<li><a href="{$link['url']}"  title="{$link['description']}" target="_blank">{$link['name']}</a></li>
+	<!--{/loop}-->
+	</ul>
+</div>
+<!--{/if}-->
+{template footer}

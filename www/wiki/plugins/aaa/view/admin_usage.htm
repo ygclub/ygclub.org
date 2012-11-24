@@ -1,0 +1,36 @@
+{template admin_header}
+<p class="map">插件/模板：插件</p>
+<p class="sec_nav">管理：
+    <a href="index.php?plugin-aaa-admin_aaa" ><span>插件管理</span></a>
+    <a href="index.php?plugin-aaa-admin_aaa-usage" class="on"><span>使用说明</span></a>
+</p>
+
+<br/>
+<style type="text/css">
+fieldset { border: 1px solid #CCC; padding: 12px; margin-bottom: 10px; }
+fieldset span { color: #333; }
+</style>
+
+<table align="center" cellpadding="10" cellspacing="0" width="98%" class="list"> 
+  <tr> 
+	<td valign="top">
+	使用本插件前先对模板做如下修改（修改文件后保存时一定要注意文件编码）：<br />
+    <br />
+	1.打开 HDwiki根目录/view/default/viewdoc.htm 查找：<br />
+	<div style="border: 1px solid #CCC; background: #FCFCFC">
+	&lt;/div&gt;<br /><br />
+&lt;div class="r w-230"&gt;
+</div>
+<br />
+在此段代码之前，加入如下代码：<br />
+<div style="border: 1px solid #CCC; background: #FCFCFC">
+	{$html}
+</div>	
+    <br />
+    <br />
+    2.按“钩子”页中的相关说明添加钩子代码。
+	</td> 
+  </tr> 
+</table> 
+
+{template admin_footer}

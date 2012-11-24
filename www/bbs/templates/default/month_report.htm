@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>月报</title>
+<style type="text/css">
+a{color:blue; text-decoration: none;}
+.t1 {font-size:16px;font-weight:bold;background-color:#eee}
+.t2 {font-size:14px;}
+</style>
+<body>
+  <form method="get">
+    <input type="text" name="starttime" value="$starttime_template">
+    <input type="text" name="endtime" value="$endtime_template">
+    <input type="submit" value="提交">
+  </form>
+  <br />
+  <span>
+共注册新人 $users_count 名，$users_link
+  </span>
+<br />
+<br />
+<table width="60%" border="0" cellpadding="1" cellspacing="1" bgcolor="#333" align='left'>
+  <!--{loop $fids $k $v}-->
+  <tr align='center' class='t1'>
+    <td colspan="2">$v[fid_name]</td>
+  </tr>
+		<!--{loop $v[fids] $b}-->
+  <tr align='left' class='t2'>
+    <td bgcolor="#FFFFFF">$b[subject_link]</td>
+    <td bgcolor="#FFFFFF">$b[author_link]</td>
+  </tr>
+		<!--{/loop}-->
+	<!--{/loop}-->
+</table>
+<br />
+<br />
+</body>
+</html>

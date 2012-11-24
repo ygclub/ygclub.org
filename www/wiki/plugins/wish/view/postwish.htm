@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>我来贴祝福，我来贴愿望 - {$setting['site_name']}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={WIKI_CHARSET}" />
+<meta name="author" content="lovewiki" />
+<meta name="description" content="爱情墙,祝福墙,许愿墙,愿望墙,wish wall,jQuery wish wall " />
+<meta name="keywords" content="爱情墙,祝福墙,许愿墙,愿望墙,wish wall,jQuery wish wall " />
+<link rel="stylesheet" type="text/css" href="plugins/wish/images/html.css" />
+<link rel="stylesheet" type="text/css" href="plugins/wish/images/layout.css" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+function mypost(){
+	var	wish=$('#wish').val();
+	if(wish.length>100 || wish.length==0 ){
+		alert('祝福内容必须介于1～100字之间！');
+		return;
+	}
+	$.ajax({
+		url: "index.php?plugin-wish-wish-post",
+		data: {receiver:$('#receiver').val(),author:$('#author').val(),wish:wish},
+		cache: false,
+		dataType: "xml",
+		type:"post",
+		beforeSend:function(){
+			$('#success').html('');
+			$('#waiting').html('<img src="plugins/wish/images/loading.gif" alt="Posting..." /> 正在发布，请稍等...');
+		},
+		success: function(xml){
+			var	message=xml.lastChild.firstChild.nodeValue;
+			if(message=='1'){
+				$('#waiting').html('');
+				$('#success').html('<img src="plugins/wish/images/ok.gif" alt="OK" /> OK,贴好了，快去look一下吧');
+			}else{
+				alert('发布失败！');
+			}
+		}
+	});
+}
+</script>
+</head>
+<body>
+<form action onsubmit="return false;" style="margin-top: 80px">
+	<div class="pad_box">
+		<span>我的祝福 （<a href="{$setting['site_url']}">{$setting['site_name']}</a>）</span>
+		<table border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td>贴给？</td>
+				<td><input type="text" maxlength="30" size="40" id="receiver" name="receiver" value="自己" onfocus="{this.value='';}" /></td>
+			</tr>
+			<tr>
+				<td>你是？</td>
+				<td><input type="text" maxlength="20" size="40" id="author" name="author" value="匿名" onfocus="{this.value='';}" /></td>
+			</tr>
+			<tr>
+				<td>Wish：<br />(&lt;=100字)</td>
+				<td><textarea id="wish" name="wish" cols="50" rows="4"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: center">
+				<input type="button" class="button" value="我贴!" onclick="mypost();" />
+				<input type="reset"  class="button" value="重来？" />
+				<input type="button" class="button" value="去看看" onclick="{location.href = '{$setting['site_url']}/{$setting['seo_prefix']}plugin-wish';}" />
+				<input type="button" class="button" value="回首页" onclick="{location.href = '{$setting['site_url']}';}" /></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: center">
+					<span id="waiting"></span>
+					<span id="success"></span>
+				</td>
+			</tr>
+		</table>
+	</div>
+</form>
+</body>
+</html>

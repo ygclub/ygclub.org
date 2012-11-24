@@ -1,0 +1,61 @@
+{template admin_header}
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	    <td><br>
+		<div id="navcontainer">
+		  <ul id="navlist">
+			<li><a href="index.php?admin_plugin-manage-{$pluginid}"  id="current">{lang commonManage}</a></li>
+			<li><a href="index.php?admin_plugin-setvar-{$pluginid}">{lang commonSet}</a></li>
+			<li><a href="index.php?admin_plugin-hook-{$pluginid}">{lang commonHook}</a></li>
+		  </ul>
+		</div>
+	    </td>
+	</tr>
+</table>
+<br/>
+<style type="text/css">
+fieldset { border: 1px solid #CCC; padding: 12px; margin-bottom: 10px; }
+fieldset span { color: #333; }
+</style>
+<table align="center" cellpadding="10" cellspacing="0" width="98%" class="list"> 
+  <tr> 
+	<td valign="top">
+	<form action="index.php?plugin-sitemap-admin_sitemap-createdoc" method="POST">
+	<fieldset>
+	<legend>重建 Sitemap:</legend>
+	<span>当您第一次使用此插件或需要彻底更新Sitemap时（例如修改了HDwiki的URL格式时），请使用此功能。</span>
+	<input type="submit" value="重建 Sitemap" />
+	</fieldset>
+	</form>
+	
+	<form action="index.php?plugin-sitemap-admin_sitemap-updatedoc" method="POST">
+	<fieldset>
+	<legend>更新 Sitemap:</legend>
+	<span>把上次重建或更新操作之后新增的词条添加到Sitemap中。上次更新：{$sitemap_update}</span>
+	<input type="submit" value="更新 Sitemap" />
+	</fieldset>
+	</form>
+	
+	<form action="index.php?plugin-sitemap-admin_sitemap-submit" method="POST">
+	<fieldset style="border: 1px solid #CCC; padding: 12px; margin-bottom: 10px">
+	<legend>提交到搜索引擎:</legend>
+	<span>将Sitemap提交或通知到搜索引擎（Google、Ask.com）。</span>
+	<input type="submit" value="提交到搜索引擎" />
+	</fieldset>
+	</form>
+
+	<form action="index.php?plugin-sitemap-admin_sitemap-baiduxml" method="POST">
+	<fieldset style="border: 1px solid #CCC; padding: 12px; margin-bottom: 10px">
+	<legend>更新百度 Sitemap:</legend>
+	<span>生成或更新百度互联网新闻开放协议标准XML（百度Sitemap）。上次更新：{$baidu_update}</span>
+	<input type="submit" value="更新" />
+	</fieldset>
+	</form>
+
+	
+	</td> 
+  </tr> 
+</table> 
+
+{template admin_footer}
