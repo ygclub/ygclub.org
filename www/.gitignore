@@ -12,7 +12,7 @@ bbs/config.inc.php
 #bbs/forumdata/templates/
 #bbs/forumdata/threadcaches/
 
-#uc/data/
+uc/data/config.inc.php
 
 wiki/api/ucconfig.inc.php
 wiki/config.php
