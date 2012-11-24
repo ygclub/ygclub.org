@@ -827,7 +827,7 @@ elseif ($subaction == "all")
                 {
                     $browsedatafield = trim($browsedatafield);
                     if($browsedatafield != '')
-                        $browsedatafield = "<a href='http://www.ygclub.org/bbs/admincp.php?frames=yes&action=members&operation=group&username=" . $browsedatafield . "' target='_blank'>$browsedatafield</a>";
+                        $browsedatafield = "<a href='/bbs/admincp.php?frames=yes&action=members&operation=group&username=" . $browsedatafield . "' target='_blank'>$browsedatafield</a>";
                 }
                 $browseoutput .= "<td align='center'>$browsedatafield</td>\n";
             }
