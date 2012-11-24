@@ -36,7 +36,7 @@
 		<div id="header">
         	<div id="statu_bar">
 
-                	<a href="http://www.ygclub.org/bbs" title="阳光论坛">阳光论坛</a> | <a href="http://www.ygclub.org/wiki" title="阳光百科">阳光百科</a>
+                	<a href="/bbs" title="阳光论坛">阳光论坛</a> | <a href="/wiki" title="阳光百科">阳光百科</a>
 
             </div>
             
@@ -48,7 +48,7 @@
                 <ul id="menu_l">
                 	<li id="home" <?php if (is_home())  echo " class=\"current_page_item\""; ?>><a href="<?php bloginfo('url'); ?>">首页</a></li>
         					<?php wp_list_pages('sort_column=menu_order&title_li='); ?>
-                	<li><a href="http://www.ygclub.org/wiki/index.php?doc-view-59.html" title="联系我们">联系我们</a></li>
+                	<li><a href="/wiki/index.php?doc-view-59.html" title="联系我们">联系我们</a></li>
                 </ul>
                 
                 <div id="nav_r"></div>
