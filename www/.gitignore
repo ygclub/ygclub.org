@@ -1,22 +1,5 @@
 # For ygclub #
 answer/config.php
-#answer/upload/surveys/*
-
-bbs/config.inc.php
-#bbs/forumdata/cache/*
-#bbs/forumdata/feedcaches/*
-#bbs/forumdata/imagecaches/*
-#bbs/forumdata/logs/*
-#bbs/forumdata/party/*
-#bbs/forumdata/plugins/*
-#bbs/forumdata/templates/*
-#bbs/forumdata/threadcaches/*
-
-#uc/data/*
-
-wiki/api/ucconfig.inc.php
-wiki/config.php
-#wiki/data/*
 
 bbs/config.inc.php
 bbs/forumdata/cache/
