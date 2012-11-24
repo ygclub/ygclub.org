@@ -1,6 +1,7 @@
 # For ygclub #
 answer/config.php
 bbs/config.inc.php
+bbs/forumdata/*.lock
 uc/data/config.inc.php
 wiki/api/ucconfig.inc.php
 wiki/config.php
