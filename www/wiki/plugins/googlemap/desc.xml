@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+<author><![CDATA[hudong.com]]></author>
+<authorurl><![CDATA[http://kaiyuan.hudong.com]]></authorurl>
+<name><![CDATA[Google Map]]></name>
+<tag><![CDATA[Google Map]]></tag>
+<desc><![CDATA[让用户在地图上添加词条相关标注的插件（使用Google Maps API V3）]]></desc>
+<weburl><![CDATA[http://]]></weburl>
+<version><![CDATA[2.1]]></version>
+<hdversion><![CDATA[5.0 beta]]></hdversion>
+<copyright><![CDATA[hudong.com]]></copyright>
+<charset><![CDATA[UTF-8]]></charset>
+</theme>

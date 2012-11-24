@@ -1,0 +1,38 @@
+{template admin_header}
+<p class="map">插件/模板：插件</p>
+<p class="sec_nav">管理：
+    <a href="index.php?admin_plugin-manage-{$pluginid}" class="on"><span>插件管理</span></a>
+    <a href="index.php?admin_plugin-setvar-{$pluginid}" ><span>插件设置</span></a>
+    <a href="index.php?admin_plugin-hook-{$pluginid}"> <span>插件钩子</span> </a>
+</p>
+<style type="text/css">
+#wraper { width:600px; text-align:left; border: 1px solid #999;" }
+#wraper h2, #wraper p { margin-bottom: 25px; }
+h3 { margin-bottom:10px; }
+div p { line-height:18px; margin:10px; }
+div h4 { margin-bottom:15px; margin-top:15px; }
+div li { line-height:16px; }
+</style>
+
+<h3 class="col-h3">欢迎使用Mapabc 2.0地图插件！ </h3> 
+<div style="width:700px;text-align:left;">
+	<p>
+		本插件可以根据用户对词条的标注显示相应的地图，如果用户没有标注相应信息，则地图默认隐藏。 <br />
+		<b style="color:red;">本服务需要Mapabc 地图API密钥，如果没有，请<a href="http://code.mapabc.com/key.shtml" target="_blank">点击这里</a>申请。</b>
+	</p>
+	
+	<h4>安装说明：</h4>
+		<ol>
+			<li>在设置中添加Mapabc 地图API密钥。</li>
+			<li>在hdwiki根目录下control下的doc.php中，查找 “&#36;this-&gt;view-&gt;assign('neighbor',&#36;neighbor);”，将<a href="index.php?admin_plugin-hook-{$pluginid}">钩子</a>放在这行代码上面。同样，按照页面中的指示添加其他的钩子.</li>
+			<li>在hdwiki根目录下找到 /view/default/viewdoc.htm，在其中寻找‘&lt;div class=&quot;block_right&quot;&gt;’（不包括引号），在其上添加：‘{&#36;mapabcviewstr}’和‘{&#36;mapabcsetpointstr}’（不包含引号）。</li>
+			<li>在hdwiki根目录下找到 /view/default/editor.htm, 在其中添加对于jquery的引用标签</li>
+			<li>在hdwiki根目录下找到 /view/default/editor.html, 在其中寻找 ‘style/default/logo.gif’，在该行下添加 ‘{&#36;mapabcsetpointstr}’</li>
+			<li>在词条显示页面，如果能能解析词条名为地址，则地图信息将显示在词条页面右侧，‘词条信息’与‘相关词条’之间。</li>
+		</ol>
+	
+	<h4>对地图的二次开发：</h4>
+		<p><strong>注意</strong>此项不建议新手手动修改，除非你真的知道你在做什么，否则会引起无法预知的错误。 </p>
+		<p>插件中地图显示与相关操作的代码位于hdwiki根目录下 /plugins/mapabc/model/mapabc.class.php 中 get_map_view_str() 这个函数中的JS, 具体参数的应用和修改方法<a href="http://code.mapabc.com/index.shtml" target="_blank">参见这里</a>！ </p>
+</div>
+{template admin_footer}

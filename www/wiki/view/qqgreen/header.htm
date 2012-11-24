@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="html">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{$navtitle} {$setting[site_name]} {$setting[seo_title]}</title>
+{$setting[seo_headers]}
+<meta name="keywords" content="{$setting[seo_keywords]}" />
+<meta name="description" content="{$setting[seo_description]}" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta name="generator" content="ChnMTC" />
+<meta name="author" content="ChnMTC" />
+<meta name="copyright" content="2009 ChnMTC" />
+<link href="style/{$style}/hdwiki.css" rel="stylesheet" type="text/css" media="all"/>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="lang/{$setting[lang_name]}/front.js"></script>
+<script type="text/javascript" src="js/jquery.dialog.js"></script>
+<script type="text/javascript">
+var g_isLogin, g_isUcenter=false, g_forward = '', g_regulars = '', g_uname_minlength, g_uname_maxlength;
+<!--{if $user['groupid']=='1'}-->
+g_regulars = "{$header_regulars}";
+g_isLogin = false;
+<!--{else}-->
+g_isLogin = true;
+<!--{/if}-->
+
+<!--{if $isUcenter}-->
+g_isUcenter = true;
+<!--{/if}-->
+
+g_seo_prefix = "{$setting[seo_prefix]}";
+g_seo_suffix = "{$setting['seo_suffix']}";
+
+g_uname_minlength = "{$setting[name_min_length]}"||3;
+g_uname_maxlength = "{$setting[name_max_length]}"||15;
+</script>
+<script type="text/javascript" src="js/login.js"></script>
+</head>
+<body>
+<div>
+<ul id="logo"><a href="{$setting[site_url]}"><img  src="style/default/logo.gif" alt="LOGO" border="0" align="absmiddle"/></a></ul>
+<ul id="login">
+<!--{if $user['groupid']=='1'}-->
+<li><a onclick="return doLogin()" href="{$setting[seo_prefix]}user-login{$setting[seo_suffix]}" >{lang login}</a></li>
+<li><a href="{$setting[seo_prefix]}user-register{$setting[seo_suffix]}" >{lang register}</a></li>
+<!--{else}-->
+<li class="bor_no pad10">{lang headerTip}<a href="{$setting[seo_prefix]}user-space-$user['uid']{$setting[seo_suffix]}">{$user['username']}</a></li>
+<li><a href="{$setting[seo_prefix]}pms{$setting[seo_suffix]}" id="header-pms">{lang mypms}&nbsp;(<span {if $newpms[0]} style="color:#FF0000" {/if}>$newpms[0]</span>/$newpms[1])</a></li>
+<li><a  href="{$setting[seo_prefix]}user-profile{$setting[seo_suffix]}">{lang selfManage}</a></li>
+<!--{if $adminlogin }--><li><a href="index.php?admin_main">{lang sysConfig}</a></li><!--{/if}-->
+<li><a href="{$setting[seo_prefix]}user-logout{$referer}" >{lang logout}</a></li>
+<!--{/if}-->
+<li class="bor_no"><a href="{$setting[seo_prefix]}doc-innerlink-{eval echo urlencode('{lang help}')}">{lang help}</a></li>
+</ul>
+<form name="searchform" method="post" action="{$setting[seo_prefix]}search-default{$setting[seo_suffix]}">
+<ul id="search">
+	<li><input name="searchtext" type="text" class="btn_txt"  maxlength="80" size="42"  value="<!--{if isset($searchtext)}-->{$searchtext}<!--{/if}-->"/></li>
+	<li><input name="default" type="submit" value="{lang goin}" tabindex="1" class="btn_inp" /></li>
+	<li><input name="full"    type="submit" value="{lang search}" tabindex="2" class="btn_inp"  onclick="document.searchform.action='{$setting[seo_prefix]}search-fulltext{$setting[seo_suffix]}';"/></li>
+	<li><a href="{$setting[seo_prefix]}search-fulltext{$setting[seo_suffix]}" class="mar-t8 block">{lang searchAdvance}</a></li>
+</ul>
+</form>
+</div>
+<div class="tj_nbsp"></div>
+<div id="tj_bjsy1">
+<div id="nav" class="link_white">
+	<ul>
+		<li><a href="{$setting[site_url]}" class="bold">{lang index}</a></li>		
+		<li><a href="{$setting[seo_prefix]}category{$setting[seo_suffix]}" >{lang wikiCategory}</a></li>
+		<li><a href="{$setting[seo_prefix]}list{$setting[seo_suffix]}" >{lang list}</a></li>
+		<li><a href="{$setting[seo_prefix]}doc-random{$setting[seo_suffix]}" >{lang randomDoc}</a></li>
+                  <li><a href="http://www.ygclub.org">阳光论坛</a></li>
+		<!--{if $user['groupid']!='1'}--><li><a href="{$setting[seo_prefix]}user-space-$user['uid']{$setting[seo_suffix]}">{lang myspace}</a></li><!--{/if}-->
+		<!--{loop $pluginlist $plugin}-->
+			<!--{if $plugin[type]}-->
+				<li><a href="{$setting[seo_prefix]}plugin-{$plugin[identifier]}{$setting[seo_suffix]}">{$plugin[name]}</a></li>
+			<!--{/if}-->
+		<!--{/loop}-->
+<!--{if count($channellist)!=0}-->
+<!--{loop $channellist $channel}-->
+<li class="l bor_no"><a href="{$channel['url']}" target="_blank">{$channel['name']}</a></li>
+<!--{/loop}-->
+<!--{/if}-->
+	</ul>
+</div>
+</div>
+<div id="tj_bjsy001"><ul>
+<li class="tj_bjsyab"><a onclick="return doLogin(this)" href="{$setting[seo_prefix]}doc-sandbox{$setting[seo_suffix]}">{lang sandbox}</a></li>
+<li class="tj_bjsyac"><a onclick="return doLogin(this)" href="{$setting[seo_prefix]}doc-create{$setting[seo_suffix]}">{lang createDoc}</a></li>
+</ul></div>
+<div id="tj_ulnav"></div>
+<!--ad start -->
+
+<!--{if isset($advlist[0]) && isset($setting[advmode]) && '1'==$setting[advmode]}-->
+<div class="net_adv pad-t8" id="advlist_0">
+{$advlist[0][code]}
+</div>
+<!--{elseif isset($advlist[0]) && (!isset($setting[advmode]) || !$setting[advmode])}-->
+<div class="net_adv pad-t8" id="advlist_0">
+</div>
+<!--{/if}-->
+
+<!--ad end -->

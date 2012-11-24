@@ -1,0 +1,17 @@
+<div class="survey-completed">{COMPLETED}</div>
+<div>{URL}</div>
+
+</div>
+
+<div id="footer_link">
+  <div id="ygclub_link">
+  <a href="http://www.ygclub.org" target="_blank">阳光志愿者首页</a> 
+   | <a href="http://www.ygclub.org/bbs" target="_blank">阳光论坛</a>
+   | <a href="http://www.ygclub.org/wiki" target="_blank">阳光百科</a>
+  </div>
+  <div id="powered_by">
+         <a href="http://www.limesurvey.org" target="_blank"><img src="{TEMPLATEURL}limesurvey_logo.png" border="0" title="LimeSurvey Survey Software" /></a><br/>
+         <a href="http://www.limesurvey.org" target="_blank">The Online Survey Tool</a> - Free &amp; Open Source
+  </div>
+</div>
+

@@ -1,0 +1,94 @@
+{template header}
+<div class="hd_map"> 
+	<a href="{$setting[site_url]}">{$setting[site_name]}</a> &gt;&gt;百科问答
+</div> 
+
+<div class="r w-710 o-v p-b10 columns bang_main">
+
+	<h2 class="col-h2" style="line-height:30px; height:30px; margin:2px;padding:0 20px;background:#eaf6fd;">{$ask['question']} </h2>
+	<div style="padding: 10px 20px; color: #666;">
+	<span>问题状态：{$ask['statusstr']}&nbsp;
+	相关词条：<a href="{$setting['seo_prefix']}doc-view-{$ask['did']}{$setting['seo_suffix']}" >{$ask['title']}</a>&nbsp;
+	提问时间：$ask['time']&nbsp;
+	提问者：<a href="{$setting['seo_prefix']}user-space-{$ask['authorid']}{$setting['seo_suffix']}" >$ask['author']</a>&nbsp;
+	悬赏分：$ask['reward']&nbsp;
+	<!--{if !empty($user['uid']) && $user['uid'] == $ask['authorid'] && $ask['status'] == '0'}--><a href="index.php?plugin-aaa-aaa-close-{$ask['id']}" onclick="return confirm('确定关闭此问题？')">无满意答案，关闭问题</a><!--{/if}-->
+	</span><br />
+	<div style="color: #000; font-size:14px; line-height: 16px;"><!--{if $ask['description']}--> $ask['description'] <!--{else}--> <span style="color: #666;">此提问无问题描述</span> <!--{/if}--></div>
+	</div>
+	<br />
+	<!--{loop $answers  $ans}-->
+		<!--{if $ans['right'] == 1 }-->
+		<h2 class="col-h2" style="line-height:30px;height:30px; margin:2px;padding:0 20px;background:#eaf6fd;">最佳答案</h2>
+		<div style="padding: 10px 20px; color: #666; ">
+		<span style="">回答者：<a href="{$setting['seo_prefix']}user-space-{$ans['authorid']}{$setting['seo_suffix']}" >{$ans['author']}</a>&nbsp;&nbsp;
+		回答时间：{$ans['time']}
+		</span> <br />
+		<div style="padding: 10px 10px; width: 650px; margin: 0 auto; color:#000; font-size:14px; line-height: 16px; ">
+		{$ans['answer']} 
+		</div>
+		</div>
+		<br />
+		<!--{/if}-->
+	<!--{/loop}-->
+
+	<!--{if !empty($answers) }-->
+	<h2 class="col-h2" style="line-height:30px;height:30px; margin:2px;padding:0 20px;background:#eaf6fd;">其他答案</h2>
+	<!--{loop $answers $ans}-->
+		<!--{if $ans['right'] == 0 }-->
+		<div style="padding: 10px 20px; color: #666; ">
+		<span style="">回答者：<a href="{$setting['seo_prefix']}user-space-{$ans['authorid']}{$setting['seo_suffix']}" >{$ans['author']}</a>&nbsp;&nbsp;
+		回答时间：{$ans['time']}
+		<!--{if !empty($user['uid']) && $user['uid'] == $ask['authorid']}--><a href="index.php?plugin-aaa-aaa-choose-{$ans['id']}">选为正确答案</a><!--{/if}-->
+		</span> <br />
+		<div style="padding: 10px 10px; width: 650px; margin: 0 auto; color:#000; font-size:14px; line-height: 16px; border-bottom: 1px dashed #999;">
+		{$ans['answer']} 
+		</div>
+		
+		</div>
+		<!--{/if}-->
+	<!--{/loop}-->
+	<!--{/if}-->
+	
+<!--{if $ask['status'] == $_ENV['aaa']->opening }-->	
+<form action="index.php?plugin-aaa-aaa-answer" method="POST">
+	<h2 class="col-h2" style="line-height:30px;height:30px; margin:2px;padding:0 20px;background:#eaf6fd;">我来回答</h2>
+	<div style="padding: 10px 20px; color: #666;">
+	<textarea name="answer" rows="4" cols="60"></textarea> <br />
+	<input type="hidden" name="id" value="{$ask['id']}" />
+	<input type="submit" value=" 提交 " />
+	</div>
+	<br />
+</form>	
+<!--{/if}-->
+	<h2 class="col-h2" style="line-height:30px;height:30px; margin:2px;padding:0 20px;background:#eaf6fd;">与“{$ask['title']}”相关的问题</h2>
+	<div style="padding: 10px 20px; color: #666;">
+		<ul>
+		<!--{loop $relative_asks  $question}-->
+			<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-view-{$question['id']}{$setting['seo_suffix']}" >{$question['question']}</a></li>
+		<!--{/loop}-->
+		</ul>
+	</div>
+	
+
+	
+	<br />
+</div>
+
+
+<div class="l w-230">
+	<div class="p-b10 m-t10 sidebar">
+	<ul>
+	<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-list-all{$setting['seo_suffix']}"  <!--{if $type=='all'}-->class="on"<!--{/if}-->>全部提问</a></li>
+	<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-list-0{$setting['seo_suffix']}"  <!--{if $type=='0'}-->class="on"<!--{/if}-->>未解决提问</a></li>
+	<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-list-1{$setting['seo_suffix']}"  <!--{if $type=='1'}-->class="on"<!--{/if}-->>已解决提问</a></li>
+	<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-list-2{$setting['seo_suffix']}" <!--{if $type=='2'}-->class="on"<!--{/if}-->>已关闭提问</a></li>
+	<li><a href="{$setting['seo_prefix']}plugin-aaa-aaa-create{$setting['seo_suffix']}"  <!--{if $type=='ask'}-->class="on"<!--{/if}-->>我要提问</a></li>
+	</ul>
+	</div>
+
+</div>
+
+
+
+{template footer}

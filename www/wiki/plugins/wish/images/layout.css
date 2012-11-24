@@ -1,0 +1,171 @@
+#top_pad {
+	BORDER-RIGHT: #888888 1px solid; BORDER-TOP: #888888 1px solid; Z-INDEX: 9999; BACKGROUND: url(header.jpg) green repeat-x; LEFT: 5px; MARGIN: 0px auto; VERTICAL-ALIGN: middle; BORDER-LEFT: #888888 1px solid; WIDTH: 99%; LINE-HEIGHT: 25px; BORDER-BOTTOM: #888888 1px solid; POSITION: absolute; HEIGHT: 30px
+}
+#top_pad INPUT {
+	FONT-SIZE: 8pt
+}
+.wall {
+	FONT-SIZE: 9pt; OVERFLOW: hidden; WIDTH: 220px; CURSOR: move; COLOR: #000; LINE-HEIGHT: 150%; FONT-FAMILY: Arial, Tahoma, Verdana; POSITION: absolute; TEXT-OVERFLOW: ellipsis; TEXT-DECORATION: none; WORD-WRAP: break-word
+}
+.wall DIV {
+	PADDING-RIGHT: 20px; PADDING-LEFT: 20px
+}
+.wall DIV SPAN {
+	DISPLAY: block
+}
+.wall DIV IMG {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; MARGIN-BOTTOM: -5px; BORDER-RIGHT-WIDTH: 0px
+}
+.wall DIV A {
+	COLOR: #000; TEXT-DECORATION: none
+}
+.top-1 {
+	PADDING-TOP: 25px
+}
+.top-2 {
+	PADDING-TOP: 25px
+}
+.top-3 {
+	PADDING-TOP: 25px
+}
+.top-4 {
+	PADDING-TOP: 25px
+}
+.top-5 {
+	PADDING-TOP: 25px
+}
+.top-6 {
+	PADDING-TOP: 25px
+}
+.top-7 {
+	PADDING-TOP: 25px
+}
+.top-8 {
+	PADDING-TOP: 25px
+}
+.mid-1 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-2 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-3 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-4 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-5 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-6 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-7 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.mid-8 {
+	PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 10px; HEIGHT: 100px; TEXT-OVERFLOW: ellipsis
+}
+.bot-1 {
+	HEIGHT: 65px
+}
+.bot-2 {
+	HEIGHT: 65px
+}
+.bot-3 {
+	HEIGHT: 65px
+}
+.bot-4 {
+	HEIGHT: 65px
+}
+.bot-5 {
+	HEIGHT: 65px
+}
+.bot-6 {
+	HEIGHT: 65px
+}
+.bot-7 {
+	HEIGHT: 65px
+}
+.bot-8 {
+	HEIGHT: 65px
+}
+.top-1 {
+	BACKGROUND: url(C0FFE51.gif)
+}
+.top-2 {
+	BACKGROUND: url(C9FFC71.gif)
+}
+.top-3 {
+	BACKGROUND: url(CBF3FF1.gif)
+}
+.top-4 {
+	BACKGROUND: url(EDFEB71.gif)
+}
+.top-5 {
+	BACKGROUND: url(FFE0FB1.gif)
+}
+.top-6 {
+	BACKGROUND: url(FFE7E81.gif)
+}
+.top-7 {
+	BACKGROUND: url(FFEDCC1.gif)
+}
+.top-8 {
+	BACKGROUND: url(FFFFFF1.gif)
+}
+.mid-1 {
+	BACKGROUND: url(C0FFE52.gif)
+}
+.mid-2 {
+	BACKGROUND: url(C9FFC72.gif)
+}
+.mid-3 {
+	BACKGROUND: url(CBF3FF2.gif)
+}
+.mid-4 {
+	BACKGROUND: url(EDFEB72.gif)
+}
+.mid-5 {
+	BACKGROUND: url(FFE0FB2.gif)
+}
+.mid-6 {
+	BACKGROUND: url(FFE7E82.gif)
+}
+.mid-7 {
+	BACKGROUND: url(FFEDCC2.gif)
+}
+.mid-8 {
+	BACKGROUND: url(FFFFFF2.gif)
+}
+.bot-1 {
+	BACKGROUND: url(C0FFE53.gif)
+}
+.bot-2 {
+	BACKGROUND: url(C9FFC73.gif)
+}
+.bot-3 {
+	BACKGROUND: url(CBF3FF3.gif)
+}
+.bot-4 {
+	BACKGROUND: url(EDFEB73.gif)
+}
+.bot-5 {
+	BACKGROUND: url(FFE0FB3.gif)
+}
+.bot-6 {
+	BACKGROUND: url(FFE7E83.gif)
+}
+.bot-7 {
+	BACKGROUND: url(FFEDCC3.gif)
+}
+.bot-8 {
+	BACKGROUND: url(FFFFFF3.gif)
+}
+.wall DIV SPAN.inline {
+	DISPLAY: inline; FLOAT: right
+}
+.wall DIV SPAN.x {
+	DISPLAY: inline; FLOAT: right; CURSOR: pointer; FONT-FAMILY: ËÎÌו
+}

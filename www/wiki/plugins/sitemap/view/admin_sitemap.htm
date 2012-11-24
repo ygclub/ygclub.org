@@ -1,0 +1,45 @@
+{template admin_header}
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	    <td><br>
+		<div id="navcontainer">
+		  <ul id="navlist">
+			<li><a href="index.php?admin_plugin-manage-{$pluginid}"  id="current">{lang commonManage}</a></li>
+			<li><a href="index.php?admin_plugin-setvar-{$pluginid}">{lang commonSet}</a></li>
+			<li><a href="index.php?admin_plugin-hook-{$pluginid}">{lang commonHook}</a></li>
+		  </ul>
+		</div>
+	    </td>
+	</tr>
+</table>
+<br />
+<table align="center" cellpadding="3" cellspacing="0" width="98%" class="list">
+<tbody>
+
+  <tr class="list_title">
+    <td valign="top" colspan="2"><strong>执行操作</strong></td>
+   </tr>
+<form name="refreshform" id="refreshform" action="index.php?plugin-sitemap-admin_sitemap-refresh"  method="post">    
+  <tr class="b">
+  	<td align="right">刷新Sitemap：</td>
+    <td align="left">
+    	<label><input type="checkbox" name="gz" value="1" checked="checked" />同时生成或刷新GZIP格式的Sitemap </label> 
+    	<input type="submit" value="刷新">
+    </td>
+  </tr>
+</form>
+<form name="subform" id="subform" action="index.php?plugin-sitemap-admin_sitemap-submit"  method="post">  
+  <tr class="b">
+  	<td align="right">提交Sitemaps到Google：</td>
+    <td align="left">
+    	<label><input type="radio" name="gz" value="1" checked="checked" />提交GZIP格式的Sitemap</label>
+    	<label><input type="radio" name="gz" value="0" />提交普通的Sitemap</label>
+    	<input type="submit" value="提交" />
+    </td>
+  </tr>  
+</form>
+</tbody>
+</table>
+
+{template admin_footer}

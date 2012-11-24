@@ -1,0 +1,68 @@
+# For ygclub #
+answer/config.php
+
+bbs/config.inc.php
+bbs/forumdata/cache/
+bbs/forumdata/feedcaches/
+bbs/forumdata/imagecaches/
+bbs/forumdata/imagecaches/
+bbs/forumdata/logs/
+bbs/forumdata/party/
+bbs/forumdata/plugins/
+bbs/forumdata/templates/
+bbs/forumdata/threadcaches/
+
+uc/data/
+
+wiki/api/ucconfig.inc.php
+wiki/config.php
+wiki/data/
+wiki/plugins/ucenter/ucconfig.inc.php
+
+wp/wp-config.php
+
+phpmyadmin
+pma
+
+*~
+*.swp
+*.bak
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db

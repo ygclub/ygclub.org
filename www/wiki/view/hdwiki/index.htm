@@ -1,0 +1,86 @@
+{template header}
+<script type="text/javascript">
+ $(document).ready(function(){
+ 	$("input[name*='searchtext']") .focus();
+	$("#yzwkb ul.tab a").click(function(){
+		var id = $(this).attr('href');
+		$("#weekuser, #topuser").hide();
+		$("#yzwkb ul.tab a").removeClass();
+		$(this).addClass('on');
+		$(id).show();
+		return false;
+	});
+  });
+</script>
+<div class="warp"> 
+<div id="market"> 
+<h2 class="link_black"><a href="index.php?list-recentupdate" target="_blank" class="r h3">更多&gt;&gt;</a><span>最近更新</span></h2>
+<ul>{hdwiki:recentupdate rows=10}<li><a href="{url doc-view-[field:did/]}" >·[field:title/]</a>[field:lastedit/]</li>{/hdwiki}</ul> 
+</div> 
+<div id="case"> 
+	<h2 class="link_black"><a href="index.php?list-focus" target="_blank" class="r h3">更多&gt;&gt;</a><span>推荐词条</span></h2> 
+	<a href="{url doc-view-$indexcache['fistcommenddoc']['did']}" target="_blank" class="a-img"><img alt="{$indexcache['fistcommenddoc']['title']}" width="164px" height="141px" src="{$indexcache['fistcommenddoc']['image']}"/></a> 
+	<form method="post"> 
+     <h3 class="h2">词条名称：<a href="{url doc-view-$indexcache['fistcommenddoc']['did']}" target="_blank">{$indexcache['fistcommenddoc']['title']}</a></h3> 
+	<div id="station"> 
+		<dl><dd><p>{$indexcache['fistcommenddoc']['summary']}...</p></dd><dd class="bor_no bg_no"><a href="{url doc-view-$indexcache['fistcommenddoc']['did']}" target="_blank"><img src="style/hdwiki/enjoy.jpg"  class="r mar-t8"/></a></dd></dl> 
+	</div> 
+	</form> 
+	<ul> 
+       <!--{loop $indexcache['commenddocs'] $i $doc}-->
+             <!--{if $i == 0||$i<=10}-->
+		<li><a href="{url doc-view-$doc['did']}" target="_blank">{$doc['title']}</a></li> 
+             <!--{/if}-->
+       <!--{/loop}-->
+	</ul> 
+</div> 
+</div> 
+<div class="warp"> 
+<div id="hot-template"> 
+	<h2 class="link_black"><a href="index.php?list-focus" target="_blank" class="r h3">更多&gt;&gt;</a>百科图片</h2> 
+	<ul> 
+	 		<!--{loop $indexcache['commenddocs'] $i $doc}-->
+			<!--{if $i >6}-->
+	<li><a href="{url doc-view-$doc['did']}" target="_blank" class="a-img"><img alt="{$doc['title']}" src="{$doc['image']}"/></a></li> 
+			<!--{/if}-->
+ 		<!--{/loop}-->
+	</ul> 
+</div> 
+</div> 
+<div class="warp o-h"> 
+<div id="work-fir" class="l"> 
+	<h2>百科之星</h2> 
+	<ul>   
+    <!--{loop $indexcache['topuserlist'] $i $user}-->
+	   <li><a href="{url user-space-$user['uid']}" target="_blank"><!--{$user[username]}--> </a></li> 
+    <!--{/loop}-->
+	</ul> 
+</div> 
+<div id="link-fir" class="r"> 
+	<h2>热门标签</h2> 
+	<ul>     
+     <!--{loop $indexcache['hottag'] $tag}-->
+    	<!--{if $tag['tagcolor']=='orange'}-->
+        <li class="link_orange"><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" >{$tag['tagname']}</a></li>
+        <!--{elseif $tag['tagcolor']=='blue'}-->
+        <li class="link_blue"><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" >{$tag['tagname']}</a></li>
+        <!--{elseif $tag['tagcolor']=='green'}-->
+        <li class="link_green"><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" >{$tag['tagname']}</a></li>
+        <!--{else}-->
+        <li><a href="{url search-tag-{eval echo urlencode($tag['tagname'])}}" >{$tag['tagname']}</a></li>
+        <!--{/if}-->
+    <!--{/loop}-->
+	</ul> 
+</div> 
+</div> 
+
+<!--{if count($indexcache['friendlink'])!=0}-->
+<div id="links" class="link_gray">
+<strong class="gray">{lang friendLink}</strong>
+<!--{loop $indexcache['friendlink'] $link}-->
+<a href="{$link['url']}" target="_blank" title="{$link['description']}">{$link['name']}</a>
+<!--{/loop}-->
+</div>
+<!--{/if}-->
+
+{template footer}

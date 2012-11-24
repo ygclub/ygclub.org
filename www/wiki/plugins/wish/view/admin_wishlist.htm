@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>许愿/祝福墙 - {$setting['site_name']}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={WIKI_CHARSET}" />
+<meta name="author" content="lovewiki" />
+<meta name="description" content="爱情墙,祝福墙,许愿墙,愿望墙,wish wall,jQuery wish wall " />
+<meta name="keywords" content="爱情墙,祝福墙,许愿墙,愿望墙,wish wall,jQuery wish wall " />
+<meta name="robots" content="follow,all" />
+<link rel="stylesheet" type="text/css" href="plugins/wish/images/html.css" />
+<link rel="stylesheet" type="text/css" href="plugins/wish/images/layout.css" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/ui/ui.core.js"></script>
+<script type="text/javascript" src="js/ui/ui.draggable.js"></script>
+<script type="text/javascript">
+	var zindex=0;
+	$(function() {
+		$(".wall").draggable({
+			start: function(e, ui) { 
+			var	curdiv=$(this);
+			$(".wall").each(function (index, element) { 
+				  var index=parseInt($(this).css('z-index'));
+				  if(index>=zindex){
+				  	zindex=index+1;
+				  }
+			});
+			curdiv.css('z-index',zindex);
+		 }
+		});
+	});
+	$(document).ready(function(){	 
+		$("span[class=x]").click(function(){
+			var wallid=$(this).parents(".wall").attr('id');
+			$.ajax({
+				url: "index.php?plugin-wish-admin_wish-remove",
+				data: {wallid:wallid},
+				cache: false,
+				dataType: "xml",
+				type:"post",
+				success: function(xml){
+					var	message=xml.lastChild.firstChild.nodeValue;
+					if(message=='1'){
+						$('#'+wallid).hide();
+					}else{
+						alert('删除失败！');
+					}
+				}
+			});
+		}); 
+		$("#clear-all").click(function(){
+			window.location="index.php?plugin-wish-admin_wish-clear";
+		}); 
+	});
+</script>
+</head>
+
+<body>
+
+<div id="top_pad">
+	<span style="float: left; padding-right: 10px;"><input id="clear-all" type="button" value="删除全部" class="button" onclick='location.href="{$setting[seo_prefix]}plugin-wish-wish-will";' /></span>
+</div>
+<br/><br/>
+{loop $wishlist $index $wish}
+<div class="wall"  id="wall{$wish[id]}" style="position:static;float:left">
+	<div class="top-{$wish['style']}"><span class="x">删除</span>第[{$wish['id']}]条&nbsp; {$wish['time']}</div>
+	<div class="mid-{$wish['style']}"><span class="wt"><b>{$wish['receiver']}</b>：</span><span>{$wish['wish']}</span></div>
+	<div class="bot-{$wish['style']}"><img src="plugins/wish/images/{$wish['style']}.gif"  /><span class="inline">{$wish['author']}</span></div>
+</div>
+{/loop}
+
+</body>
+</html>
