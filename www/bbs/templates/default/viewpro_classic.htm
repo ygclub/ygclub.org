@@ -232,7 +232,8 @@
 			<!--{/if}-->
 			<!--{if $allowbanuser || $allowedituser || $member['adminid'] > 0 && $modworkstatus}-->
 			<ul>
-				<!--{if $member['adminid'] > 0 && $modworkstatus}--><li><a href="stats.php?type=modworks&amp;uid=$member[uid]"><span>{lang moderations}</span></a></li><!--{/if}-->
+                <!--{if $member['adminid'] > 0 && $modworkstatus}--><li><a href="stats.php?type=modworks&amp;uid=$member[uid]"><span>{lang moderations}</span></a></li><!--{/if}-->
+                <li><a href="act.php?uid=$member[uid]">活动统计</a></li>
 				<!--{if $allowbanuser || $allowedituser}-->
 					<li>{lang admin_member}</li>
 					<li>

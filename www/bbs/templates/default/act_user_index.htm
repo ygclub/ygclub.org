@@ -4,10 +4,13 @@
     #content a {font-family: Tahoma,sans-serif; }
     #content a:hover { color: #690;}
     h4 {color:#666;font-weight:normal;}
-    table.tableline{border-collapse: collapse; width:70%; font-size: 12px; margin-top:10px; }
+    table.tableline{border-collapse: collapse; width:80%; font-size: 12px; margin-top:10px; }
     table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
     table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
     table.tableline caption{font-size:14px; font-weight:bold; }
+    .checkin0 {color:#aaa}
+    .checkin1 {color:green}
+    .checkin2 {color:red}
 </style>
 <div id="nav">
     <a href="$indexname">$bbname</a> &raquo; <a href="$thisrc">用户活动统计</a> &raquo; $user_name
@@ -41,9 +44,10 @@
             </caption>
             <tr>
                 <th style="width:35px">#</th>
-                <th width="70%">活动名称</th>
+                <th width="60%">活动名称</th>
+                <th style="width:200px">实际参加</th>
                 <!--{if $cv == '阳光公益活动'}-->
-                <th style="width:40px">课程</th>
+                <th style="width:100px">课程</th>
                 <!--{/if}-->
                 <th style="width:250px">活动时间</th>
             </tr>
@@ -53,13 +57,16 @@
             <tr class='t1'>
                 <th>$size</th>
                 <td><a href="viewthread.php?tid=$k&from=act_f" target="_blank">$v['subject']</a></td>
+                <td>
+                    <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>
+                </td>
                 <!--{if $cv == '阳光公益活动'}-->
                 <td><!--{loop $v['config']['课程'] $config}-->
                     $config  
                     <!--{/loop}-->
                 </td>
                 <!--{/if}-->
-                <td>$v['showtime']</td>
+                 <td>$v['showtime']</td>
             </tr>
             <!--{/loop}-->
         </table>

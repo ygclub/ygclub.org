@@ -782,7 +782,58 @@ if (defined('IN_PARTY')){
 			}
 			include template($tpl);
 		}
-	}
+    }elseif($act=='checkin'){
+        // 签到统计
+        if ($tid > 0 && is_numeric($tid)){
+            $party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
+            if ($party){
+    	        $thread = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid'");
+                $party['subject'] = $thread['subject'];
+
+                if($party['showtime'] > time())
+                {
+                    $notshow = true;
+                }
+                else{
+                    $mPerm = 0;
+				    if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
+				    	$mPerm = 1;
+				    }else{
+                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+			            if ($ckConvenePerm['uid']>0){
+			            	$mPerm = 1;
+			            }
+                    }
+                    if($mPerm)
+                    {
+                        if ($step=='post'){
+                            foreach($checkin as $uid => $ck)
+                            {
+			                    $db->query("update {$tablepre}partyers set checkin='$ck' where uid='$uid' and tid='$tid'");
+                            }
+                            showmessage("设置成功","$thisrc?act=checkin&tid=$tid");
+                        }
+                    }
+                    //$count = $db->result_first("select count(*) from {$tablepre}partyers where verified{$sfv}'4' and tid='$tid'");
+                    $checkAttr = array('0'=>'待确认', '1'=>'已参加', '2'=>'未参加');
+                    $query = $db->query("select p.*,m.gender from {$tablepre}partyers p left join {$tablepre}members m on m.uid=p.uid where p.tid='$tid' and p.verified='4' order by p.checkin asc, p.pid desc");
+                    $checkin_count_list = array('0'=>0, '1'=>0, '2'=>0);
+                    $total_count = 0;
+				    while ($rs = $db->fetch_array($query)){
+				    	$rs['d1'] = gmdate('Y-m-d',$rs['dateline']+3600*$_DSESSION['timeoffset']);
+				    	$rs['d2'] = gmdate('H:i',$rs['dateline']+3600*$_DSESSION['timeoffset']);
+				    	$rs['v1'] = $verifiedArr[$rs['verified']];
+                        $rs['m1'] = $party['marks'] ? $partyMarks[$rs['marks']] : "";
+                        $rs['checkin_txt'] = $checkAttr[$rs['checkin']];
+                        $checkin_count_list[$rs['checkin']] ++;
+                        $total_count ++;
+				    	$list[] = $rs;
+				    }
+                }
+                include template('party_checkin');
+			}
+        }
+    }
 }
 
 // 函数部分

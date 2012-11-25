@@ -68,7 +68,7 @@ if ($discuz_uid)
         if($endtime <= $today)
         {
             $uid = intval($uid);
-            $sql = 'SELECT pe.uid, pe.username, pe.config, p.class, p.tid, p.showtime, t.subject  FROM ';
+            $sql = 'SELECT pe.uid, pe.username, pe.config, pe.checkin, p.class, p.tid, p.showtime, t.subject  FROM ';
             $sql .= "{$tablepre}partyers as pe LEFT JOIN {$tablepre}party as p on pe.tid = p.tid LEFT JOIN {$tablepre}threads as t on p.tid = t.tid where 1 ";
             $sql .= "AND pe.uid = '{$uid}'";
             $sql .= "AND pe.verified = 4 ";
@@ -82,6 +82,7 @@ if ($discuz_uid)
             $query = $db->query($sql);
             $party_class_count = array();
             foreach($partyClass as $value) $party_class_count[$value] = 0;
+            $checkAttr = array('0'=>'待确认', '1'=>'已参加', '2'=>'未参加');
 
             while ($act_user = $db->fetch_array($query))
             {
@@ -91,6 +92,7 @@ if ($discuz_uid)
                     $user_name = $act_user['username'];
                     $act_user['config'] = unserialize($act_user['config']); 
                     $act_user['showtime'] = gmdate('Y-m-d H:i',$act_user['showtime']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$act_user['showtime']+3600*$_DSESSION['timeoffset'])].")";
+                    $act_user['checkin_txt'] = $checkAttr[$act_user['checkin']];
                     $act_user_list[$act_user['class']]['tlist'][$act_user['tid']] = $act_user;
                     $total_count ++;
                 }
