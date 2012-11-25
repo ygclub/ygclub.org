@@ -41,7 +41,7 @@ function add_sign_field(v){
 			<table cellspacing="0" cellpadding="0" class="formtable">
 				<tr>
 					<td><b>召集开关</b></th>
-					<td><input type="radio" name="party[allowed]" value='1' onclick="document.getElementById('party_body').style.display='block';" {if $condata[allowed]==1}checked{/if}/> 开启 <input type="radio" name="party[allowed]" value='0' onclick="document.getElementById('party_body').style.display='none';" {if $condata[allowed]==0 || empty($condata)}checked{/if}/> 关闭</td>
+					<td><input type="radio" name="party[allowed]" value='1' onclick="document.getElementById('party_body').style.display='$party_body_display';" {if $condata[allowed]==1}checked{/if}/> 开启 <input type="radio" name="party[allowed]" value='0' onclick="document.getElementById('party_body').style.display='none';" {if $condata[allowed]==0 || empty($condata)}checked{/if}/> 关闭</td>
 				</tr>
 
 				<tbody id="party_body">

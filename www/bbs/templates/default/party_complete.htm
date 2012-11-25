@@ -60,7 +60,7 @@
 
 				<tr>
 					<th><b>备注选项</b></th>
-					<td><input name="marks" class="txt" type="text" value="$tinfo[marks]"/> 如：“自驾|搭乘|自理”</td>
+					<td><input name="marks" class="txt" type="text" value="$tinfo[marks]"/>用竖线|分割，如：“集合点|自行前往”</td>
 				</tr>
 
 				<!--{if $sc_data['follower']==1}-->
@@ -73,8 +73,7 @@
 				<!--{if $sc_data['dowork']==1}-->
 				<tr>
 					<th><b>分工设置</b><font color="red">(*)</font></th>
-					<td><input name="doworker" class="txt" type="text" value="$tinfo[doworker]"/></td>
-				</tr>
+					<td><input name="doworker" class="txt" type="text" value="$tinfo[doworker]"/>用英逗号,分割，如：“主讲,助教,旁听”</td>				</tr>
 				<!--{/if}-->
 
 				<!--{if $sc_data['optionform']==1}-->

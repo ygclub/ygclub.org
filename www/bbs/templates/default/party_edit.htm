@@ -21,17 +21,25 @@
 					<th height='30'>备注选项 <font color='red'>(*)</font></th>
 					<td><!--{loop $ex_marks $k $v}--><!--{eval $checked = $k==$party['emarks'] ? "checked" : "";}--><input name="marks" type="radio" value="$k" {$checked}/>$v<!--{/loop}--></td>
 				</tr>
-				<!--{/if}-->
+                <!--{/if}-->
+	            <!--{if !empty($ex_workers)}-->
+	            <tr>
+                    <th height='30'>选择分工 <font color='red'>(*)</font></th>
+                    <td><!--{if $party['uid'] == $discuz_uid}--><input name="usertask" type="radio" value="召集人" checked="checked" />召集人<!--{/if}--><!-- {loop $ex_workers $k $v}--><input name="usertask" type="radio" value="$v" <!--{if $party['usertask'] == $v}-->checked="checked"<!--{/if}-->/>$v<!-- {/loop}--></td>
+	            </tr>
+	            <!--{/if}-->
 				<!--{if $party['followed']}-->
 				<tr>
 					<th height='30'>随行人员(加几) <font color='red'>(*)</font></th>
 					<td><input type='text' name='followed' class='txt' onkeyup="value=value.replace(/[^0123456789-]/g,'')" value='$party[efollowed]' maxlength='4' size='4'> <font color='#666666'>请输入数字</font></td>
 				</tr>
 				<!--{/if}-->
-				<!--{if $sc_data['signfield'] && $sc_data['signform']==1}-->
+                <!--{if $sc_data['signfield'] && $sc_data['signform']==1}-->
+                <!--
 					<tr>
 						<th colspan='2' height='30' bgcolor='#f1f1f1'>以下部分仅限于召集人可见</th>
-					</tr>
+                    </tr>
+                 -->
 					<!--{loop $sc_data['signfield'] $v}-->
 					<tr>
 						<th height='30'>$v[name] <!--{if $v['must']=='on'}--><font color='red'>(*)</font><!--{/if}--></th>

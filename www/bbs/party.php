@@ -15,9 +15,13 @@ if (defined('IN_PARTY')){
 			$party_img = $party['closed'] == 1 ? 'end' : 'on';
 			// 性别
 			$party_xb = array('0'=>'(不限性别)','1'=>'(仅限于男性)','2'=>'(仅限于女性)');
-			$party_xb = $party_xb[$party['gender']];
-			// 备注
-			if (strstr($party['marks'],'|')){
+            $party_xb = $party_xb[$party['gender']];
+
+            // 分工
+            $ex_workers = empty($party['doworker']) ? "" : explode(',',$party['doworker']);
+            
+            // 备注
+			//if (strstr($party['marks'],'|')){
 				$ex_marks = explode('|',$party['marks']);
 				for($mi = 0; $mi < count($ex_marks); $mi++){
 					${"marksCount".$mi} = $db->result_first("select count(*) from {$tablepre}partyers where marks='$mi' and tid='$tid' and verified='4'");
@@ -28,9 +32,13 @@ if (defined('IN_PARTY')){
 						$countMarksHtml .= $ex_marks[$k]."(<font color='red'><b>$v</b></font>)；&nbsp;&nbsp;";
 					}
 				}
-			}
+			//}
+            // 当前登录用户是否已报名 
+			$verifiedArr = array('1'=> '等待确认','2'=> '取消申请','3'=> '拒绝申请','4'=> '已确认','5'=> '下次参加');
+            $ckIn  = $db->fetch_first("select * from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+            
 			// 报名部分
-			$query = $db->query("select p.*,m.gender from {$tablepre}partyers p left join {$tablepre}members m on m.uid=p.uid where p.tid='$tid' order by p.pid desc");
+            $query = $db->query("select p.*,m.gender from {$tablepre}partyers p left join {$tablepre}members m on m.uid=p.uid where p.tid='$tid' order by p.pid desc");
 			while ($rs = $db->fetch_array($query)){
 				$partyers[] = $rs;
 			}
@@ -102,8 +110,9 @@ if (defined('IN_PARTY')){
 			if ($party['uid']==$discuz_uid){
 				$mPerm = $joined = 1;
 			}else{
-				$ckPerm = $db->fetch_first("select verified,usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-				if ($ckPerm['usertask']=='召集人'){
+                $ckPerm = $db->fetch_first("select verified,usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+                $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				if ($ckConvenePerm['uid']>0){
 					$mPerm = 1;
 				}
 				if ($ckPerm['verified']==4){
@@ -134,7 +143,7 @@ if (defined('IN_PARTY')){
 			 }
 		}
 		include template("party_index");
-	}elseif($act == 'set'){
+	}elseif($act=='set'){
 		sc_admin();
 		$confile = DISCUZ_ROOT."./forumdata/party/con_{$fid}_fig.php";
 		if (file_exists($confile)){
@@ -159,7 +168,7 @@ if (defined('IN_PARTY')){
 		}
 		$forumname = $_DCACHE['forums'][$fid]['name'];
 		require_once DISCUZ_ROOT."./forumdata/cache/cache_usergroups.php";
-		$party_body_display = $condata && $condata['allowed']==1 ? "block" : "none" ;
+		$party_body_display = $condata && $condata['allowed']==1 ? "" : "none" ;
 		include template('party_set');
 	}elseif($act=='check'){
 		// 因为不想动太多文件，在论坛帖子删除的时候不会同步删除这个活动的数据，所以在这里写了段清除的代码
@@ -191,10 +200,11 @@ if (defined('IN_PARTY')){
 		exit;
 	}elseif ($act=='complete'){
 		if ($fid && $tid){
-			$sc_data = sc_perms($fid);
+            $sc_data = sc_perms($fid);
 			if ($sc_data['toperm']==1){
 				$party = $db->fetch_first("select * from {$tablepre}threads where tid='$tid' and authorid='$discuz_uid'");
-				$tinfo = $db->fetch_first("select * from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				//$tinfo = $db->fetch_first("select * from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				$tinfo = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
 				$tinfo['showtime'] = $tinfo['showtime'] ? gmdate('Y-m-d H:i',$tinfo['showtime']+3600*$_DSESSION['timeoffset']) : "";
 				$tinfo['starttimefrom'] = $tinfo['starttimefrom'] ? gmdate('Y-m-d H:i',$tinfo['starttimefrom']+3600*$_DSESSION['timeoffset']) : "";
 				$tinfo['starttimeto'] = $tinfo['starttimeto'] ? gmdate('Y-m-d H:i',$tinfo['starttimeto']+3600*$_DSESSION['timeoffset']) : "";
@@ -205,7 +215,7 @@ if (defined('IN_PARTY')){
 						$SF_CONFIG_VALUES = unserialize($tinfo['config']);
 					}
 					$sc_data['optionfield'] = sc_order_fields($sc_data['optionfield']);
-				}
+                }
 				include template('party_complete');
 			}
 		}
@@ -269,9 +279,9 @@ if (defined('IN_PARTY')){
 					}
 				}
 				// 写入数据库
-				$count = $db->result_first("select count(*) from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				$count = $db->result_first("select count(*) from {$tablepre}party where tid='$tid'");
 				if ($count > 0){
-					$db->query("update {$tablepre}party set picurl='$picurl',showtime='$showtime',starttimefrom='$starttimefrom',starttimeto='$starttimeto',class='$class',gender='$gender',number='$number',phone='$phone',marks='$marks',config='$SFDC',followed='$followed',doworker='$doworker',isjoin='$isjoin' where tid='$tid' and uid='$discuz_uid'");
+					$db->query("update {$tablepre}party set picurl='$picurl',showtime='$showtime',starttimefrom='$starttimefrom',starttimeto='$starttimeto',class='$class',gender='$gender',number='$number',phone='$phone',marks='$marks',config='$SFDC',followed='$followed',doworker='$doworker',isjoin='$isjoin' where tid='$tid'");
 				}else{
 					$db->query("insert into {$tablepre}party (tid,fid,uid,picurl,showtime,starttimefrom,starttimeto,class,gender,number,phone,marks,config,followed,doworker,isold,isjoin) values ('$tid','$fid','$discuz_uid','$picurl','$showtime','$starttimefrom','$starttimeto','$class','$gender','$number','$phone','$marks','$SFDC','$followed','$doworker','0','$isjoin')");
 					$db->query("insert into {$tablepre}partyers (tid,uid,username,phone,verified,dateline,message,usertask) values ('$tid','$discuz_uid','$discuz_user','$phone','4','$timestamp','欢迎大家来参加活动','召集人')");
@@ -302,7 +312,12 @@ if (defined('IN_PARTY')){
 				// 个人说明
 				if (empty($usrexplain)){
 					showmessage("请输入个人参加活动的说明",$goBack);
-				}
+                }
+                // 分工
+				$usertask = $party['uid'] == $discuz_uid ? "召集人" : $usertask;
+                if (!empty($party['doworker']) && empty($usertask)){
+					showmessage("请选择分工",$goBack);
+                }
 				// 备注
 				if ($marks && !is_numeric($marks)){
 					showmessage("请选择备注选项",$goBack);
@@ -328,7 +343,6 @@ if (defined('IN_PARTY')){
 					$SFDC = serialize($SFDC);
 				}
 				// 保存数据
-				$usertask = $party['uid'] == $discuz_uid ? "召集人" : "";
 				$db->query("insert into {$tablepre}partyers (tid,uid,username,phone,verified,dateline,message,marks,usertask,followed,config) values ('$tid','$discuz_uid','$discuz_user','$usermobile','1','$timestamp','$usrexplain','$marks','$usertask','$followed','$SFDC')");
 				showmessage("已申请成功，请等待确认。",$goUrl);
 			}
@@ -366,10 +380,14 @@ if (defined('IN_PARTY')){
 					if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
 						$mPerm = 1;
 					}else{
-						$joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-						if ($joinEr['usertask']=='召集人'){
-							$mPerm = 1;
-						}
+                        $joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				        if ($ckConvenePerm['uid']>0){
+				        	$mPerm = 1;
+				        }
+						//if ($joinEr['usertask']=='召集人'){
+						//	$mPerm = 1;
+						//}
 					}
 					include template('header_ajax');
 					include template('party_list');
@@ -386,10 +404,15 @@ if (defined('IN_PARTY')){
 				if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
 					$mPerm = 1;
 				}else{
-					$joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-					if ($joinEr['usertask']=='召集人'){
-						$mPerm = 1;
-					}
+                    $joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				    if ($ckConvenePerm['uid']>0){
+				    	$mPerm = 1;
+				    }
+
+					//if ($joinEr['usertask']=='召集人'){
+					//	$mPerm = 1;
+					//}
 				}
 			}
 		}
@@ -442,18 +465,24 @@ if (defined('IN_PARTY')){
 	}elseif($act=='operate'){
 		if (in_array($for,array('wait','reply','accept','nexttime','edit'))){
 			if ($tid>0 && $pid>0 && $discuz_uid && $fid>0){
-				$party = $db->fetch_first("select a.uid,a.starttimeto,a.marks,a.followed,a.closed,e.uid as joinUid,e.phone,e.message,e.marks as emarks,e.followed as efollowed,e.reply,e.config,t.subject from {$tablepre}party a left join {$tablepre}partyers e on e.tid=a.tid left join {$tablepre}threads t on t.tid=a.tid where a.tid='$tid' and e.pid='$pid'");
+				$party = $db->fetch_first("select a.uid,a.starttimeto,a.marks,a.doworker,a.followed,a.closed,e.uid as joinUid,e.phone,e.message,e.marks as emarks,e.followed as efollowed,e.reply,e.config,e.usertask,t.subject from {$tablepre}party a left join {$tablepre}partyers e on e.tid=a.tid left join {$tablepre}threads t on t.tid=a.tid where a.tid='$tid' and e.pid='$pid'");
 				if ($party){
 					if ($party['closed']==1){
 						showmessage("此活动已结束，不能进行相关的操作",$goUrl);
 					}
 					$ckPerms = $db->fetch_first("select * from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-					$mPerm = 0;
+                    $mPerm = 0;
+                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				    if ($ckConvenePerm['uid']>0){
+					   $mPerm = 1;
+				    }
+
 					if ($discuz_uid==$party['uid'] || $adminid==1 || $adminid==2){
 						$mPerm = 1;
-					}elseif($ckPerms['usertask']=='召集人'){
-						$mPerm = 1;
-					}
+                    }
+                    //elseif($ckPerms['usertask']=='召集人'){
+					//	$mPerm = 1;
+					//}
 					$sc_data = sc_perms($fid);
 					if ($for=='nexttime'){
 						if ($discuz_uid==$party['joinUid'] && $_POST['partysubmit']=='确认下次再参加'){
@@ -475,10 +504,14 @@ if (defined('IN_PARTY')){
 						include template('party_nexttime');
 					}elseif($for=='edit'){
 						if ($discuz_uid==$party['joinUid']){
+                			//$usertask = $party['uid'] == $discuz_uid ? "召集人" : $usertask;
 							if ($_POST['partysubmit']=='确认编辑'){
 								if (!$usermobile) showmessage("请输入联系电话",$goBack);
 								if (empty($usrexplain)) showmessage("请输入个人参加活动的说明",$goBack);
-								if (!is_numeric($marks)) showmessage("请选择备注选项",$goBack);
+                                if (!is_numeric($marks)) showmessage("请选择备注选项",$goBack);
+                                if (!empty($party['doworker']) && empty($usertask)){
+                					showmessage("请选择分工",$goBack);
+                                }
 								if ($party['followed']==1){
 									if (!is_numeric($followed)){
 										showmessage("请输入随行人员的数量",$goBack);
@@ -496,7 +529,7 @@ if (defined('IN_PARTY')){
 									}
 									$SFDC = serialize($SFDC);
 								}
-								$db->query("update {$tablepre}partyers set phone='$usermobile',message='$usrexplain',marks='$marks',followed='$followed',config='$SFDC' where tid='$tid' and uid='$discuz_uid' and pid='$pid'");
+								$db->query("update {$tablepre}partyers set phone='$usermobile',message='$usrexplain',marks='$marks',usertask='$usertask',followed='$followed',config='$SFDC' where tid='$tid' and uid='$discuz_uid' and pid='$pid'");
 								showmessage("成功编辑个人说明。",$goUrl);
 							}
 							if ($sc_data['limittime']){
@@ -511,6 +544,7 @@ if (defined('IN_PARTY')){
 								}
 							}
 							$ex_marks = $party['marks'] ? explode('|',$party['marks']) : "";
+                            $ex_workers = empty($party['doworker']) ? "" : explode(',',$party['doworker']);
 							include template('party_edit');
 						}
 					}else{
@@ -562,10 +596,14 @@ if (defined('IN_PARTY')){
 					if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
 						$mPerm = 1;
 					}else{
-						$ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-						if ($ckPerm['usertask']=='召集人'){
-							$mPerm = 1;
-						}
+                        $ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+			            if ($ckConvenePerm['uid']>0){
+			            	$mPerm = 1;
+			            }
+						//if ($ckPerm['usertask']=='召集人'){
+						//	$mPerm = 1;
+						//}
 					}
 					if ($mPerm = 1){
 						$sc_data = sc_perms($fid);
@@ -636,10 +674,14 @@ if (defined('IN_PARTY')){
 				if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
 					$mPerm = 1;
 				}else{
-					$ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-					if ($ckPerm['usertask']=='召集人'){
-						$mPerm = 1;
-					}
+                    $ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
+                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+    				if ($ckConvenePerm['uid']>0){
+    					$mPerm = 1;
+    				}
+					//if ($ckPerm['usertask']=='召集人'){
+					//	$mPerm = 1;
+					//}
 				}
 			}
 			if ($mPerm == 1){

@@ -1,4 +1,15 @@
 <div class="signup" id='signup'>
+    <!--{if !empty($ckIn) }-->
+    <h4><center>
+    <!--{if $ckIn['verified'] == 4}-->
+            你已成功报名此次活动！
+    <!--{elseif $ckIn['verified'] == 5}-->
+            你已选择了下次参加活动。
+    <!--{else}-->
+            你的报名尚未得到确认。
+    <!--{/if}-->
+    </center></h4>
+<!--{else}-->
 <h4>我要报名</h4>
 <!--{if $joinPerm==1}-->
 <form id="signupform" name="signupform" method="POST" action="party.php?act=party_sign">
@@ -12,7 +23,7 @@
 	<thead>
 		<tr>
 			<th width='24%' style='padding-left:12px;'>用户名：</th>
-			<td>$discuz_user [<a href="logging.php?action=logout&amp;formhash={FORMHASH}">退出登录</a>]</td>
+            <td>$discuz_user <!--[<a href="logging.php?action=logout&amp;formhash={FORMHASH}">退出登录</a>]--></td>
 		</tr>
 	</thead>
 	<!--{/if}-->
@@ -23,7 +34,14 @@
 	<tr>
 		<th style='padding-left:12px;'>个人说明：(200字以内) <font color='red'>(*)</font><br /><span style="color:green">提示：本部分内容为公开信息，请勿输入身份证号码和手机号等个人信息。</span></th>
 		<td><textarea name="usrexplain" ROWS="4" COLS="80"></textarea></td>
+    </tr>
+	<!--{if !empty($ex_workers)}-->
+	<tr>
+		<th style='padding-left:12px;'>选择分工 <font color='red'>(*)</font></th>
+        <td><!-- {loop $ex_workers $k $v}--><input name="usertask" type="radio" value="$v" />$v<!-- {/loop}--></td>
 	</tr>
+	<!--{/if}-->
+
 	<!--{if !empty($party['marks'])}-->
 	<tr>
 		<th style='padding-left:12px;' height='30'>备注选项 <font color='red'>(*)</font></th>
@@ -36,10 +54,12 @@
 		<td><input type='text' name='followed' class='txt' onkeyup="value=value.replace(/[^0123456789-]/g,'')" value='0' maxlength='4' size='4'> <font color='#666666'>请输入数字</font></td>
 	</tr>
 	<!--{/if}-->
-	<!--{if $sc_data['signfield'] && $sc_data['signform']==1}-->
+    <!--{if $sc_data['signfield'] && $sc_data['signform']==1}-->
+    <!--
 		<tr>
 			<th colspan='2' style='padding-left:12px;' height='30' bgcolor='#f1f1f1'>以下部分仅限于召集人可见</th>
-		</tr>
+        </tr>
+    -->
 		<!--{loop $sc_data['signfield'] $v}-->
 		<tr>
 			<th style='padding-left:12px;' height='30'>$v[name] <!--{if $v['must']=='on'}--><font color='red'>(*)</font><!--{/if}--></th>
@@ -84,4 +104,5 @@
 	</tr>
 </table>
 <!--{if $joinPerm==1}--></form><!--{/if}-->
+	<!--{/if}-->
 </div>
