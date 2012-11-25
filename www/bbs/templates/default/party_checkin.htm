@@ -23,7 +23,7 @@
 <!--{else}-->
 <table cellspacing="0" cellpadding="0" class="tableline">
     <caption>
-        共有{$total_count}人成功报名参加了活动，其中：&nbsp; {$checkin_count_list[1]}人实际参加了活动<!--{if $checkin_count_list[2]>0}-->，{$checkin_count_list[2]}人未参加活动<!--{/if}--><!--{if $checkin_count_list[0]>0}-->，还有{$checkin_count_list[0]}人等待确认<!--{/if}-->
+        共有{$total_count}人成功报名了活动，其中：&nbsp; {$checkin_count_list[1]}人实际参加了活动<!--{if $checkin_count_list[2]>0}-->，{$checkin_count_list[2]}人未参加活动<!--{/if}--><!--{if $checkin_count_list[0]>0}-->，还有{$checkin_count_list[0]}人等待确认<!--{/if}-->
     </caption>
 	<thead>
 		<tr>
@@ -60,7 +60,7 @@
 			</div>
             </td>
 			<td class="state">
-           <!--{if $mPerm}-->
+                <!--{if $mPerm && $step != 'list'}-->
                 <input type="radio" name="checkin[{$v[uid]}]" value="0" id="checkin0_{$v[uid]}" <!--{if $v['checkin'] == 0}-->checked="checked"<!--{/if}-->/> <label for="checkin0_{$v[uid]}">稍后确认</label>
                 <input type="radio" name="checkin[{$v[uid]}]" value="1" id="checkin1_{$v[uid]}" <!--{if $v['checkin'] == 1}-->checked="checked"<!--{/if}-->/> <label for="checkin1_{$v[uid]}">已参加</label>
                 <input type="radio" name="checkin[{$v[uid]}]" value="2" id="checkin2_{$v[uid]}" <!--{if $v['checkin'] == 2}-->checked="checked"<!--{/if}-->/> <label for="checkin2_{$v[uid]}">未参加</label>
@@ -76,8 +76,8 @@
 	<tbody>
            </table>
            <br />
-           <!--{if $mPerm}-->
-			<input type="submit" name="checkinsubmit" class="postsubmit" value="更新签到数据" />
+            <!--{if $mPerm && $step != 'list'}-->
+			<input type="submit" name="checkinsubmit" value="更新签到数据" />
             <input type="reset"  value="取消" />
             <!--{/if}-->
             <!--{/if}-->

@@ -25,12 +25,16 @@
 				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed; table-layout:fixed; ">
 					<tr>
 						<th style="border-bottom:none;">活动主题:</th>
-						<td colspan="3" style="font-size: 14px; color:red; font-weight: bold; border-bottom:none;">$thread[subject] 
-						<a href="party.php?act=checkin&tid=$tid" style="font-weight:normal;font-size:12px;">[查看签到信息]</a>  
+                        <td colspan="3" style="font-size: 14px; color:red; font-weight: bold; border-bottom:none;">$thread[subject] 
+                        <!--{if $party['showtime_orgin'] < time() }-->
+                        <a href="party.php?act=checkin&step=list&tid=$tid" style="font-weight:normal;font-size:12px;">[签到信息]</a>  
+						<!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
+						<a href="party.php?act=checkin&tid=$tid" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
+                        <!--{/if}-->
+                        <!--{/if}-->
 						<!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
 						<a href="post.php?action=edit&fid=$fid&tid=$tid&pid=$post[pid]" title='编辑' style="font-weight:normal;font-size:12px;">[编辑帖子]</a>  
 						<a href="party.php?act=complete&tid=$tid" style="font-weight:normal;font-size:12px;">[编辑活动资料]</a>  
-						<a href="party.php?act=checkin&tid=$tid" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
 						<a href='party.php?act=onoff&for=on&tid=$tid' class='openorclose'>[开]</a></span>  
 						<a href='party.php?act=onoff&for=off&tid=$tid' class='openorclose'>[关]</a></span>
 						<!--{/if}--></td>

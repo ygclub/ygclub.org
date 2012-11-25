@@ -8,6 +8,7 @@ if (defined('IN_PARTY')){
 		if ($party){
 			// 时间
 			$party_date = array('1'=>'星期一','2'=>'星期二','3'=>'星期三','4'=>'星期四','5'=>'星期五','6'=>'星期六','7'=>'星期天');
+			$party['showtime_orgin'] = $party['showtime'];
 			$party['showtime'] = gmdate('Y-m-d H:i',$party['showtime']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$party['showtime']+3600*$_DSESSION['timeoffset'])].")";
 			$party['starttimefrom'] = gmdate('Y-m-d H:i',$party['starttimefrom']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$party['starttimefrom']+3600*$_DSESSION['timeoffset'])].")";
 			$party['starttimeto'] = gmdate('Y-m-d H:i',$party['starttimeto']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$party['starttimeto']+3600*$_DSESSION['timeoffset'])].")";
@@ -809,12 +810,11 @@ if (defined('IN_PARTY')){
                         if ($step=='post'){
                             foreach($checkin as $uid => $ck)
                             {
-			                    $db->query("update {$tablepre}partyers set checkin='$ck' where uid='$uid' and tid='$tid'");
+			                    $db->query("update {$tablepre}partyers set checkin='$ck', updatetime='". time() ."' where uid='$uid' and tid='$tid'");
                             }
                             showmessage("设置成功","$thisrc?act=checkin&tid=$tid");
                         }
                     }
-                    //$count = $db->result_first("select count(*) from {$tablepre}partyers where verified{$sfv}'4' and tid='$tid'");
                     $checkAttr = array('0'=>'待确认', '1'=>'已参加', '2'=>'未参加');
                     $query = $db->query("select p.*,m.gender from {$tablepre}partyers p left join {$tablepre}members m on m.uid=p.uid where p.tid='$tid' and p.verified='4' order by p.checkin asc, p.pid desc");
                     $checkin_count_list = array('0'=>0, '1'=>0, '2'=>0);
