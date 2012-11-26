@@ -1,17 +1,21 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>月报</title>
+{subtemplate header}
 <style type="text/css">
-a{color:blue; text-decoration: none;}
-.t1 {font-size:16px;font-weight:bold;background-color:#eee}
-.t2 {font-size:14px;}
+    table.tableline{border-collapse: collapse; width:80%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:#eee;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
 </style>
-<body>
+
+<div id="nav">
+    <a href="$indexname">$bbname</a> &raquo; <a href="$thisrc">月报</a> &raquo; 首页
+</div>
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+    <div class="content">
+
   <form method="get">
-    <input type="text" name="starttime" value="$starttime_template">
-    <input type="text" name="endtime" value="$endtime_template">
+    <input type="text" name="starttime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$starttime_template" readonly="readonly" />
+    <input type="text" name="endtime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$endtime_template" readonly="readonly"/ >
     <input type="submit" value="提交">
   </form>
   <br />
@@ -20,10 +24,11 @@ a{color:blue; text-decoration: none;}
   </span>
 <br />
 <br />
-<table width="60%" border="0" cellpadding="1" cellspacing="1" bgcolor="#333" align='left'>
+    <!--{if $discuz_uid > 0 }-->
+<table cellspacing="0" cellpadding="0" class="tableline">
   <!--{loop $fids $k $v}-->
   <tr align='center' class='t1'>
-    <td colspan="2">$v[fid_name]</td>
+    <th colspan="2">$v[fid_name]</th>
   </tr>
 		<!--{loop $v[fids] $b}-->
   <tr align='left' class='t2'>
@@ -33,7 +38,13 @@ a{color:blue; text-decoration: none;}
 		<!--{/loop}-->
 	<!--{/loop}-->
 </table>
-<br />
-<br />
-</body>
-</html>
+    <!--{else}-->
+        <center>
+            请先<a href="logging.php?action=login">登录</a>
+        </center>
+    <!--{/if}-->
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{$jspath}calendar.js?{VERHASH}" reload="1"></script>
+{subtemplate footer}

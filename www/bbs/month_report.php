@@ -46,17 +46,6 @@
          $fids[$thread[fid]]['fids'][$i] = array();
          $fids[$thread[fid]]['fids'][$i]['subject_link'] = "<a href=\"viewthread.php?tid=$thread[tid]\" target=\"_blank\">$thread[subject]</a>";
          $fids[$thread[fid]]['fids'][$i]['author_link'] = "<a href=\"space.php?uid=$thread[authorid]\" target=\"_blank\">$thread[author]</a>";
-         //if( $current_fid != $thread[fid])
-         //{
-         //  $fids['fid_' . $current_fid] = array($_DCACHE[forums][$thread[fid]][name]);
-         //  $i ++;
-         //  $current_fid = $thread[fid];
-         //}
-         // $fids[$i] = array(); 
-         // $fids[$i]['subject_link'] = "<a href=\"viewthread.php?tid=$thread[tid]\" target=\"_blank\">$thread[subject]</a>";
-         // //$fids[$i]['forum_link'] = "<a href=\"forumdisplay.php?fid=$thread[fid]\" target=\"_blank\">{$_DCACHE[forums][$thread[fid]][name]}</a>";
-				 // $fids[$i]['author_link'] = "<a href=\"space.php?uid=$thread[authorid]\" target=\"_blank\">$thread[author]</a>";
-         // //$fids[$i]['dateline'] = gmdate("$dateformat $timeformat", $thread['dateline'] + $timeoffset * 3600);
           $i ++;
        }
        foreach($fids as $key => $value)
@@ -64,9 +53,6 @@
          if(count($value) == 0) unset($fids[$key]);
        }
        unset($fids[22]);
-       //echo '<pre>';
-       //print_r($fids);
-
        $sql = '1';
 		   $sql .= $starttime != '' ? " AND regdate>'".$starttime."'" : '';
        $sql .= $endtime != '' ? " AND regdate <='".$endtime."'" : '';
@@ -81,9 +67,6 @@
        $users_link = join(', ', $users);
 
 			 include template('month_report');
-       //echo '<pre>';
-       //print_r($fids);
-       //die($sql); 
   }
   else
   {
