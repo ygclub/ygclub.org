@@ -296,6 +296,26 @@ else
     // TMSW - Move this into LEM::NavigateForwards?
     $filenotvalidated = checkUploadedFileValidity($move, $backok);
 
+    // CHECK BBS USER leeyupeng@2012-11-27
+    if($_SESSION['85827X19X504'] != '')
+    {
+        $bbs_username = addslashes($_SESSION['85827X19X504']);
+        $query = "SELECT uid FROM ygclub_members WHERE username = '$bbs_username'";
+        $result = db_execute_num($query);
+        list($uid) = $result->FetchRow();
+        if(empty($uid))
+        {
+            $error_message = '您输入的用户名 ' . $bbs_username . ' 尚未在论坛注册，请点击本页面上方的“论坛注册”，完成注册后的将用户名填写在本页面“论坛注册用户名”的输入框中。';
+            $invaliduserpopup="<script type=\"text/javascript\">\n
+                    <!--\n $(document).ready(function(){
+                        alert(\"".$clang->gT($error_message, "js")."\");});\n //-->\n
+                    </script>\n";
+                        $moveResult['finished'] = false;
+                        $notanswered = true;
+                        $move = "movenext";
+        }
+    }
+
     //SEE IF THIS GROUP SHOULD DISPLAY
     $show_empty_group = false;
 
@@ -657,6 +677,7 @@ doHeader();
 if (isset($popup)) {echo $popup;}
 if (isset($vpopup)) {echo $vpopup;}
 if (isset($fpopup)) {echo $fpopup;}
+if (isset($invaliduserpopup)) {echo $invaliduserpopup;}
 
 echo templatereplace(file_get_contents("$thistpl/startpage.pstpl"));
 
