@@ -13,8 +13,8 @@ display('layer_message');
 	setTimeout("window.location.href='memcp.php'", $mrefreshtime);
 {elseif $regverify == 2}
 	$('messageleft1').innerHTML = '<p>{lang register_succeed} $bbname</p><p>{lang register_manual_verify}</p>';
-	$('messageright1').innerHTML = '<a href="memcp.php">{lang user_center}</a>';
-	setTimeout("window.location.href='memcp.php'", $mrefreshtime);
+	$('messageright1').innerHTML = '<a href="/answer/index.php?sid=85827#inform">填写个人报到信息</a>';
+	setTimeout("window.location.href='/answer/index.php?sid=85827#inform'", $mrefreshtime);
 {else}
 	{if $newbietask}
 		$('messageleft1').innerHTML = '<p>{lang register_succeed} $bbname</p><p>{lang register_newbietask}</p>';
