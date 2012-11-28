@@ -112,10 +112,10 @@ if (defined('IN_PARTY')){
 				$mPerm = $joined = 1;
 			}else{
                 $ckPerm = $db->fetch_first("select verified,usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-                $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-				if ($ckConvenePerm['uid']>0){
-					$mPerm = 1;
-				}
+                //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				//if ($ckConvenePerm['uid']>0){
+				//	$mPerm = 1;
+				//}
 				if ($ckPerm['verified']==4){
 					$joined = 1;
 				}
@@ -130,7 +130,8 @@ if (defined('IN_PARTY')){
 	$goUrl = "viewthread.php?tid=$tid";
 
 	require_once DISCUZ_ROOT."./forumdata/cache/cache_forums.php";
-
+    if($tid > 0)
+		$party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
 	if (!$act){
 		sc_admin();
 		$forums = $subforums = array();
@@ -202,23 +203,23 @@ if (defined('IN_PARTY')){
 	}elseif ($act=='complete'){
 		if ($fid && $tid){
             $sc_data = sc_perms($fid);
-			if ($sc_data['toperm']==1){
-				$party = $db->fetch_first("select * from {$tablepre}threads where tid='$tid' and authorid='$discuz_uid'");
-				//$tinfo = $db->fetch_first("select * from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-				$tinfo = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
-				$tinfo['showtime'] = $tinfo['showtime'] ? gmdate('Y-m-d H:i',$tinfo['showtime']+3600*$_DSESSION['timeoffset']) : "";
-				$tinfo['starttimefrom'] = $tinfo['starttimefrom'] ? gmdate('Y-m-d H:i',$tinfo['starttimefrom']+3600*$_DSESSION['timeoffset']) : "";
-				$tinfo['starttimeto'] = $tinfo['starttimeto'] ? gmdate('Y-m-d H:i',$tinfo['starttimeto']+3600*$_DSESSION['timeoffset']) : "";
-				$tinfo['number'] = $tinfo['number'] ? $tinfo['number'] : 0;
-				$tinfo['doworker'] = $tinfo['doworker'] ? $tinfo['doworker'] : $sc_data['doworker'];
+			//if ($sc_data['toperm']==1){
+            if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
+				$tinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid' and authorid='$discuz_uid'");
+				$party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
+				$party['showtime'] = $party['showtime'] ? gmdate('Y-m-d H:i',$party['showtime']+3600*$_DSESSION['timeoffset']) : "";
+				$party['starttimefrom'] = $party['starttimefrom'] ? gmdate('Y-m-d H:i',$party['starttimefrom']+3600*$_DSESSION['timeoffset']) : "";
+				$party['starttimeto'] = $party['starttimeto'] ? gmdate('Y-m-d H:i',$party['starttimeto']+3600*$_DSESSION['timeoffset']) : "";
+				$party['number'] = $party['number'] ? $party['number'] : 0;
+				$party['doworker'] = $party['doworker'] ? $party['doworker'] : $sc_data['doworker'];
 				if ($sc_data['optionform']==1){
-					if ($tinfo['config']){
-						$SF_CONFIG_VALUES = unserialize($tinfo['config']);
+					if ($party['config']){
+						$SF_CONFIG_VALUES = unserialize($party['config']);
 					}
 					$sc_data['optionfield'] = sc_order_fields($sc_data['optionfield']);
                 }
 				include template('party_complete');
-			}
+            }
 		}
 	}elseif($act=="post"){
 		// 验证权限
@@ -382,13 +383,10 @@ if (defined('IN_PARTY')){
 						$mPerm = 1;
 					}else{
                         $joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-				        if ($ckConvenePerm['uid']>0){
-				        	$mPerm = 1;
-				        }
-						//if ($joinEr['usertask']=='召集人'){
-						//	$mPerm = 1;
-						//}
+                        //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				        //if ($ckConvenePerm['uid']>0){
+				        //	$mPerm = 1;
+				        //}
 					}
 					include template('header_ajax');
 					include template('party_list');
@@ -406,14 +404,10 @@ if (defined('IN_PARTY')){
 					$mPerm = 1;
 				}else{
                     $joinEr = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-				    if ($ckConvenePerm['uid']>0){
-				    	$mPerm = 1;
-				    }
-
-					//if ($joinEr['usertask']=='召集人'){
-					//	$mPerm = 1;
-					//}
+                    //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				    //if ($ckConvenePerm['uid']>0){
+				    //	$mPerm = 1;
+				    //}
 				}
 			}
 		}
@@ -473,17 +467,14 @@ if (defined('IN_PARTY')){
 					}
 					$ckPerms = $db->fetch_first("select * from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
                     $mPerm = 0;
-                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-				    if ($ckConvenePerm['uid']>0){
-					   $mPerm = 1;
-				    }
+                    //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+				    //if ($ckConvenePerm['uid']>0){
+					//   $mPerm = 1;
+				    //}
 
 					if ($discuz_uid==$party['uid'] || $adminid==1 || $adminid==2){
 						$mPerm = 1;
                     }
-                    //elseif($ckPerms['usertask']=='召集人'){
-					//	$mPerm = 1;
-					//}
 					$sc_data = sc_perms($fid);
 					if ($for=='nexttime'){
 						if ($discuz_uid==$party['joinUid'] && $_POST['partysubmit']=='确认下次再参加'){
@@ -492,7 +483,7 @@ if (defined('IN_PARTY')){
 									showmessage("你已超过活动允许自由退出的时间，要记得去哦。",$goUrl);
 								}
 							}
-							if ($mPerm==1){
+							if ($discuz_uid==$party['uid']){
 								showmessage("你为此活动的召集人，不允许退出活动！",$goUrl);
 							}
 							if (empty($message)){
@@ -598,13 +589,10 @@ if (defined('IN_PARTY')){
 						$mPerm = 1;
 					}else{
                         $ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-			            if ($ckConvenePerm['uid']>0){
-			            	$mPerm = 1;
-			            }
-						//if ($ckPerm['usertask']=='召集人'){
-						//	$mPerm = 1;
-						//}
+                        //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+			            //if ($ckConvenePerm['uid']>0){
+			            //	$mPerm = 1;
+			            //}
 					}
 					if ($mPerm = 1){
 						$sc_data = sc_perms($fid);
@@ -615,12 +603,12 @@ if (defined('IN_PARTY')){
 						);
 						if ($sc_data['signform']==1){
 							$sc_data['signfield'] = sc_order_fields($sc_data['signfield']);
-							foreach($sc_data['signfield'] as $v){
+                            foreach($sc_data['signfield'] as $v){
 								array_push($doc[0],$v['name']);
 								$fields[] = $v['field'];
 							}
 							$count = count($sc_data['signfield']);
-							$last = 5+$count;
+							$last = count($doc[0])+$count;
 						}
 						array_push($doc[0],'与会签名');
 						if ($party['marks']){
@@ -676,13 +664,10 @@ if (defined('IN_PARTY')){
 					$mPerm = 1;
 				}else{
                     $ckPerm = $db->fetch_first("select usertask from {$tablepre}partyers where tid='$tid' and uid='$discuz_uid'");
-                    $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-    				if ($ckConvenePerm['uid']>0){
-    					$mPerm = 1;
-    				}
-					//if ($ckPerm['usertask']=='召集人'){
-					//	$mPerm = 1;
-					//}
+                    //$ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
+    				//if ($ckConvenePerm['uid']>0){
+    				//	$mPerm = 1;
+    				//}
 				}
 			}
 			if ($mPerm == 1){
@@ -787,7 +772,7 @@ if (defined('IN_PARTY')){
         // 签到统计
         if ($tid > 0 && is_numeric($tid)){
             $party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
-            if ($party){
+            if ($party && $discuz_uid > 0){
     	        $thread = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid'");
                 $party['subject'] = $thread['subject'];
 
@@ -797,17 +782,12 @@ if (defined('IN_PARTY')){
                 }
                 else{
                     $mPerm = 0;
-				    if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
+				    if ($party['uid']==$discuz_uid || $adminid == 1){
 				    	$mPerm = 1;
-				    }else{
-                        $ckConvenePerm = $db->fetch_first("select uid from {$tablepre}party where tid='$tid' and uid='$discuz_uid'");
-			            if ($ckConvenePerm['uid']>0){
-			            	$mPerm = 1;
-			            }
                     }
-                    if($mPerm)
-                    {
-                        if ($step=='post'){
+                    if ($step=='post'){
+			            $sc_data = sc_perms($fid);
+			            if ($sc_data['toperm']==1){
                             foreach($checkin as $uid => $ck)
                             {
 			                    $db->query("update {$tablepre}partyers set checkin='$ck', updatetime='". time() ."' where uid='$uid' and tid='$tid'");
