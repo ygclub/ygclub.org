@@ -229,7 +229,7 @@ if (defined('IN_PARTY')){
 				// 活动时间
 				if ($showtime){
 					$showtime = strtotime($showtime);
-					if ($showtime <= $timestamp){
+					if ($showtime <= $timestamp && $party['closed'] != '1'){
 						showmessage("活动时间小于等于当前时间",$goBack);
 					}
 				}else{
