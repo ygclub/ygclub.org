@@ -70,6 +70,7 @@
   }
   else
   {
-    die('<a href="logging.php?action=login">Please login first</a>');
+	showmessage("此功能仅限登录用户查看。","logging.php?action=login");
+    //die('<a href="logging.php?action=login">Please login first</a>');
   }
 ?> 
