@@ -203,8 +203,8 @@ if (defined('IN_PARTY')){
 	}elseif ($act=='complete'){
 		if ($fid && $tid){
             $sc_data = sc_perms($fid);
-			//if ($sc_data['toperm']==1){
-            if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
+			if ($sc_data['toperm']==1){
+            //if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
 				$tinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid' and authorid='$discuz_uid'");
 				$party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
 				$party['showtime'] = $party['showtime'] ? gmdate('Y-m-d H:i',$party['showtime']+3600*$_DSESSION['timeoffset']) : "";
