@@ -782,7 +782,9 @@ if (defined('IN_PARTY')){
                 }
                 else{
                     $mPerm = 0;
-				    if ($party['uid']==$discuz_uid || $adminid == 1){
+			        $sc_data = sc_perms($fid);
+			        if ($sc_data['toperm']==1){
+				    //if ($party['uid']==$discuz_uid || $adminid == 1){
 				    	$mPerm = 1;
                     }
                     if ($step=='post'){
