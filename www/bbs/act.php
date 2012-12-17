@@ -68,7 +68,7 @@ if ($discuz_uid)
         if($endtime <= $today)
         {
             $uid = intval($uid);
-            $sql = 'SELECT pe.uid, pe.username, pe.config, pe.checkin, p.class, p.tid, p.showtime, t.subject  FROM ';
+            $sql = 'SELECT pe.uid, pe.username, pe.config, pe.checkin, p.class, p.tid, p.ctid, p.showtime, t.subject  FROM ';
             $sql .= "{$tablepre}partyers as pe LEFT JOIN {$tablepre}party as p on pe.tid = p.tid LEFT JOIN {$tablepre}threads as t on p.tid = t.tid where 1 ";
             $sql .= "AND pe.uid = '{$uid}'";
             $sql .= "AND pe.verified = 4 ";
@@ -83,7 +83,6 @@ if ($discuz_uid)
             $party_class_count = array();
             foreach($partyClass as $value) $party_class_count[$value] = 0;
             $checkAttr = array('0'=>'待确认', '1'=>'已参加', '2'=>'未参加');
-
             while ($act_user = $db->fetch_array($query))
             {
                 if(in_array($act_user['class'], $partyClass))

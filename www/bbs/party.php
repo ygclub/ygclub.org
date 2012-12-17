@@ -4,6 +4,11 @@
 if (defined('IN_PARTY')){
 	if (IN_PARTY==1){
 		$sc_data = sc_perms($fid);
+        $cpartyinfo = $db->fetch_first("select tid from {$tablepre}party where ctid='$tid'");
+        if($cpartyinfo)
+        {
+            $cpartyinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where tid='$cpartyinfo[tid]'");
+        }
 		$party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
 		if ($party){
 			// 时间
@@ -204,8 +209,7 @@ if (defined('IN_PARTY')){
 		if ($fid && $tid){
             $sc_data = sc_perms($fid);
 			if ($sc_data['toperm']==1){
-            //if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2){
-				$tinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid' and authorid='$discuz_uid'");
+				$tinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid'");
 				$party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
 				$party['showtime'] = $party['showtime'] ? gmdate('Y-m-d H:i',$party['showtime']+3600*$_DSESSION['timeoffset']) : "";
 				$party['starttimefrom'] = $party['starttimefrom'] ? gmdate('Y-m-d H:i',$party['starttimefrom']+3600*$_DSESSION['timeoffset']) : "";
@@ -784,15 +788,15 @@ if (defined('IN_PARTY')){
                     $mPerm = 0;
 			        $sc_data = sc_perms($fid);
 			        if ($sc_data['toperm']==1){
-				    //if ($party['uid']==$discuz_uid || $adminid == 1){
 				    	$mPerm = 1;
                     }
+                    $ex_workers = empty($party['doworker']) ? array('') : array_merge(array('','召集人') , explode(',',$party['doworker']));
                     if ($step=='post'){
 			            $sc_data = sc_perms($fid);
-			            if ($sc_data['toperm']==1){
+                        if ($sc_data['toperm']==1){
                             foreach($checkin as $uid => $ck)
                             {
-			                    $db->query("update {$tablepre}partyers set checkin='$ck', updatetime='". time() ."' where uid='$uid' and tid='$tid'");
+			                    $db->query("update {$tablepre}partyers set usertask='{$usertask_list[$uid]}', checkin='$ck', updatetime='". time() ."' where uid='$uid' and tid='$tid'");
                             }
                             showmessage("设置成功","$thisrc?act=checkin&tid=$tid");
                         }
@@ -807,13 +811,120 @@ if (defined('IN_PARTY')){
 				    	$rs['v1'] = $verifiedArr[$rs['verified']];
                         $rs['m1'] = $party['marks'] ? $partyMarks[$rs['marks']] : "";
                         $rs['checkin_txt'] = $checkAttr[$rs['checkin']];
+                        $rs['config'] = unserialize($rs['config']);
                         $checkin_count_list[$rs['checkin']] ++;
                         $total_count ++;
 				    	$list[] = $rs;
 				    }
                 }
-                include template('party_checkin');
+                if($step=='list' && $party['class'] == '阳光公益活动')
+                {
+                    $other_task = '其他分工';
+                    $main_count = 0;
+                    $assis_count = 0;
+                    $audit_count = 0;
+                    $sum_list = array($other_task=>array());
+                    foreach($list as $key => $value)
+                    {
+                        if($value['checkin'] == 1)
+                        {
+                            if($value['usertask'] == '')
+                            {
+                                if(preg_match('/主讲/', $value['message']))
+                                {
+                                    $value['usertask'] = '主讲人';
+                                }
+                                else if(preg_match('/助教/', $value['message']))
+                                {
+                                    $value['usertask'] = '助教';
+                                }
+                                else if(preg_match('/旁听/', $value['message']))
+                                {
+                                    $value['usertask'] = '旁听';
+                                }
+                                else
+                                {
+                                    $value['usertask'] = '旁听';
+                                }
+                            }
+                            if(is_array($value['config']['课程']))
+                            {
+                                foreach($value['config']['课程'] as $lesson)
+                                {
+                                    $sum_list[$lesson][$value['usertask']]['detail'][$value['uid']] = $value;
+                                }
+                            }
+                            else
+                            {
+                                    $sum_list[$other_task][$other_task]['detail'][$value['uid']] = $value;
+                            }
+                        }
+                    }
+                    foreach($sum_list as $lesson => $value)
+                    {
+                        foreach($value as $usertask => $detail)
+                        {
+                            foreach($detail['detail'] as $user_id => $user_info)
+                            {
+                                $temp_sum[] = '<a href="space.php?uid=' . $user_info['uid'] . '" target="_blank">' . $user_info['username'] . '</a>';
+                            }
+                            $sum_list[$lesson][$usertask]['sum'] = join(', ', $temp_sum);
+                            unset($temp_sum);
+                        }
+                    }
+                    $temp = $sum_list[$other_task];
+                    unset($sum_list[$other_task]);
+                    $sum_list[$other_task] = $temp;
+                    include template('party_checkin_list');
+                }
+                else
+                {
+                    include template('party_checkin');
+                }
 			}
+        }
+    }
+    elseif($act=='relec'){
+        $sc_data = sc_perms($fid);
+	    if ($sc_data['toperm']==1){
+	   	    $tinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid'");
+            $party = $db->fetch_first("select * from {$tablepre}party where tid='$tid'");
+            if ($step == 'post'){
+                $ctinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$ctid'");
+                if(empty($ctinfo))
+                {
+                    showmessage("帖子中没有与您输入ID相符的记录","$thisrc?act=relec&tid=$tid");
+                }
+                else
+                {
+			        $db->query("update {$tablepre}party set ctid='{$ctid}' where tid='{$tid}'");
+				    showmessage("关联总结帖成功","$thisrc?act=relec&tid=$tid");
+                }
+            }
+            if($party['ctid'] == 0)
+            {
+                 $rcinfo = array();
+                 $ctitle_patten = $tinfo['subject'];
+                 $ctitle_patten = str_replace('【活动召集】','',$ctitle_patten);
+                 $ctitle_patten = str_replace('召集','',$ctitle_patten);
+                 $ctitle_patten = trim($ctitle_patten);
+                 $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$ctitle_patten}%' and subject like '%总结%'");
+                 if(empty($rcinfo))
+                 {
+                     $ctitle_patten = preg_match('/([\d-]*)(.*)/', $ctitle_patten, $reg);
+                     if(is_array($reg) && count($reg) > 1)
+                     {
+                         $reg[1] = trim($reg[1]);
+                         $reg[2] = trim($reg[2]);
+                         $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$reg[1]}%' and subject like '%$reg[2]%' and subject like '%总结%'");
+                     }
+                 }
+            }
+            else
+            {
+	   	        $ctinfo = $db->fetch_first("select subject from {$tablepre}threads where tid='$party[ctid]'");
+            }
+            include template('party_relec');
         }
     }
 }

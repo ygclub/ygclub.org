@@ -56,7 +56,10 @@
             <!--{eval $size++;}-->
             <tr class='t1'>
                 <th>$size</th>
-                <td><a href="viewthread.php?tid=$k&from=act_f" target="_blank">$v['subject']</a></td>
+                <td>
+                    <a href="viewthread.php?tid=$k&from=act_f" target="_blank">$v['subject']</a>
+                    <!--{if $v['ctid'] > 0 }--><a href="viewthread.php?tid=$v[ctid]" target="_blank" style="color:green">[相关总结帖]</a><!--{/if}-->
+                </td>
                 <td>
                     <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>
                 </td>

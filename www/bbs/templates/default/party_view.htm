@@ -1,5 +1,5 @@
 <style type="text/css">
-@import url(forumdata/cache/party.css);
+    @import url(forumdata/cache/party.css);
 </style>
 
 <div id="info">
@@ -27,9 +27,15 @@
 						<th style="border-bottom:none;">活动主题:</th>
                         <td colspan="3" style="font-size: 14px; color:red; font-weight: bold; border-bottom:none;">$thread[subject] 
                             <!--{if $party['showtime_orgin'] < time() && $discuz_uid > 0}-->
-                        <a href="party.php?act=checkin&step=list&tid=$tid" target="_blank" style="font-weight:normal;font-size:12px;">[签到信息]</a>  
+                            <a href="party.php?act=checkin&step=list&tid=$tid" style="font-weight:normal;font-size:12px;">[签到信息]</a>  
+                            <!--{if $party['ctid'] > 0}-->
+                            <a href="viewthread.php?tid=$party[ctid]" style="font-weight:normal;font-size:12px;">[相关总结帖]</a>
+                            <!--{else}-->
+                            <span  style="font-weight:normal;color:#ddd;font-size:12px;">[相关总结帖]</span>
+                            <!--{/if}-->
 						<!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
-						<a href="party.php?act=checkin&tid=$tid" target="_blank" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
+						<a href="party.php?act=checkin&tid=$tid" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
+						<a href="party.php?act=relec&tid=$tid" style="font-weight:normal;font-size:12px;">[关联总结贴]</a>  
                         <!--{/if}-->
                         <!--{/if}-->
 						<!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
