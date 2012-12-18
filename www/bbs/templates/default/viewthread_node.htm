@@ -208,7 +208,7 @@
 						<!--{if $sc_data['toperm']==1 && $thread['special'] == 0 && $post['first']}-->
 						<a href="party.php?act=complete&tid=$tid"><img src='{IMGDIR}/add-party.gif' border='0' align='absmiddle' alt='点击完善活动相关资料' /></a>
                         <!--{/if}-->		
-                        <!--{if $cpartyinfo}--><a href="viewthread.php?tid=$cpartyinfo[tid]" title="$cpartyinfo[subject]">[相关召集帖]</a><!--{/if}-->
+                        <!--{if $cpartyinfo}--><a href="viewthread.php?tid=$cpartyinfo[tid]" title="$cpartyinfo[subject]" style="color:blue">[相关召集帖]</a><!--{/if}-->
 						</h1>
 						<!--{if $thread[tags] || $relatedkeywords}-->
 							<div class="threadtags">
