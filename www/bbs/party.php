@@ -908,16 +908,32 @@ if (defined('IN_PARTY')){
                  $ctitle_patten = str_replace('【活动召集】','',$ctitle_patten);
                  $ctitle_patten = str_replace('召集','',$ctitle_patten);
                  $ctitle_patten = trim($ctitle_patten);
+                 $ctitle_patten = str_replace(' ', '', $ctitle_patten);
                  $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$ctitle_patten}%' and subject like '%总结%'");
                  if(empty($rcinfo))
                  {
-                     $ctitle_patten = preg_match('/([\d-]*)(.*)/', $ctitle_patten, $reg);
-                     if(is_array($reg) && count($reg) > 1)
+                     $location = explode('学校', $ctitle_patten);
+                     if(count($location) == 2)
+                     {
+                        $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$reg[1]}%' and subject like '%{$location[0]}%' and subject like '%总结%'");
+                     }
+                     else
+                     {
+                        $location = explode('社区', $ctitle_patten);
+                        if(count($location) == 2)
+                        {
+                            $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$reg[1]}%' and subject like '%{$location[0]}%' and subject like '%总结%'");
+                        }
+                     }
+                 }
+                 if(empty($rcinfo))
+                 {
+                     if(preg_match('/([\d-.]*)(.*)/', $ctitle_patten, $reg))
                      {
                          $reg[1] = trim($reg[1]);
                          $reg[2] = trim($reg[2]);
                          $rcinfo = $db->fetch_first("select tid, subject from {$tablepre}threads where subject like '%{$reg[1]}%' and subject like '%$reg[2]%' and subject like '%总结%'");
-                     }
+                    }
                  }
             }
             else
