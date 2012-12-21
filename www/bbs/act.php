@@ -79,6 +79,7 @@ if ($discuz_uid)
             $act_user_list = array();
             $user_name = '';
             $total_count = 0;
+            $total_checkin_count = 0;
             $query = $db->query($sql);
             $party_class_count = array();
             foreach($partyClass as $value) $party_class_count[$value] = 0;
@@ -88,6 +89,15 @@ if ($discuz_uid)
                 if(in_array($act_user['class'], $partyClass))
                 {
                     $party_class_count[$act_user['class']] ++;
+                    if(!isset($party_class_checkin_count[$act_user['class']]))
+                    {
+                        $party_class_checkin_count[$act_user['class']] = 0;
+                    }
+                    if($act_user['checkin'] == 1)
+                    {
+                        $total_checkin_count ++;
+                        $party_class_checkin_count[$act_user['class']] ++;
+                    }
                     $user_name = $act_user['username'];
                     $act_user['config'] = unserialize($act_user['config']); 
                     $act_user['showtime'] = gmdate('Y-m-d H:i',$act_user['showtime']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$act_user['showtime']+3600*$_DSESSION['timeoffset'])].")";
