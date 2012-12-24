@@ -350,6 +350,8 @@ if (defined('IN_PARTY')){
 				}
 				// 保存数据
 				$db->query("insert into {$tablepre}partyers (tid,uid,username,phone,verified,dateline,message,marks,usertask,followed,config) values ('$tid','$discuz_uid','$discuz_user','$usermobile','1','$timestamp','$usrexplain','$marks','$usertask','$followed','$SFDC')");
+				$thread = $db->fetch_first("select subject from {$tablepre}threads where tid='$tid'");
+				sendpm($party[uid], "{$thread[subject]}的活动通知", "你的好友：{$discuz_user}，已报名“{$thread[subject]}”的活动，正在等待你的审核。", 0);
 				showmessage("已申请成功，请等待确认。",$goUrl);
 			}
 			exit;
