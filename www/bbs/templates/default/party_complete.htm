@@ -14,8 +14,8 @@
 				<tr>
 					<th><b>发起人参与？</b><font color="red">(*)</font></th>
 					<td>
-						<input name="isjoin" type="radio" value="1" {if $party[isjoin]==1 || empty($party[isjoin])}checked{/if}/>参与活动
-						<input name="isjoin" type="radio" value="0" {if $party[isjoin]==0}checked{/if}/>不参与活动
+						<input name="isjoin" type="radio" value="1" {if $party[isjoin]==1 || !isset($party[isjoin])}checked{/if}/>参与活动
+						<input name="isjoin" type="radio" value="0" {if $party[isjoin]==0 && isset($party[isjoin])}checked{/if}/>不参与活动
 					</td>
 				</tr>
 
@@ -66,7 +66,7 @@
 				<!--{if $sc_data['follower']==1}-->
 				<tr>
 					<th><b>随行人员</b><font color="red">(*)</font></th>
-					<td><input name='followed' type='radio' value='0' {if $party[followed]==0}checked{/if}>不允许 <input name='followed' type='radio' value='1' {if empty($party[followed]) || $party[followed]==1}checked{/if}>允许</td>
+					<td><input name='followed' type='radio' value='0' {if $party[followed]==0 || !isset($party[followed])}checked{/if}>不允许 <input name='followed' type='radio' value='1' {if isset($party[followed]) && $party[followed]==1}checked{/if}>允许</td>
 				</tr>
 				<!--{/if}-->
 
