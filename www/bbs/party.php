@@ -63,7 +63,8 @@ if (defined('IN_PARTY')){
 						$j++;
 					}
 					if ($party['followed']){
-						$allFolloweder += $v['followed'];
+                        $allFolloweder += $v['followed'];
+                        $i += $v['followed'];
 					}
 				}
 				$allPartyers_count = count($partyers);
