@@ -76,7 +76,7 @@
 			<!--{if $party['closed']}-->
 				<p id="notice"><IMG SRC="images/default/notice_1.gif" align="absmiddle"> 本次活动已结束，不再接受报名。^_^</p>
 			<!--{else}-->
-				<!--{if $passPartyers_count >= $party['number'] && $party['number']}-->
+				<!--{if $passPartyers_count + $passFolloweder >= $party['number'] && $party['number']}-->
 					<p id="notice"><IMG SRC="images/default/notice_1.gif" align="absmiddle"> 本次活动参加人数已达上限，不再接受报名。^_^ 请下次赶早</p>
 				<!--{elseif $myGender!=$party['gender'] && $party['gender']}-->
 					<p id="notice"><IMG SRC="images/default/notice_1.gif" align="absmiddle"> 不好意思，此次活动有性别要求。^_^ <a href="memcp.php" target="_blank">(点此进行性别设置)</a></p>

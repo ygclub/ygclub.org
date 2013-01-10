@@ -64,7 +64,6 @@ if (defined('IN_PARTY')){
 					}
 					if ($party['followed']){
                         $allFolloweder += $v['followed'];
-                        $i += $v['followed'];
 					}
 				}
 				$allPartyers_count = count($partyers);
@@ -95,7 +94,7 @@ if (defined('IN_PARTY')){
 				if ($party['number']==0){
 					$joinPerm = 1;
 				}else{
-					if ($party['number'] > $passPartyers_count){
+					if ($party['number'] > $passPartyers_count + $passFolloweder){
 						if ($party['gender']){
 							if ($myGender==$party['gender']){
 								$joinPerm = 1;
