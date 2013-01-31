@@ -1,0 +1,229 @@
+body {
+  background-color: #67B400;
+  
+}
+
+header {
+  background-color: #FFF;
+  position: relative;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.main {
+  margin: 5px;
+  background-color: #FFF;
+  border-radius: 5px;
+}
+
+.logo {
+  background: url(../img/logo.png) no-repeat left center;
+  background-size: 200px 56px;
+  width: 200px;
+  height: 70px;
+  display: block;
+  margin-left: 5px;
+}
+
+.action-nav {
+  position: absolute;
+  right: 5px;
+  top: 25px;
+}
+
+.action-nav a {
+  padding: 5px;
+  color: #fff;
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.form-signin {
+  padding: 29px;
+  margin: 5px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin input[type="text"],
+.form-signin input[type="password"] {
+  font-size: 16px;
+  height: auto;
+  margin-bottom: 15px;
+  padding: 7px 9px;
+}
+
+.form-signin .btn-group {
+  width: 120px;
+  margin: 0px auto;
+  display: block;
+}
+
+.form-signin .btn {
+  width: 120px;
+}
+
+.activity-list {
+  border-bottom: 1px solid #67B400;
+}
+
+.activity-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-list li {
+  line-height: 30px;
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  display: block;
+  font-size: 16px;
+  position: relative;
+  padding-right: 70px;
+}
+
+.activity-list li:first-child{
+  border-top: none;
+}
+
+.activity-list li a {
+
+}
+
+.activity-list .list-checkin {
+  margin-left: 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.moderator-on .list-checkin {
+  display: none;
+}
+
+.moderator-on li {
+  padding-right: 10px;
+}
+
+.activity {
+  padding: 10px;
+}
+
+.activity h2 {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  line-height: 24px;
+}
+
+
+.activity-detail table th {
+  width: 75px;
+  text-align: right;
+}
+
+.checkin-item {
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.checkin-item-title {
+  color: #000;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px;
+  background-color: #ddd;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+
+.checkin-item-status {
+  margin: 0;
+  color: #666;
+  padding: 5px;
+}
+
+.checkin-item input[type="radio"] {
+  margin-top: -3px;
+}
+
+.checkin-btn {
+  display: block;
+  padding: 15px;
+  border-top: 1px solid #e8e8e8;
+  margin: 0px auto;
+  text-align: center;
+}
+
+.checkin-btn:first-child {
+  border-top: none;
+}
+
+.spec-more {
+  background: url(../img/chevron-down.png) no-repeat center center;
+  background-size: 27px 18px;
+  display: block;
+  width: 100%;
+  height: 30px;
+  border-bottom: 1px solid #ddd;
+  margin: 0px auto;
+}
+
+.spec {
+  background-color: #eee;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  margin: 0;
+}
+
+.spec dl {
+  position: relative;
+  width: 245px;
+  margin: 0px auto;
+}
+
+.spec dt {
+  position: absolute;
+  font-size: 14px;
+  color: #666;
+  padding: 10px 5px;
+}
+
+.spec dd {
+  margin-left: 50px;
+}
+
+.spec-btn {
+  display: inline-block;
+  margin: 0px;
+  padding: 10px 10px 10px 5px;
+}
+
+
+
+
+
+
+@media (max-width: 767px) {
+  body {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+}
+
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+only screen and (-moz-min-device-pixel-ratio: 1.5),
+only screen and (-o-min-device-pixel-ratio: 3/2),
+only screen and (min-device-pixel-ratio: 1.5) {
+  .logo {
+    background-image: url(../img/logo@2x.png);
+  }
+}
+
