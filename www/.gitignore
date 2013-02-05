@@ -53,3 +53,12 @@ pma
 Icon?
 ehthumbs.db
 Thumbs.db
+
+
+## Xbbs ###
+.idea
+#*.doc
+xbbs/config/config_global.php
+xbbs/config/config_ucenter.php
+xbbs/uc_server/data/config.inc.php
+wiki/plugins/mapabc/*.doc
