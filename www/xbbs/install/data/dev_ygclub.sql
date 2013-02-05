@@ -17,14 +17,23 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `xbbs_ygclub_org`
+-- Database: `ygclub`
 --
 
 -- --------------------------------------------------------
+-- create database
+--
 
+DROP DATABASE IF EXISTS ygclub;
+CREATE DATABASE IF NOT EXISTS ygclub;
+USE ygclub;
+
+-- --------------------------------------------------------
 --
 -- Table structure for table `ygclub_common_admincp_cmenu`
 --
+
+
 
 CREATE TABLE IF NOT EXISTS `ygclub_common_admincp_cmenu` (
   `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
