@@ -13,9 +13,10 @@ Requirements
 install MAMP(for mac), or LAMP(for linux), or WAMP(for windows)
 
 
-1. Config AMP
+1. Config AMP & start servers
 ------------------------------
 Config MAMP, point apache's document root to ygclub/www.
+Start servers on MAMP
 
 2. install database
 ------------------------------
