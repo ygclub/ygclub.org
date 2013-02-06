@@ -27,3 +27,8 @@ Run: ./deploy_dev.sh initdb
 ------------------------------
 Go to ggclub/www/xbbs/suport
 Run: ./deploy_dev.sh cfg
+
+4. run phpunit in command line:
+-------------------------------
+phpunit --debug .
+phpunit will run all the test(will name *Test.php) in the current directory recursively.
