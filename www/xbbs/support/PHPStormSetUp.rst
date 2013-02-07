@@ -55,12 +55,13 @@ Select PHP Interpreter:
 2.1 set up Xdebug：
 
     integrate Xdebug with MAMP:
-        edit file: "<MAMP_PATH>/conf/php5.4.4/php.ini"
+        edit file: "<MAMP_PATH>/bin/php/php5.4.4/conf/php.ini"
             add the following lines to Xdebug section:
-                zend_extension="/Applications/MAMP/bin/php/php5.4.4/lib/php/extensions/no-debug-non-zts-20100525/Xdebug.so"
-                Xdebug.remote_enable=1
-                Xdebug.remote_host="localhost"
-                Xdebug.remote_port=9000
+                zend_extension="/Applications/MAMP/bin/php/php5.4.4/lib/php/extensions/no-debug-non-zts-20100525/xdebug.so"
+                xdebug.remote_enable=1
+                xdebug.remote_host="localhost"
+                xdebug.remote_port=9000
+                xdebug.profiler_enable=1
 
 
 3. set up PhpUnit
