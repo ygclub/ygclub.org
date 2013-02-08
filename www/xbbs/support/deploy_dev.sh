@@ -16,7 +16,7 @@ function init_db {
     echo "################${FUNCNAME[0]} start################"
 
     mysqladmin -u root -p'root' password ''
-    mysql -v -uroot ygclub  < ../install/data/dev_ygclub.sql
+    mysql -v -uroot < ../install/data/dev_ygclub.sql
 
     echo "################${FUNCNAME[0]} finished################"
 }
