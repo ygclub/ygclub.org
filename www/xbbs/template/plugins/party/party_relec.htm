@@ -1,0 +1,51 @@
+{subtemplate header}
+
+<script type="text/javascript" src="include/js/calendar.js?{VERHASH}" reload="1"></script>
+
+<div id="nav"><a href="$indexname">$bbname</a> &raquo; <a>关联总结帖</a> &raquo; <a href="viewthread.php?tid=$tid">$tinfo[subject]</a></div>
+
+<form method="post" action="$thisrc?act=relec&step=post&fid=$fid&tid=$tid">
+<div id="wrap" class="wrap s_clear">
+	<div class="main">
+        <div class="content specialpost">
+			<table cellspacing="0" cellpadding="0" class="formtable">
+                <tr>
+                    <td>
+                        <h1>
+                        <!--{if $party[ctid] > 0}-->已关联至总结帖: <a href="viewthread.php?tid=$party[ctid]">$ctinfo[subject]</a>
+                        <!--{else}-->尚未关联总结帖<!--{/if}-->
+                        </h1>
+                    </td>
+				</tr>
+				<tr>
+                    <td>输入要关联的总结贴ID:
+                      <!--{if $party[ctid] > 0}-->
+                      <input type="text" value="$party[ctid]" name="ctid" />
+                      <!--{elseif $rcinfo[tid] > 0}-->
+                      <input type="text" value="$rcinfo[tid]" name="ctid" />
+                      <!--{else}-->
+                      <input type="text" value="" name="ctid" />
+                      <!--{/if}-->
+                  </td>
+				</tr>				
+				<tr>
+					<td><input type="submit" value='关联总结帖' name='partysubmit'/></td>
+				</tr>				
+                <!--{if $party[ctid] == 0}-->
+                <tr>
+                    <td>
+                        <!--{if $rcinfo[tid]>0}-->
+                        系统推荐您关联至总结帖：[{$rcinfo['tid']}] <a href="viewthread.php?tid=$rcinfo[tid]">$rcinfo[subject]</a>
+                        <!--{else}-->
+                        系统没有找到可推荐的总结帖进行关联，请尝试检查是否有相关总结帖或手工输入ID进行关联。
+                        <!--{/if}-->
+                    </td>
+                </tr>				
+                <!--{/if}-->
+			</table>
+		</div>
+	</div>
+</div>
+</form>
+
+{subtemplate footer}

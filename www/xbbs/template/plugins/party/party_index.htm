@@ -1,0 +1,43 @@
+{subtemplate header}
+<style type="text/css">
+	#content li {margin-top: 8px;}
+	#content{padding: 8px; clear: both; width:95%;  margin: auto; margin-top: 10px;}
+</style>
+<script type="text/javascript">
+function show_set(fid){
+	document.getElementById('sset_'+fid).style.display = 'inline';
+}
+function clear_set(fid){
+	document.getElementById('sset_'+fid).style.display = 'none';
+}
+</script>
+
+<div id="nav"><a href="$indexname">$bbname</a> &raquo; <a href="$thisrc">召集设置</a> &raquo; 首页</div>
+
+<div id="wrap" class="wrap s_clear">
+	<div id="content">
+	<!--{loop $categories $category}-->
+		<!--{if isset($forums[$category['fid']])}-->
+			<h3>$category[name]</h3>
+			<ul>
+				<!--{loop $forums[$category[fid]] $forum}-->
+				<!--{eval $forum_allow = file_exists("forumdata/cache/party_".$forum[fid].".php") ? "<img src='images/common/access_allow.gif' alt='此版块含召集配置文件' align='absmiddle'/>&nbsp;&nbsp;" : "" ;}-->
+					<li onmouseover="show_set($forum[fid]);" onmouseout="clear_set($forum[fid]);">&nbsp;&nbsp;&nbsp;&nbsp;◆
+					<a href="forumdisplay.php?fid=$forum[fid]" target="_blank">$forum[name]</a>&nbsp;&nbsp;$forum_allow<span id="sset_$forum[fid]" style="display:none;"><a href="$thisrc?act=set&fid=$forum[fid]"><font color="#666666">设置</font></a> // <a href="party.php?act=check&fid=$forum[fid]" target="_blank"><font color="#666666">清理</font></a></span>
+					<!--{if isset($subforums[$forum['fid']])}-->
+						<ul>
+						<!--{loop $subforums[$forum['fid']] $subforum}-->
+						<!--{eval $subforums_allow = file_exists("forumdata/cache/party_".$subforum[fid].".php") ? "<img src='images/common/access_allow.gif' alt='此版块含召集配置文件' align='absmiddle'/>&nbsp;&nbsp;" : "" ;}-->
+							<li onmouseover="show_set($subforum[fid]);" onmouseout="clear_set($subforum[fid]);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◇
+							<a href="forumdisplay.php?fid=$subforum[fid]" target="_blank">$subforum[name]</a>&nbsp;&nbsp;$subforums_allow<span id="sset_$subforum[fid]" style="display:none;"><a href="$thisrc?act=set&fid=$subforum[fid]"><font color="#666666">设置</font></a> // <a href="party.php?act=check&fid=$forum[fid]" target="_blank"><font color="#666666">清理</font></a></span></li>
+						<!--{/loop}-->
+						</ul></li>
+					<!--{/if}-->
+				<!--{/loop}-->
+			</li></ul>
+		<!--{/if}-->
+	<!--{/loop}-->
+	</div>
+</div>
+
+{subtemplate footer}

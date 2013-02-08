@@ -1,0 +1,64 @@
+{subtemplate header}
+
+<div id="nav"><a href="$indexname">$bbname</a> &raquo; <a href="viewthread.php?tid=$tid">$party[subject]</a></div>
+
+<div id="wrap" class="wrap s_clear">
+	<div class="main">
+		<div class="content specialpost">
+			<h1><font color="blue">活动个人说明编辑</font></h1>
+			<form method="post" action="party.php?act=operate&for=edit&tid=$tid&pid=$pid">
+			<table cellspacing="0" cellpadding="0">	
+				<tr>
+					<th width='24%'>联系电话：(必填，只有召集者可见) <font color='red'>(*)</font></th>
+					<td><input TYPE="text" class='txt' name="usermobile" size="36" maxlength="20" onkeyup="value=value.replace(/[^0123456789-]/g,'')" value="$party[phone]"></td>
+				</tr>
+				<tr>
+					<th>个人说明：(200字以内) <font color='red'>(*)</font><br /><span style="color:green">提示：本部分内容为公开信息，请勿输入身份证号码和手机号等个人信息。</span></th>
+					<td><textarea name="usrexplain" ROWS="4" COLS="80">$party[message]</textarea></td>
+				</tr>
+				<!--{if !empty($party['marks'])}-->
+				<tr>
+					<th height='30'>备注选项 <font color='red'>(*)</font></th>
+					<td><!--{loop $ex_marks $k $v}--><!--{eval $checked = $k==$party['emarks'] ? "checked" : "";}--><input name="marks" type="radio" value="$k" {$checked}/>$v<!--{/loop}--></td>
+				</tr>
+                <!--{/if}-->
+	            <!--{if !empty($ex_workers)}-->
+	            <tr>
+                    <th height='30'>选择分工 <font color='red'>(*)</font></th>
+                    <td><!--{if $party['uid'] == $discuz_uid}--><input name="usertask" type="radio" value="召集人" checked="checked" />召集人<!--{/if}--><!-- {loop $ex_workers $k $v}--><input name="usertask" type="radio" value="$v" <!--{if $party['usertask'] == $v}-->checked="checked"<!--{/if}-->/>$v<!-- {/loop}--></td>
+	            </tr>
+	            <!--{/if}-->
+				<!--{if $party['followed']}-->
+				<tr>
+					<th height='30'>随行人员(加几) <font color='red'>(*)</font></th>
+					<td><input type='text' name='followed' class='txt' onkeyup="value=value.replace(/[^0123456789-]/g,'')" value='$party[efollowed]' maxlength='4' size='4'> <font color='#666666'>请输入数字</font></td>
+				</tr>
+				<!--{/if}-->
+                <!--{if $sc_data['signfield'] && $sc_data['signform']==1}-->
+                <!--
+					<tr>
+						<th colspan='2' height='30' bgcolor='#f1f1f1'>以下部分仅限于召集人可见</th>
+                    </tr>
+                 -->
+					<!--{loop $sc_data['signfield'] $v}-->
+					<tr>
+						<th height='30'>$v[name] <!--{if $v['must']=='on'}--><font color='red'>(*)</font><!--{/if}--></th>
+						<td>$v[html]</td>
+					</tr>
+					<!--{/loop}-->
+				<!--{/if}-->
+				<tr>
+					<th>&nbsp;</th>
+					<td><input type="submit" value='确认编辑' name='partysubmit'/></td>
+				</tr>	
+				<tr>
+					<th></th>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+</div>
+
+{subtemplate footer}

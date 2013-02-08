@@ -1,0 +1,98 @@
+{template header}
+
+<script type="text/javascript">
+function toSelect(e){
+	if (e.checked==true)
+	{
+		for (i=0; i< $count ; i++ )
+		{
+			if (document.getElementById('ck'+i)==null)
+			{
+				continue;
+			}
+			document.getElementById('ck'+i).checked = true;
+		}
+	}else{
+		for (i=0; i< $count ; i++ )
+		{
+			if (document.getElementById('ck'+i)==null)
+			{
+				continue;
+			}
+			document.getElementById('ck'+i).checked = false;
+		}
+	}
+}
+</script>
+
+<div id="nav"><a href="$indexname">$bbname</a> &raquo; <a href="viewthread.php?tid=$tid">$party[subject]</a></div>
+
+<div id="wrap" class="wrap s_clear">
+	<div class="main">
+		<div class="content specialpost">
+			<h1><font color="blue">短信群发给{$hdr}的朋友们</font></h1>
+			<form method="post" action="party.php?act=$act&for=$for&tid=$tid">
+			<table cellspacing="1" cellpadding="6" width="100%" align="center" bgcolor='#666666'>
+				<tr bgcolor='#ebf2f8'>
+					<td align='center' height='30' width='10'><input type='checkbox' onclick="toSelect(this);"/></td>
+					<td align='center'>用户名</td>
+					<td align='center'>电话</td>
+					<td align='center'>个人说明</td>
+					<td align='center'>状态</td>
+					<td align='center'>分工</td>
+				</tr>
+				<!--{loop $list $k $v}-->
+				<tr bgcolor='#FFFFFF' style="line-height:22px;">
+					<td align='center' width='10' valign="top" height='30'><input type='checkbox' name='applePhones[]' id="ck$k" value="{if $act=='sms'}$v[phone]{else}$v[uid]{/if}"/></td>
+					<td align='center' width='120' valign="top">$v[username]</td>
+					<td align='center' width='100' valign="top">$v[phone]</td>
+					<td align='left' valign="top">$v[message]<br><font color='green'>$v[reply]</font></td>
+					<td align='center' width='60' valign="top"><!--{echo $verifiedArr[$v['verified']]}--></td>
+					<td align='center' width='60' valign="top">$v[usertask]</td>
+				</tr>
+				<!--{/loop}-->
+			</table>
+			<br />
+			<!--{if $act=='sms'}-->
+			<table cellspacing="1" cellpadding="6" width="100%" align="center" bgcolor='#666666'>
+				<tr bgcolor='#ebf2f8'>
+					<td colspan="2" align='center' height='30'><b>群发手机短信</b></td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'><span class="bold">重要说明：</span></td>
+					<td width='80%'>1、本系统用于活动召集者通过手机短信与参加活动人员联系，请勿用于其他用途。 <br>2、短信发送产生的费用由<font color='blue'><u>{$bbname}</u></font>承担，接收短信免费。<br><font color='red'><b>3、避免造成不必要的资源浪费，请慎重使用群发手机短信功能！</b> </td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'><span class="bold">内容：</span> <font color='red'>(必填)</td>
+					<td width='80%'><textarea name="content" rows="4" cols="80"></textarea></td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'></td>
+					<td width='80%'><input class="submit" type="submit" name="partysubmit" value="发送短信" /></td>
+				</tr>
+			</table>
+			<!--{elseif $act=='pm'}-->
+			<table cellspacing="1" cellpadding="6" width="100%" align="center" bgcolor='#666666'>
+				<tr bgcolor='#ebf2f8'>
+					<td colspan="2" align='center' height='30'><b>群发站内短信</b></td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'><span class="bold">重要说明：</span></td>
+					<td width='80%'>1、本系统用于活动召集者通过站内短信与参加活动人员联系，请勿用于其他用途。 <br><font color='red'><b>2、避免造成不必要的资源浪费，请慎重使用群发站内短信功能！</b> </td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'><span class="bold">内容：</span> <font color='red'>(必填)</td>
+					<td width='80%'><textarea name="content" rows="4" cols="80"></textarea></td>
+				</tr>
+				<tr bgcolor='#FFFFFF'>
+					<td width='20%'></td>
+					<td width='80%'><input class="submit" type="submit" name="partysubmit" value="发送短信" /></td>
+				</tr>
+			</table>
+			<!--{/if}-->
+			</form>
+		</div>
+	</div>
+</div>
+
+{template footer}
