@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: mobile.php 31964 2012-10-26 07:27:36Z zhangjie $
+ *      $Id: mobile.php 32061 2012-11-06 02:41:00Z zhangjie $
  */
 
 define('IN_MOBILE_API', 1);
@@ -22,7 +22,7 @@ $modules = array('extends', 'buyattachment', 'buythread', 'checkpost', 'connect'
 		'newthread', 'profile', 'publicpm', 'register', 'seccode',
 		'secure', 'sendpm', 'sendreply', 'sub_checkpost', 'sublist',
 		'toplist', 'viewthread', 'uploadavatar', 'pollvote', 'mynotelist',
-		'modcp', 'topicadmin');
+		'modcp', 'topicadmin', 'forumimage');
 
 if(!in_array($_GET['module'], $modules)) {
 	mobile_core::result(array('error' => 'module_not_exists'));

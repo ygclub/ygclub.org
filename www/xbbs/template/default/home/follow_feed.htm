@@ -308,7 +308,7 @@
 					function resumeContent() {
 						var data = loadUserdata(userdatakey);
 						if(in_array((data = trim(data)), ['', 'null', 'false', null, false])) {
-							modifyformurl($dmfid);
+							modifyformurl();
 							return false;
 						}
 						var data = data.split(/\x09\x09/);

@@ -55,7 +55,7 @@
 								<!--{loop $_G['cache']['groupreadaccess'] $val}-->
 									<option value="$val[readaccess]" title="{lang readperm}: $val[readaccess]"{if $thread['readperm'] == $val[readaccess]} selected="selected"{/if}>$val[grouptitle]</option>
 								<!--{/loop}-->
-								<option value="255">{lang highest_right}</option>
+								<option value="255"{if $thread['readperm'] == 255} selected="selected"{/if}>{lang highest_right}</option>
 							</select>
 							<span class="xg1">{lang post_select_usergroup_readacces}</span>
 						</td>

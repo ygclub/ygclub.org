@@ -4,7 +4,7 @@
  *	  [Discuz! X] (C)2001-2099 Comsenz Inc.
  *	  This is NOT a freeware, use is subject to license terms
  *
- *	  $Id: spacecp.inc.php 31459 2012-08-30 07:05:37Z songlixin $
+ *	  $Id: spacecp.inc.php 32450 2013-01-17 09:12:39Z liulanbo $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -59,6 +59,9 @@ if ($pluginop == 'config') {
 		$post['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $post['message']);
 	}
 
+	if(strpos($msglower, '[/hide]') !== FALSE) {
+		$post['message'] = preg_replace("/\[hide[=]?(d\d+)?[,]?(\d+)?\]\s*(.*?)\s*\[\/hide\]/is", '', $post['message']);
+	}
 	$html_content = $connectService->connectParseBbcode($post['message'], $thread['fid'], $post['pid'], $post['htmlon'], $attach_images);
 	if ($_G['group']['allowgetimage'] && $thread['price'] == 0 && $post['pid']) {
 		if ($attach_images && is_array($attach_images)) {
@@ -96,13 +99,26 @@ if ($pluginop == 'config') {
 	if($sh_type == 1 || $sh_type == 3) {
 
 		$firstpost = C::t('forum_post')->fetch_threadpost_by_tid_invisible($tid, 0);
+		$msglower = strtolower($firstpost['message']);
+		if(strpos($msglower, '[/quote]') !== FALSE) {
+			$firstpost['message'] = preg_replace('/\[quote\].*\[\/quote\](\r\n|\n|\r){0,}/is', '', $firstpost['message']);
+		}
+		if(strpos($msglower, '[/media]') !== FALSE) {
+			$firstpost['message'] = preg_replace("/\[media=([\w,]+)\]\s*([^\[\<\r\n]+?)\s*\[\/media\]/ies", '', $firstpost['message']);
+		}
+		if(strpos($msglower, '[/flash]') !== FALSE) {
+			$firstpost['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $firstpost['message']);
+		}
+		if(strpos($msglower, '[/hide]') !== FALSE) {
+			$firstpost['message'] = preg_replace("/\[hide[=]?(d\d+)?[,]?(\d+)?\]\s*(.*?)\s*\[\/hide\]/is", '', $firstpost['message']);
+		}
 		$summary = $connectService->connectParseBbcode($firstpost['message'], $firstpost['fid'], $firstpost['pid'], $firstpost['htmlon'], $attach_images);
 
 		$qzone_params = array(
 			'title' => $_POST['share_subject'],
 			'url' => $url,
 			'comment' => $_POST['reason'],
-			'summary' => $summary,
+			'summary' => strip_tags($summary),
 			'images' => $_POST['attach_image'],
 			'nswb' => '1',
 		);

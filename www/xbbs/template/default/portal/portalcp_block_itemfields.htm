@@ -58,23 +58,24 @@
 				<!--{/loop}-->
 			</div>
 		</div>
-		<script type="text/javascript">
-			function activateIdent(obj) {
-				var imgList = $('imgList').getElementsByTagName('img');
-				for(i in imgList) {
-					imgList[i].className = 'z';
-				}
-				obj.className = 'z selected';
-			}
-			function openCropper(pic) {
-				$('icflag').value=0;
-				var url = 'misc.php?mod=imgcropper&width=$block[picwidth]&height=$block[picheight]&bid=$bid&ictype=block&picflag=$itemfields[picflag]&img='+pic;
-				showWindow('cropper', url, 'get', 0);
-			}
-		</script>
+		
 	</div>
-	<input type="hidden" name="icflag" id="icflag" value="0" />
 	<!--{/if}-->
+	<input type="hidden" name="icflag" id="icflag" value="0" />
+	<script type="text/javascript">
+		function activateIdent(obj) {
+			var imgList = $('imgList').getElementsByTagName('img');
+			for(i in imgList) {
+				imgList[i].className = 'z';
+			}
+			obj.className = 'z selected';
+		}
+		function openCropper(pic) {
+			$('icflag').value=0;
+			var url = 'misc.php?mod=imgcropper&width=$block[picwidth]&height=$block[picheight]&bid=$bid&ictype=block&picflag=$itemfields[picflag]&img='+pic;
+			showWindow('cropper', url, 'get', 0);
+		}
+	</script>
 	<!--{elseif $field[formtype] == 'date'}-->
 	<input type="text" class="px" name="$fieldname" value="$itemfields[$fieldname]" onclick="showcalendar(event, this, true)" />
 	<!--{else}-->

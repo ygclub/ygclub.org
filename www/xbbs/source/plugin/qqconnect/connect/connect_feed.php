@@ -4,7 +4,7 @@
  *	  [Discuz!] (C)2001-2099 Comsenz Inc.
  *	  This is NOT a freeware, use is subject to license terms
  *
- *	  $Id: connect_feed.php 31459 2012-08-30 07:05:37Z songlixin $
+ *	  $Id: connect_feed.php 32450 2013-01-17 09:12:39Z liulanbo $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -58,8 +58,11 @@ if ($op == 'new') {
 		if(strpos($msglower, '[/flash]') !== FALSE) {
 			$post['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $post['message']);
 		}
+		if(strpos($msglower, '[/hide]') !== FALSE) {
+			$post['message'] = preg_replace("/\[hide[=]?(d\d+)?[,]?(\d+)?\]\s*(.*?)\s*\[\/hide\]/is", '', $post['message']);
+		}
 		$html_content = $connectService->connectParseBbcode($post['message'], $thread['fid'], $post['pid'], $post['htmlon'], $attach_images);
-		$html_content = preg_replace('/(&nbsp;)+/', ' ', $html_content);
+		$html_content = strip_tags(preg_replace('/(&nbsp;)+/', ' ', $html_content));
 
 		if($_G['setting']['rewritestatus'] && in_array('forum_viewthread', $_G['setting']['rewritestatus'])) {
 			$url = rewriteoutput('forum_viewthread', 1, $_G['siteurl'], $tid);
@@ -77,7 +80,7 @@ if ($op == 'new') {
 		$_t_content = lang('plugin/qqconnect', 'connect_feed_iam');
 		$_t_content .= '#' . cutstr($_G['setting']['bbname'], 20,'') . '#';
 		$_t_content .= lang('plugin/qqconnect', 'connect_feed_published_thread', array('subject' => cutstr($thread['subject'], 120)));
-		$_t_content .= cutstr(strip_tags($html_content), 80);
+		$_t_content .= cutstr($html_content, 80);
 		$_t_content .= ' ' . $url;
 
 		$t_params = array(
@@ -219,14 +222,14 @@ if ($op == 'new') {
 			$post['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $post['message']);
 		}
 		$html_content = $connectService->connectParseBbcode($post['message'], $post['fid'], $post['pid'], $post['htmlon'], $attach_images);
-		$html_content = preg_replace('/(&nbsp;)+/', ' ', $html_content);
+		$html_content = strip_tags(preg_replace('/(&nbsp;)+/', ' ', $html_content));
 
 		$url = $_G['siteurl'].'forum.php?mod=redirect&goto=findpost&ptid='.$tid.'&pid='.$pid;
 
 		$_t_content = lang('plugin/qqconnect', 'connect_feed_iam');
 		$_t_content .= '#' . cutstr($_G['setting']['bbname'], 20,'') . '#';
 		$_t_content .= lang('plugin/qqconnect', 'connect_feed_published_post', array('subject' => cutstr($thread['subject'], 120)));
-		$_t_content .= cutstr(strip_tags($html_content), 80);
+		$_t_content .= cutstr($html_content, 80);
 		$_t_content .= ' ' . $url;
 		$t_params = array(
 		'content' => $_t_content,

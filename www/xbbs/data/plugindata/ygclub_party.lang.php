@@ -1,5 +1,8 @@
 <?php
-$scriptlang['party'] = array(     'add' => '添加',
+$scriptlang['ygclub_party'] = array(
+    'plugin_name' => '阳光活动',
+    'plugin_buttontext' => '发布阳光活动',
+    'add' => '添加',
     'title' => '标题',
     'content' => '内容',
     'submit' => '提交',
@@ -12,12 +15,13 @@ $scriptlang['party'] = array(     'add' => '添加',
     'status' => '状态',
     'publish' => '点击发布',
     'in_publish' => '发布中',
-    'edit_success' => '消息已更换'
+    'edit_success' => '消息已更换',
+    'consummate_party_data' => '完善活动资料',
 );
-$templatelang['party'] = array(
-    'name' => 'yes'
+$templatelang['ygclub_party'] = array(
+    'name' => 'yes',
 );
-$installlang['party'] = array(
+$installlang['ygclub_party'] = array(
 
 );
 ?>

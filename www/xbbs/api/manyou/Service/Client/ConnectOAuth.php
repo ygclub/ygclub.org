@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: ConnectOAuth.php 30537 2012-06-01 07:11:25Z songlixin $
+ *      $Id: ConnectOAuth.php 32196 2012-11-28 02:34:36Z liudongdong $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -70,9 +70,16 @@ class Cloud_Service_Client_ConnectOAuth extends Cloud_Service_Client_OAuth {
 		}
 	}
 
-	public function connectGetRequestToken($clientIp = '') {
+	public function connectGetRequestToken($callback, $clientIp = '') {
 
-		$extra = $clientIp ? array('oauth_client_ip' => $clientIp) : array();
+		$extra = array();
+
+		$extra['oauth_callback'] = rawurlencode($callback);
+
+		if ($clientIp) {
+			$extra['oauth_client_ip'] = $clientIp;
+		}
+
 		$this->setTokenSecret('');
 		$response = $this->_request($this->_requestTokenURL, $extra);
 
@@ -86,12 +93,11 @@ class Cloud_Service_Client_ConnectOAuth extends Cloud_Service_Client_OAuth {
 
 	}
 
-	public function getOAuthAuthorizeURL($requestToken, $callback) {
+	public function getOAuthAuthorizeURL($requestToken) {
 
 		$params = array(
 			'oauth_consumer_key' => $this->_appKey,
 			'oauth_token' => $requestToken,
-			'oauth_callback' => rawurlencode($callback),
 		);
 		$utilService = Cloud::loadClass('Service_Util');
 		$oAuthAuthorizeURL = $this->_oAuthAuthorizeURL.'?'.$utilService->httpBuildQuery($params, '', '&');

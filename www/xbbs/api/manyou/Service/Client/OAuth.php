@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: OAuth.php 29306 2012-04-01 03:42:53Z houdelei $
+ *      $Id: OAuth.php 32189 2012-11-26 08:08:25Z liudongdong $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -142,6 +142,10 @@ class Cloud_Service_Client_OAuth {
 		$method = strtoupper($method);
 		if(!in_array($method, array ('GET', 'POST'))) {
 			throw new Exception('Request Method Invlid');
+		}
+
+		if ($params['oauth_callback']) {
+			$params['oauth_callback'] = rawurlencode($params['oauth_callback']);
 		}
 
 		foreach($params as $name => $val) {

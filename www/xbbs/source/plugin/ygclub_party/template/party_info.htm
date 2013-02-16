@@ -14,22 +14,24 @@ function tpl_ygclub_party_info ($party = array()) {
     </table>
     <button class="pn" value="true" name="ijoin" onclick="showDialog($('partyjoin').innerHTML, 'info', '{lang ygclub_party:party_join}')"><span>{lang ygclub_party:party_join}</span></button>
     <div id="partyjoin" style="display:none">
-		<form name="party" id="party" method="post" autocomplete="off" action="forum.php?mod=misc&action=activityapplies&fid=$_G[fid]&tid=$_G[tid]&pid=$post[pid]{if $_GET['from']}&from=$_GET['from']{/if}" onsubmit="ajaxpost('party', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
+		<form name="party" id="party" method="post" autocomplete="off" action="plugin.php?id=ygclub_party" onsubmit="ajaxpost('party', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
             <input type="hidden" name="formhash" value="{FORMHASH}" />
 			<input type="hidden" name="handlekey" value="partyapplies" />
+			<input type="hidden" name="action" value="partyapplies" />
+            <input type="hidden" name="tid" value="{$party[tid]}" />
             <div class="c">
 				<div class="actfm">
                     <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" class="">
                         <tr>
                             <th>{lang ygclub_party:party_join_phone}<strong class="rq y">*</strong></th>
                             <td>
-                                <input type="text" class="px" name="usermobile" size="38" maxlength="20" value="" onkeyup="value=value.replace(/[^0123456789-]/g,'')">
+                                <input type="text" class="px" name="phone" size="38" maxlength="20" value="" onkeyup="value=value.replace(/[^0123456789-]/g,'')">
                             </td>
                         </tr>
                         <tr>
                             <th>{lang ygclub_party:party_join_usrexplain}<strong class="rq y">*</strong></th>
                             <td>
-                                <textarea name="usrexplain" maxlength="200" cols="38" rows="3" class="pt"></textarea>
+                                <textarea name="message" maxlength="200" cols="38" rows="3" class="pt"></textarea>
                             </td>
                         </tr>
                         <tr>
@@ -42,9 +44,8 @@ function tpl_ygclub_party_info ($party = array()) {
                 </div>
             </div>
             <div class="o pns">
-				<input type="hidden" name="activitysubmit" value="true">
 				<em class="xi1" id="return_activityapplies"></em>
-                <button type="submit" name="activitycancel" class="pn pnc" value="true"><span>{lang submit}</span></button>
+                <button type="submit" name="partysubmit" class="pn pnc" value="true"><span>{lang submit}</span></button>
             </div>
 		</form>
     </div>

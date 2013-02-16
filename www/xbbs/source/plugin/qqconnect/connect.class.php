@@ -4,7 +4,7 @@
  *		[Discuz! X] (C)2001-2099 Comsenz Inc.
  *		This is NOT a freeware, use is subject to license terms
  *
- *		$Id: connect.class.php 31961 2012-10-26 06:32:42Z monkey $
+ *		$Id: connect.class.php 32318 2012-12-25 02:18:50Z liudongdong $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -127,7 +127,8 @@ class plugin_qqconnect extends plugin_qqconnect_base {
 	}
 
 	function global_login_extra() {
-		if(!$this->allow) {
+        global $_G;
+		if(!$this->allow || $_G['inshowmessage']) {
 			return;
 		}
 		return tpl_global_login_extra();

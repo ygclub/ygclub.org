@@ -20,7 +20,7 @@
 		</form>
 	<!--{elseif $thread[special] == 2}-->
 		<ul class="side_trade cl">
-		<!--{loop $trades $key $trade}-->
+		<!--{loop $trades[$tid] $key $trade}-->
 			<li class="cl">
 				<!--{if $trade[aid]}-->
 					<a href="forum.php?mod=viewthread&do=tradeinfo&tid=$tid&pid=$trade[pid]" target="_blank"><img src="$trade[aid]" width="80" alt="$trade[subject]" /></a>

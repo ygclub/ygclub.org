@@ -34,7 +34,7 @@
 						<!--{loop $_G['cache']['groupreadaccess'] $val}-->
 							<option value="$val[readaccess]" title="{lang readperm}: $val[readaccess]"{if $attach[readperm] == $val[readaccess]} selected{/if}>$val[grouptitle]</option>
 						<!--{/loop}-->
-							<option value="255">{lang highest_right}</option>
+							<option value="255"{if $attach[readperm] == 255} selected{/if}>{lang highest_right}</option>
 					</select>
 					<!--{/if}-->
 				</td>

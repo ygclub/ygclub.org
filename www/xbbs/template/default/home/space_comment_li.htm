@@ -42,7 +42,7 @@
 				<a href="home.php?mod=spacecp&ac=comment&op=delete&cid=$value[cid]&handlekey=delcommenthk_{$value[cid]}" id="c_$value[cid]_delete" onclick="showWindow(this.id, this.href, 'get', 0);">{lang delete}</a>
 			<!--{/if}-->
 		<!--{/if}-->
-		<!--{if $value[authorid]!=$_G[uid] && ($value['idtype'] != 'uid' || $space[self])}-->
+		<!--{if $value[authorid]!=$_G[uid] && ($value['idtype'] != 'uid' || $space[self]) && $value[author]}-->
 			<a href="home.php?mod=spacecp&ac=comment&op=reply&cid=$value[cid]&feedid=$feedid&handlekey=replycommenthk_{$value[cid]}" id="c_$value[cid]_reply" onclick="showWindow(this.id, this.href, 'get', 0);">{lang reply}</a>
 		<!--{/if}-->
         <!--{if checkperm('managecomment')}-->

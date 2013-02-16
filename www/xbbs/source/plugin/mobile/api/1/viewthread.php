@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: viewthread.php 31418 2012-08-27 08:47:01Z zhangjie $
+ *      $Id: viewthread.php 32474 2013-01-24 07:38:35Z monkey $
  */
 
 if(!defined('IN_MOBILE_API')) {
@@ -33,7 +33,7 @@ class mobile_api {
 		$variable = array(
 			'thread' => mobile_core::getvalues($_G['thread'], array('tid', 'author', 'authorid', 'subject', 'views', 'replies', 'attachment', 'price', 'freemessage')),
 			'fid' => $_G['fid'],
-			'postlist' => array_values(mobile_core::getvalues($GLOBALS['postlist'], array('/^\d+$/'), array('pid', 'tid', 'author', 'first', 'dbdateline', 'dateline', 'useip', 'username', 'adminid', 'email', 'memberstatus', 'authorid', 'username', 'groupid', 'memberstatus', 'status', 'message', 'number', 'memberstatus', 'groupid', 'attachment', 'attachments', 'attachlist', 'imagelist', 'anonymous'))),
+			'postlist' => array_values(mobile_core::getvalues($GLOBALS['postlist'], array('/^\d+$/'), array('pid', 'tid', 'author', 'first', 'dbdateline', 'dateline', 'username', 'adminid', 'memberstatus', 'authorid', 'username', 'groupid', 'memberstatus', 'status', 'message', 'number', 'memberstatus', 'groupid', 'attachment', 'attachments', 'attachlist', 'imagelist', 'anonymous'))),
 			'ppp' => $_G['ppp'],
 			'setting_rewriterule' => $_G['setting']['rewriterule'],
 			'setting_rewritestatus' => $_G['setting']['rewritestatus'],
