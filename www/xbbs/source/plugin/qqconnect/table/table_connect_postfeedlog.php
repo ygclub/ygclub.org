@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: table_connect_postfeedlog.php 31304 2012-08-09 06:31:09Z liudongdong $
+ *      $Id: table_connect_postfeedlog.php 31305 2012-08-09 06:36:16Z liudongdong $
  */
 
 if(!defined('IN_DISCUZ')) {

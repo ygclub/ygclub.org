@@ -4,7 +4,7 @@
  *	  [Discuz! X] (C)2001-2099 Comsenz Inc.
  *	  This is NOT a freeware, use is subject to license terms
  *
- *	  $Id: spacecp.inc.php 32450 2013-01-17 09:12:39Z liulanbo $
+ *	  $Id: spacecp.inc.php 32196 2012-11-28 02:34:36Z liudongdong $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -22,10 +22,12 @@ if (!in_array($pluginop, array('config', 'share', 'new', 'sync_tthread'))) {
 $sh_type = trim(intval($_GET['sh_type']));
 $tid = trim(intval($_GET['thread_id']));
 $connectService = Cloud::loadClass('Service_Connect');
+// debug QCÅäÖÃ
 if ($pluginop == 'config') {
 
 	$connectService->connectMergeMember();
 
+	// debug ÊÇ·ñÎªĞÂ°æ±¾QCÓÃ»§
 	$_G['connect']['is_oauth_user'] = true;
 	if (empty($_G['member']['conuinsecret'])) {
 		$_G['connect']['is_oauth_user'] = false;
@@ -42,29 +44,36 @@ if ($pluginop == 'config') {
 
 	$_G['connect']['loginbind_url'] = $_G['siteurl'].'connect.php?mod=login&op=init&type=loginbind&referer='.urlencode($_G['connect']['referer'] ? $_G['connect']['referer'] : 'index.php');
 
+// debug ÏÔÊ¾·ÖÏí±íµ¥
 } elseif ($pluginop == 'share') {
 
+	// debug ±¾µØ·ÖÏí´úÀíÒ³
 	$_GET['share_url'] = $_G['connect']['discuz_new_share_url'];
 
+	//$posttable = getposttablebytid($tid);
+	//$post = DB::fetch_first("SELECT * FROM ".DB::table($posttable)." WHERE tid = '$tid' AND first='1' AND invisible='0'");
 	$post = C::t('forum_post')->fetch_threadpost_by_tid_invisible($tid, 0);
+//	$thread = DB::fetch_first("SELECT * FROM ".DB::table('forum_thread')." WHERE tid = '$tid' AND displayorder >= 0");
 	$thread = C::t('forum_thread')->fetch_by_tid_displayorder($tid, 0);
 	$msglower = strtolower($post['message']);
+	// ¹ıÂËÒıÓÃ
 	if(strpos($msglower, '[/quote]') !== FALSE) {
 		$post['message'] = preg_replace('/\[quote\].*\[\/quote\](\r\n|\n|\r){0,}/is', '', $post['message']);
 	}
+	// ¹ıÂËÊÓÆµ
 	if(strpos($msglower, '[/media]') !== FALSE) {
 		$post['message'] = preg_replace("/\[media=([\w,]+)\]\s*([^\[\<\r\n]+?)\s*\[\/media\]/ies", '', $post['message']);
 	}
+	// ¹ıÂËFlash
 	if(strpos($msglower, '[/flash]') !== FALSE) {
 		$post['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $post['message']);
 	}
 
-	if(strpos($msglower, '[/hide]') !== FALSE) {
-		$post['message'] = preg_replace("/\[hide[=]?(d\d+)?[,]?(\d+)?\]\s*(.*?)\s*\[\/hide\]/is", '', $post['message']);
-	}
 	$html_content = $connectService->connectParseBbcode($post['message'], $thread['fid'], $post['pid'], $post['htmlon'], $attach_images);
+	// debug ·¢·ÖÏíÍ¼Æ¬
 	if ($_G['group']['allowgetimage'] && $thread['price'] == 0 && $post['pid']) {
 		if ($attach_images && is_array($attach_images)) {
+			// debug Ö»ÏÔÊ¾ÈıÕÅÍ¼Æ¬
 			$_GET['share_images'] = array_slice($attach_images, 0, 3);
 
 			$attach_images = array();
@@ -77,7 +86,9 @@ if ($pluginop == 'config') {
 	}
 	$share_message = lang('plugin/qqconnect', 'connect_spacecp_share_a_post', array('bbname' => cutstr($_G['setting']['bbname'], 20,''), 'subject' => cutstr($thread['subject'], 120), 'message' => cutstr(strip_tags(str_replace('&nbsp;', ' ', $html_content)), 80)));
 	$share_message = str_replace(array('\'', "\r\n", "\r", "\n"), array('"', '', '', ''), $share_message);
+// debug ´¦ÀíÌá½»·ÖÏíÄÚÈİ
 } elseif ($pluginop == 'new') {
+	// hash ÑéÖ¤
 	if (trim($_GET['formhash']) != formhash()) {
 		showmessage('submit_invalid');
 	}
@@ -85,6 +96,7 @@ if ($pluginop == 'config') {
 	$sh_type = intval(trim($_POST['sh_type']));
 	$tid = intval(trim($_POST['thread_id']));
 	$dialog_id = $_POST['dialog_id'];
+	//$sync_post = $_POST['sync_post'];
 
 	$connectService->connectMergeMember();
 
@@ -100,17 +112,17 @@ if ($pluginop == 'config') {
 
 		$firstpost = C::t('forum_post')->fetch_threadpost_by_tid_invisible($tid, 0);
 		$msglower = strtolower($firstpost['message']);
+		// ¹ıÂËÒıÓÃ
 		if(strpos($msglower, '[/quote]') !== FALSE) {
 			$firstpost['message'] = preg_replace('/\[quote\].*\[\/quote\](\r\n|\n|\r){0,}/is', '', $firstpost['message']);
 		}
+		// ¹ıÂËÊÓÆµ
 		if(strpos($msglower, '[/media]') !== FALSE) {
 			$firstpost['message'] = preg_replace("/\[media=([\w,]+)\]\s*([^\[\<\r\n]+?)\s*\[\/media\]/ies", '', $firstpost['message']);
 		}
+		// ¹ıÂËFlash
 		if(strpos($msglower, '[/flash]') !== FALSE) {
 			$firstpost['message'] = preg_replace("/\[flash(=(\d+),(\d+))?\]\s*([^\[\<\r\n]+?)\s*\[\/flash\]/ies", '', $firstpost['message']);
-		}
-		if(strpos($msglower, '[/hide]') !== FALSE) {
-			$firstpost['message'] = preg_replace("/\[hide[=]?(d\d+)?[,]?(\d+)?\]\s*(.*?)\s*\[\/hide\]/is", '', $firstpost['message']);
 		}
 		$summary = $connectService->connectParseBbcode($firstpost['message'], $firstpost['fid'], $firstpost['pid'], $firstpost['htmlon'], $attach_images);
 
@@ -120,7 +132,7 @@ if ($pluginop == 'config') {
 			'comment' => $_POST['reason'],
 			'summary' => strip_tags($summary),
 			'images' => $_POST['attach_image'],
-			'nswb' => '1',
+			'nswb' => '1', // ²»×Ô¶¯Í¬²½µ½Î¢²©
 		);
 
 		try {
@@ -131,11 +143,11 @@ if ($pluginop == 'config') {
 
 		if($errorCode) {
 			$code = $errorCode;
-			if($errorCode == 41001) {
+			if($errorCode == 41001) { // ÓÃ»§Î´ÊÚÈ¨
 				$message = lang('plugin/qqconnect', 'connect_user_unauthorized', array('login_url' => $_G['connect']['login_url'].'&reauthorize=yes&formhash='.FORMHASH));
-			} elseif($errorCode == 41003 || $errorCode == 40006) { // access tokenå¤±æ•ˆæˆ–éæ³•
+			} elseif($errorCode == 41003 || $errorCode == 40006) { // access tokenÊ§Ğ§»ò·Ç·¨
 				$message = lang('plugin/qqconnect', 'connect_share_token_outofdate', array('login_url' => $_G['connect']['login_url']));
-			} elseif ($errorCode == 3021) {
+			} elseif ($errorCode == 3021) { // Í¬Ò»ÕËºÅÁ¬Ğø·ÖÏíÁËÍ¬Ò»Á´½Ó
 				$message = lang('plugin/qqconnect', 'connect_qzone_share_same_url');
 			} else {
 				$code = 100;
@@ -174,13 +186,13 @@ if ($pluginop == 'config') {
 
 		if($errorCode) {
 			$code = $errorCode;
-			if($errorCode == 41001) {
+			if($errorCode == 41001) { // ÓÃ»§Î´ÊÚÈ¨
 				$message = lang('plugin/qqconnect', 'connect_user_unauthorized', array('login_url' => $_G['connect']['login_url'].'&reauthorize=yes&formhash='.FORMHASH));
-			} elseif($errorCode == 41003 || $errorCode == 40006) { // access tokenå¤±æ•ˆæˆ–éæ³•
+			} elseif($errorCode == 41003 || $errorCode == 40006) { // access tokenÊ§Ğ§»ò·Ç·¨
 				$message = lang('plugin/qqconnect', 'connect_share_token_outofdate', array('login_url' => $_G['connect']['login_url']));
-			} elseif ($errorCode == 3013) {
+			} elseif ($errorCode == 3013) { // ÔÚ¶ÌÊ±¼ä£¨Ò»·ÖÖÓ£©ÄÚ·¢±íÍ¬ÑùÄÚÈİµÄÎ¢²©
 				$message = lang('plugin/qqconnect', 'connect_qzone_weibo_same_content');
-			} else if($errorCode == 3020) {
+			} else if($errorCode == 3020) { // ÓÃ»§Î´¿ªÍ¨Î¢²©
 				$message = lang('plugin/qqconnect', 'connect_weibo_account_not_signup');
 			} else {
 				$code = 100;
@@ -191,6 +203,7 @@ if ($pluginop == 'config') {
 			$thread = C::t('forum_thread')->fetch($tid);
 			if($response['data']['id'] && $_G['setting']['connect']['t']['reply'] && $thread['tid'] && !$thread['closed'] && !getstatus($thread['status'], 3) && empty($_G['forum']['replyperm'])) {
 
+				//DB::insert('connect_tthreadlog', array(
 				C::t('#qqconnect#connect_tthreadlog')->insert(array(
 					'twid' => $response['data']['id'],
 					'tid' => $tid,
@@ -203,35 +216,38 @@ if ($pluginop == 'config') {
 				));
 			}
 			if(!getstatus($thread['status'], 8)) {
-				C::t('forum_thread')->update($tid, array('status' => setstatus(8, 1, $thread['status'])));
+				C::t('forum_thread')->update($tid, array('status' => setstatus(8, 1, $thread['status'])));//note ·ÖÏíÒ²Ôö¼ÓÍÆËÍÎ¢²©±êÖ¾
 			}
 			$code = $response['ret'];
 			$message = lang('plugin/qqconnect', 'connect_broadcast_success');
     	}
 	}
 } elseif($pluginop == 'sync_tthread') {
+	// hash ÑéÖ¤
 	if (trim($_GET['formhash']) != formhash()) {
 		showmessage('submit_invalid');
 	}
 	if(!$_G['setting']['connect']['t']['reply']) {
-		exit;
+		exit;//note Î´¿ªÆô
 	}
 	$tid = $_GET['tid'];
 	$processname = 'connect_tthread_'.$tid.'_cache';
-	if(discuz_process::islocked($processname, 600)) {
+	if(discuz_process::islocked($processname, 600)) {//note ·ÀÖ¹²¢·¢
 		exit;
 	}
 	$thread = C::t('forum_thread')->fetch($tid);
 	if(!$thread || $thread['closed'] == 1 || getstatus($thread['status'], 3) || $thread['displayorder'] < 0 || !empty($_G['forum']['replyperm'])) {
 		discuz_process::unlock($processname);
-		exit;
+		exit;//note Ö÷Ìâ²»´æÔÚ¡¢Ö÷Ìâ¹Ø±Õ¡¢Ö÷ÌâÎ´ÏÔÊ¾³öÀ´»òÕßÎªÇÀÂ¥ÌùÊ±£¬²»´¦Àí»ØÁ÷ĞÅÏ¢
 	}
 
+	//$updatetime = DB::result_first("SELECT updatetime FROM ".DB::table('connect_tthreadlog')." WHERE tid='$tid' ORDER BY updatetime DESC LIMIT 1");
 	$updatetime = C::t('#qqconnect#connect_tthreadlog')->fetch_max_updatetime_by_tid($tid);
 	if($_G['timestamp'] < $updatetime + 10 * 60) {
 		discuz_process::unlock($processname);
-		exit;
+		exit;//note 10·ÖÖÓ¸üĞÂÒ»´Î, Èç¹û¿ÉÒÔthreadÀïÃæ¼ÓÒ»¸ö×Ö¶Îweiboupdatetime¸üºÃÁË
 	}
+	//$tthread = DB::fetch_first("SELECT * FROM ".DB::table('connect_tthreadlog')." WHERE tid='$tid' ORDER BY nexttime ASC LIMIT 1");
 	$tthread = C::t('#qqconnect#connect_tthreadlog')->fetch_min_nexttime_by_tid($tid);
 	if(empty($tthread)) {
 		discuz_process::unlock($processname);
@@ -254,14 +270,17 @@ if ($pluginop == 'config') {
 	} catch(Exception $e) {
 		showmessage('qqconnect:server_busy');
 	}
+	//if($response && $response['status'] == 0 && $response['result']) {
 	if($response && $response['ret'] == 0 && $response['data']['info']) {
+		//note ´¦ÀíÆÀÂÛÊı¾İ
 
 		include_once libfile('function/forum');
 		$forum = C::t('forum_forum')->fetch($thread['fid']);
-		$pinvisible = $forum['modnewposts'] ? -2 : 0;
+		$pinvisible = $forum['modnewposts'] ? -2 : 0;//note °æ¿éÉèÖÃÉóºË»ØÌû£¬Ôò½øÈëÉóºË¡£ÓÃ»§×éµÄÈ¨ÏŞ²»¿¼ÂÇ
 
 		$pids = array();
 		$i = 0;
+		//foreach($response['result'] as $post) {
 		$responseinfo = array();
 		if(!isset($response['data']['info'][0])) {
 			$responseinfo[] = $response['data']['info'];
@@ -270,7 +289,9 @@ if ($pluginop == 'config') {
 			krsort($responseinfo);
 		}
 		foreach($responseinfo as $post) {
+			//$message = diconv(trim($post['content']), 'UTF-8');
 			$message = trim($post['text']);
+			//$post['username'] = diconv(trim($post['username']), 'UTF-8');
 			$post['username'] = trim($post['name']);
 			$post['nick'] = trim($post['nick']);
 			$message = preg_replace("/((https?|ftp|gopher|news|telnet|rtsp|mms|callto):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\()|]+\s*)/i", '', $message);
@@ -278,12 +299,13 @@ if ($pluginop == 'config') {
 			if($message) {
 				$newmessage = censor($message, null, true);
 				if($message != $newmessage) {
-					continue;
+					continue;//note ÓĞ¹ıÂË´ÊÖ±½ÓÌø¹ı,²»Èë¿â
 				}
 			} else {
 				$message = lang('plugin/qqconnect', 'connect_tthread_broadcast');
 			}
 			if($_G['setting']['connect']['t']['reply_showauthor']) {
+				//$message .= lang('plugin/qqconnect', 'connect_tthread_message', array('username' => $post['username'], 'nick' => $post['nick']));
 				$message .= '[tthread='.$post['username'].', '.$post['nick'].']'.$post['head'].'[/tthread]';
 			}
 
@@ -294,9 +316,9 @@ if ($pluginop == 'config') {
 				'author' => '',
 				'authorid' => '0',
 				'subject' => '',
-				'dateline' => $_G['timestamp'] + $i,
+				'dateline' => $_G['timestamp'] + $i,//note ±£³ÖÎ¢²©»ØÁ÷µÄÊı¾İµÄË³Ğò
 				'message' => $message,
-				'useip' => '',
+				'useip' => '',//note ÄÜ²»ÄÜ´«¹ıÀ´£¿
 				'invisible' => $pinvisible,
 				'anonymous' => '0',
 				'usesig' => '0',
@@ -305,7 +327,7 @@ if ($pluginop == 'config') {
 				'smileyoff' => '0',
 				'parseurloff' => '0',
 				'attachment' => '0',
-				'status' => 16,
+				'status' => 16,//note ÔÙÊ¹ÓÃÒ»¸ö×´Ì¬Î»
 			));
 			if($pid) {
 				$pids[] = $pid;
@@ -313,6 +335,7 @@ if ($pluginop == 'config') {
 			$i++;
 		}
 
+		//note ¸üĞÂ»Ø¸´Êı¼°×îºó·¢±íÈË
 		if($pinvisible) {
 			updatemoderate('pid', $pids);
 			C::t('forum_forum')->update_forum_counter($thread['fid'], 0, 0, count($pids), 1);
@@ -336,8 +359,10 @@ if ($pluginop == 'config') {
 			}
 		}
 
+		//note Í¬Ê±»¹Òª¼ÇÂ¼×îºóÒ»ÌõµÄidºÍÊ±¼ä
 		$setarr['pagetime'] = $post['timestamp'];
 		$setarr['lasttwid'] = $post['id'];
+		//if(count($response['result']) < $param['req_num']) {
 		if(count($responseinfo) < $param['reqnum']) {
 			$setarr['nexttime'] = $_G['timestamp'] + 2 * 3600;
 		} else {
@@ -347,6 +372,7 @@ if ($pluginop == 'config') {
 		$setarr['nexttime'] = $_G['timestamp'] + 3 * 3600;
 	}
 	$setarr['updatetime'] = $_G['timestamp'];
+	//DB::update('connect_tthreadlog', $setarr, array('twid' => $tthread['twid']));
 	C::t('#qqconnect#connect_tthreadlog')->update($tthread['twid'], $setarr);
 
 	discuz_process::unlock($processname);
