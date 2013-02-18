@@ -6,6 +6,7 @@
  *
  *      $Id: secure.php 28691 2012-03-08 05:07:45Z monkey $
  */
+//note secure(验证安全) @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');
@@ -15,6 +16,7 @@ include_once 'misc.php';
 
 class mobile_api {
 
+	//note 程序模块执行前需要运行的代码
 	function common() {
 		global $_G;
 		$seccodecheck = $secqaacheck = false;
@@ -41,6 +43,7 @@ class mobile_api {
 		mobile_core::result(mobile_core::variable($variable));
 	}
 
+	//note 程序模板输出前运行的代码
 	function output() {}
 
 }

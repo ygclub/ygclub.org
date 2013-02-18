@@ -31,12 +31,12 @@ function add_sign_field(v){
 </script>
 
 
-<form method="post" action="party.php?act=set&step=post&fid=$fid">
+<form method="post" autocomplete="off" action="">
     <table class="tb tb2">
         <tbody id="party_body">
             <tr>
                 <th colspan="2" class="partition">
-                    $_G['cache']['forums'][$_GET[fid]]['name']
+                    $_G['cache']['forums'][$fid]['name']
                 </th>
             </tr>
 
@@ -72,7 +72,7 @@ function add_sign_field(v){
                     {eval $j=0;}
                     <!--{loop $_G['cache']['usergroups'] $k $v}-->
                         {eval $j++}
-                        <input type="checkbox" name="partyb[group][]" id="party_bgroup_$k" value="$k" {if $condata[group] && in_array($k,$condata[group])}checked{/if}/><label for="party_bgroup_$k">$v[grouptitle]</label> &nbsp;
+                        <input type="checkbox" name="party[bgroup][]" id="party_bgroup_$k" value="$k" {if $condata[bgroup] && in_array($k,$condata[bgroup])}checked{/if}/><label for="party_bgroup_$k">$v[grouptitle]</label> &nbsp;
                         <!--{if $j%4 == 0}--><br /><!--{/if}-->
                     <!--{/loop}-->
                 </td>
@@ -122,7 +122,7 @@ function add_sign_field(v){
             </tr>
             <tr class="noborder">
                 <td class="vtop rowform">
-                    <input type="text" name="party[classes]" value='$condata[classes]' class='txt'/> 
+                    <input type="text" name="party[doworker]" value='$condata[doworker]' class='txt'/> 
                 </td>
                 <td class="vtop tips2">
                     多个设置请用英文状态下的逗号隔开。如：分工1,分工2,分工3

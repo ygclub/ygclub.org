@@ -5,6 +5,7 @@
 *
 *      $Id: modcp.php 31964 2012-10-26 07:27:36Z zhangjie $
 */
+//note modcp入口管理 @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');

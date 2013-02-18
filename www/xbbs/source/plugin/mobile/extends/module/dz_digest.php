@@ -7,6 +7,9 @@
  *      $Id: dz_digest.php 31964 2012-10-26 07:27:36Z zhangjie $
  */
 class dz_digest extends extends_data {
+//	private $variable;
+//	private $page;
+//	private $perpage = 50;
 	function __construct() {
 		parent::__construct();
 	}

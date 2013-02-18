@@ -19,8 +19,8 @@ $modules = array('extends', 'buyattachment', 'buythread', 'checkpost', 'connect'
 		'favforum', 'favthread', 'forumdisplay', 'forumindex',
 		'forumnav', 'forumupload', 'friend', 'hotforum', 'hotthread',
 		'login', 'myfavforum', 'myfavthread', 'mypm', 'mythread',
-		'newthread', 'profile', 'publicpm', 'register', 'seccode',
-		'secure', 'sendpm', 'sendreply', 'sub_checkpost', 'sublist',
+		'newthread', 'profile', 'publicpm', 'register', 'seccode', 
+		'secure', 'sendpm', 'sendreply', 'sub_checkpost', 'sublist', 
 		'toplist', 'viewthread', 'uploadavatar', 'pollvote', 'mynotelist',
 		'modcp', 'topicadmin', 'forumimage');
 

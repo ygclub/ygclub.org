@@ -89,7 +89,7 @@ class mobile_core {
 				}
 			}
 			$message_result = strip_tags($message_result);
-
+			
 			if($_G['messageparam'][4]) {
 				$_G['messageparam'][0] = "custom";
 			}

@@ -5,6 +5,7 @@
 *
 *      $Id: forumimage.php 32061 2012-11-06 02:41:00Z zhangjie $
 */
+//note 生成获取缩略图 @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');

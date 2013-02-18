@@ -5,6 +5,7 @@
 *
 *      $Id: pollvote.php 31418 2012-08-27 08:47:01Z zhangjie $
 */
+//note Õ∂∆±¥¶¿Ì @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');

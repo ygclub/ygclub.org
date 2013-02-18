@@ -1,8 +1,11 @@
 {eval
 
-function tpl_ygclub_party_info ($party = array()) {
+global $party;
+function tpl_ygclub_party_info () {
+global $party;
 
 }
+
 <!--{block return}-->
 <style type="text/css">
     #party_info {font-size:14px}
@@ -50,9 +53,6 @@ function tpl_ygclub_party_info ($party = array()) {
     </table>
 </div>
 <div class="pbm cl">
-    <center>
-        <button class="pn" value="true" name="ijoin" onclick="showDialog($('partyjoin').innerHTML, 'info', '{lang ygclub_party:party_join}')"><span>{lang ygclub_party:party_join}</span></button>
-    </center>
     <dl>
         <dt></dt>
         <dd>
@@ -62,46 +62,6 @@ function tpl_ygclub_party_info ($party = array()) {
         </dd>
     </dl>
 </div>
-
-
-
-    <div id="partyjoin" style="display:none">
-		<form name="party" id="party" method="post" autocomplete="off" action="plugin.php?id=ygclub_party" onsubmit="ajaxpost('party', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
-            <input type="hidden" name="formhash" value="{FORMHASH}" />
-            <input type="hidden" name="partysubmit" value="partysubmit" />
-			<input type="hidden" name="handlekey" value="partyapplies" />
-			<input type="hidden" name="action" value="partyapplies" />
-            <input type="hidden" name="tid" value="{$party[tid]}" />
-            <div class="c">
-				<div class="actfm">
-                    <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" class="">
-                        <tr>
-                            <th>{lang ygclub_party:party_join_phone}<strong class="rq y">*</strong></th>
-                            <td>
-                                <input type="text" class="px" name="phone" size="38" maxlength="20" value="" onkeyup="value=value.replace(/[^0123456789-]/g,'')">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{lang ygclub_party:party_join_usrexplain}<strong class="rq y">*</strong></th>
-                            <td>
-                                <textarea name="message" maxlength="200" cols="38" rows="3" class="pt"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{lang ygclub_party:party_join_usertask}<strong class="rq y">*</strong></th>
-                            <td>
-                                <label for="usertask_0"><input class="pr" type="radio" value="0" name="usertask" id="usertask_0" checked="checked" />{lang activity_pay_myself}</label>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="o pns">
-				<em class="xi1" id="return_activityapplies"></em>
-                <button type="submit" id="partysubmit" name="partysubmit" value="partysubmit" class="pn pnc" value="true"><span>{lang submit}</span></button>
-            </div>
-		</form>
-    </div>
 
 <!--{/block}-->
 <!--{eval return $return;}-->

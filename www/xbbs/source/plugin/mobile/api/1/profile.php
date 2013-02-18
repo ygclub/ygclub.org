@@ -6,6 +6,7 @@
  *
  *      $Id: profile.php 32474 2013-01-24 07:38:35Z monkey $
  */
+//note 更多more >> profile(个人信息) @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');
@@ -17,9 +18,11 @@ include_once 'home.php';
 
 class mobile_api {
 
+	//note 程序模块执行前需要运行的代码
 	function common() {
 	}
 
+	//note 程序模板输出前运行的代码
 	function output() {
 		global $_G;
 		$data = $GLOBALS['space'];

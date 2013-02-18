@@ -5,6 +5,7 @@
 *
 *      $Id: mynotelist.php 31698 2012-09-24 03:37:17Z zhangjie $
 */
+//note 提醒列表接口 @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');

@@ -22,6 +22,11 @@ if($_POST['action'] == 'partyapplies')
 		showmessage('not_loggedin', NULL, array(), array('login' => 1));
     }
     if(submitcheck('partysubmit')) {
+
+        if(empty($_POST['phone']))
+        {
+            showmessage('ygclub_party:phone_not_valid', NULL, array());
+        }
         $insertData = array(
             'tid' => $_POST['tid'],
             'uid' => $_G['uid'],

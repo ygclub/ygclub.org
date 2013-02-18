@@ -6,6 +6,7 @@
  *
  *      $Id: sub_checkpost.php 28400 2012-02-29 03:07:57Z monkey $
  */
+//note checkpost.sub @ Discuz! X2.5
 
 if(!defined('IN_MOBILE_API')) {
 	exit('Access Denied');
