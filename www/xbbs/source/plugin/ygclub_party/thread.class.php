@@ -37,7 +37,6 @@ class threadplugin_ygclub_party {
     } 
 
     function newthread_submit_end($fid, $tid) { 
-        global $_G;
         $insertData = array(
             'tid'=>$tid, 
             'fid'=>$fid,
@@ -101,10 +100,7 @@ class threadplugin_ygclub_party {
     function viewthread($tid) { 
         global $_G;
         include_once template('ygclub_party:party_info');
-
         $party = $this->_getpartyinfo($tid);
-        //$condata = $this->_load_forumparty_condata($_G['fid']);
-
         return tpl_ygclub_party_info();
     } 
 
@@ -114,12 +110,13 @@ class threadplugin_ygclub_party {
         $cachename_party = "{$this->identifier}_forum_{$fid}_config";
         include(DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php');
         $condata['_classes_list'] = explode(',', $condata['classes']);
-        $condata['_signfield_list'] = sc_order_fields($condata['signfield']);
+        $condata['_signfield_list'] = ygclub_party_order_fields($condata['signfield']);
         return $condata;
     }
 
     public function _getpartyinfo($tid)
     {
+        global $_G;
         $party = C::t('#ygclub_party#party')->fetch($tid);
         $party['showtime']      = gmdate('Y-m-d H:i',$party['showtime']+3600*$_DSESSION['timeoffset']);
         $party['starttimefrom'] = gmdate('Y-m-d H:i',$party['starttimefrom']+3600*$_DSESSION['timeoffset']);
@@ -127,7 +124,38 @@ class threadplugin_ygclub_party {
         
         $party['_doworker_list'] = explode(',', $party['doworker']);
         $party['_marks_list'] = explode('|', $party['marks']);
-        
+
+        $partyers_list = C::t('#ygclub_party#partyers')->fetch_all_for_thread($tid);
+        $party['_verified']['4']['count'] = 0;
+        $party['_verified']['4']['followed'] = 0;
+        $party['_verified']['un4']['count'] = 0;
+        $party['_verified']['un4']['followed'] = 0;
+        $party['_total_num'] = 0;
+
+        foreach($partyers_list as $key=> $partyer)
+        {
+            if($partyer['verified'] == 4){
+                $party['_verified']['4']['count'] ++;
+                $party['_verified']['4']['followed'] += $partyer['followed'];
+                $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
+                $party['_marks_count'][$partyer['marks']] ++;
+            }
+            else{
+                $party['_verified']['un4']['count'] ++;
+                $party['_verified']['un4']['followed'] += $partyer['followed'];
+            }
+            $party['_verified']['all']['count'] ++;
+            $party['_verified']['all']['followed'] += $partyer['followed'];
+            $party['_total_count'] ++;
+            $party['_total_count'] += $partyer['followed'];
+        }
+
+        $party['_approved_username_list_html'] = join(', ', $party['_approved_username_list_html']);
+
+        if($_G['adminid'] == 1 || $_G['adminid'] == 2 || $_G['uid'] == $party['uid']) {
+            $party['_mPerm'] = 1;
+        }
+       
         return $party;
     }
 }

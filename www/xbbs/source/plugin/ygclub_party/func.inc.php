@@ -1,7 +1,7 @@
 <?php
 
 // 自定义部分排序
-function sc_order_fields($a){
+function ygclub_party_order_fields($a){
     global $SF_CONFIG_VALUES;
     $b = $a['field'];
 	if ($b){
@@ -16,7 +16,7 @@ function sc_order_fields($a){
 				$e[$o]['color']		= $a['color'][$c];
 				$e[$o]['must']		= $a['must'][$c];
 				$e[$o]['order']		= $a['order'][$c];
-				$e[$o]['html']		= sc_form($d,$a['type'][$c],$a['default'][$c],$SF_CONFIG_VALUES[$d]);
+				$e[$o]['html']		= ygclub_party_form($d,$a['type'][$c],$a['default'][$c],$SF_CONFIG_VALUES[$d]);
 				$e[$o]['value']		= is_array($SF_CONFIG_VALUES[$d]) ? implode(',',$SF_CONFIG_VALUES[$d]) : nl2br($SF_CONFIG_VALUES[$d]) ;
 			}
 		}
@@ -26,7 +26,7 @@ function sc_order_fields($a){
 }
 
 // 自定义部分队列
-function sc_ck_fields($a){
+function ygclub_party_ck_fields($a){
 	$b = $a['field'];
 	foreach($b as $c=>$d){
 		if ($d){
@@ -44,7 +44,7 @@ function sc_ck_fields($a){
 }
 
 // 表单部分
-function sc_form($field,$type,$default,$value){
+function ygclub_party_form($field,$type,$default,$value){
 	$html = '';
 	$value = $value ? $value : $default;
 	switch ($type){

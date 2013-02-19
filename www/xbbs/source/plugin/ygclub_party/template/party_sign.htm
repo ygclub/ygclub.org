@@ -8,7 +8,7 @@ global $party, $condata;
 
 <!--{block return}-->
 <div id="partyjoin">
-    <h2>{lang yglcub_party:i_join}</h2>
+    <h2>{lang ygclub_party:i_join}</h2>
     <form name="party_join" id="party_join" method="post" action="plugin.php?id=ygclub_party" onsubmit="ajaxpost('party_join', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
         <input type="hidden" name="formhash" value="{FORMHASH}" />
         <input type="hidden" name="partysubmit" value="partysubmit" />
@@ -63,7 +63,11 @@ global $party, $condata;
             <!--{if $condata['_signfield_list'] && $condata['signform'] == 1}-->
             <!--{loop $condata['_signfield_list'] $v}-->
             <tr>
-                <th>$v[name] <!--{if $v['must']=='on'}--><span class="rq y">*</span><!--{/if}--></th>
+                <th>
+                    <input type="hidden" name="SFDC_LIST[{$v[field]}][name]" value="$v[name]" />
+                    $v[name] <!--{if $v['must']=='on'}--><span class="rq y">*</span>
+                    <input type="hidden" name="SFDC_LIST[{$v[field]}][must]" value="1" />
+                    <!--{/if}--></th>
                 <td>$v[html]</td>
             </tr>
             <!--{/loop}-->
@@ -80,11 +84,7 @@ global $party, $condata;
                     <button type="submit" id="partysubmit" name="partysubmit" value="partysubmit" class="pn pnc" value="true"><span>{lang ygclub_party:join_party}</span></button>
                 </td>
             </tr>
-
         </table>
-        <div class="pbm ptm">
-            <em class="xi1" id="return_activityapplies"></em>
-        </div>
     </form>
 </div>
 

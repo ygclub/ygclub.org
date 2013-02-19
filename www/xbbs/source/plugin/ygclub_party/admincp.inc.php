@@ -47,24 +47,24 @@ if($_GET['act'] == "") {
 }
 elseif($_GET['act'] == "set"){
     $fid = $_GET['fid'];
-    @require_once(DISCUZ_ROOT.'./source/discuz_version.php');
+    require_once (DISCUZ_ROOT.'./source/discuz_version.php');
     $cachedir_party = DISCUZ_VERSION == "X2" ? './data/cache/cache_' : './data/sysdata/cache_';
     $cachename_party = "{$identifier}_forum_{$fid}_config";
 
     if(file_exists(DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php'))
     {
-        include(DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php');
-        $condata['signfield'] = sc_order_fields($condata['signfield']);
+        include_once (DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php');
+        $condata['signfield'] = ygclub_party_order_fields($condata['signfield']);
     }
 
     if($_POST['partysubmit'])
     {
-        $_POST['party']['signfield'] = sc_ck_fields($_POST['party']['signfield']);
+        $_POST['party']['signfield'] = ygclub_party_ck_fields($_POST['party']['signfield']);
         $cacheArray .= "\$condata = " . arrayeval($_POST['party']) . ";\n"; 
         writetocache($cachename_party, $cacheArray);
-        cpmsg(":-)", "action=$base_link&fid=$fid&act=set", 'succeed');
+        cpmsg("succeed", "action=$base_link&fid=$fid&act=set", 'succeed');
     }
-    include template('ygclub_party:admin_party_set');
+    include_once template('ygclub_party:admin_party_set');
 }
 
 ?>
