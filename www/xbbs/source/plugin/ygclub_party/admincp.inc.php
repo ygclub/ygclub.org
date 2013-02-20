@@ -62,7 +62,7 @@ elseif($_GET['act'] == "set"){
         $_POST['party']['signfield'] = ygclub_party_ck_fields($_POST['party']['signfield']);
         $cacheArray .= "\$condata = " . arrayeval($_POST['party']) . ";\n"; 
         writetocache($cachename_party, $cacheArray);
-        cpmsg("succeed", "action=$base_link&fid=$fid&act=set", 'succeed');
+        cpmsg("ygclub_party:update_forum_condata_succeed", "action=$base_link&fid=$fid&act=set", 'succeed');
     }
     include_once template('ygclub_party:admin_party_set');
 }

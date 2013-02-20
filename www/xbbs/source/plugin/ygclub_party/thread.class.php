@@ -37,6 +37,8 @@ class threadplugin_ygclub_party {
     } 
 
     function newthread_submit_end($fid, $tid) { 
+        global $_G;
+
         $insertData = array(
             'tid'=>$tid, 
             'fid'=>$fid,
@@ -55,6 +57,25 @@ class threadplugin_ygclub_party {
         );
 
         C::t('#ygclub_party#party')->insert($insertData);
+
+        
+        $verified = $_POST['isjoin'] == 1 ? 4 : 5;
+        $insertData = array(
+            'tid' => $tid,
+            'uid' => $_G['uid'],
+            'username' => $_G['username'],
+            'phone' => $_POST['phone'],
+            'verified' => $verified, 
+            'dateline' => $_G['timestamp'],
+            'message' => '欢迎大家来参加活动',
+            'usertask' => '召集人',
+            'marks' => '',
+            'followed' => '',
+            'config' => '',
+        );
+
+        C::t('#ygclub_party#partyers')->insert($insertData);
+
     } 
 
     function editpost($fid, $tid) {
@@ -123,14 +144,37 @@ class threadplugin_ygclub_party {
         $party['starttimeto']   = gmdate('Y-m-d H:i',$party['starttimeto']+3600*$_DSESSION['timeoffset']);
         
         $party['_doworker_list'] = explode(',', $party['doworker']);
-        $party['_marks_list'] = explode('|', $party['marks']);
+        $party['_marks_list'] = array();
+        if($party['marks'] != '')
+        {
+            $party['_marks_list'] = explode('|', $party['marks']);
+        }
+
+        if($party['number'] == 0)
+        {
+            $party['_number'] = lang('plugin/ygclub_party', 'unlimited');
+        }
+        if($party['gender'] == 0)
+        {
+            $party['_gender'] = lang('plugin/ygclub_party', 'unlimited_gender');
+        }
+        elseif($party['gender'] == 1)
+        {
+            $party['_gender'] = lang('plugin/ygclub_party', 'male');
+        }
+        elseif($party['gender'] == 2)
+        {
+            $party['_gender'] = lang('plugin/ygclub_party', 'female');
+        }
 
         $partyers_list = C::t('#ygclub_party#partyers')->fetch_all_for_thread($tid);
         $party['_verified']['4']['count'] = 0;
         $party['_verified']['4']['followed'] = 0;
         $party['_verified']['un4']['count'] = 0;
         $party['_verified']['un4']['followed'] = 0;
-        $party['_total_num'] = 0;
+        $party['_verified']['all']['count'] = 0;
+        $party['_verified']['all']['followed'] = 0;
+        $party['_total_count'] = 0;
 
         foreach($partyers_list as $key=> $partyer)
         {

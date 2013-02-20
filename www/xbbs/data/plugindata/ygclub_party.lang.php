@@ -2,6 +2,9 @@
 $scriptlang['ygclub_party'] = array(
     'plugin_name' => '阳光活动',
     'plugin_buttontext' => '召集阳光活动',
+    'unlimited' => '不限',
+    'unlimited_gender' => '不限性别',
+    'partyapplies_succeed' => '已申请成功，请等待确认',
     'add' => '添加',
     'title' => '标题',
     'content' => '内容',
@@ -17,6 +20,16 @@ $scriptlang['ygclub_party'] = array(
     'in_publish' => '发布中',
     'edit_success' => '消息已更换',
     'consummate_party_data' => '完善活动资料',
+    'already_applied' => '已经报名此次活动',
+    'error_phone_empty' => '请输入联系电话',
+    'error_message_empty' => '请输入个人说明',
+    'error_empty_usertask' => '请选择分工',
+    'error_empty_marks' => '请选择备注选项',
+    'error_followed' => '随行人员请输入数字',
+    'error_SFDC_field' => '{field_name}不能为空',
+    'update_forum_condata_succeed' => '设置成功',
+    'update_succeed' => '更新成功',
+
 );
 $templatelang['ygclub_party'] = array(
     'name' => 'yes',
@@ -25,9 +38,10 @@ $templatelang['ygclub_party'] = array(
     'class' => '活动分类',
     'gender' => '性别',
     'unlimited' => '不限',
+    'unlimited_gender' => '不限性别',
     'male' => '男',
     'female' => '女',
-    'number' => '人数',
+    'number_limited' => '限制人数',
     'number_spec' => '0为不限',
     'followed' => '随行人员',
     'inviter_isjoin' => '召集人参与',
@@ -38,7 +52,7 @@ $templatelang['ygclub_party'] = array(
     'marks_spec' => '多个选项请用竖线|分割，如：集合点|自行前往',
     'starttimefrom' => '发起时间',
     'starttimeto' => '报名截至时间',
-    'confirmed' => '已确认',
+    'already_confirmed' => '已确认',
     'applied' => '报名',
     'status' => '状态',
     'approved_partyers' => '通过人员',
@@ -53,6 +67,7 @@ $templatelang['ygclub_party'] = array(
     'party_join_marks' => '备注选项',
     'party_join_followed' => '随行人员',
     'join_party' => '同意以上声明并确认报名',
+    'you_already_applied' => '你已经报名了此次活动。',
 );
 $installlang['ygclub_party'] = array(
 

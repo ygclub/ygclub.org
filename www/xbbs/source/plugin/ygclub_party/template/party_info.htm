@@ -36,11 +36,11 @@ global $party;
                 </th>
             </tr>
             <tr>
-                <th>{lang ygclub_party:number}</th>
-                <td>{$party[number]}({$party[gender]})</td>
+                <th>{lang ygclub_party:number_limited}</th>
+                <td>{$party[_number]}({$party[_gender]})</td>
             </tr>
             <tr>
-                <th>{lang yglcub_party:confirmed}/{lang ygclub_party:applied}</th>
+                <th>{lang ygclub_party:already_confirmed}/{lang ygclub_party:applied}</th>
                 <td><strong class="rq">{$party[_verified][4]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][4]['followed']}<!--{/if}--></strong> / {$party[_verified][all]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][all]['followed']}<!--{/if}--></td>
             </tr>
             <tr>

@@ -35,14 +35,14 @@ global $condata;
             <dd>
                 <span class="ftid">
                     <select name="gender" id="gender" class="ps">
-                        <option value="0" {if !$party['gender']}selected="selected"{/if}>{lang ygclub_party:unlimited}</option>
+                        <option value="0" {if !$party['gender']}selected="selected"{/if}>{lang ygclub_party:unlimited_gender}</option>
                         <option value="1" {if $party['gender'] == 1}selected="selected"{/if}>{lang ygclub_party:male}</option>
                         <option value="2" {if $party['gender'] == 2}selected="selected"{/if}>{lang ygclub_party:female}</option>
                     </select>
                 </span>
             </dd>
 
-            <dt><span class="rq">*</span>{lang ygclub_party:number}:</dt>
+            <dt><span class="rq">*</span>{lang ygclub_party:number_limited}:</dt>
             <dd>
             <input type="text" name="number" id="party_number" class="px z" style="width:55px;" onkeyup="checkvalue(this.value, 'activitynumbermessage')" value="{if $party[number]+0 <= 0}0{else}$party[number]{/if}" />
                 <span class="xg1">{lang ygclub_party:number_spec}</span>
@@ -63,8 +63,8 @@ global $condata;
         <dl>
             <dt><span class="rq">*</span>{lang ygclub_party:inviter_isjoin}:</dt>
             <dd>
-                <label for="isjoin_0"><input type="radio" name="isjoin" id="isjoin_1" class="pc" value="1" {if $party[isjoin] == '' || $party[isjoin] == '1'}checked="checked"{/if} />Yes</label>
-                <label for="isjoin_1"><input type="radio" name="isjoin" id="isjoin_0" class="pc" value="0" {if $party[isjoin] == '0'}checked="checked"{/if} />No</label>
+                <label for="isjoin_1"><input type="radio" name="isjoin" id="isjoin_1" class="pc" value="1" {if $party[isjoin] == '' || $party[isjoin] == '1'}checked="checked"{/if} />Yes</label>
+                <label for="isjoin_0"><input type="radio" name="isjoin" id="isjoin_0" class="pc" value="0" {if $party[isjoin] == '0'}checked="checked"{/if} />No</label>
             </dd>
 
             <dt><span class="rq">*</span>{lang ygclub_party:inviter_phone}:<dt>

@@ -39,29 +39,6 @@ function add_sign_field(v){
                     $_G['cache']['forums'][$fid]['name']
                 </th>
             </tr>
-            <tr>
-                <td class="td27" colspan="2">发起权限</td>
-            </tr>
-            <tr class="noborder">
-                <td class="vtop" width="400">
-                    <input type="radio" name="party[perms]" value='group' onclick="show_perms(1);" {if $condata[perms]=='group'}checked{/if}/> 指定用户组 <input type="radio" name="party[perms]" value='moderator' onclick="show_perms(2);" {if $condata[perms]=='moderator'}checked{/if}/> 本版版主 <input type="radio" name="party[perms]" value='member' onclick="show_perms(3);" {if $condata[perms]=='member'}checked{/if}/> 指定会员 <input type="radio" name="party[perms]" value='everyone' onclick="show_perms(4);" {if $condata[perms]=='everyone' || empty($condata)}checked{/if}/> 所有人
-                    <span id="perms1" style="display:{if $condata[perms]=='group'}block{else}none{/if};">
-                    {eval $j=0;}
-                    <!--{loop $_G['cache']['usergroups'] $k $v}-->
-                        {eval $j++}
-                        <input type="checkbox" name="party[group][]" id="party_group_$k" value="$k" {if $condata[group] && in_array($k,$condata[group])}checked{/if}/><label for="party_group_$k">$v[grouptitle]</label> &nbsp;
-                        <!--{if $j%4 == 0}--><br /><!--{/if}-->
-                    <!--{/loop}-->
-                    </span>
-                    <span id="perms2" style="display:none;"></span>
-                    <span id="perms3" style="display:{if $condata[perms]=='member'}block{else}none{/if};"><input type="text" name="party[member]" value="$condata[member]" class="txt"/><span class="tips2">多个会员用英文状态下的逗号隔开即可</span></span>
-                    <span id="perms4" style="display:none;"></span>
-                </td>
-                <td class="vtop tips2">
-                    指定哪些成员可以发起活动
-                </td>
-
-            </tr>
 
             <tr>
                 <td class="td27" colspan="2">报名权限</td>

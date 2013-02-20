@@ -1,13 +1,16 @@
 {eval
 
-global $party, $condata;
+global $party, $partyer, $condata;
 function tpl_ygclub_party_sign () {
-global $party, $condata;
+global $party, $partyer, $condata;
 
 }
 
 <!--{block return}-->
 <div id="partyjoin">
+<!--{if $partyer[uid] > 0}-->
+    <h2>{lang ygclub_party:you_already_applied}</h2>
+<!--{else}-->
     <h2>{lang ygclub_party:i_join}</h2>
     <form name="party_join" id="party_join" method="post" action="plugin.php?id=ygclub_party" onsubmit="ajaxpost('party_join', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
         <input type="hidden" name="formhash" value="{FORMHASH}" />
@@ -86,6 +89,7 @@ global $party, $condata;
             </tr>
         </table>
     </form>
+<!--{/if}-->
 </div>
 
 <!--{/block}-->

@@ -35,7 +35,7 @@ if($_POST['action'] == 'partyapplies')
         $partyer = C::t('#ygclub_party#partyers')->fetch_by_uid_tid($_G['uid'], $tid);
 
         if($partyer){
-            showmessage('already_applied');
+            showmessage('ygclub_party:already_applied');
         }
        
         if(empty($_POST['phone'])) {
@@ -82,7 +82,7 @@ if($_POST['action'] == 'partyapplies')
 
         C::t('#ygclub_party#partyers')->insert($insertData);
 
-        showmessage('partyapplies_succeed', 'forum.php?mod=viewthread&tid='.$_POST['tid'], array(), array('showdialog' => true, 'locationtime' => true));
+        showmessage('ygclub_party:partyapplies_succeed', 'forum.php?mod=viewthread&tid='.$_POST['tid'], array(), array('showdialog' => true, 'locationtime' => true));
     }
 }
 // 获取报名列表

@@ -29,6 +29,8 @@ class plugin_ygclub_party_forum extends plugin_ygclub_party {
         $party = $party_thread->_getpartyinfo($_G['tid']);
         if(!$party['tid']) return '';
 
+        $partyer = C::t('#ygclub_party#partyers')->fetch_by_uid_tid($_G['uid'], $party['tid']);
+
         $condata = $party_thread->_load_forumparty_condata($_G['fid']);
         return array(tpl_ygclub_party_partyers_list() . tpl_ygclub_party_sign());
     }
