@@ -39,6 +39,7 @@ class threadplugin_ygclub_party {
     function newthread_submit_end($fid, $tid) { 
         global $_G;
 
+        $_POST['doworker'] = str_replace('，',',', $_POST['doworker']);
         $insertData = array(
             'tid'=>$tid, 
             'fid'=>$fid,
@@ -92,6 +93,8 @@ class threadplugin_ygclub_party {
 
     function editpost_submit($fid, $tid) { 
         global $_G;
+        
+        $_POST['doworker'] = str_replace('，',',', $_POST['doworker']);
         $updateData = array(
             'showtime'      =>strtotime($_POST['showtime']),
             'starttimefrom' =>strtotime($_POST['starttimefrom']),
