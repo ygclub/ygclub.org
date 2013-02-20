@@ -19,17 +19,21 @@ define('NOROBOT', TRUE);
 // 申请参加活动
 if($_POST['action'] == 'partyapplies')
 {
-	if(!$_G['uid']) {
-		showmessage('not_loggedin', NULL, array(), array('login' => 1));
+    if(!$_G['uid']) {
+		showmessage('not_loggedin', '', array(), array('login' => true));
     }
     if(submitcheck('partysubmit')) {
         
         $tid = $_POST['tid'];
 
         $party = C::t('#ygclub_party#party')->fetch($tid);
+        
 
         if(!$party){
             showmessage('ygclub_party:party_not_valid');
+        }
+        if($party['closed']==1){
+            showmessage("此活动已结束.");
         }
 
         $partyer = C::t('#ygclub_party#partyers')->fetch_by_uid_tid($_G['uid'], $tid);
@@ -67,7 +71,7 @@ if($_POST['action'] == 'partyapplies')
         }
 
         $insertData = array(
-            'tid' => $_POST['tid'],
+            'tid' => $tid,
             'uid' => $_G['uid'],
             'username' => $_G['username'],
             'phone' => $_POST['phone'],
@@ -79,9 +83,12 @@ if($_POST['action'] == 'partyapplies')
             'followed' => $_POST['followed'],
             'config' => serialize($_POST['SFDC']),
         );
-
+        
+        $thread_subject = DB::result_first("SELECT subject FROM " . DB::table('forum_thread') . " where tid='$tid'");
+        $notic = array('subject' => "{$_G['username']}已报名参加：{$thread_subject}", 'message' => $_POST['message'] . ' &nbsp;<a href="forum.php?mod=viewthread&tid=' . $tid . '#ygclub_party_nopassed_partyers">查看&gt;</a>');
+        notification_add($party['uid'],'report','system_notice',$notic);
+       
         C::t('#ygclub_party#partyers')->insert($insertData);
-
         showmessage('ygclub_party:partyapplies_succeed', 'forum.php?mod=viewthread&tid='.$_POST['tid'], array(), array('showdialog' => true, 'locationtime' => true));
     }
 }
@@ -143,7 +150,6 @@ elseif($_GET['act'] == 'operate'){
         $tid = $_GET['tid'];
         $pid = $_POST['operate_pid'];
         $for = $_POST['operate_for'];
-
         if (in_array($for,array('wait','reply','accept','nexttime','edit'))){
             if($tid > 0 && $pid > 0 && $_G['uid'] > 0) {
                 $goUrl = 'forum.php?mod=viewthread&tid='.$tid;
@@ -155,24 +161,79 @@ elseif($_GET['act'] == 'operate'){
                     showmessage("此活动已结束，不能进行相关的操作");
                 }
                 else{
+                    if($for == 'nexttime')
+                    {
+                        if(trim($_POST['reply_message']) == '')
+                        {
+                            showmessage("请输入退出的原因。");
+                        }
+                        else
+                        {
+                            include_once('thread.class.php');
+                            $party_thread = new threadplugin_ygclub_party();
+                            $condata = $party_thread->_load_forumparty_condata($party['fid']);
+                            if ($condata['limittime'] > 0 && (($party['starttimeto']-$_G['timestamp'])<=60*$condata['limittime'])) {
+                                showmessage("报名截至时间前 " .  $condata['limittime'] . " 分钟不能退出活动，请联系召集人或管理员。");
+                            }
+                            
+                            $thread_subject = DB::result_first("SELECT subject FROM " . DB::table('forum_thread') . " where tid='$tid'");
+                            $partyer = C::t('#ygclub_party#partyers')->fetch($pid);
+                            if($partyer['uid'] != $_G['uid'])
+                            {
+                                showmessage("非法操作!");
+                            }
+                            $updateData['verified'] = '5';
+                            $updateData['message'] = $_POST['reply_message'];
+                            $success_msg = '你已经退出此次活动'; 
+                            $notice_subject = "{$_G['username']} 退出了活动：{$thread_subject}";
+                            $notice_message = $_POST['reply_message'] . ' &nbsp;<a href="forum.php?mod=viewthread&tid=' . $tid . '">查看&gt;</a>';
+                        }
+                        $updateData['updatetime'] = $_G['timestamp']; 
+                        C::t('#ygclub_party#partyers')->update($pid, $updateData);
+
+                        if($_G['uid'] != $party['uid']){
+                            $notic = array('subject' => $notice_subject, 'message' => $notice_message);
+                            notification_add($party['uid'],'report','system_notice',$notic);
+                        }
+
+                        showmessage($success_msg, $goUrl,  array(), array('showdialog' => true, 'locationtime'=>true));
+
+                    }
                     if($mPerm) {
+                        $thread_subject = DB::result_first("SELECT subject FROM " . DB::table('forum_thread') . " where tid='$tid'");
+                        $partyer = C::t('#ygclub_party#partyers')->fetch($pid);
+
                         if($for == 'wait') {
                             $updateData['verified'] = '2';
-                            $success_msg = '成功取消了此朋友的活动请求。'; 
+                            $success_msg = '成功取消了此朋友的活动请求。';
+                            $notice_subject = "{$_G['username']} 取消了你在活动：{$thread_subject} 中的报名";
+                            $notice_message = $_POST['reply_message'] . ' &nbsp;<a href="forum.php?mod=viewthread&tid=' . $tid . '">查看&gt;</a>';
                         }
                         elseif($for == 'accept') {
                             $updateData['verified'] = '4';
                             $success_msg = '成功接受了此朋友的请求。'; 
+                            $notice_subject = "{$_G['username']} 通过了你在活动：{$thread_subject} 中的报名";
+                            $notice_message = $_POST['reply_message'] . ' &nbsp;<a href="forum.php?mod=viewthread&tid=' . $tid . '">查看&gt;</a>';
                         }
                         elseif($for == 'reply') {
                             $success_msg = '回复留言成功。'; 
+                            $notice_subject = "{$_G['username']} 在活动：{$thread_subject} 报名中回复了你";
+                            $notice_message = $_POST['reply_message'] . ' &nbsp;<a href="forum.php?mod=viewthread&tid=' . $tid . '">查看&gt;</a>';
                         }
                         if($_POST['reply_message'] != '') {
                             $updateData['reply'] = "From {$_G['username']}: " . $_POST['reply_message'];
                         }
                         $updateData['updatetime'] = $_G['timestamp']; 
                         C::t('#ygclub_party#partyers')->update($pid, $updateData);
+                        
+
+                        if($_G['uid'] != $partyer['uid']){
+                            $notic = array('subject' => $notice_subject, 'message' => $notice_message);
+                            notification_add($partyer['uid'],'report','system_notice',$notic);
+                        }
+                        
                         showmessage($success_msg, $goUrl,  array(), array('header'=>false, 'showdialog' => false,  'clean_msgforward'=> true ));
+
                     }
                 }
             }
@@ -206,11 +267,41 @@ elseif($_GET['act'] == 'print'){
             showmessage('ygclub_party:party_not_valid');
         }
         else {
-            echo 'to be continued';
+            
+            $party['_subject'] = DB::result_first("SELECT subject FROM " . DB::table('forum_thread') . " where tid='$tid'");
+            $applylist = C::t('#ygclub_party#partyers')->fetch_all_for_thread($tid);
+            $count = DB::result_first("SELECT count(*) AS num FROM %t WHERE tid=%d " , array('partyers', $tid));
+
+            $applylist = DB::fetch_all("SELECT p.*, m.email FROM " . 
+                DB::table('partyers') . " AS p LEFT JOIN " .
+                DB::table('common_member') . " AS m ON m.uid=p.uid ".
+                "WHERE p.verified=4 AND p.tid={$tid} " . 
+                "ORDER BY p.phone ASC");
+
+            $print_list = array(0 => array("用户名{$Fstring}",'联系电话','E-Mail', '个人说明','分工','备注选项','签到'));
+
+            $marks_list = explode('|', $party['marks']);
+            foreach($applylist as $key => $partyer)
+            {
+                $print_list[$partyer['pid']]['username'] = $partyer['username'];
+                $print_list[$partyer['pid']]['phone'] = $partyer['phone'];
+                $print_list[$partyer['pid']]['email'] = $partyer['email'];
+                $print_list[$partyer['pid']]['message'] = $partyer['message'];
+                $print_list[$partyer['pid']]['usertask'] = $partyer['usertask'];
+                $print_list[$partyer['pid']]['marks'] = $marks_list[$partyer['marks']];
+                $print_list[$partyer['pid']]['checkin'] = '';
+            }
+
+            include template('ygclub_party:party_print');
         }
+    }
+    else
+    {
+            showmessage('没有权限打印');
     }
 }
 else{
+    showmessage('参数不合法');
     die('fdafd');
     $tmp = DB::fetch_all("SELECT tid FROM %t", array('party'));
     foreach($tmp as $v)

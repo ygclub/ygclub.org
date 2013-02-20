@@ -1,0 +1,84 @@
+{eval
+
+global $party;
+function tpl_ygclub_party_info () {
+global $party;
+
+}
+
+<!--{block return}-->
+<style type="text/css">
+    #party_info {font-size:14px}
+    #party_info tr th {text-align:center;width:200px;}
+</style>
+
+<div class="pbm cl">
+    <table id="party_info" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>{lang ygclub_party:inviter_phone}</td>
+                <td>{$party[phone]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:class}</td>
+                <td>{$party[class]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:showtime}</td>
+                <td>{$party[showtime]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:starttimefrom}</td>
+                <td>{$party[starttimefrom]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:starttimeto}</td>
+                <td>{$party[starttimeto]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:number_limited}</td>
+                <td>{$party[_number]}({$party[_gender]})</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:already_confirmed}/{lang ygclub_party:applied}</td>
+                <td><strong class="rq">{$party[_verified][4]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][4]['followed']}<!--{/if}--></strong> / {$party[_verified][all]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][all]['followed']}<!--{/if}--></td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:approved_partyers}</td>
+                <td>{$party[_approved_username_list_html]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:marks_stat}</td>
+                <td>
+                    <!--{loop $party[_marks_list] $k $v}-->
+                    $v(<font color="red">{$party[_marks_count][$k]}</font>);&nbsp;
+                    <!--{/loop}-->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--{if $party[_mPerm] == '1'}-->
+<div class="pbm cl">
+    <center>
+    <dl>
+        <dt></dt>
+        <dd>
+        <!--<span class="xi2"><a href="" onclick="showWindow('activity', this.href, 'get', 0)" title="{lang ygclub_party:manager_partyers}">[{lang ygclub_party:manager_partyers}]</a></span>-->
+            <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=print" target="_blank" title="打印名单">[打印名单]</a></span>
+        </dd>
+    </dl>
+    </center>
+</div>
+
+<!--{/if}-->
+
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}
+

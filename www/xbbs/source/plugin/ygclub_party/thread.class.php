@@ -178,6 +178,7 @@ class threadplugin_ygclub_party {
         $party['_verified']['all']['count'] = 0;
         $party['_verified']['all']['followed'] = 0;
         $party['_total_count'] = 0;
+        $party['_current_user_verified'] = 0;
 
         foreach($partyers_list as $key=> $partyer)
         {
@@ -195,6 +196,11 @@ class threadplugin_ygclub_party {
             $party['_verified']['all']['followed'] += $partyer['followed'];
             $party['_total_count'] ++;
             $party['_total_count'] += $partyer['followed'];
+
+            if($partyer['uid'] == $_G['uid'])
+            {
+                $party['_current_user_verified'] = $partyer['verified'];
+            }
         }
 
         $party['_approved_username_list_html'] = join(', ', $party['_approved_username_list_html']);

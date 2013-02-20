@@ -63,8 +63,8 @@
 function succeedhandle_partyer_operate(url, message)
 {
     showDialog(message,'right',null, null, 1, null, null, null, null, 1, null);
-    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=PassUsers','ptpassed1361248989');
-    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=noPassUsers','ptnopass1361248989');
+    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=PassUsers','ygclub_party_passed_partyers');
+    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=noPassUsers','ygclub_party_nopassed_partyers');
 }
 </script>
 <div id="partyer_operate" style="display:none">

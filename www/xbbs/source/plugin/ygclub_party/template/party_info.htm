@@ -33,7 +33,7 @@ global $party;
                 <th rowspan="3">{lang ygclub_party:status}</th>
                 <td rowspan="3">
                     <img src="source/plugin/ygclub_party/images/party_<!--{if $party[closed] == '0'}-->on<!--{else}-->end<!--{/if}-->.gif" />
-                </th>
+                </td>
             </tr>
             <tr>
                 <th>{lang ygclub_party:number_limited}</th>
@@ -59,51 +59,59 @@ global $party;
     </table>
 </div>
 
-<!--{if $party[_mPerm] == '1'}-->
 <div class="pbm cl">
     <center>
     <dl>
         <dt></dt>
         <dd>
+        <!--{if $party[_mPerm] == '1'}-->
         <!--<span class="xi2"><a href="" onclick="showWindow('activity', this.href, 'get', 0)" title="{lang ygclub_party:manager_partyers}">[{lang ygclub_party:manager_partyers}]</a></span>-->
             <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=print" target="_blank" title="打印名单">[打印名单]</a></span>
-            <span class="pipe">|</span>
+            <span class="pipe"></span>
             <!--{if $party[closed] == '1'}-->
             <button onclick="showDialog($('close_open_party').innerHTML,'info','开启活动',null,1);return false;" class="pn"><span>开启活动</span></button>
             <!--{else}-->
             <button onclick="showDialog($('close_open_party').innerHTML,'info','关闭活动',null,1);return false;" class="pn"><span>关闭活动</span></button>
             <!--{/if}-->
+            <div id="close_open_party" style="display:none">
+                <form name="close_open_party_form" id="close_open_party_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$party[tid]}&act=onoff&for=<!--{if $party[closed] == '0'}-->off<!--{else}-->on<!--{/if}-->" onsubmit="ajaxpost('close_open_party_form', 'return_close_open_party', 'return_close_open_party', 'onerror');return false;">
+                    <input type="hidden" name="formhash" value="{FORMHASH}" />
+                    <input type="hidden" name="handlekey" value="close_open_party_submit" />
+                     <input type="hidden" name="close_open_party_submit" value="close_open_party_submit">
+                    <div class="c">
+                        <div class="actfm">
+                            <table cellpadding="0" cellspacing="0" class="actl">
+                                <tr>
+                                    <td>
+                                    <!--{if $party[closed] == '1'}-->
+                                    开启活动
+                                    <!--{else}-->
+                                    关闭活动
+                                    <!--{/if}-->
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="o pns">
+                        <button type="submit" name="close_open_party_submit" class="pn pnc"><span>提交</span></button>
+                    </div>
+                </form>
+            </div>
+            <!--{/if}-->
+            <!--{if $party['_current_user_verified'] == 0}-->
+            <a href="{$_SERVER[REQUEST_URI]}#ygclub_party_sign_form_anchor" class="pn" style="padding:3px 5px">{lang ygclub_party:i_join}</a>
+            <!--{elseif $party['_current_user_verified'] == 1}-->
+            你已申请参加活动，请耐心等待召集人或管理员的审核
+            <!--{elseif $party['_current_user_verified'] == 4}-->
+            <button onclick="showDialog($('single_partyer_operate').innerHTML,'info','下次参加',null,1);return false;" class="pn pnc"><span>下次参加</span></button>
+            <!--{elseif $party['_current_user_verified'] == 5}-->
+            你已退出活动
+            <!--{/if}-->
         </dd>
     </dl>
-    </center>
+</center>
 </div>
-<div id="close_open_party" style="display:none">
-    <form name="close_open_party_form" id="close_open_party_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$party[tid]}&act=onoff&for=<!--{if $party[closed] == '0'}-->off<!--{else}-->on<!--{/if}-->" onsubmit="ajaxpost('close_open_party_form', 'return_close_open_party', 'return_close_open_party', 'onerror');return false;">
-        <input type="hidden" name="formhash" value="{FORMHASH}" />
-        <input type="hidden" name="handlekey" value="close_open_party_submit" />
-         <input type="hidden" name="close_open_party_submit" value="close_open_party_submit">
-        <div class="c">
-            <div class="actfm">
-                <table cellpadding="0" cellspacing="0" class="actl">
-                    <tr>
-                        <td>
-                        <!--{if $party[closed] == '1'}-->
-                        开启活动
-                        <!--{else}-->
-                        关闭活动
-                        <!--{/if}-->
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div class="o pns">
-            <button type="submit" name="close_open_party_submit" class="pn pnc"><span>提交</span></button>
-        </div>
-    </form>
-</div>
-
-<!--{/if}-->
 
 <!--{/block}-->
 <!--{eval return $return;}-->
@@ -123,10 +131,10 @@ global $party;
 }
 <!--{block return}-->
 <br />
-<div id="ptpassed1361248989"></div>
-<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=PassUsers','ptpassed1361248989');</script>
-<div id="ptnopass1361248989"></div>
-<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=noPassUsers','ptnopass1361248989');</script>
+<div id="ygclub_party_passed_partyers"></div>
+<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=PassUsers','ygclub_party_passed_partyers');</script>
+<div id="ygclub_party_nopassed_partyers"></div>
+<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=noPassUsers','ygclub_party_nopassed_partyers');</script>
 <!--{/block}-->
 <!--{eval return $return;}-->
 {eval

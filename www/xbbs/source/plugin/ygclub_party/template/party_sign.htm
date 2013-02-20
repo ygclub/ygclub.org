@@ -8,9 +8,34 @@ global $party, $partyer, $condata;
 
 <!--{block return}-->
 <div id="partyjoin">
-<!--{if $partyer[uid] > 0}-->
-    <h2>{lang ygclub_party:you_already_applied}</h2>
+    <!--{if $partyer[uid] > 0}-->
+    <!--{if $partyer[verified] == 4}-->
+    <div id="single_partyer_operate" style="display:none">
+    <form name="partyer_operate_form" id="partyer_operate_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$partyer[tid]}&act=operate" onsubmit="ajaxpost('partyer_operate_form', 'return_partyer_operate', 'return_partyer_operate', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="partyer_operate" />
+        <input type="hidden" name="operate_for" id="operate_for" value="nexttime" />
+        <input type="hidden" name="operate_pid" value="{$partyer[pid]}" />
+        <div class="c">
+            <div class="actfm">
+                <table cellpadding="0" cellspacing="0" class="actl">
+                    <tr>
+                        <th>原因</th>
+                        <td><textarea name="reply_message" maxlength="200" cols="38" rows="2" class="pt"></textarea></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="o pns">
+            <input type="hidden" name="partyer_operate_submit" value="true">
+            <em class="xi1" id="return_partyer_operate"></em>
+            <button type="submit" class="pn pnc"><span>提交</span></button>
+        </div>
+    </form>
+    </div>
+    <!--{/if}-->
 <!--{else}-->
+    <a name="ygclub_party_sign_form_anchor" ></a>
     <h2>{lang ygclub_party:i_join}</h2>
     <form name="party_join" id="party_join" method="post" action="plugin.php?id=ygclub_party" onsubmit="ajaxpost('party_join', 'return_activityapplies', 'return_activityapplies', 'onerror');return false;">
         <input type="hidden" name="formhash" value="{FORMHASH}" />
