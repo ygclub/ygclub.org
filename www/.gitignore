@@ -13,6 +13,7 @@ pma
 zt/tmp/*
 zt/module/ucenter/config.php
 zt/config/config.php
+zt/config/my.php
 
 *~
 *.swp
