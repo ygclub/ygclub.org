@@ -50,7 +50,7 @@ var browseType  = '<?php echo $browseType;?>';
           <thead>
           <tr class='colhead'>
             <th class='w-id'>    <?php common::printOrderLink('id',        $orderBy, $vars, $lang->idAB);?></th>
-            <th class='w-pri'>   <?php common::printOrderLink('pri',       $orderBy, $vars, $lang->priAB);?></th>
+            <th class='w-pri'>   <?php common::printOrderLink('pri',       $orderBy, $vars, $lang->task->pri);?></th>
             <th class='w-p30'>   <?php common::printOrderLink('name',      $orderBy, $vars, $lang->task->name);?></th>
             <th class='w-status'><?php common::printOrderLink('status',    $orderBy, $vars, $lang->statusAB);?></th>
 
