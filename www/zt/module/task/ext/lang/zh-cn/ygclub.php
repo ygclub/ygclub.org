@@ -9,4 +9,5 @@ $lang->task->finishedDate = '完成日期';
 $lang->comment = '回复';
 $lang->action->desc->commented    = '$date, 由 <strong>$actor</strong> 添加回复。' . "\n";
 $lang->project->taskSummary     = "本页共 <strong>%s</strong> 个任务，未开始<strong>%s</strong>，进行中<strong>%s</strong>，总预计<strong>%s</strong>小时，已消耗<strong>%s</strong>小时，剩余<strong>%s</strong>小时。";
+$lang->workingHour = '小时';
 ?>
