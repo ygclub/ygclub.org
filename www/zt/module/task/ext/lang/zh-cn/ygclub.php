@@ -1,6 +1,6 @@
 <?php
 $lang->task->typeList = array('', '项目活动','课程建设', 'IT建设', '其他');
-$lang->task->create = '新增任务';
+$lang->task->create = '发起新任务';
 $lang->task->priList = array(2=>'中', 1=>'高', 3=>'低');
 $lang->task->estimate = '预计花费时间';
 $lang->task->estStarted = '期望开始日期';
