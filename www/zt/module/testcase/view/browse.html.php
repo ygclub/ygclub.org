@@ -2,22 +2,23 @@
 /**
  * The browse view file of testcase module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testcase
- * @version     $Id: browse.html.php 3853 2012-12-19 05:41:11Z wyd621@gmail.com $
+ * @version     $Id: browse.html.php 4487 2013-02-27 02:53:25Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/datepicker.html.php';?>
-<?php include '../../common/view/treeview.html.php';?>
-<?php include '../../common/view/colorize.html.php';?>
-<script language="Javascript">
-var browseType = '<?php echo $browseType;?>';
-var moduleID   = '<?php echo $moduleID;?>';
-</script>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/datepicker.html.php';
+include '../../common/view/treeview.html.php';
+include '../../common/view/colorize.html.php';
+js::set('browseType', $browseType);
+js::set('moduleID'  , $moduleID);
+?>
+
 <div id='featurebar'>
   <div class='f-left'>
     <?php
@@ -28,7 +29,6 @@ var moduleID   = '<?php echo $moduleID;?>';
     ?>
   </div>
   <div class='f-right'>
-    <?php //common::printLink('testcase', 'import', "productID=$productID", '&nbsp;', '', "class='import icon-green-big-import' title='{$lang->testcase->import}'"); ?>
     <?php if($browseType != 'needconfirm') common::printIcon('testcase', 'export', "productID=$productID&orderBy=$orderBy"); ?>
     <?php common::printIcon('testcase', 'batchCreate', "productID=$productID&moduleID=$moduleID");?>
     <?php common::printIcon('testcase', 'create', "productID=$productID&moduleID=$moduleID"); ?>
@@ -54,19 +54,19 @@ var moduleID   = '<?php echo $moduleID;?>';
         <table class='table-1 colored tablesorter datatable fixed'>
           <thead>
             <tr class='colhead'>
-              <th class='w-id'> <?php common::printOrderLink('id',    $orderBy, $vars, $lang->idAB);?></th>
-              <th class='w-pri'><?php common::printOrderLink('pri',   $orderBy, $vars, $lang->priAB);?></th>
-              <th><?php common::printOrderLink('title', $orderBy, $vars, $lang->testcase->title);?></th>
+              <th class='w-id'>    <?php common::printOrderLink('id',            $orderBy, $vars, $lang->idAB);?></th>
+              <th class='w-pri'>   <?php common::printOrderLink('pri',           $orderBy, $vars, $lang->priAB);?></th>
+              <th>                 <?php common::printOrderLink('title',         $orderBy, $vars, $lang->testcase->title);?></th>
               <?php if($browseType == 'needconfirm'):?>
-              <th><?php common::printOrderLink('story', $orderBy, $vars, $lang->testcase->story);?></th>
+              <th>                 <?php common::printOrderLink('story',         $orderBy, $vars, $lang->testcase->story);?></th>
               <th class='w-50px'><?php echo $lang->actions;?></th>
               <?php else:?>
-              <th class='w-type'>  <?php common::printOrderLink('type',      $orderBy, $vars, $lang->typeAB);?></th>
-              <th class='w-user'>  <?php common::printOrderLink('openedBy',  $orderBy, $vars, $lang->openedByAB);?></th>
-              <th class='w-80px'>  <?php common::printOrderLink('lastRunner',  $orderBy, $vars, $lang->testtask->lastRunAccount);?></th>
+              <th class='w-type'>  <?php common::printOrderLink('type',          $orderBy, $vars, $lang->typeAB);?></th>
+              <th class='w-user'>  <?php common::printOrderLink('openedBy',      $orderBy, $vars, $lang->openedByAB);?></th>
+              <th class='w-80px'>  <?php common::printOrderLink('lastRunner',    $orderBy, $vars, $lang->testtask->lastRunAccount);?></th>
               <th class='w-120px'> <?php common::printOrderLink('lastRunDate',   $orderBy, $vars, $lang->testtask->lastRunTime);?></th>
-              <th class='w-80px'>  <?php common::printOrderLink('lastRunResult',$orderBy, $vars, $lang->testtask->lastRunResult);?></th>
-              <th class='w-status'><?php common::printOrderLink('status',    $orderBy, $vars, $lang->statusAB);?></th>
+              <th class='w-80px'>  <?php common::printOrderLink('lastRunResult', $orderBy, $vars, $lang->testtask->lastRunResult);?></th>
+              <th class='w-status'><?php common::printOrderLink('status',        $orderBy, $vars, $lang->statusAB);?></th>
               <th class='w-150px {sorter:false}'><?php echo $lang->actions;?></th>
               <?php endif;?>
             </tr>
@@ -78,21 +78,21 @@ var moduleID   = '<?php echo $moduleID;?>';
                 <?php echo html::a($viewLink, sprintf('%03d', $case->id));?>
               </td>
               <td><span class='<?php echo 'pri' . $case->pri?>'><?php echo $case->pri?></span></td>
-              <td class='a-left nobr'><?php echo html::a($viewLink, $case->title);?></td>
+              <td class='a-left' title="<?php echo $case->title?>"><?php echo html::a($viewLink, $case->title);?></td>
               <?php if($browseType == 'needconfirm'):?>
               <td class='a-left'><?php echo html::a($this->createLink('story', 'view', "storyID=$case->story"), $case->storyTitle, '_blank');?></td>
-              <td><?php echo html::a(inlink('confirmStoryChange', "caseID=$case->id"), $lang->confirm, 'hiddenwin');?></td>
+              <td><?php $lang->testcase->confirmStoryChange = $lang->confirm; common::printIcon('testcase', 'confirmStoryChange', "caseID=$case->id", '', 'list', '', 'hiddenwin');?></td>
               <?php else:?>
               <td><?php echo $lang->testcase->typeList[$case->type];?></td>
               <td><?php echo $users[$case->openedBy];?></td>
               <td><?php echo $users[$case->lastRunner];?></td>
               <td><?php if(!helper::isZeroDate($case->lastRunDate)) echo date(DT_MONTHTIME1, strtotime($case->lastRunDate));?></td>
-              <td><?php if($case->lastRunResult) echo $lang->testcase->resultList[$case->lastRunResult];?></td>
-              <td><?php echo $lang->testcase->statusList[$case->status];?></td>
+              <td class='<?php echo $case->lastRunResult;?>'><?php if($case->lastRunResult) echo $lang->testcase->resultList[$case->lastRunResult];?></td>
+              <td class='<?php echo $run->status;?>'><?php echo $lang->testcase->statusList[$case->status];?></td>
               <td class='a-right'>
                 <?php
-                common::printLink('testtask', 'runCase', "runID=0&caseID=$case->id&version=$case->version", $this->app->loadLang('testtask')->testtask->runCase, '', 'class="runcase"');
-                common::printLink('testtask', 'results', "runID=0&caseID=$case->id", $lang->testtask->results, '', 'class="results"');
+                common::printIcon('testtask', 'runCase', "runID=0&caseID=$case->id&version=$case->version", '', 'list', '', '', 'runCase');
+                common::printIcon('testtask', 'results', "runID=0&caseID=$case->id", '', 'list', '', '', 'results');
                 common::printIcon('testcase', 'edit',    "caseID=$case->id", $case, 'list');
                 common::printIcon('testcase', 'create',  "productID=$case->product&moduleID=$case->module&from=testcase&param=$case->id", $case, 'list', 'copy');
                 common::printIcon('testcase', 'delete',  "caseID=$case->id", '', 'list', '', 'hiddenwin');
@@ -105,14 +105,17 @@ var moduleID   = '<?php echo $moduleID;?>';
           </thead>
          <tfoot>
            <tr>
-             <td colspan='10'>
+             <?php $mergeColums = $browseType == 'needconfirm' ? 5 : 10;?>
+             <td colspan='<?php echo $mergeColums?>'>
+               <?php if($cases):?>
                <div class='f-left'>
                <?php
                echo html::selectAll() . html::selectReverse(); 
-               if(common::hasPriv('testcase', 'batchEdit'))echo html::submitButton($lang->testcase->batchEdit, "onclick='changeAction(\"" . inLink('batchEdit', "from=testcaseBrowse&productID=$productID&orderBy=$orderBy") . "\")'");
-               if(common::hasPriv('testtask', 'batchRun')) echo html::submitButton($lang->testtask->batchRun,  "onclick='changeAction(\"" . $this->createLink('testtask', 'batchRun', "productID=$productID&orderBy=$orderBy") . "\")'");
+               if(common::hasPriv('testcase', 'batchEdit'))echo html::submitButton($lang->edit, "onclick='changeAction(\"" . inLink('batchEdit', "from=testcaseBrowse&productID=$productID&orderBy=$orderBy") . "\")'");
+               if(common::hasPriv('testtask', 'batchRun')) echo html::submitButton($lang->testtask->runCase,  "onclick='changeAction(\"" . $this->createLink('testtask', 'batchRun', "productID=$productID&orderBy=$orderBy") . "\")'");
                ?>
                </div>
+               <?php endif?>
                <?php $pager->show();?>
              </td>
            </tr>

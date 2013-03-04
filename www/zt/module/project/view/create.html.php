@@ -2,11 +2,11 @@
 /**
  * The create view of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: create.html.php 3481 2012-09-02 05:53:18Z wwccss $
+ * @version     $Id: create.html.php 4422 2013-02-22 02:57:42Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -20,7 +20,7 @@ var projectID = <?php echo $projectID;?>;
 defaultURL    = createLink('project', 'task', 'projectID=' + projectID);
 $(document).ready(function() 
 {
-    $.fn.colorbox({html:tips, open:true, width:480, height:280});
+    $.fn.colorbox({html:tips, open:true, transition:'none', width:450, height:250});
     setTimeout( function() {location.href=defaultURL}, 5000);
 });
 </script>
@@ -32,7 +32,7 @@ $(document).ready(function()
 <?php include '../../common/view/datepicker.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
 <?php js::import($jsRoot . 'misc/date.js');?>
-<script>var holders=<?php echo json_encode($lang->project->placeholder);?></script>
+<?php js::set('holders', $lang->project->placeholder);?>
 <form method='post' target='hiddenwin' id='dataform'>
   <table align='center' class='table-1 a-left'> 
     <caption>
@@ -71,6 +71,10 @@ $(document).ready(function()
     <tr>
       <th class='rowhead'><?php echo $lang->project->teamname;?></th>
       <td><?php echo html::input('team', $team, "class='text-3'");?></td>
+    </tr>  
+    <tr>
+      <th class='rowhead'><?php echo $lang->project->type;?></th>
+      <td><?php echo html::select('type', $lang->project->typeList, '', "class='text-3'") . $lang->project->typeDesc;?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->project->manageProducts;?></th>

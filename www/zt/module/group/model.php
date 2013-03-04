@@ -2,11 +2,11 @@
 /**
  * The model file of group module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     group
- * @version     $Id: model.php 3879 2012-12-24 06:24:54Z wyd621@gmail.com $
+ * @version     $Id: model.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -185,20 +185,55 @@ class groupModel extends model
      * @access public
      * @return bool
      */
-    public function updatePrivByGroup($groupID)
+    public function updatePrivByGroup($groupID, $menu, $version)
     {
+        /* Set priv when have version. */
+        if($version)
+        {
+            $noCheckeds = trim($this->post->noChecked, ',');
+            if($noCheckeds)
+            {
+                $noCheckeds = explode(',', $noCheckeds);
+                foreach($noCheckeds as $noChecked)
+                {
+                    /* Delete no checked priv*/
+                    list($module, $method) = explode('-', $noChecked);
+                    $this->dao->delete()->from(TABLE_GROUPPRIV)->where('`group`')->eq($groupID)->andWhere('module')->eq($module)->andWhere('method')->eq($method)->exec();
+                }
+            }
+
+            /* Replace new. */
+            if($this->post->actions)
+            {
+                foreach($this->post->actions as $moduleName => $moduleActions)
+                {
+                    foreach($moduleActions as $actionName)
+                    {
+                        $data->group = $groupID;
+                        $data->module = $moduleName;
+                        $data->method = $actionName;
+                        $this->dao->replace(TABLE_GROUPPRIV)->data($data)->exec();
+                    }
+                }
+            }
+            return true;
+        }
+
         /* Delete old. */
-        $this->dao->delete()->from(TABLE_GROUPPRIV)->where('`group`')->eq($groupID)->exec();
+        $this->dao->delete()->from(TABLE_GROUPPRIV)->where('`group`')->eq($groupID)->andWhere('module')->in($this->getMenuModules($menu))->exec();
 
         /* Insert new. */
-        foreach($this->post->actions as $moduleName => $moduleActions)
+        if($this->post->actions)
         {
-            foreach($moduleActions as $actionName)
+            foreach($this->post->actions as $moduleName => $moduleActions)
             {
-                $data->group = $groupID;
-                $data->module = $moduleName;
-                $data->method = $actionName;
-                $this->dao->insert(TABLE_GROUPPRIV)->data($data)->exec();
+                foreach($moduleActions as $actionName)
+                {
+                    $data->group = $groupID;
+                    $data->module = $moduleName;
+                    $data->method = $actionName;
+                    $this->dao->insert(TABLE_GROUPPRIV)->data($data)->exec();
+                }
             }
         }
         return true;
@@ -301,5 +336,38 @@ class groupModel extends model
                 unset($tmpResources);
             }
         }
+    }
+
+    /**
+     * Check menu have module 
+     * 
+     * @param  string    $menu 
+     * @param  string    $moduleName 
+     * @access public
+     * @return void
+     */
+    public function checkMenuModule($menu, $moduleName)
+    {
+        if(empty($menu)) return true;
+        if($menu == 'other' and (isset($this->lang->menugroup->$moduleName) or isset($this->lang->menu->$moduleName))) return false;
+        if($menu != 'other' and !($moduleName == $menu or (isset($this->lang->menugroup->$moduleName) and $this->lang->menugroup->$moduleName == $menu))) return false;
+        return true;
+    }
+
+    /**
+     * Get modules in menu
+     * 
+     * @param  string    $menu 
+     * @access public
+     * @return void
+     */
+    public function getMenuModules($menu)
+    {
+        $modules = array();
+        foreach($this->lang->resource as $moduleName => $action)
+        {
+            if($this->checkMenuModule($menu, $moduleName)) $modules[] = $moduleName;
+        }
+        return $modules;
     }
 }

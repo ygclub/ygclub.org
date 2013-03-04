@@ -2,11 +2,11 @@
 /**
  * The install module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     install
- * @version     $Id: en.php 3879 2012-12-24 06:24:54Z wyd621@gmail.com $
+ * @version     $Id: en.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->install = new stdclass();
@@ -128,8 +128,6 @@ $lang->install->groupList['TOP']['name']    = 'Top manager';
 $lang->install->groupList['TOP']['desc']    = 'for top manager';
 $lang->install->groupList['OTHERS']['name'] = 'Others';
 $lang->install->groupList['OTHERS']['desc'] = 'for others';
-$lang->install->groupList['guest']['name']  = 'Guest';
-$lang->install->groupList['guest']['desc']  = 'for guest';
 
 $lang->install->success = "Success installed";
 

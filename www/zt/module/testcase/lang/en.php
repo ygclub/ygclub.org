@@ -2,11 +2,11 @@
 /**
  * The testcase module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testcase
- * @version     $Id: en.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: en.php 4539 2013-03-02 14:05:21Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->testcase->id               = 'ID';
@@ -51,7 +51,7 @@ $lang->testcase->stepExpect = 'Expect';
 
 $lang->testcase->common             = 'Case';
 $lang->testcase->index              = "Index";
-$lang->testcase->create             = "Create";
+$lang->testcase->create             = "Create case";
 $lang->testcase->batchCreate        = "Batch create";
 $lang->testcase->delete             = "Delete";
 $lang->testcase->view               = "Info";
@@ -101,7 +101,6 @@ $lang->testcase->legendVersion      = 'Versions';
 
 $lang->testcase->confirmDelete = 'Are you sure to delete this case?';
 $lang->testcase->same          = 'The same as above';
-$lang->testcase->notes         = '(Notes: the type and title must be written, otherwise it is no use)';
 
 $lang->testcase->priList[3] = 3;
 $lang->testcase->priList[1] = 1;
@@ -115,6 +114,7 @@ $lang->testcase->typeList['performance'] = 'Performance';
 $lang->testcase->typeList['config']      = 'Config';
 $lang->testcase->typeList['install']     = 'Install';
 $lang->testcase->typeList['security']    = 'Security';
+$lang->testcase->typeList['interface']   = 'Interface';
 $lang->testcase->typeList['other']       = 'Other';
 
 $lang->testcase->stageList['']            = '';

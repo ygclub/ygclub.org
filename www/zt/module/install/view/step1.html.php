@@ -2,11 +2,11 @@
 /**
  * The html template file of step1 method of install module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     ZenTaoPMS
- * @version     $Id: step1.html.php 3685 2012-12-02 01:51:33Z zhujinyonging@gmail.com $
+ * @version     $Id: step1.html.php 4129 2013-01-18 01:58:14Z wwccss $
  */
 ?>
 <?php include '../../common/view/header.lite.html.php';?>

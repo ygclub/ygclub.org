@@ -2,11 +2,11 @@
 /**
  * The productplan module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     productplan
- * @version     $Id: zh-cn.php 3238 2012-07-02 01:44:49Z wwccss $
+ * @version     $Id: zh-cn.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->productplan->common    = '产品计划';
@@ -32,3 +32,10 @@ $lang->productplan->title   = '名称';
 $lang->productplan->desc    = '描述';
 $lang->productplan->begin   = '开始日期';
 $lang->productplan->end     = '结束日期';
+
+$lang->productplan->endList[14]  = '两星期';
+$lang->productplan->endList[31]  = '一个月';
+$lang->productplan->endList[62]  = '两个月';
+$lang->productplan->endList[93]  = '三个月';
+$lang->productplan->endList[186] = '半年';
+$lang->productplan->endList[365] = '一年';

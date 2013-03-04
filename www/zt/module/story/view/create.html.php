@@ -2,17 +2,17 @@
 /**
  * The create view of story module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     story
- * @version     $Id: create.html.php 3887 2012-12-24 10:06:50Z wwccss $
+ * @version     $Id: create.html.php 4269 2013-01-24 09:30:50Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include './header.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
-<script>var holders=<?php echo json_encode($lang->story->placeholder);?></script>
+<?php js::set('holders', $lang->story->placeholder); ?>
 <form method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
   <table align='center' class='table-1'> 
     <caption><?php echo $lang->story->create;?></caption>
@@ -33,7 +33,7 @@
     </tr>
     <tr>
       <th class='rowhead'><?php echo $lang->story->title;?></th>
-      <td><?php echo html::input('title', $title, "class='text-1'");?></td>
+      <td><?php echo html::input('title', $storyTitle, "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->story->spec;?></th>

@@ -2,11 +2,11 @@
 /**
  * The file module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     file
- * @version     $Id: zh-cn.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: zh-cn.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->file = new stdclass();
@@ -18,7 +18,7 @@ $lang->file->delete        = '删除附件';
 $lang->file->export2CSV    = '导出CSV';
 $lang->file->ajaxUpload    = '接口：编辑器上传附件';
 $lang->file->label         = '标题：';
-$lang->file->maxUploadSize = "最大可上传附件：<span class='red'>%s</span>";
+$lang->file->maxUploadSize = "<span class='red'>%s</span>";
 
 $lang->file->errorNotExists   = "<span class='red'>文件夹 '%s' 不存在</span>";
 $lang->file->errorCanNotWrite = "<span class='red'>文件夹 '%s' 不可写,请改变文件夹的权限。在linux中输入指令:sudo chmod -R 777 '%s'</span>";

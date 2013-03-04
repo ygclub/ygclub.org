@@ -2,11 +2,11 @@
 /**
  * The model file of install module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     install
- * @version     $Id: model.php 3879 2012-12-24 06:24:54Z wyd621@gmail.com $
+ * @version     $Id: model.php 4338 2013-02-02 05:33:27Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -388,6 +388,7 @@ class installModel extends model
         if($this->post->password == '') die(js::error($this->lang->install->errorEmptyPassword));
 
         /* Insert a company. */
+        $company = new stdclass();
         $company->name   = $this->post->company;
         $company->pms    = $this->post->pms;
         $company->admins = ",{$this->post->account},";
@@ -397,22 +398,24 @@ class installModel extends model
         {
             /* Set admin. */
             $companyID = $this->dbh->lastInsertID();
+            $admin = new stdclass();
             $admin->account  = $this->post->account;
             $admin->realname = $this->post->account;
             $admin->password = md5($this->post->password);
+            $admin->gender   = '';
             $admin->company  = $companyID;
-            $this->dao->insert(TABLE_USER)->data($admin)->autoCheck()->check('account', 'notempty')->exec();
+            $this->dao->insert(TABLE_USER)->data($admin)->check('account', 'notempty')->exec();
 
             /* Update the group and groupPriv table. */
             $this->dao->update(TABLE_GROUP)->set('company')->eq($companyID)->exec($autoCompany = false);
             $this->dao->update(TABLE_GROUPPRIV)->set('company')->eq($companyID)->exec($autoCompany = false);
 
-            /* Update group name and desc on dafault lang.*/
-            include('lang/' . $this->config->default->lang . '.php');
+            /* Update group name and desc on dafault lang. */
             $groups = $this->dao->select('*')->from(TABLE_GROUP)->orderBy('id')->fetchAll();
             foreach($groups as $group)
             {
-                if(isset($lang->install->groupList[$group->name]))$this->dao->update(TABLE_GROUP)->data($lang->install->groupList[$group->name])->where('id')->eq($group->id)->exec();
+                $data = zget($this->lang->install->groupList, $group->name, '');
+                if($data) $this->dao->update(TABLE_GROUP)->data($data)->where('id')->eq($group->id)->exec();
             }
         }
     }
@@ -447,4 +450,42 @@ class installModel extends model
         return true;
     }
 
+    /**
+     * Get the mysqldump binary.
+     * 
+     * @access public
+     * @return string
+     */
+    public function getMySQLDump()
+    {
+        $mysqldump = '';
+
+        if(strpos(__FILE__, '/opt/lampp') !== false)         // linux.
+        {
+            $mysqldump = '/opt/lampp/bin/mysqldump';
+        }
+        elseif(strpos(__FILE__, '\xampp\zentao') !== false)  // windows.
+        {
+            $mysqldump = substr(__FILE__, 0, 2) . '\xampp\mysql\bin\mysqldump.exe';
+        }
+        else
+        {
+            if(strpos(PHP_OS, 'WIN') !== false)
+            {
+                $mysql = `wmic process where name='mysqld.exe' get executablepath`;
+                if(strpos($mysql, 'mysqld.exe') !== false)
+                {
+                    $mysql = explode("\n", $mysql);
+                    if(isset($mysql[1])) $mysqldump = trim(str_replace('mysqld.exe', 'mysqldump.exe', $mysql[1]));
+                }
+            }
+            else
+            {
+                $mysqldump = trim(`which mysqldump`);
+            }
+        }
+
+        if(file_exists($mysqldump)) return $mysqldump;
+        return '';
+    }
 }

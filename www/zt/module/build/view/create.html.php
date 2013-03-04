@@ -2,11 +2,11 @@
 /**
  * The create view of build module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     build
- * @version     $Id: create.html.php 3705 2012-12-03 02:15:42Z zhujinyonging@gmail.com $
+ * @version     $Id: create.html.php 4386 2013-02-19 07:37:45Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -65,9 +65,7 @@
                   <div class='contentDiv'>
                     <table class='f-left table-1 fixed' id='story'>
                       <?php foreach($stories as $key => $story):?>
-                      <?php
-                      $storyLink = $this->createLink('story', 'view', "storyID=$story->id");
-                      ?>
+                      <?php $storyLink = $this->createLink('story', 'view', "storyID=$story->id", '', true); ?>
                       <tr class='a-center'>
                         <td class='w-id a-left'>
                           <input type='checkbox' name='stories[]' value="<?php echo $story->id;?>" <?php if($story->stage == 'developed' or $story->status == 'closed') echo 'checked';?>> <?php echo sprintf('%03d', $story->id);?>
@@ -103,7 +101,7 @@
                   <div class='contentDiv'>
                     <table class='f-left table-1 fixed' id='bug'>
                       <?php foreach($bugs as $bug):?>
-                      <?php $bugLink = $this->createLink('bug', 'view', "bugID=$bug->id");?>
+                      <?php $bugLink = $this->createLink('bug', 'view', "bugID=$bug->id", '', true);?>
                       <tr class='a-center'>
                         <td class='w-id a-left'>
                           <input type='checkbox' name='bugs[]' value="<?php echo $bug->id;?>" <?php if($bug->status == 'resolved' or $bug->status == 'closed') echo "checked";?>> <?php echo sprintf('%03d', $bug->id);?>

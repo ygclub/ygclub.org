@@ -2,7 +2,7 @@
 /**
  * The batch create view of story module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yangyang Shi <shiyangyang@cnezsoft.com>
  * @package     story
@@ -12,8 +12,8 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/chosen.html.php';?>
-<script> var batchCreateNum = '<?php echo $config->task->batchCreate;?>'; </script>
-<form method='post'>
+<?php js::set('batchCreateNum', $config->task->batchCreate);?>
+<form method='post' target='hiddenwin'>
   <table class='table-1 fixed'> 
     <caption><?php echo $lang->task->project . $lang->colon . $lang->task->batchCreate;?></caption>
     <tr>
@@ -26,13 +26,25 @@
       <th class='w-200px'><?php echo $lang->task->desc;?></th>
       <th class='w-50px'><?php echo $lang->task->pri;?></th>
     </tr>
-    <?php for($i = 0; $i < $config->task->batchCreate; $i++):?>
-    <?php $story = ($i == 0 and $storyID != 0) ? $storyID : 'ditto';?>
-    <?php
-    $lang->task->typeList['ditto'] = $lang->task->ditto; $type = $i == 0 ? '' : 'ditto';
-    $members['ditto'] = $lang->task->ditto; $member = $i == 0 ? '' : 'ditto';
-    ?>
 
+    <?php
+    $stories['ditto'] = $this->lang->task->ditto; 
+    $lang->task->typeList['ditto'] = $lang->task->ditto; 
+    $members['ditto'] = $lang->task->ditto;
+    ?>
+    <?php for($i = 0; $i < $config->task->batchCreate; $i++):?>
+    <?php 
+    if($i == 0)
+    {
+        $story  = $storyID;
+        $type   = '';
+        $member = '';
+    }
+    else
+    {
+        $story = $type = $member = 'ditto';
+    }
+    ?>
     <?php $pri = 3;?>
     <tr class='a-center'>
       <td><?php echo $i+1;?></td>
@@ -41,9 +53,9 @@
       <td><?php echo html::select("type[$i]", $lang->task->typeList, $type, 'class=select-1');?></td>
       <td><?php echo html::select("assignedTo[$i]", $members, $member, 'class=select-1');?></td>
       <td><?php echo html::input("estimate[$i]", '', 'class=text-1');?></td>
-      <td><?php echo html::textarea("desc[$i]", '', "class=text-1 rows='1'");?></td>
+      <td><?php echo html::input("desc[$i]", '', "class=text-1");?></td>
       <td><?php echo html::select("pri[$i]", (array)$lang->task->priList, $pri, 'class=select-1');?></td>
-    </tr>  
+    </tr>
     <?php endfor;?>
     <tr><td colspan='8' class='a-center'><?php echo html::submitButton() . html::resetButton();?></td></tr>
   </table>

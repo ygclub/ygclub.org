@@ -2,27 +2,27 @@
 /**
  * The browse view file of group module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     group
- * @version     $Id: browse.html.php 3792 2012-12-13 06:13:02Z zhujinyonging@gmail.com $
+ * @version     $Id: browse.html.php 4174 2013-01-20 09:23:06Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/tablesorter.html.php';?>
 <table align='center' class='table-1 tablesorter'>
-  <caption class='caption-tl'>
+  <caption class='caption-tl pb-10px'>
     <div class='f-left'><?php echo $lang->group->browse;?></div>
-    <div class='f-right'><?php echo html::a(inlink('create'), $lang->group->create);?></div>
+    <div class='f-right'><?php common::printIcon('group', 'create');?></div>
   </caption>
   <thead>
   <tr class='colhead'>
    <th class='w-id'><?php echo $lang->group->id;?></th>
    <th class='w-100px'><?php echo $lang->group->name;?></th>
    <th><?php echo $lang->group->desc;?></th>
-   <th class='w-200px {sorter:false}'><?php echo $lang->actions;?></th>
+   <th class='w-120px {sorter:false}'><?php echo $lang->actions;?></th>
   </tr>
   </thead>
   <tbody>
@@ -31,9 +31,11 @@
     <td class='strong'><?php echo $group->id;?></td>
     <td><?php echo $group->name;?></td>
     <td class='a-left'><?php echo $group->desc;?></td>
-    <td class='a-right'>
-      <?php common::printLink('group', 'managepriv',   "type=byGroup&param=$group->id", $lang->group->managePrivByGroup);?>
-      <?php common::printLink('group', 'managemember', "groupID=$group->id", $lang->group->manageMember);?>
+    <td class='a-center'>
+      <?php $lang->group->managepriv = $lang->group->managePrivByGroup;?>
+      <?php common::printIcon('group', 'managepriv',   "type=byGroup&param=$group->id", '', 'list');?>
+      <?php $lang->group->managemember = $lang->group->manageMember;?>
+      <?php common::printIcon('group', 'managemember', "groupID=$group->id", '', 'list');?>
       <?php common::printIcon('group', 'edit',         "groupID=$group->id", '', 'list');?>
       <?php common::printIcon('group', 'copy',         "groupID=$group->id", '', 'list');?>
       <?php common::printIcon('group', 'delete',       "groupID=$group->id", '', 'list', '', "hiddenwin");?>

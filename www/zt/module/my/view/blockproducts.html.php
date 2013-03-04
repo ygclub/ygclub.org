@@ -1,17 +1,13 @@
 <div class='block linkbox1' id='productbox'>
 <?php if(empty($productStats)):?>
 <table class='table-1 a-center bg-gray' height='138px'>
-  <caption><span class='icon-title'></span><?php echo $lang->my->home->products;?></caption>
+  <caption><span class='icon-allProducts'>&nbsp;</span><?php echo $lang->my->home->products;?></caption>
   <tr>
     <td valign='middle'>
       <table class='a-left bd-none' align='center'>
         <tr>
-          <td valign='top'><span class='icon-notice'></span></td>
-          <td><?php printf($lang->my->home->noProductsTip, $this->createLink('product', 'create'));?></td>
-        </tr>
-        <tr>
-          <td><span class='icon-help'></span></td>
-          <td><?php echo $lang->my->home->help; ?></td>
+          <td><?php echo html::a($this->createLink('product', 'create'), $lang->my->home->createProduct);?></td>
+          <td><?php echo $lang->my->home->help;?></td>
         </tr>
       </table>
     </td>
@@ -20,16 +16,15 @@
 <?php else:?>
   <table class='table-1 colored fixed'>
     <tr class='colhead'>
-      <th class='w-150px'><?php echo $lang->product->name;?></th>
-      <th><?php echo $lang->story->statusList['active']  . $lang->story->common;?></th>
-      <th><?php echo $lang->story->statusList['changed'] . $lang->story->common;?></th>
-      <th><?php echo $lang->story->statusList['draft']   . $lang->story->common;?></th>
-      <th><?php echo $lang->story->statusList['closed']  . $lang->story->common;?></th>
+      <th class='w-150px'><div class='f-left'><span class='icon-allProjects'>&nbsp;</span><?php echo $lang->product->name;?></div></th>
+      <th title='<?php echo $lang->story->common;?>'><?php echo $lang->story->statusList['active'];?></th>
+      <th title='<?php echo $lang->story->common;?>'><?php echo $lang->story->statusList['changed'];?></th>
+      <th title='<?php echo $lang->story->common;?>'><?php echo $lang->story->statusList['draft'];?></th>
+      <th title='<?php echo $lang->story->common;?>'><?php echo $lang->story->statusList['closed'];?></th>
       <th><?php echo $lang->product->plans;?></th>
       <th><?php echo $lang->product->releases;?></th>
       <th><?php echo $lang->product->bugs;?></th>
-      <th><?php echo $lang->bug->unResolved;?></th>
-      <th><?php echo $lang->bug->assignToNull;?></th>
+      <th title='<?php echo $lang->bug->common;?>'><?php echo $lang->bug->unResolved;?></th>
     </tr>
     <?php foreach($productStats as $product):?>
     <tr class='a-center' style='height:30px'>
@@ -42,7 +37,6 @@
       <td><?php echo $product->releases?></td>
       <td><?php echo $product->bugs?></td>
       <td><?php echo $product->unResolved?></td>
-      <td><?php echo $product->assignToNull?></td>
     </tr>
     <?php endforeach;?>
   </table>

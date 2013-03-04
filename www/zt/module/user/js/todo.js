@@ -11,3 +11,5 @@ $(".todo-date").datePicker({createButton:true, startDate:startDate, maxDate:'%y-
      this.blur();
      return false;
 });
+
+$(".colorbox").colorbox({width:960, height:550, iframe:true, transition:'none'});

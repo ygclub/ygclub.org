@@ -2,7 +2,7 @@
 /**
  * The start file of task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Jia Fu <fujia@cnezsoft.com>
  * @package     task
@@ -12,7 +12,8 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/datepicker.html.php';?>
-<form method='post' target='hiddenwin'>
+<?php js::set('confirmFinish', $lang->task->confirmFinish);?>
+<form method='post' target='hiddenwin' onsubmit='return checkLeft();'>
   <table class='table-1'>
     <caption><?php echo $task->name;?></caption>
     <tr>
@@ -32,7 +33,7 @@
       <td><?php echo html::textarea('comment', '', "rows='6' class='area-1'");?></td>
     </tr>
     <tr>
-      <td colspan='2' class='a-center'><?php echo html::submitButton() . html::linkButton($lang->goback, $this->session->taskList); ?></td>
+      <td colspan='2' class='a-center'><?php echo html::submitButton(); ?></td>
     </tr>
   </table>
   <?php include '../../common/view/action.html.php';?>

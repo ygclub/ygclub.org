@@ -2,11 +2,11 @@
 /**
  * The control file of company module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     company
- * @version     $Id: control.php 3858 2012-12-19 08:16:17Z wyd621@gmail.com $
+ * @version     $Id: control.php 4373 2013-02-19 02:31:01Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 class company extends control
@@ -50,6 +50,9 @@ class company extends control
         $deptID = $type == 'bydept' ? (int)$param : 0;
         $this->company->setMenu($deptID);
 
+        /* Save session. */
+        $this->session->set('userList', $this->app->getURI(true));
+
         /* Set the pager. */
         $this->app->loadClass('pager', $static = true);
         $pager = pager::init($recTotal, $recPerPage, $pageID);
@@ -60,8 +63,8 @@ class company extends control
         $this->config->company->browse->search['queryID']   = $queryID;
         $this->config->company->browse->search['params']['dept']['values'] = array('' => '') + $this->dept->getOptionMenu();
 
-        $header['title'] = $this->lang->company->index . $this->lang->colon . $this->lang->dept->common;
-        $position[]      = $this->lang->dept->common;
+        $title      = $this->lang->company->index . $this->lang->colon . $this->lang->dept->common;
+        $position[] = $this->lang->dept->common;
 
         if($type == 'bydept')
         {
@@ -86,7 +89,7 @@ class company extends control
             $users = $this->loadModel('user')->getByQuery($this->session->userQuery, $pager, $orderBy);
         }
 
-        $this->view->header      = $header;
+        $this->view->title       = $title;
         $this->view->position    = $position;
         $this->view->users       = $users;
         $this->view->searchForm  = $this->fetch('search', 'buildForm', $this->config->company->browse->search);
@@ -120,10 +123,10 @@ class company extends control
         $this->lang->company->menu      = $this->lang->admin->menu;
         $this->lang->company->menuOrder = $this->lang->admin->menuOrder;
 
-        $header['title'] = $this->lang->admin->common . $this->lang->colon . $this->lang->company->create;
-        $position[]      = html::a($this->createLink('admin', 'browsecompany'), $this->lang->admin->company);
-        $position[]      = $this->lang->company->create;
-        $this->view->header   = $header;
+        $title      = $this->lang->admin->common . $this->lang->colon . $this->lang->company->create;
+        $position[] = html::a($this->createLink('admin', 'browsecompany'), $this->lang->admin->company);
+        $position[] = $this->lang->company->create;
+        $this->view->title    = $title;
         $this->view->position = $position;
 
         $this->display();
@@ -141,12 +144,17 @@ class company extends control
         {
             $this->company->update();
             if(dao::isError()) die(js::error(dao::getError()));
-            die(js::alert($this->lang->company->successSaved));
+
+            /* reset company in session. */
+            $company = $this->loadModel('company')->getByDomain();
+            $this->session->set('company', $company);
+
+            die(js::alert($this->lang->company->successSaved) . js::reload('parent'));
         }
 
-        $header['title'] = $this->lang->company->common . $this->lang->colon . $this->lang->company->edit;
-        $position[]      = $this->lang->company->edit;
-        $this->view->header    = $header;
+        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->company->edit;
+        $position[] = $this->lang->company->edit;
+        $this->view->title     = $title;
         $this->view->position  = $position;
         $this->view->company   = $this->company->getById($this->app->company->id);
 
@@ -235,8 +243,8 @@ class company extends control
         $this->view->users    = $users; 
 
         /* The header and position. */
-        $this->view->header->title = $this->lang->company->common . $this->lang->colon . $this->lang->company->dynamic;
-        $this->view->position[]    = $this->lang->company->dynamic;
+        $this->view->title      = $this->lang->company->common . $this->lang->colon . $this->lang->company->dynamic;
+        $this->view->position[] = $this->lang->company->dynamic;
 
         /* Get actions. */
         if($browseType != 'bysearch') 

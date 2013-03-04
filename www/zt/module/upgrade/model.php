@@ -2,11 +2,11 @@
 /**
  * The model file of upgrade module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     upgrade
- * @version     $Id: model.php 3892 2012-12-25 01:09:51Z wyd621@gmail.com $
+ * @version     $Id: model.php 4540 2013-03-02 14:19:44Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -32,52 +32,56 @@ class upgradeModel extends model
     {
         switch($fromVersion)
         {
-        case '0_3beta': $this->execSQL($this->getUpgradeFile('0.3'));
-        case '0_4beta': $this->execSQL($this->getUpgradeFile('0.4'));
-        case '0_5beta': $this->execSQL($this->getUpgradeFile('0.5'));
-        case '0_6beta': $this->execSQL($this->getUpgradeFile('0.6'));
-        case '1_0beta':
-            $this->execSQL($this->getUpgradeFile('1.0.beta'));
-            $this->updateCompany();
-        case '1_0rc1': $this->execSQL($this->getUpgradeFile('1.0.rc1'));
-        case '1_0rc2':
-        case '1_0':
-        case '1_0_1': $this->execSQL($this->getUpgradeFile('1.0.1'));
-        case '1_1': $this->execSQL($this->getUpgradeFile('1.1'));
-        case '1_2':
-            $this->execSQL($this->getUpgradeFile('1.2'));
-            $this->updateUBB();
-            $this->updateNL1_2();
-        case '1_3':
-            $this->execSQL($this->getUpgradeFile('1.3'));
-            $this->updateNL1_3();
-            $this->updateTasks();
-        case '1_4': $this->execSQL($this->getUpgradeFile('1.4'));
-        case '1_5': $this->execSQL($this->getUpgradeFile('1.5'));
-        case '2_0': $this->execSQL($this->getUpgradeFile('2.0'));
-        case '2_1': $this->execSQL($this->getUpgradeFile('2.1'));
-        case '2_2':
-            $this->execSQL($this->getUpgradeFile('2.2'));
-            $this->updateCases();
-            $this->updateActivatedCountOfBug();
-        case '2_3': $this->execSQL($this->getUpgradeFile('2.3'));
-        case '2_4': $this->execSQL($this->getUpgradeFile('2.4'));
-        case '3_0_beta1':
-            $this->execSQL($this->getUpgradeFile('3.0.beta1'));
-            $this->updateAction();
-            $this->setOrderData();
-        case '3_0_beta2':
-        case '3_0':
-        case '3_1': $this->execSQL($this->getUpgradeFile('3.1'));
-        case '3_2': $this->execSQL($this->getUpgradeFile('3.2'));
-        case '3_2_1': $this->execSQL($this->getUpgradeFile('3.2.1'));
-        case '3_3':
-            $this->execSQL($this->getUpgradeFile('3.3'));
-            $this->updateTaskAssignedTo();
-            $this->loadModel('setting')->setItem('system', 'common', '', 'flow', 'full');
-        case '4_0_beta1': $this->execSQL($this->getUpgradeFile('4.0.beta1'));
+            case '0_3beta': $this->execSQL($this->getUpgradeFile('0.3'));
+            case '0_4beta': $this->execSQL($this->getUpgradeFile('0.4'));
+            case '0_5beta': $this->execSQL($this->getUpgradeFile('0.5'));
+            case '0_6beta': $this->execSQL($this->getUpgradeFile('0.6'));
+            case '1_0beta':
+                $this->execSQL($this->getUpgradeFile('1.0.beta'));
+                $this->updateCompany();
+            case '1_0rc1': $this->execSQL($this->getUpgradeFile('1.0.rc1'));
+            case '1_0rc2':
+            case '1_0':
+            case '1_0_1': $this->execSQL($this->getUpgradeFile('1.0.1'));
+            case '1_1': $this->execSQL($this->getUpgradeFile('1.1'));
+            case '1_2':
+                $this->execSQL($this->getUpgradeFile('1.2'));
+                $this->updateUBB();
+                $this->updateNL1_2();
+            case '1_3':
+                $this->execSQL($this->getUpgradeFile('1.3'));
+                $this->updateNL1_3();
+                $this->updateTasks();
+            case '1_4': $this->execSQL($this->getUpgradeFile('1.4'));
+            case '1_5': $this->execSQL($this->getUpgradeFile('1.5'));
+            case '2_0': $this->execSQL($this->getUpgradeFile('2.0'));
+            case '2_1': $this->execSQL($this->getUpgradeFile('2.1'));
+            case '2_2':
+                $this->execSQL($this->getUpgradeFile('2.2'));
+                $this->updateCases();
+                $this->updateActivatedCountOfBug();
+            case '2_3': $this->execSQL($this->getUpgradeFile('2.3'));
+            case '2_4': $this->execSQL($this->getUpgradeFile('2.4'));
+            case '3_0_beta1':
+                $this->execSQL($this->getUpgradeFile('3.0.beta1'));
+                $this->updateAction();
+                $this->setOrderData();
+            case '3_0_beta2':
+            case '3_0':
+            case '3_1': $this->execSQL($this->getUpgradeFile('3.1'));
+            case '3_2': $this->execSQL($this->getUpgradeFile('3.2'));
+            case '3_2_1': $this->execSQL($this->getUpgradeFile('3.2.1'));
+            case '3_3':
+                $this->execSQL($this->getUpgradeFile('3.3'));
+                $this->updateTaskAssignedTo();
+                $this->loadModel('setting')->setItem('system.common.global.flow', 'full', 0);
+            case '4_0_beta1': $this->execSQL($this->getUpgradeFile('4.0.beta1'));
+            case '4_0_beta2':  
+                $this->execSQL($this->getUpgradeFile('4.0.beta2'));
+                $this->updateProjectType();
+                $this->updateEstimatePriv();
 
-        default: if(!$this->isError()) $this->setting->updateVersion($this->config->version);
+            default: if(!$this->isError()) $this->setting->updateVersion($this->config->version);
         }
 
         $this->deletePatch();
@@ -122,6 +126,7 @@ class upgradeModel extends model
         case '3_2_1':     $confirmContent .= file_get_contents($this->getUpgradeFile('3.2.1'));
         case '3_3':       $confirmContent .= file_get_contents($this->getUpgradeFile('3.3'));
         case '4_0_beta1': $confirmContent .= file_get_contents($this->getUpgradeFile('4.0.beta1'));
+        case '4_0_beta2': $confirmContent .= file_get_contents($this->getUpgradeFile('4.0.beta2'));
         }
         return str_replace('zt_', $this->config->db->prefix, $confirmContent);
     }
@@ -384,6 +389,53 @@ class upgradeModel extends model
                 ->set('lastRun')->eq($result[0]->date)
                 ->set('lastResult')->eq($result[0]->caseResult)
                 ->where('id')->eq($result[0]->case)
+                ->exec();
+        }
+    }
+
+    /**
+     * Update type of projects. 
+     * 
+     * @access public
+     * @return void
+     */
+    public function updateProjectType()
+    {
+        $projects = $this->dao->select('root')->from(TABLE_MODULE)->where('type')->eq('task')->fetchPairs('root'); 
+        $this->dao->update(TABLE_PROJECT)->set('type')->eq('waterfall')->where('id')->in($projects)->exec();        
+    }
+
+    /**
+     * Update estimate priv.
+     * 
+     * @access public
+     * @return void
+     */
+    public function updateEstimatePriv()
+    {
+        $groups = $this->dao->select('*')->from(TABLE_GROUPPRIV)
+            ->where('module')->eq('task')
+            ->andWhere('method')->eq('edit')
+            ->fetchAll();
+        foreach($groups as $group)
+        {
+            $this->dao->insert(TABLE_GROUPPRIV)
+                ->set('company')->eq($group->company)
+                ->set('`group`')->eq($group->group)
+                ->set('module')->eq('task')
+                ->set('method')->eq('recordEstimate')
+                ->exec();
+            $this->dao->insert(TABLE_GROUPPRIV)
+                ->set('company')->eq($group->company)
+                ->set('`group`')->eq($group->group)
+                ->set('module')->eq('task')
+                ->set('method')->eq('editEstimate')
+                ->exec();
+            $this->dao->insert(TABLE_GROUPPRIV)
+                ->set('company')->eq($group->company)
+                ->set('`group`')->eq($group->group)
+                ->set('module')->eq('task')
+                ->set('method')->eq('deleteEstimate')
                 ->exec();
         }
     }

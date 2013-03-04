@@ -2,11 +2,11 @@
 /**
  * The control file of convert currentModule of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     convert
- * @version     $Id: control.php 2605 2012-02-21 07:22:58Z wwccss $
+ * @version     $Id: control.php 4156 2013-01-20 06:56:13Z wwccss $
  * @link        http://www.zentao.net
  */
 class convert extends control
@@ -20,7 +20,7 @@ class convert extends control
     public function index()
     {
         $this->convert->saveState();
-        $this->view->header->title = $this->lang->convert->common;
+        $this->view->title = $this->lang->convert->common;
         $this->display();
     }
 
@@ -32,7 +32,7 @@ class convert extends control
      */
     public function selectSource()
     {
-        $this->view->header->title = $this->lang->convert->common . $this->lang->colon;
+        $this->view->title = $this->lang->convert->common . $this->lang->colon;
         $this->display();
     }
 
@@ -53,7 +53,7 @@ class convert extends control
         }
         list($sourceName, $version) = explode('_', $this->post->source);
         $setFunc = "set$sourceName";
-        $this->view->header->title = $this->lang->convert->setting;
+        $this->view->title   = $this->lang->convert->setting;
         $this->view->source  = $sourceName;
         $this->view->version = $version;
         $this->view->setting = $this->fetch('convert', $setFunc, "version=$version");
@@ -102,9 +102,9 @@ class convert extends control
     public function checkConfig()
     {
         $checkFunc = 'check' . $this->post->source;
-        $this->view->header->title = $this->lang->convert->checkConfig;
-        $this->view->source        = $this->post->source;
-        $this->view->checkResult   = $this->fetch('convert', $checkFunc, "version={$this->post->version}");
+        $this->view->title       = $this->lang->convert->checkConfig;
+        $this->view->source      = $this->post->source;
+        $this->view->checkResult = $this->fetch('convert', $checkFunc, "version={$this->post->version}");
         $this->display();
     }
 
@@ -184,9 +184,9 @@ class convert extends control
     public function execute()
     {
         $convertFunc = 'convert' . $this->post->source;
-        $this->view->header->title = $this->lang->convert->execute;
-        $this->view->source        = $this->post->source;
-        $this->view->version       = $this->post->version;
+        $this->view->title   = $this->lang->convert->execute;
+        $this->view->source  = $this->post->source;
+        $this->view->version = $this->post->version;
 
         $this->view->executeResult = $this->fetch('convert', $convertFunc, "version={$this->post->version}");
         $this->display();

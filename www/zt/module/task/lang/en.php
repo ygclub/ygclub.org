@@ -2,11 +2,11 @@
 /**
  * The task module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: en.php 3872 2012-12-24 00:50:43Z zhujinyonging@gmail.com $
+ * @version     $Id: en.php 4561 2013-03-03 01:24:04Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->task->index              = "Index";
@@ -17,7 +17,8 @@ $lang->task->import             = "Import undone";
 $lang->task->edit               = "Update";
 $lang->task->delete             = "Delete";
 $lang->task->view               = "Info";
-$lang->task->logEfforts         = "Efforts";
+$lang->task->logEfforts         = "Log working hours";
+$lang->task->record             = "Estimate";
 $lang->task->start              = "Start";
 $lang->task->finish             = "Finish";
 $lang->task->close              = "Close";
@@ -46,8 +47,11 @@ $lang->task->leftAB            = 'Left';
 $lang->task->consumed          = 'Consumed';
 $lang->task->consumedAB        = 'Use';
 $lang->task->hour              = 'Hour';
+$lang->task->consumedThisTime  = 'Hours';
+$lang->task->leftThisTime      = 'Left';
 $lang->task->estStarted        = 'Estimate start';
 $lang->task->realStarted       = 'Real start';
+$lang->task->date              = 'Date';
 $lang->task->deadline          = 'Deadline';
 $lang->task->deadlineAB        = 'Deadline';
 $lang->task->status            = 'Status';
@@ -63,7 +67,7 @@ $lang->task->openedByAB        = 'Open';
 $lang->task->openedDate        = 'Opened Date';
 $lang->task->openedDateAB      = 'Open';
 $lang->task->finishedBy        = 'Finished By';
-$lang->task->finishedByAB      = 'Finishe';
+$lang->task->finishedByAB      = 'Finish';
 $lang->task->finishedDate      = 'Finished Date';
 $lang->task->finishedDateAB    = 'Date';
 $lang->task->canceledBy        = 'Canceled By';
@@ -74,12 +78,15 @@ $lang->task->closedReason      = 'Closed Reason';
 $lang->task->lastEditedBy      = 'Last Edited By';
 $lang->task->lastEditedDate    = 'Last Edited Date';
 $lang->task->lastEdited        = 'Last Edited';
+$lang->task->recordEstimate    = 'Hours';
+$lang->task->editEstimate      = 'Edit Hour';
+$lang->task->deleteEstimate    = 'Delete Hour';
 
 $lang->task->ditto = 'Ditto';
 
 $lang->task->statusList['']        = '';
 $lang->task->statusList['wait']    = 'Pending';
-$lang->task->statusList['doing']   = 'In progress';
+$lang->task->statusList['doing']   = 'Doing';
 $lang->task->statusList['done']    = 'Done';
 $lang->task->statusList['cancel']  = 'Canceled';
 $lang->task->statusList['closed']  = 'Closed';
@@ -124,18 +131,21 @@ $lang->task->legendLife   = 'Lifetime';
 $lang->task->legendDesc   = 'Desc';
 $lang->task->legendAction = 'Action';
 
-$lang->task->ajaxGetUserTasks     = "API:My tasks";
-$lang->task->ajaxGetProjectTasks  = "API:Project tasks";
-$lang->task->confirmDelete        = "Are you sure you want to delete this task?";
-$lang->task->copyStoryTitle       = "Same as story";
-$lang->task->afterSubmit          = "After created";
-$lang->task->successSaved         = "Successfully saved";
-$lang->task->delayWarning         = " <strong class='delayed f-14px'> Postponed %s days </strong>";
-$lang->task->remindBug            = "This task from Bug, update the Bug:%s or not?";
-$lang->task->confirmChangeProject = 'Change project will change module, story and assignedTo also, are you sure?';
+$lang->task->ajaxGetUserTasks      = "API:My tasks";
+$lang->task->ajaxGetProjectTasks   = "API:Project tasks";
+$lang->task->confirmDelete         = "Are you sure you want to delete this task?";
+$lang->task->confirmDeleteEstimate = "Are you sure you want to delete this hour?";
+$lang->task->copyStoryTitle        = "Same as story";
+$lang->task->afterSubmit           = "After created";
+$lang->task->successSaved          = "Successfully saved";
+$lang->task->delayWarning          = " <strong class='delayed f-14px'> Postponed %s days </strong>";
+$lang->task->remindBug             = "This task from Bug, update the Bug:%s or not?";
+$lang->task->confirmChangeProject  = 'Change project will change module, story and assignedTo also, are you sure?';
+$lang->task->confirmFinish         = '"Left" is 0, this task will be done. Are you sure?';
 
 $lang->task->error = new stdclass();
-$lang->task->error->consumed = '"Consumed" must be number';
+$lang->task->error->consumed      = '"Consumed" must be number';
+$lang->task->error->consumedSmall = '"Consumed" must be more than consumed before';
 
 /* Report. */
 $lang->task->report = new stdclass();

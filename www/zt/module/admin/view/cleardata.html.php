@@ -2,7 +2,7 @@
 /**
  * The view file of admin module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Congzhi Chen <congzhi@cnezsoft.com>
  * @package     admin
@@ -15,7 +15,12 @@
   <table align='center' class='table-5'>
     <caption><?php echo $lang->admin->clearData;?></caption>
     <tr><td><?php echo nl2br($lang->admin->clearDataDesc);?></td></tr>
-    <tr><td class='a-center'><?php echo html::submitButton($lang->admin->clearData);?></td></tr>
+    <tr>
+      <td class='a-center'>
+        <span><?php echo $this->lang->admin->pleaseInputYes . html::input('sure', '', "class='text-2' onkeyup='showClearButton()' autocomplete='off'");?></span>
+        <?php echo html::submitButton($lang->admin->clearData, "class='hidden'");?>
+      </td>
+    </tr>
   </table>
 </form>
 <?php include '../../common/view/footer.html.php';?>

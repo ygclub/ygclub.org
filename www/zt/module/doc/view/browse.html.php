@@ -2,7 +2,7 @@
 /**
  * The browse view file of doc module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     lib
@@ -23,7 +23,7 @@ var browseType = '<?php echo $browseType;?>';
     <span id='bysearchTab'><a href='#'><span class='icon-search'></span><?php echo $lang->doc->searchDoc;?></a></span>
   </div>
   <div class='f-right'>
-    <?php common::printLink('doc', 'create', "libID=$libID&moduleID=$moduleID&productID=$productID&projectID=$projectID&from=doc", $lang->doc->create);?>
+    <?php common::printIcon('doc', 'create', "libID=$libID&moduleID=$moduleID&productID=$productID&projectID=$projectID&from=doc");?>
   </div>
 </div>
 <div id='querybox' class='<?php if($browseType !='bysearch') echo 'hidden';?>'></div>
@@ -46,9 +46,9 @@ var browseType = '<?php echo $browseType;?>';
         <thead>
           <tr class='colhead'>
             <?php $vars = "libID=$libID&module=$moduleID&productID=$productID&projectID=$projectID&browseType=$browseType&param=$param&orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}";?>
-            <th class='w-id'> <?php common::printOrderLink('id',    $orderBy, $vars, $lang->idAB);?></th>
-            <th><?php common::printOrderLink('title', $orderBy, $vars, $lang->doc->title);?></th>
-            <th class='w-100px'><?php common::printOrderLink('type', $orderBy, $vars, $lang->doc->type);?></th>
+            <th class='w-id'>   <?php common::printOrderLink('id',        $orderBy, $vars, $lang->idAB);?></th>
+            <th>                <?php common::printOrderLink('title',     $orderBy, $vars, $lang->doc->title);?></th>
+            <th class='w-100px'><?php common::printOrderLink('type',      $orderBy, $vars, $lang->doc->type);?></th>
             <th class='w-100px'><?php common::printOrderLink('addedBy',   $orderBy, $vars, $lang->doc->addedBy);?></th>
             <th class='w-120px'><?php common::printOrderLink('addedDate', $orderBy, $vars, $lang->doc->addedDate);?></th>
             <th class='w-100px {sorter:false}'><?php echo $lang->actions;?></th>
@@ -62,7 +62,7 @@ var browseType = '<?php echo $browseType;?>';
           ?>
           <tr class='a-center'>
             <td><?php if($canView) echo html::a($viewLink, sprintf('%03d', $doc->id)); else printf('%03d', $doc->id);?></td>
-            <td class='a-left nobr'><nobr><?php echo html::a($viewLink, $doc->title);?></nobr></td>
+            <td class='a-left' title="<?php echo $doc->title?>"><nobr><?php echo html::a($viewLink, $doc->title);?></nobr></td>
             <td><?php echo $lang->doc->types[$doc->type];?></td>
             <td><?php isset($users[$doc->addedBy]) ? print($users[$doc->addedBy]) : print($doc->addedBy);?></td>
             <td><?php echo date("m-d H:i", strtotime($doc->addedDate));?></td>
@@ -81,4 +81,4 @@ var browseType = '<?php echo $browseType;?>';
     </td>              
   </tr>    
 </table>  
-<?php include './footer.html.php';?>
+<?php include '../../common/view/footer.html.php';?>

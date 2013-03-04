@@ -2,15 +2,15 @@
 /**
  * The bug module zh-tw file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: zh-tw.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: zh-tw.php 4536 2013-03-02 13:39:37Z wwccss $
  * @link        http://www.zentao.net
  */
 /* 欄位列表。*/
-$lang->bug->common           = '缺陷管理';
+$lang->bug->common           = 'Bug';
 $lang->bug->id               = 'Bug編號';
 $lang->bug->product          = '所屬產品';
 $lang->bug->module           = '所屬模組';
@@ -68,7 +68,7 @@ $lang->bug->toCase           = '生成用例';
 
 /* 方法列表。*/
 $lang->bug->index              = '首頁';
-$lang->bug->create             = '創建';
+$lang->bug->create             = '提Bug';
 $lang->bug->confirmBug         = '確認';
 $lang->bug->edit               = '編輯';
 $lang->bug->batchEdit          =  '批量編輯';
@@ -77,7 +77,7 @@ $lang->bug->browse             = 'Bug列表';
 $lang->bug->view               = 'Bug詳情';
 $lang->bug->resolve            = '解決';
 $lang->bug->close              = '關閉';
-$lang->bug->activate           = '激活Bug';
+$lang->bug->activate           = '激活';
 $lang->bug->reportChart        = '報表統計';
 $lang->bug->export             = '導出';
 $lang->bug->delete             = '刪除';
@@ -143,7 +143,7 @@ $lang->bug->buttonActivate       = '激活';
 $lang->bug->buttonResolve        = '解決';
 $lang->bug->buttonClose          = '關閉';
 $lang->bug->buttonToList         = '返回';
-$lang->bug->buttonCreateTestcase = '建用例';
+$lang->bug->buttonCreateTestcase = '轉用例';
 
 /* 交互提示。*/
 $lang->bug->confirmChangeProduct = '修改產品會導致相應的項目、需求和任務發生變化，確定嗎？';

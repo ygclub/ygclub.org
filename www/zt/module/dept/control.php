@@ -2,11 +2,11 @@
 /**
  * The control file of dept module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     dept
- * @version     $Id: control.php 3752 2012-12-11 05:43:45Z zhujinyonging@gmail.com $
+ * @version     $Id: control.php 4157 2013-01-20 07:09:42Z wwccss $
  * @link        http://www.zentao.net
  */
 class dept extends control
@@ -34,11 +34,11 @@ class dept extends control
      */
     public function browse($deptID = 0)
     {
-        $header['title'] = $this->lang->dept->manage . $this->lang->colon . $this->app->company->name;
-        $position[]      = $this->lang->dept->manage;
+        $title      = $this->lang->dept->manage . $this->lang->colon . $this->app->company->name;
+        $position[] = $this->lang->dept->manage;
 
         $parentDepts = $this->dept->getParents($deptID);
-        $this->view->header      = $header;
+        $this->view->title       = $title;
         $this->view->position    = $position;
         $this->view->deptID      = $deptID;
         $this->view->depts       = $this->dept->getTreeMenu($rootDeptID = 0, array('deptmodel', 'createManageLink'));

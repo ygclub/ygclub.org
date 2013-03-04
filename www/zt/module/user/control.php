@@ -2,11 +2,11 @@
 /**
  * The control file of user module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     user
- * @version     $Id: control.php 3887 2012-12-24 10:06:50Z wwccss $
+ * @version     $Id: control.php 4374 2013-02-19 02:32:40Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 class user extends control
@@ -43,15 +43,16 @@ class user extends control
      * Todos of a user. 
      * 
      * @param  string $account 
-     * @param  string $type         the tod type, today|lastweek|thisweek|all|undone, or a date.
+     * @param  string $type         the todo type, today|lastweek|thisweek|all|undone, or a date.
      * @param  string $status 
+     * @param  string $orderBy 
      * @param  int    $recTotal 
      * @param  int    $recPerPage 
      * @param  int    $pageID 
      * @access public
      * @return void
      */
-    public function todo($account, $type = 'today', $status = 'all', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+    public function todo($account, $type = 'today', $status = 'all', $orderBy='date,status,begin', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
         /* Set thie url to session. */
         $uri = $this->app->getURI(true);
@@ -70,13 +71,13 @@ class user extends control
 
         /* Get user, totos. */
         $user  = $this->dao->findByAccount($account)->from(TABLE_USER)->fetch();
-        $todos = $this->todo->getList($type, $account, $status, 0, $pager);
-        $date  = (int)$type == 0 ? $this->todo->today() : $type;
+        $todos = $this->todo->getList($type, $account, $status, 0, $pager, $orderBy);
+        $date  = (int)$type == 0 ? helper::today() : $type;
 
-        $header['title'] = $this->lang->company->orgView . $this->lang->colon . $this->lang->user->todo;
-        $position[]      = $this->lang->user->todo;
+        $title      = $this->lang->company->orgView . $this->lang->colon . $this->lang->user->todo;
+        $position[] = $this->lang->user->todo;
 
-        $this->view->header   = $header;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->tabID    = 'todo';
         $this->view->date     = $date;
@@ -84,6 +85,8 @@ class user extends control
         $this->view->user     = $user;
         $this->view->account  = $account;
         $this->view->type     = $type;
+        $this->view->status   = $status;
+        $this->view->orderBy  = $orderBy;
         $this->view->pager    = $pager;
 
         $this->display();
@@ -114,9 +117,9 @@ class user extends control
         $this->view->userList = $this->user->setUserList($this->user->getPairs('noempty|noclosed'), $account);
 
         /* Assign. */
-        $header['title'] = $this->lang->user->common . $this->lang->colon . $this->lang->user->task;
-        $position[]      = $this->lang->user->task;
-        $this->view->header   = $header;
+        $title      = $this->lang->user->common . $this->lang->colon . $this->lang->user->task;
+        $position[] = $this->lang->user->task;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->tabID    = 'task';
         $this->view->tasks    = $this->loadModel('task')->getUserTasks($account, 'assignedto', 0, $pager);
@@ -154,10 +157,10 @@ class user extends control
         /* Load the lang of bug module. */
         $this->app->loadLang('bug');
  
-        $header['title'] = $this->lang->user->common . $this->lang->colon . $this->lang->user->bug;
-        $position[]      = $this->lang->user->bug;
+        $title      = $this->lang->user->common . $this->lang->colon . $this->lang->user->bug;
+        $position[] = $this->lang->user->bug;
 
-        $this->view->header   = $header;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->tabID    = 'bug';
         $this->view->bugs     = $this->user->getBugs($account, $pager);
@@ -184,9 +187,9 @@ class user extends control
         $this->user->setMenu($this->user->getPairs('noempty|noclosed'), $account);
         $this->view->userList = $this->user->setUserList($this->user->getPairs('noempty|noclosed'), $account);
 
-        $header['title'] = $this->lang->user->common . $this->lang->colon . $this->lang->user->project;
-        $position[]      = $this->lang->user->project;
-        $this->view->header   = $header;
+        $title      = $this->lang->user->common . $this->lang->colon . $this->lang->user->project;
+        $position[] = $this->lang->user->project;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->tabID    = 'project';
         $this->view->projects = $this->user->getProjects($account);
@@ -214,8 +217,8 @@ class user extends control
         $user = $this->user->getById($account);
         $deptPath = $this->dept->getParents($user->dept);
        
-        $header['title'] = "USER #$user->id $user->account/" . $this->lang->user->profile;
-        $this->view->header   = $header;
+        $title = "USER #$user->id $user->account/" . $this->lang->user->profile;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->account  = $account;
         $this->view->user     = $user;
@@ -263,13 +266,23 @@ class user extends control
             if(dao::isError()) die(js::error(dao::getError()));
             die(js::locate($this->createLink('company', 'browse'), 'parent'));
         }
+        $groups    = $this->dao->select('id, name, role')->from(TABLE_GROUP)->fetchAll();
+        $groupList = array('' => '');
+        $roleGroup = array();
+        foreach($groups as $group)
+        {
+            $groupList[$group->id] = $group->name;
+            if($group->role) $roleGroup[$group->role] = $group->id;
+        }
 
-        $header['title'] = $this->lang->company->common . $this->lang->colon . $this->lang->user->create;
-        $position[]      = $this->lang->user->create;
-        $this->view->header   = $header;
-        $this->view->position = $position;
-        $this->view->depts    = $this->dept->getOptionMenu();
-        $this->view->deptID   = $deptID;
+        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->user->create;
+        $position[] = $this->lang->user->create;
+        $this->view->title     = $title;
+        $this->view->position  = $position;
+        $this->view->depts     = $this->dept->getOptionMenu();
+        $this->view->groupList = $groupList;
+        $this->view->roleGroup = $roleGroup;
+        $this->view->deptID    = $deptID;
 
         $this->display();
     }
@@ -284,6 +297,15 @@ class user extends control
      */
     public function batchCreate($deptID = 0)
     {
+        $groups    = $this->dao->select('id, name, role')->from(TABLE_GROUP)->fetchAll();
+        $groupList = array('' => '');
+        $roleGroup = array();
+        foreach($groups as $group)
+        {
+            $groupList[$group->id] = $group->name;
+            if($group->role) $roleGroup[$group->role] = $group->id;
+        }
+
         $this->lang->set('menugroup.user', 'company');
         $this->lang->user->menu      = $this->lang->company->menu;
         $this->lang->user->menuOrder = $this->lang->company->menuOrder;
@@ -294,12 +316,14 @@ class user extends control
             die(js::locate($this->createLink('company', 'browse'), 'parent'));
         }
 
-        $header['title'] = $this->lang->company->common . $this->lang->colon . $this->lang->user->batchCreate;
-        $position[]      = $this->lang->user->batchCreate;
-        $this->view->header   = $header;
-        $this->view->position = $position;
-        $this->view->depts    = $this->dept->getOptionMenu();
-        $this->view->deptID   = $deptID;
+        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->user->batchCreate;
+        $position[] = $this->lang->user->batchCreate;
+        $this->view->title     = $title;
+        $this->view->position  = $position;
+        $this->view->depts     = $this->dept->getOptionMenu();
+        $this->view->deptID    = $deptID;
+        $this->view->groupList = $groupList;
+        $this->view->roleGroup = $roleGroup;
 
         $this->display();
     }
@@ -323,9 +347,9 @@ class user extends control
             die(js::locate($this->createLink('company', 'browse'), 'parent'));
         }
 
-        $header['title'] = $this->lang->company->common . $this->lang->colon . $this->lang->user->edit;
-        $position[]      = $this->lang->user->edit;
-        $this->view->header   = $header;
+        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->user->edit;
+        $position[] = $this->lang->user->edit;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->user     = $this->user->getById($userID);
         $this->view->depts    = $this->dept->getOptionMenu();
@@ -355,9 +379,9 @@ class user extends control
         $this->lang->user->menu      = $this->lang->company->menu;
         $this->lang->user->menuOrder = $this->lang->company->menuOrder;
 
-        $header['title'] = $this->lang->company->common . $this->lang->colon . $this->lang->user->batchEdit;
-        $position[]      = $this->lang->user->edit;
-        $this->view->header   = $header;
+        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->user->batchEdit;
+        $position[] = $this->lang->user->edit;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->depts    = $this->dept->getOptionMenu();
         $this->display();
@@ -380,7 +404,7 @@ class user extends control
         else
         {
             $this->user->delete(TABLE_USER, $userID);
-            die(js::locate($this->createLink('company', 'browse'), 'parent'));
+            die(js::locate($this->session->userList, 'parent'));
         }
     }
 
@@ -518,17 +542,15 @@ class user extends control
         }
         else
         { 
-            $demoUsers = $this->user->getPairs('nodeleted, noletter');
-            array_shift($demoUsers);
-            array_shift($demoUsers);
-            array_pop($demoUsers);
-            $this->view->showDemoUsers = $this->dao->select('value')->from(TABLE_CONFIG)->where('`key`')->eq('showDemoUsers')->fetch();
-            $this->view->demoUsers = $demoUsers;
+            if(!empty($this->config->global->showDemoUsers))
+            {
+                $demoUsers = $this->user->getPairs('nodeleted, noletter, noempty, noclosed');
+                $this->view->demoUsers = $demoUsers;
+            }
 
-            $header['title'] = $this->lang->user->login;
-            $this->view->header    = $header;
+            $this->view->title     = $this->lang->user->login;
             $this->view->referer   = $this->referer;
-            $this->view->s         = $this->loadModel('setting')->getItem('system', 'common', 'global', 'sn', 0);
+            $this->view->s         = zget($this->config->global, 'sn');
             $this->view->keepLogin = $this->cookie->keepLogin ? $this->cookie->keepLogin : 'off';
             $this->display();
         }
@@ -546,8 +568,7 @@ class user extends control
     public function deny($module, $method, $refererBeforeDeny = '')
     {
         $this->setReferer();
-        $header['title'] = $this->lang->user->deny;
-        $this->view->header            = $header;
+        $this->view->title             = $this->lang->user->deny;
         $this->view->module            = $module;
         $this->view->method            = $method;
         $this->view->denyPage          = $this->referer;        // The denied page.
@@ -612,8 +633,8 @@ class user extends control
         $this->view->orderBy = $orderBy;
         $this->view->pager   = $pager;
 
-        $this->view->header->title = $this->lang->company->common . $this->lang->colon . $this->lang->company->dynamic;
-        $this->view->position[]    = $this->lang->company->dynamic;
+        $this->view->title      = $this->lang->company->common . $this->lang->colon . $this->lang->company->dynamic;
+        $this->view->position[] = $this->lang->company->dynamic;
 
         /* Assign. */
         $this->view->period  = $period;

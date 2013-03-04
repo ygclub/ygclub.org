@@ -2,11 +2,11 @@
 /**
  * The html template file of step3 method of install module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author	  Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package	 ZenTaoPMS
- * @version	 $Id: step3.html.php 3760 2012-12-11 07:21:54Z zhujinyonging@gmail.com $
+ * @version	 $Id: step3.html.php 4297 2013-01-27 07:51:45Z wwccss $
  */
 ?>
 <?php include '../../common/view/header.lite.html.php';?>
@@ -27,7 +27,7 @@ if(!isset($error))
 \$config->webRoot         = getWebRoot();
 \$config->default->domain = '$domain';
 \$config->default->lang   = '$defaultLang';
-\$config->mysqldump       = '';
+\$config->mysqldump       = '$mysqldump';
 EOT;
 }
 ?>

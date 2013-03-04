@@ -2,11 +2,11 @@
 /**
  * The api library of zentaopms.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     API
- * @version     $Id: api.class.php 2605 2012-02-21 07:22:58Z wwccss $
+ * @version     $Id: api.class.php 4132 2013-01-18 02:30:05Z wwccss $
  * @link        http://www.zentao.net
  */
 class ztclient
@@ -50,7 +50,7 @@ class ztclient
      */
     private function getRemoteConfig()
     {
-        $url = $this->zentao->root  . '/index.php?mode=getconfig';
+        $url = $this->zentao->root  . 'index.php?mode=getconfig';
         $this->agent->fetchText($url);
         $config = json_decode($this->agent->results);
         return $config;

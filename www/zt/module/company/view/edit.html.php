@@ -2,11 +2,11 @@
 /**
  * The edit view of company module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     company
- * @version     $Id: edit.html.php 3257 2012-07-02 06:25:41Z wwccss $
+ * @version     $Id: edit.html.php 4488 2013-02-27 02:54:49Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -36,11 +36,11 @@
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->company->website;?></th>
-      <td><?php echo html::input('website', $company->website, "class='text-1'");?></td>
+      <td><?php echo html::input('website', $company->website ? $company->website : 'http://', "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->company->backyard;?></th>
-      <td><?php echo html::input('backyard', $company->backyard, "class='text-1'");?></td>
+      <td><?php echo html::input('backyard', $company->backyard ? $company->backyard : 'http://', "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->company->pms;?></th>

@@ -2,33 +2,27 @@
 /**
  * The todo view file of dashboard module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     dashboard
- * @version     $Id: todo.html.php 3753 2012-12-11 05:51:16Z wwccss $
+ * @version     $Id: todo.html.php 4478 2013-02-27 01:51:51Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/datepicker.html.php';?>
-<?php include '../../common/view/tablesorter.html.php';?>
 <form method='post' id='todoform'>
   <div id='featurebar'>
     <div class='f-left'>
       <?php 
-      echo '<span id="today">'    . html::a(inlink('todo', "date=today"),     $lang->todo->todayTodos)    . '</span>';
-      echo '<span id="yesterday">'. html::a(inlink('todo', "date=yesterday"), $lang->todo->yesterdayTodos). '</span>';
-      echo '<span id="thisweek">' . html::a(inlink('todo', "date=thisweek"),  $lang->todo->thisWeekTodos) . '</span>';
-      echo '<span id="lastweek">' . html::a(inlink('todo', "date=lastweek"),  $lang->todo->lastWeekTodos) . '</span>';
-      echo '<span id="thismonth">'. html::a(inlink('todo', "date=thismonth"), $lang->todo->thismonthTodos). '</span>';
-      echo '<span id="lastmonth">' . html::a(inlink('todo', "date=lastmonth"), $lang->todo->lastmonthTodos). '</span>';
-      echo '<span id="thisseason">'. html::a(inlink('todo', "date=thisseason"),$lang->todo->thisseasonTodos).'</span>';
-      echo '<span id="thisyear">'  . html::a(inlink('todo', "date=thisyear"),  $lang->todo->thisyearTodos) . '</span>';
-      echo '<span id="future">'   . html::a(inlink('todo', "date=future"),    $lang->todo->futureTodos)   . '</span>';
-      echo '<span id="all">'      . html::a(inlink('todo', "date=all"),       $lang->todo->allDaysTodos)  . '</span>';
-      echo '<span id="before">'   . html::a(inlink('todo', "date=before&account={$app->user->account}&status=undone"), $lang->todo->allUndone) . '</span>';
-      echo "<span id='$date'>"    . html::input('date', $date,"class='w-date date'") . '</span>';
+      foreach($lang->todo->periods as $period => $label)
+      {
+          $vars = "date=$period";
+          if($period == 'before') $vars .= "&account={$app->user->account}&status=undone";
+          echo "<span id='$period'>" . html::a(inlink('todo', $vars), $label) . '</span>';
+      }
+      echo "<span id='byDate'>" . html::input('date', $date,"class='w-date date' onchange='changeDate(this.value)'") . '</span>';
 
       if($type == 'bydate') 
       {
@@ -53,17 +47,18 @@
     </div>
   </div>
   <table class='table-1 tablesorter'>
+    <?php $vars = "type=$type&account=$account&status=$status&orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage&pageID=$pageID"; ?>
     <thead>
     <tr class='colhead'>
-      <th class='w-id'><?php echo $lang->idAB;?></th>
-      <th class='w-date'><?php echo $lang->todo->date;?></th>
-      <th class='w-type'><?php echo $lang->todo->type;?></th>
-      <th class='w-pri'><?php echo $lang->priAB;?></th>
-      <th><?php echo $lang->todo->name;?></th>
-      <th class='w-hour'><?php echo $lang->todo->beginAB;?></th>
-      <th class='w-hour'><?php echo $lang->todo->endAB;?></th>
-      <th class='w-status'><?php echo $lang->todo->status;?></th>
-      <th class='w-140px {sorter:false}'><?php echo $lang->actions;?></th>
+      <th class='w-id'>    <?php common::printOrderLink('id',     $orderBy, $vars, $lang->idAB);?></th>
+      <th class='w-date'>  <?php common::printOrderLink('date',   $orderBy, $vars, $lang->todo->date);?></th>
+      <th class='w-type'>  <?php common::printOrderLink('type',   $orderBy, $vars, $lang->todo->type);?></th>
+      <th class='w-pri'>   <?php common::printOrderLink('pri',    $orderBy, $vars, $lang->priAB);?></th>
+      <th>                 <?php common::printOrderLink('name',   $orderBy, $vars, $lang->todo->name);?></th>
+      <th class='w-hour'>  <?php common::printOrderLink('begin',  $orderBy, $vars, $lang->todo->beginAB);?></th>
+      <th class='w-hour'>  <?php common::printOrderLink('end',    $orderBy, $vars, $lang->todo->endAB);?></th>
+      <th class='w-status'><?php common::printOrderLink('status', $orderBy, $vars, $lang->todo->status);?></th>
+      <th class='w-80px {sorter:false}'><?php echo $lang->actions;?></th>
     </tr>
     </thead>
     <tbody>
@@ -75,16 +70,16 @@
         <?php endif;?>
         <?php echo $todo->id; ?>
       </td>
-      <td><?php echo $todo->date == '2030-01-01' ? $lang->todo->dayInFuture : $todo->date;?></td>
+      <td><?php echo $todo->date == '2030-01-01' ? $lang->todo->periods['future'] : $todo->date;?></td>
       <td><?php echo $lang->todo->typeList[$todo->type];?></td>
       <td><span class='<?php echo 'pri' . $todo->pri;?>'><?php echo $todo->pri?></span></td>
-      <td class='a-left'><?php echo html::a($this->createLink('todo', 'view', "id=$todo->id&from=my"), $todo->name);?></td>
+      <td class='a-left'><?php echo html::a($this->createLink('todo', 'view', "id=$todo->id&from=my", '', true), $todo->name, '', "class='colorbox'");?></td>
       <td><?php echo $todo->begin;?></td>
       <td><?php echo $todo->end;?></td>
       <td class='<?php echo $todo->status;?>'><?php echo $lang->todo->statusList[$todo->status];?></td>
-      <td>
+      <td class='a-right'>
         <?php 
-        echo html::a($this->createLink('todo', 'mark',   "id=$todo->id&status=$todo->status"), $lang->todo->{'mark'.ucfirst($todo->status)}, 'hiddenwin');
+        common::printIcon('todo', 'finish', "id=$todo->id", $todo, 'list', '', 'hiddenwin');
         common::printIcon('todo', 'edit',   "id=$todo->id", '', 'list');
         common::printIcon('todo', 'delete', "id=$todo->id", '', 'list', '', 'hiddenwin');
         ?>
@@ -105,7 +100,7 @@
         if(common::hasPriv('todo', 'batchEdit'))
         {
             $actionLink = $this->createLink('todo', 'batchEdit', "from=myTodo&type=$type&account=$account&status=$status");
-            echo html::commonButton($lang->todo->batchEdit, "onclick=\"changeAction('todoform', 'batchEdit', '$actionLink')\"");
+            echo html::commonButton($lang->edit, "onclick=\"changeAction('todoform', 'batchEdit', '$actionLink')\"");
 
         }
         if(common::hasPriv('todo', 'import2Today') and $importFuture)
@@ -115,7 +110,7 @@
         }
         ?>
         </div>
-        <?php if($type == 'all') $pager->show();?>
+        <?php $pager->show();?>
         </td>
       </tr>
     </tfoot>

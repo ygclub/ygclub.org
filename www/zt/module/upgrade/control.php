@@ -2,11 +2,11 @@
 /**
  * The control file of upgrade module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     upgrade
- * @version     $Id: control.php 2605 2012-02-21 07:22:58Z wwccss $
+ * @version     $Id: control.php 4189 2013-01-20 09:54:37Z wwccss $
  * @link        http://www.zentao.net
  */
 class upgrade extends control
@@ -32,9 +32,9 @@ class upgrade extends control
     {
         $version = str_replace(array(' ', '.'), array('', '_'), $this->config->installedVersion);
         $version = strtolower($version);
-        $this->view->header->title = $this->lang->upgrade->common . $this->lang->colon . $this->lang->upgrade->selectVersion;
-        $this->view->position[]    = $this->lang->upgrade->common;
-        $this->view->version       = $version;
+        $this->view->title      = $this->lang->upgrade->common . $this->lang->colon . $this->lang->upgrade->selectVersion;
+        $this->view->position[] = $this->lang->upgrade->common;
+        $this->view->version    = $version;
         $this->display();
     }
 
@@ -46,10 +46,10 @@ class upgrade extends control
      */
     public function confirm()
     {
-        $this->view->header->title = $this->lang->upgrade->confirm;
-        $this->view->position[]    = $this->lang->upgrade->common;
-        $this->view->confirm       = $this->upgrade->getConfirm($this->post->fromVersion);
-        $this->view->fromVersion   = $this->post->fromVersion;
+        $this->view->title       = $this->lang->upgrade->confirm;
+        $this->view->position[]  = $this->lang->upgrade->common;
+        $this->view->confirm     = $this->upgrade->getConfirm($this->post->fromVersion);
+        $this->view->fromVersion = $this->post->fromVersion;
 
         $this->display();
     }
@@ -64,8 +64,8 @@ class upgrade extends control
     {
         $this->upgrade->execute($this->post->fromVersion);
 
-        $this->view->header->title = $this->lang->upgrade->result;
-        $this->view->position[]    = $this->lang->upgrade->common;
+        $this->view->title      = $this->lang->upgrade->result;
+        $this->view->position[] = $this->lang->upgrade->common;
 
         if(!$this->upgrade->isError())
         {

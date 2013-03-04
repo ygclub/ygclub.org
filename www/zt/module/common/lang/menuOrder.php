@@ -6,9 +6,9 @@ $lang->menuOrder[15] = 'project';
 $lang->menuOrder[20] = 'qa';
 $lang->menuOrder[25] = 'doc';
 $lang->menuOrder[30] = 'report';
-//$lang->menuOrder[35] = 'webapp';
-$lang->menuOrder[40] = 'company';
-$lang->menuOrder[45] = 'admin';
+$lang->menuOrder[32] = 'webapp';
+$lang->menuOrder[35] = 'company';
+$lang->menuOrder[40] = 'admin';
 
 /* index menu order. */
 $lang->index->menuOrder[5]  = 'product';
@@ -110,9 +110,8 @@ $lang->admin->menuOrder[5]  = 'index';
 $lang->admin->menuOrder[10] = 'extension';
 $lang->admin->menuOrder[15] = 'editor';
 $lang->admin->menuOrder[20] = 'mail';
-$lang->admin->menuOrder[25] = 'clearData';
-$lang->admin->menuOrder[30] = 'convert';
-$lang->admin->menuOrder[35] = 'trashes';
+$lang->admin->menuOrder[25] = 'convert';
+$lang->admin->menuOrder[30] = 'trashes';
 $lang->convert->menuOrder   = $lang->admin->menuOrder;
 $lang->upgrade->menuOrder   = $lang->admin->menuOrder;
 $lang->action->menuOrder    = $lang->admin->menuOrder;

@@ -2,11 +2,11 @@
 /**
  * The testtask module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: zh-cn.php 3860 2012-12-19 10:08:20Z wyd621@gmail.com $
+ * @version     $Id: zh-cn.php 4490 2013-02-27 03:27:05Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->testtask->index          = "测试任务首页";
@@ -25,7 +25,10 @@ $lang->testtask->results        = "结果";
 $lang->testtask->createBug      = "提Bug";
 $lang->testtask->assign         = '指派';
 $lang->testtask->cases          = '用例';
+$lang->testtask->pre            = '上一个';
 $lang->testtask->next           = '下一个';
+$lang->testtask->start          = "开始";
+$lang->testtask->close          = "关闭";
 
 $lang->testtask->common         = '测试任务';
 $lang->testtask->id             = '任务编号';
@@ -44,6 +47,7 @@ $lang->testtask->linkVersion    = '版本';
 $lang->testtask->lastRunAccount = '执行人';
 $lang->testtask->lastRunTime    = '执行时间';
 $lang->testtask->lastRunResult  = '结果';
+$lang->testtask->report         = '测试总结';
 
 $lang->testtask->statusList['wait']    = '未开始';
 $lang->testtask->statusList['doing']   = '进行中';
@@ -67,7 +71,7 @@ $lang->testtask->fail          = '失败';
 
 $lang->testtask->byModule      = '按模块';
 $lang->testtask->assignedToMe  = '指派给我';
-$lang->testtask->allCases      = '所有Case';
+$lang->testtask->allCases      = '所有用例';
 
 $lang->testtask->lblCases      = '用例列表';
 $lang->testtask->lblUnlinkCase = '移除用例';

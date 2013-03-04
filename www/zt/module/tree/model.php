@@ -2,11 +2,11 @@
 /**
  * The model file of tree module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     tree
- * @version     $Id: model.php 3745 2012-12-11 01:14:57Z wyd621@gmail.com $
+ * @version     $Id: model.php 4474 2013-02-27 01:09:39Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -156,7 +156,7 @@ class treeModel extends model
             $treeMenu[$module->parent] .= "</li>\n"; 
         }
 
-        $lastMenu = "<ul id='tree'>" . @array_pop($treeMenu) . "</ul>\n";
+        $lastMenu = "<ul class='tree'>" . @array_pop($treeMenu) . "</ul>\n";
         return $lastMenu; 
     }
 
@@ -168,7 +168,7 @@ class treeModel extends model
      */
     public function getProductDocTreeMenu()
     {
-        $menu = "<ul id='tree'>";
+        $menu = "<ul class='tree'>";
         $products = $this->loadModel('product')->getPairs('nocode');
         $modules  = $this->dao->findByType('productdoc')->from(TABLE_MODULE)->orderBy('`order`')->fetchAll();
         $projectModules = $this->dao->findByType('projectdoc')->from(TABLE_MODULE)->orderBy('`order`')->fetchAll();
@@ -214,11 +214,11 @@ class treeModel extends model
      */
     public function getProjectDocTreeMenu()
     {
-        $menu     = "<ul id='tree'>";
+        $menu     = "<ul class='tree'>";
         $products = $this->loadModel('product')->getPairs('nocode');
         $projects = $this->loadModel('project')->getProductGroupList();
         $modules  = $this->dao->findByType('projectdoc')->from(TABLE_MODULE)->orderBy('`order`')->fetchAll();
-        $products[0] = $this->lang->project->noProduct;
+
         foreach($projects as $id => $project)
         {
             if($id == '') 
@@ -227,6 +227,8 @@ class treeModel extends model
                 unset($projects['']);
             }
         }
+
+       if(!empty($projects[0])) $products[0] = $this->lang->project->noProduct;
 
         foreach($products as $productID => $productName)
         {
@@ -312,7 +314,7 @@ class treeModel extends model
         $linkHtml  = $module->name;
         if($module->type == 'bug' and $module->owner) $linkHtml .= '<span class="owner">[' . $users[$module->owner] . ']</span>';
         if(common::hasPriv('tree', 'edit')) $linkHtml .= ' ' . html::a(helper::createLink('tree', 'edit',   "module={$module->id}"), $this->lang->tree->edit, '', 'class="iframe"');
-        if(common::hasPriv('tree', 'browse') and strpos('productdoc,projectdoc', $module->type) === false) $linkHtml .= ' ' . html::a(helper::createLink('tree', 'browse', "root={$module->root}&type={$module->type}&module={$module->id}"), $this->lang->tree->child);
+        if(common::hasPriv('tree', 'browse') and strpos('productdoc,projectdoc', $module->type) === false and $module->type != 'webapp') $linkHtml .= ' ' . html::a(helper::createLink('tree', 'browse', "root={$module->root}&type={$module->type}&module={$module->id}"), $this->lang->tree->child);
         if(common::hasPriv('tree', 'delete')) $linkHtml .= ' ' . html::a(helper::createLink('tree', 'delete', "root={$module->root}&module={$module->id}"), $this->lang->delete, 'hiddenwin');
         if(common::hasPriv('tree', 'updateorder')) $linkHtml .= ' ' . html::input("orders[$module->id]", $module->order, 'style="width:30px;text-align:center"');
         return $linkHtml;
@@ -435,7 +437,6 @@ class treeModel extends model
         {
             $i++;
             $newOrder = $i * 10;
-            if($newOrder == $order) continue;
             $this->dao->update(TABLE_MODULE)->set('`order`')->eq($newOrder)->where('id')->eq((int)$moduleID)->limit(1)->exec();
         }
     }

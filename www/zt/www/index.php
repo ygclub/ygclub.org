@@ -4,11 +4,11 @@
  *
  * All request should be routed by this router.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     ZenTaoPMS
- * @version     $Id: index.php 3795 2012-12-13 08:24:11Z wyd621@gmail.com $
+ * @version     $Id: index.php 4131 2013-01-18 02:24:44Z wwccss $
  * @link        http://www.zentao.net
  */
 /* Set the error reporting. */

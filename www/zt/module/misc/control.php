@@ -2,11 +2,11 @@
 /**
  * The control file of misc of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     misc
- * @version     $Id: control.php 3833 2012-12-17 09:06:33Z chencongzhi520@gmail.com $
+ * @version     $Id: control.php 4332 2013-01-30 08:32:37Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 class misc extends control
@@ -100,10 +100,14 @@ class misc extends control
         $this->app->loadClass('pclzip', true);
         $sourceZip = new pclzip($packageFile);
         $files = $sourceZip->extract(PCLZIP_OPT_PATH, $notifyDir);
-        if($files == 0) die("Error : ".$archive->errorInfo(true));
+        if($files == 0) die("Error : ".$sourceZip->errorInfo(true));
 
-        $currentUser = $this->app->user;
-        $loginInfo   = json_encode(array('account' => $currentUser->account, 'password' => $currentUser->password, 'zentaoRoot' => 'http://' . $this->config->default->domain));
+        $loginInfo = new stdclass();
+        $loginInfo->account    = $this->app->user->account;
+        $loginInfo->password   = $this->app->user->password;
+        $loginInfo->zentaoRoot = common::getSysURL() . $this->config->webRoot;
+        $loginInfo = json_encode($loginInfo);
+
         file_put_contents($loginFile, $loginInfo);
 
         unlink($packageFile);

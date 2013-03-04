@@ -2,11 +2,11 @@
 /**
  * The upgrade router file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     ZenTaoPMS
- * @version     $Id: upgrade.php 3902 2012-12-25 06:43:23Z wwccss $
+ * @version     $Id: upgrade.php 4131 2013-01-18 02:24:44Z wwccss $
  * @link        http://www.zentao.net
  */
 /* Judge my.php exists or not. */

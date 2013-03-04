@@ -2,11 +2,11 @@
 /**
  * The control file of common module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     common
- * @version     $Id: control.php 3619 2012-11-21 02:27:42Z wyd621@gmail.com $
+ * @version     $Id: control.php 4539 2013-03-02 14:05:21Z wwccss $
  * @link        http://www.zentao.net
  */
 class common extends control
@@ -203,10 +203,7 @@ class common extends control
     public static function printLink($module, $method, $vars = '', $label, $target = '', $misc = '', $newline = true, $onlyBody = false)
     {
         if(!common::hasPriv($module, $method)) return false;
-        global $config;
-        $concat = $config->requestType == 'GET' ? '&' : '?';
-        $onlyBody = $onlyBody ? $concat . "onlybody=yes" : '';
-        echo html::a(helper::createLink($module, $method, $vars) . $onlyBody, $label, $target, $misc, $newline);
+        echo html::a(helper::createLink($module, $method, $vars, '', $onlyBody), $label, $target, $misc, $newline);
         return true;
     }
 
@@ -254,7 +251,7 @@ class common extends control
      * @access public
      * @return void
      */
-    public static function printIcon($module, $method, $vars = '', $object = '', $type = 'button', $icon = '', $target = '')
+    public static function printIcon($module, $method, $vars = '', $object = '', $type = 'button', $icon = '', $target = '', $extraClass = '', $onlyBody = false)
     {
         global $app, $lang;
 
@@ -276,7 +273,7 @@ class common extends control
         if(strtolower($module) == 'bug'      and strtolower($method) == 'tostory')    ($module = 'story') and ($method = 'create');
         if(strtolower($module) == 'bug'      and strtolower($method) == 'createcase') ($module = 'testcase') and ($method = 'create');
         if(!common::hasPriv($module, $method)) return false;
-        $link = helper::createLink($module, $method, $vars);
+        $link = helper::createLink($module, $method, $vars, '', $onlyBody);
 
         /* Set the icon title, try search the $method defination in $module's lang or $common's lang. */
         $title = $method;
@@ -286,14 +283,14 @@ class common extends control
         {
             $title = $method == 'report' ? $lang->$module->$method->common : $lang->$module->$method;
         }
-        if($icon == 'toStory')   $title = $lang->bug->toStory;
-        if($icon == 'createBug') $title = $lang->testtask->createBug;
+        if($icon == 'toStory')   $title  = $lang->bug->toStory;
+        if($icon == 'createBug') $title  = $lang->testtask->createBug;
 
         /* set the class. */
         if(!$icon) $icon = $method;
         if(strpos(',edit,copy,report,export,delete,', ",$icon,") !== false) $module = 'common';
         $color      = $type == 'button' ? 'green' : ($clickable ? 'green' : 'gray');
-        $extraClass = strpos(',export,customFields,runCase,results,', ",$method,") !== false ? $method : '';
+        $extraClass = strpos(',export,customFields,', ",$method,") !== false ? $method : $extraClass;
         $class      = $extraClass ? "icon-$color-$module-$icon $extraClass" : "icon-$color-$module-$icon";
  
         /* Create the icon link. */
@@ -318,6 +315,7 @@ class common extends control
         {
             if($type == 'list')
             {
+                $class = "icon-$color-$module-$icon";
                 echo "<span class='$class' title='$title'>&nbsp;</span>";
             }
         }
@@ -380,10 +378,15 @@ class common extends control
             if(strtolower($key) == 'editeddate')     continue;
 
             if($magicQuote) $value = stripslashes($value);
-            if($value != $old->$key)
+            if($value != stripslashes($old->$key))
             { 
                 $diff = '';
-                if(substr_count($value, "\n") > 1 or substr_count($old->$key, "\n") > 1 or strpos('name,title,desc,spec,steps,content,digest,verify', strtolower($key)) !== false) $diff = commonModel::diff($old->$key, $value);
+                if(substr_count($value, "\n") > 1     or 
+                   substr_count($old->$key, "\n") > 1 or 
+                   strpos('name,title,desc,spec,steps,content,digest,verify,report', strtolower($key)) !== false)
+                {
+                    $diff = commonModel::diff($old->$key, $value);
+                }
                 $changes[] = array('field' => $key, 'old' => $old->$key, 'new' => $value, 'diff' => $diff);
             }
         }

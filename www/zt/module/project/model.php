@@ -2,11 +2,11 @@
 /**
  * The model file of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: model.php 3891 2012-12-25 01:06:31Z wwccss $
+ * @version     $Id: model.php 4508 2013-03-01 09:53:27Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -70,6 +70,16 @@ class projectModel extends model
     {
         /* Check the privilege. */
         $project = $this->getById($projectID);
+
+        /* Unset story, bug, build and testtask if type is ops. */
+        if($project and $project->type == 'ops') 
+        {
+            unset($this->lang->project->menu->story);
+            unset($this->lang->project->menu->bug);
+            unset($this->lang->project->menu->build);
+            unset($this->lang->project->menu->testtask);
+        }
+
         if($projects and !isset($projects[$projectID]) and !$this->checkPriv($project))
         {
             echo(js::alert($this->lang->project->accessDenied));
@@ -114,7 +124,7 @@ class projectModel extends model
         {
             foreach($projects as $project)
             {
-                if($projectMode == 'noclosed' and $project->status == 'done') continue;
+                if($projectMode == 'noclosed' and ($project->status == 'done' or $project->status == 'suspended')) continue;
 
                 $status = $project->status != 'done' ? $this->lang->project->selectGroup->doing : '';
                 if($project->product)
@@ -148,11 +158,14 @@ class projectModel extends model
     {
         $products     = $this->loadModel('product')->getPairs('nocode');
         $productGroup = $this->getProductGroupList();
-        $projectTree  = "<ul id='tree'>";
+        $projectTree  = "<ul class='tree'>";
         foreach($productGroup as $productID => $projects)
         {
-            if(!isset($products[$productID]) and $productID != '') continue;
+            if(!isset($products[$productID]) and $productID != '')  continue;
+            if(!isset($products[$productID]) and !count($projects)) continue;
+
             $productName  = isset($products[$productID]) ? $products[$productID] : $this->lang->project->noProduct;
+
             $projectTree .= "<li>$productName<ul>";
            
             foreach($projects as $project)
@@ -235,6 +248,7 @@ class projectModel extends model
     {
         $this->lang->project->team = $this->lang->project->teamname;
         $project = fixer::input('post')
+            ->setDefault('status', 'wait')
             ->stripTags('name, code, team')
             ->setIF($this->post->acl != 'custom', 'whitelist', '')
             ->join('whitelist', ',')
@@ -275,6 +289,7 @@ class projectModel extends model
             {
                 $member->project  = $projectID;
                 $member->account  = $this->app->user->account;
+                $member->role     = $this->lang->user->roleList[$this->app->user->role];
                 $member->join     = $today;
                 $member->days     = $project->days;
                 $member->hours    = $this->config->project->defaultWorkhours;
@@ -333,6 +348,119 @@ class projectModel extends model
                 }
             }
         }
+        if(!dao::isError()) return common::createChanges($oldProject, $project);
+    }
+
+    /**
+     * Start project.
+     * 
+     * @param  int    $projectID 
+     * @access public
+     * @return void
+     */
+    public function start($projectID)
+    {
+        $oldProject = $this->getById($projectID);
+        $now        = helper::now();
+        $project = fixer::input('post')
+            ->setDefault('status', 'doing')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_PROJECT)->data($project)
+            ->autoCheck()
+            ->where('id')->eq((int)$projectID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldProject, $project);
+    }
+
+    /**
+     * Put project off.
+     * 
+     * @param  int    $projectID 
+     * @access public
+     * @return void
+     */
+    public function putoff($projectID)
+    {
+        $oldProject = $this->getById($projectID);
+        $now        = helper::now();
+        $project = fixer::input('post')->remove('comment')->get();
+
+        $this->dao->update(TABLE_PROJECT)->data($project)
+            ->autoCheck()
+            ->where('id')->eq((int)$projectID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldProject, $project);
+    }
+
+    /**
+     * Suspend project.
+     * 
+     * @param  int    $projectID 
+     * @access public
+     * @return void
+     */
+    public function suspend($projectID)
+    {
+        $oldProject = $this->getById($projectID);
+        $now        = helper::now();
+        $project = fixer::input('post')
+            ->setDefault('status', 'suspended')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_PROJECT)->data($project)
+            ->autoCheck()
+            ->where('id')->eq((int)$projectID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldProject, $project);
+    }
+
+    /**
+     * Activate project.
+     * 
+     * @param  int    $projectID 
+     * @access public
+     * @return void
+     */
+    public function activate($projectID)
+    {
+        $oldProject = $this->getById($projectID);
+        $now        = helper::now();
+        $project = fixer::input('post')
+            ->setDefault('status', 'doing')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_PROJECT)->data($project)
+            ->autoCheck()
+            ->where('id')->eq((int)$projectID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldProject, $project);
+    }
+
+    /**
+     * Close project.
+     * 
+     * @param  int    $projectID 
+     * @access public
+     * @return void
+     */
+    public function close($projectID)
+    {
+        $oldProject = $this->getById($projectID);
+        $now        = helper::now();
+        $project = fixer::input('post')
+            ->setDefault('status', 'done')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_PROJECT)->data($project)
+            ->autoCheck()
+            ->where('id')->eq((int)$projectID)
+            ->exec();
+
         if(!dao::isError()) return common::createChanges($oldProject, $project);
     }
 
@@ -429,7 +557,8 @@ class projectModel extends model
             ->orderBy('t1.order')
             ->fetchGroup('product');
 
-        $projects = $this->getList();
+        $noProducts = array();
+        $projects   = $this->getList();
 
         foreach($list as $id => $product)
         {
@@ -439,8 +568,15 @@ class projectModel extends model
                 {
                     unset($list[$id][$ID]);
                 }
+                if(!$project->product)
+                {
+                    if($this->checkPriv($projects[$project->id])) $noProducts[] = $project;
+                    unset($list[$id][$ID]); 
+                }
             }
         }
+        unset($list['']);
+        $list[''] = $noProducts;
 
         return $list;
     }
@@ -592,6 +728,7 @@ class projectModel extends model
             ->fetch();
         if($managers) return $managers;
 
+        $managers = new stdclass();
         $managers->PO = '';
         $managers->QD = '';
         $managers->RD = '';
@@ -632,7 +769,7 @@ class projectModel extends model
         $now   = date('Y-m-d');
         foreach($projects as $id => $project)
         {
-            if($this->checkPriv($project) and ($project->status == 'done' or $project->end < $now)) $pairs[$id] = $project->name;
+            if($this->checkPriv($project) and ($project->status == 'done' or $project->end < $now)) $pairs[$id] = ucfirst(substr($project->code, 0, 1)) . ':' . $project->name;
         }
         return $pairs;
     }
@@ -651,6 +788,7 @@ class projectModel extends model
         $products = array_unique($_POST['products']);
         foreach($products as $productID)
         {
+            $data = new stdclass();
             $data->project = $projectID;
             $data->product = $productID;
             $this->dao->insert(TABLE_PROJECTPRODUCT)->data($data)->exec();
@@ -996,14 +1134,19 @@ class projectModel extends model
         {
             if(empty($account)) continue;
 
+            $member = new stdclass();
             $member->role  = $roles[$key];
             $member->days  = $days[$key];
             $member->hours = $hours[$key];
-            $mode        = $modes[$key];
 
+            $mode = $modes[$key];
             if($mode == 'update')
             {
-                $this->dao->update(TABLE_TEAM)->data($member)->where('project')->eq((int)$projectID)->andWhere('account')->eq($account)->exec();
+                $this->dao->update(TABLE_TEAM)
+                    ->data($member)
+                    ->where('project')->eq((int)$projectID)
+                    ->andWhere('account')->eq($account)
+                    ->exec();
             }
             else
             {
@@ -1041,7 +1184,7 @@ class projectModel extends model
 
         $projects = $this->dao->select('id, name')->from(TABLE_PROJECT)
             ->where("end >= '$today'")
-            ->orWhere('end')->eq('0000-00-00')
+            ->andWhere('status')->notin('done,suspended')
             ->fetchPairs();
         if(!$projects) return $burns;
 
@@ -1234,5 +1377,49 @@ class projectModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll();
+    }
+
+    /**
+     * Get the summary of project.
+     * 
+     * @param  array    $tasks 
+     * @access public
+     * @return string
+     */
+    public function summary($tasks)
+    {
+        $taskSum = $statusWait = $statusDone = $statusDoing = $statusClosed = $statusCancel = 0;  
+        $totalEstimate = $totalConsumed = $totalLeft = 0.0;
+        foreach($tasks as $task)
+        {
+            $totalEstimate  += $task->estimate;
+            $totalConsumed  += $task->consumed;
+            $totalLeft      += (($task->status == 'cancel' or $task->closedReason == 'cancel') ? 0 : $task->left);
+            $statusVar       = 'status' . ucfirst($task->status);
+            $$statusVar ++;
+        }
+
+        return sprintf($this->lang->project->taskSummary, count($tasks), $statusWait, $statusDoing, $totalEstimate, $totalConsumed, $totalLeft);
+    }
+
+    /**
+     * Judge an action is clickable or not.
+     * 
+     * @param  object    $project
+     * @param  string    $action 
+     * @access public
+     * @return bool
+     */
+    public function isClickable($project, $action)
+    {
+        $action = strtolower($action);
+
+        if($action == 'start')    return $project->status == 'wait';
+        if($action == 'close')    return $project->status != 'done';
+        if($action == 'suspend')  return $project->status == 'wait' or $project->status == 'doing';
+        if($action == 'putoff')   return $project->status == 'wait' or $project->status == 'doing';
+        if($action == 'activate') return $project->status == 'suspended' or $project->status == 'done';
+
+        return true;
     }
 }

@@ -2,21 +2,21 @@
 /**
  * The view file of task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: view.html.php 3588 2012-10-29 07:34:36Z chencongzhi520@gmail.com $
+ * @version     $Id: view.html.php 4545 2013-03-02 14:44:53Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <div id='titlebar'>
-<?php if($task->fromBug == 0):?>
-  <div id='main' class='<?php if($task->deleted) echo 'deleted';?>'>TASK #<?php echo $task->id . ' ' . $task->name;?></div>
-<?php else:?>
-  <div id='main' class='<?php if($task->deleted) echo 'deleted';?>'>TASK #<?php echo $task->id . ' ' . $task->name . '('. $lang->task->fromBug . $lang->colon . $task->fromBug . ')';?></div>
-<?php endif;?>
+  <?php 
+  $name = "TASK #$task->id $task->name"; 
+  if($task->fromBug != 0) $name .= "({$lang->task->fromBug}$lang->colon$task->fromBug)";
+  ?>
+  <div id='main' class='<?php if($task->deleted) echo 'deleted';?>'><?php echo $name;?></div>
   <div>
   <?php
   $browseLink  = $app->session->taskList != false ? $app->session->taskList : $this->createLink('project', 'browse', "projectID=$task->project");
@@ -24,13 +24,13 @@
   if(!$task->deleted)
   {
       ob_start();
-      //if(!($task->status != 'closed' and $task->status != 'cancel' and common::printLink('task', 'logEfforts', "taskID=$task->id", $lang->task->buttonLogEfforts))) echo $lang->task->buttonLogEfforts . ' ';
-      common::printIcon('task', 'assignTo', "projectID=$task->project&taskID=$task->id");
-      if($this->task->isClickable($task, 'start'))    common::printIcon('task', 'start',    "taskID=$task->id");
-      if($this->task->isClickable($task, 'finish'))   common::printIcon('task', 'finish',   "taskID=$task->id");
-      if($this->task->isClickable($task, 'close'))    common::printIcon('task', 'close',    "taskID=$task->id");
-      if($this->task->isClickable($task, 'activate')) common::printIcon('task', 'activate', "taskID=$task->id");
-      if($this->task->isClickable($task, 'cancel'))   common::printIcon('task', 'cancel',   "taskID=$task->id");
+      common::printIcon('task', 'assignTo',       "projectID=$task->project&taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'start',          "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'recordEstimate', "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'finish',         "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'close',          "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'activate',       "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+      common::printIcon('task', 'cancel',         "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
 
       common::printDivider();
       common::printIcon('task', 'edit',  "taskID=$task->id");
@@ -43,6 +43,10 @@
       $actionLinks = ob_get_contents();
       ob_clean();
       echo $actionLinks;
+  }
+  else
+  {
+      common::printRPN($browseLink);
   }
   ?>
   </div>

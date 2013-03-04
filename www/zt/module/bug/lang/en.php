@@ -2,11 +2,11 @@
 /**
  * The bug module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: en.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: en.php 4536 2013-03-02 13:39:37Z wwccss $
  * @link        http://www.zentao.net
  */
 /* Fieldlist. */
@@ -75,9 +75,9 @@ $lang->bug->batchEdit          = 'Batch edit';
 $lang->bug->assignTo           = 'Assign';
 $lang->bug->browse             = 'Browse Bug';
 $lang->bug->view               = 'Bug Info';
-$lang->bug->resolve            = 'Resolve Bug';
-$lang->bug->close              = 'Close Bug';
-$lang->bug->activate           = 'Activate Bug';
+$lang->bug->resolve            = 'Resolve';
+$lang->bug->close              = 'Close';
+$lang->bug->activate           = 'Activate';
 $lang->bug->reportChart        = 'Report';
 $lang->bug->export             = 'Export data';
 $lang->bug->delete             = 'Delete Bug';
@@ -143,7 +143,7 @@ $lang->bug->buttonActivate       = 'Activate';
 $lang->bug->buttonResolve        = 'Resolve';
 $lang->bug->buttonClose          = 'Close';
 $lang->bug->buttonToList         = 'Back';
-$lang->bug->buttonCreateTestcase = 'Create case';
+$lang->bug->buttonCreateTestcase = 'Create Case';
 
 /* Confirm messags. */
 $lang->bug->confirmChangeProduct = 'Change product will change project, task and story also, are you sure?';

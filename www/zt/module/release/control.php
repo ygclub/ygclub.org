@@ -2,11 +2,11 @@
 /**
  * The control file of release module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     release
- * @version     $Id: control.php 3861 2012-12-20 05:49:15Z zhujinyonging@gmail.com $
+ * @version     $Id: control.php 4178 2013-01-20 09:32:11Z wwccss $
  * @link        http://www.zentao.net
  */
 class release extends control
@@ -38,9 +38,9 @@ class release extends control
         $this->commonAction($productID);
         $products                  = $this->product->getPairs();
         $this->session->set('releaseList', $this->app->getURI(true));
-        $this->view->header->title = $products[$productID] . $this->lang->colon . $this->lang->release->browse;
-        $this->view->position[]    = $this->lang->release->browse;
-        $this->view->releases      = $this->release->getList($productID);
+        $this->view->title      = $products[$productID] . $this->lang->colon . $this->lang->release->browse;
+        $this->view->position[] = $this->lang->release->browse;
+        $this->view->releases   = $this->release->getList($productID);
         $this->display();
     }
 
@@ -67,10 +67,10 @@ class release extends control
         unset($builds['trunk']);
 
         $this->commonAction($productID);
-        $this->view->header->title = $this->lang->release->create;
-        $this->view->position[]    = $this->lang->release->create;
-        $this->view->builds        = $builds;
-        $this->view->productID     = $productID;
+        $this->view->title      = $this->lang->release->create;
+        $this->view->position[] = $this->lang->release->create;
+        $this->view->builds     = $builds;
+        $this->view->productID  = $productID;
         $this->display();
     }
 
@@ -115,13 +115,13 @@ class release extends control
             $bugs    = array();
         }
 
-        $this->view->header->title = $this->lang->release->edit;
-        $this->view->position[]    = $this->lang->release->edit;
-        $this->view->release       = $release;
-        $this->view->build         = $build;
-        $this->view->stories       = $stories;
-        $this->view->bugs          = $bugs;
-        $this->view->builds        = $this->loadModel('build')->getProductBuildPairs($release->product);
+        $this->view->title      = $this->lang->release->edit;
+        $this->view->position[] = $this->lang->release->edit;
+        $this->view->release    = $release;
+        $this->view->build      = $build;
+        $this->view->stories    = $stories;
+        $this->view->bugs       = $bugs;
+        $this->view->builds     = $this->loadModel('build')->getProductBuildPairs($release->product);
         unset($this->view->builds['trunk']);
         $this->display();
     }
@@ -149,14 +149,15 @@ class release extends control
         
 
         $this->commonAction($release->product);
-        $products                  = $this->product->getPairs();
-        $this->view->header->title = "RELEASE #$release->id $release->name/" . $products[$release->product];
-        $this->view->position[]    = $this->lang->release->view;
-        $this->view->release       = $release;
-        $this->view->stories       = $stories;
-        $this->view->bugs          = $bugs;
-        $this->view->actions       = $this->loadModel('action')->getList('release', $releaseID);
-        $this->view->users         = $this->loadModel('user')->getPairs('noletter');
+        $products = $this->product->getPairs();
+
+        $this->view->title      = "RELEASE #$release->id $release->name/" . $products[$release->product];
+        $this->view->position[] = $this->lang->release->view;
+        $this->view->release    = $release;
+        $this->view->stories    = $stories;
+        $this->view->bugs       = $bugs;
+        $this->view->actions    = $this->loadModel('action')->getList('release', $releaseID);
+        $this->view->users      = $this->loadModel('user')->getPairs('noletter');
         $this->display();
     }
  

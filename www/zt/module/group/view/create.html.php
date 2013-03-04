@@ -2,16 +2,15 @@
 /**
  * The create view of group module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     group
- * @version     $Id: create.html.php 3253 2012-07-02 05:59:24Z wwccss $
+ * @version     $Id: create.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
-<script>var holders=<?php echo json_encode($lang->group->placeholder);?></script>
 <form method='post' target='hiddenwin' id='dataform'>
   <table align='center' class='table-4 a-left'> 
     <caption><?php echo $lang->group->create;?></caption>

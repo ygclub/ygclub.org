@@ -2,11 +2,11 @@
 /**
  * The admin module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     admin
- * @version     $Id: en.php 3742 2012-12-10 08:41:09Z wwccss $
+ * @version     $Id: en.php 4460 2013-02-26 02:28:02Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->admin->common  = 'Admin';
@@ -19,10 +19,11 @@ $lang->admin->welcome = 'Welcome to ZenTaoPMS.';
 
 $lang->admin->browseCompany = 'Browse Company';
 
-$lang->admin->clearData        = 'Clear Data';
-$lang->admin->confirmClearData = 'Are you sure to clear data?';
-$lang->admin->clearDataFailed  = 'Failed to clear data!';
-$lang->admin->clearDataSucceed = 'Succeed to clear data!';
+$lang->admin->clearData             = 'Clear Data';
+$lang->admin->pleaseInputYes        = "Input 'yes' to clear data:";
+$lang->admin->confirmClearData      = 'Are you sure to clear data?';
+$lang->admin->clearDataFailed       = 'Failed to clear data!';
+$lang->admin->clearDataSuccessfully = 'Succeed in clearing data!';
 $lang->admin->clearDataDesc    = <<<EOT
 <strong><font color='red'>Clear data is dangerous. Be sure to backup your database and other data files and sure nobody is using pms when importing.</font></strong>\n
 The impact of clearing data:
@@ -54,3 +55,12 @@ $lang->admin->bind = new stdclass();
 $lang->admin->bind->caption = 'Bind with community account';
 $lang->admin->bind->action  = 'bind';
 $lang->admin->bind->success = "Bind success";
+
+$lang->admin->selectFlow = 'How do you plan to use zentao?';
+
+$lang->admin->flowList['full']      = 'All features(including product, project, plan, release, story, task, bug, case, testtask, doc and so on.)';
+$lang->admin->flowList['onlyTest']  = 'Only testing(including product, release, bug, case, testtask, doc and so on.)';
+$lang->admin->flowList['onlyTask']  = 'Only task (including project, task, doc and so on.)';
+$lang->admin->flowList['onlyStory'] = 'Only story(including product, story, plan, release, doc and so on.)';
+
+$lang->admin->flowNotice = "<span class='red'>You can remove testing, task or story extension in admin->extension panel to use all features again.</span>";

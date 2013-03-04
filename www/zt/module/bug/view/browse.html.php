@@ -2,22 +2,22 @@
 /**
  * The browse view file of bug module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: browse.html.php 3794 2012-12-13 08:07:07Z wyd621@gmail.com $
+ * @version     $Id: browse.html.php 4469 2013-02-27 00:54:49Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/treeview.html.php';?>
-<?php include '../../common/view/colorize.html.php';?>
-<script language='Javascript'>
-var browseType = '<?php echo $browseType;?>';
-var moduleID   = '<?php echo $moduleID;?>';
-var customed   = <?php echo (int)$customed;?>;
-</script>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/treeview.html.php';
+include '../../common/view/colorize.html.php';
+js::set('browseType', $browseType);
+js::set('moduleID', $moduleID);
+js::set('customed', $customed);
+?>
 
 <div id='featurebar'>
   <div class='f-left'>
@@ -37,10 +37,12 @@ var customed   = <?php echo (int)$customed;?>;
     ?>
   </div>
   <div class='f-right'>
-    <?php if($browseType != 'needconfirm') common::printIcon('bug', 'export', "productID=$productID&orderBy=$orderBy");?>
-    <?php common::printIcon('bug', 'customFields'); ?>
-    <?php common::printIcon('bug', 'report', "productID=$productID&browseType=$browseType&moduleID=$moduleID");?>
-    <?php common::printIcon('bug', 'create', "productID=$productID&extra=moduleID=$moduleID"); ?>
+    <?php
+    if($browseType != 'needconfirm') common::printIcon('bug', 'export', "productID=$productID&orderBy=$orderBy");
+    common::printIcon('bug', 'customFields');
+    common::printIcon('bug', 'report', "productID=$productID&browseType=$browseType&moduleID=$moduleID");
+    common::printIcon('bug', 'create', "productID=$productID&extra=moduleID=$moduleID");
+    ?>
   </div>
 </div>
 <div id='querybox' class='<?php if($browseType !='bysearch') echo 'hidden';?>'></div>
@@ -73,24 +75,24 @@ var customed   = <?php echo (int)$customed;?>;
         <table class='table-1 fixed colored tablesorter datatable'>
           <thead>
           <tr class='colhead'>
-            <th class='w-id'>       <?php common::printOrderLink('id',       $orderBy, $vars, $lang->idAB);?></th>
-            <th class='w-severity'> <?php common::printOrderLink('severity', $orderBy, $vars, $lang->bug->severityAB);?></th>
-            <th class='w-pri'>      <?php common::printOrderLink('pri',      $orderBy, $vars, $lang->priAB);?></th>
+            <th class='w-id'>       <?php common::printOrderLink('id',          $orderBy, $vars, $lang->idAB);?></th>
+            <th class='w-severity'> <?php common::printOrderLink('severity',    $orderBy, $vars, $lang->bug->severityAB);?></th>
+            <th class='w-pri'>      <?php common::printOrderLink('pri',         $orderBy, $vars, $lang->priAB);?></th>
 
-            <th><?php common::printOrderLink('title', $orderBy, $vars, $lang->bug->title);?></th>
+            <th>                    <?php common::printOrderLink('title',       $orderBy, $vars, $lang->bug->title);?></th>
 
             <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-            <th class='w-80px'><?php common::printOrderLink('status',     $orderBy, $vars, $lang->bug->statusAB);?></th>
+            <th class='w-80px'><?php common::printOrderLink('status',           $orderBy, $vars, $lang->bug->statusAB);?></th>
             <?php endif;?>
 
             <?php if($browseType == 'needconfirm'):?>
-            <th class='w-p85'<?php common::printOrderLink('story', $orderBy, $vars, $lang->bug->story);?></th>
-            <th class='w-120px'><?php echo $lang->actions;?></th>
+            <th class='w-200px'><?php common::printOrderLink('story',           $orderBy, $vars, $lang->bug->story);?></th>
+            <th class='w-50px'><?php echo $lang->actions;?></th>
             <?php else:?>
             <th class='w-user'><?php common::printOrderLink('openedBy',         $orderBy, $vars, $lang->openedByAB);?></th>
 
             <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-            <th class='w-date'>  <?php common::printOrderLink('openedDate', $orderBy, $vars, $lang->bug->openedDateAB);?></th>
+            <th class='w-date'><?php common::printOrderLink('openedDate',       $orderBy, $vars, $lang->bug->openedDateAB);?></th>
             <?php endif;?>
 
             <th class='w-user'><?php common::printOrderLink('assignedTo',       $orderBy, $vars, $lang->assignedToAB);?></th>
@@ -98,7 +100,7 @@ var customed   = <?php echo (int)$customed;?>;
             <th class='w-resolution'><?php common::printOrderLink('resolution', $orderBy, $vars, $lang->bug->resolutionAB);?></th>
 
             <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-            <th class='w-date'>  <?php common::printOrderLink('resolvedDate', $orderBy, $vars, $lang->bug->resolvedDateAB);?></th>
+            <th class='w-date'><?php common::printOrderLink('resolvedDate',     $orderBy, $vars, $lang->bug->resolvedDateAB);?></th>
             <?php endif;?>
 
             <th class='w-100px {sorter:false}'><?php echo $lang->actions;?></th>
@@ -110,22 +112,22 @@ var customed   = <?php echo (int)$customed;?>;
           <?php $bugLink = inlink('view', "bugID=$bug->id");?>
           <tr class='a-center'>
             <td class='<?php echo $bug->status;?>' style="font-weight:bold">
-             <input type='checkbox' name='bugIDList[]'  value='<?php echo $bug->id;?>'/> 
-             <?php echo html::a($bugLink, sprintf('%03d', $bug->id));?>
+              <input type='checkbox' name='bugIDList[]'  value='<?php echo $bug->id;?>'/> 
+              <?php echo html::a($bugLink, sprintf('%03d', $bug->id));?>
             </td>
             <td><span class='<?php echo 'severity' . $bug->severity;?>'><?php echo $bug->severity;?></span></td>
             <td><span class='<?php echo 'pri' . $lang->bug->priList[$bug->pri];?>'><?php echo $lang->bug->priList[$bug->pri];?></span></td>
 
             <?php $class = 'confirm' . $bug->confirmed;?>
-            <td class='a-left nobr'><?php echo "<span class='$class'>[{$lang->bug->confirmedList[$bug->confirmed]}] </span>" . html::a($bugLink, $bug->title);?></td>
+            <td class='a-left' title="<?php echo $bug->title?>"><?php echo "<span class='$class'>[{$lang->bug->confirmedList[$bug->confirmed]}] </span>" . html::a($bugLink, $bug->title);?></td>
 
             <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
             <td><?php echo $lang->bug->statusList[$bug->status];?></td>
             <?php endif;?>
 
             <?php if($browseType == 'needconfirm'):?>
-            <td class='a-left nobr'><?php echo html::a($this->createLink('story', 'view', "stoyID=$bug->story"), $bug->storyTitle, '_blank');?></td>
-            <td><?php echo html::a(inlink('confirmStoryChange', "bugID=$bug->id"), $lang->confirm, 'hiddenwin')?></td>
+            <td class='a-left' title="<?php echo $bug->storyTitle?>"><?php echo html::a($this->createLink('story', 'view', "stoyID=$bug->story"), $bug->storyTitle, '_blank');?></td>
+            <td><?php $lang->bug->confirmStoryChange = $lang->confirm; common::printIcon('bug', 'confirmStoryChange', "bugID=$bug->id", '', 'list', '', 'hiddenwin')?></td>
             <?php else:?>
             <td><?php echo $users[$bug->openedBy];?></td>
 
@@ -156,14 +158,19 @@ var customed   = <?php echo (int)$customed;?>;
           </tbody>
           <tfoot>
             <tr>
-              <?php $columns = $this->cookie->windowWidth >= $this->config->wideSize ? 12 : 9;?>
+              <?php
+              $columns = $this->cookie->windowWidth >= $this->config->wideSize ? 12 : 9;
+              if($browseType == 'needconfirm') $columns = $this->cookie->windowWidth >= $this->config->wideSize ? 7 : 6; 
+              ?>
               <td colspan='<?php echo $columns;?>'>
+                <?php if(!empty($bugs)):?>
                 <div class='f-left'>
                   <?php 
                   echo html::selectAll() . html::selectReverse(); 
-                  if(common::hasPriv('bug', 'batchEdit') and $bugs) echo html::submitButton($lang->bug->batchEdit);
+                  if(common::hasPriv('bug', 'batchEdit') and $bugs) echo html::submitButton($lang->edit);
                  ?>
                 </div>
+                <?php endif?>
                 <div class='f-right'><?php $pager->show();?></div>
               </td>
             </tr>

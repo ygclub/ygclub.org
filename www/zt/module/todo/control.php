@@ -2,11 +2,11 @@
 /**
  * The control file of todo module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     todo
- * @version     $Id: control.php 3793 2012-12-13 06:34:30Z wyd621@gmail.com $
+ * @version     $Id: control.php 4513 2013-03-02 06:42:59Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 class todo extends control
@@ -20,6 +20,7 @@ class todo extends control
     public function __construct()
     {
         parent::__construct();
+        $this->app->loadClass('date');
         $this->loadModel('task');
         $this->loadModel('bug');
         $this->loadModel('my')->setMenu();
@@ -35,24 +36,33 @@ class todo extends control
      */
     public function create($date = 'today', $account = '')
     {
-        if($date == 'today') $date = $this->todo->today();
+        if($date == 'today') $date = date::today();
         if($account == '')   $account = $this->app->user->account;
         if(!empty($_POST))
         {
             $todoID = $this->todo->create($date, $account);
             if(dao::isError()) die(js::error(dao::getError()));
             $this->loadModel('action')->create('todo', $todoID, 'opened');
-            die(js::locate($this->createLink('my', 'todo', "date=" . str_replace('-', '', $this->post->date)), 'parent'));
+            $date = str_replace('-', '', $this->post->date);
+            if($date == '')
+            {
+                $date = 'future'; 
+            }
+            else if($date == date('Ymd'))
+            {
+                $date = 'today'; 
+            }
+            die(js::locate($this->createLink('my', 'todo', "type=$date"), 'parent'));
         }
 
-        $header['title'] = $this->lang->my->common . $this->lang->colon . $this->lang->todo->create;
-        $position[]      = $this->lang->todo->create;
+        $title      = $this->lang->my->common . $this->lang->colon . $this->lang->todo->create;
+        $position[] = $this->lang->todo->create;
 
-        $this->view->header   = $header;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->date     = strftime("%Y-%m-%d", strtotime($date));
-        $this->view->times    = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
-        $this->view->time     = $this->todo->now();
+        $this->view->times    = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+        $this->view->time     = date::now();
         $this->display();
     }
 
@@ -74,17 +84,25 @@ class todo extends control
 
             /* Locate the browser. */
             $date = str_replace('-', '', $this->post->date);
-            die(js::locate($this->createLink('my', 'todo', "date=$date"), 'parent'));
+            if($date == '')
+            {
+                $date = 'future'; 
+            }
+            else if($date == date('Ymd'))
+            {
+                $date= 'today'; 
+            }
+            die(js::locate($this->createLink('my', 'todo', "type=$date"), 'parent'));
         }
 
-        $header['title'] = $this->lang->my->common . $this->lang->colon . $this->lang->todo->create;
-        $position[]      = $this->lang->todo->create;
+        $title      = $this->lang->my->common . $this->lang->colon . $this->lang->todo->create;
+        $position[] = $this->lang->todo->create;
 
-        $this->view->header   = $header;
+        $this->view->title    = $title;
         $this->view->position = $position;
         $this->view->date     = (int)$date == 0 ? $date : date('Y-m-d', strtotime($date));
-        $this->view->times    = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
-        $this->view->time     = $this->todo->now();
+        $this->view->times    = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+        $this->view->time     = date::now();
 
         $this->display();
     }
@@ -114,13 +132,13 @@ class todo extends control
         $todo = $this->todo->getById($todoID);
         if($todo->private and $this->app->user->account != $todo->account) die('private');
        
-        $todo->date      = strftime("%Y-%m-%d", strtotime($todo->date));
-        $header['title'] = $this->lang->my->common . $this->lang->colon . $this->lang->todo->edit;
-        $position[]      = $this->lang->todo->edit;
+        $todo->date = strftime("%Y-%m-%d", strtotime($todo->date));
+        $title      = $this->lang->my->common . $this->lang->colon . $this->lang->todo->edit;
+        $position[] = $this->lang->todo->edit;
 
-        $this->view->header   = $header;
+        $this->view->title    = $title;
         $this->view->position = $position;
-        $this->view->times    = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+        $this->view->times    = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
         $this->view->todo     = $todo;
         $this->display();
     }
@@ -176,17 +194,17 @@ class todo extends control
             $this->app->session->set('showSuhosinInfo', $showSuhosinInfo);
 
             /* Assign. */
-            $header['title'] = $this->lang->my->common . $this->lang->colon . $this->lang->todo->batchEdit;
-            $position[]      = $this->lang->todo->common;
-            $position[]      = $this->lang->todo->batchEdit;
+            $title      = $this->lang->my->common . $this->lang->colon . $this->lang->todo->batchEdit;
+            $position[] = $this->lang->todo->common;
+            $position[] = $this->lang->todo->batchEdit;
 
             if($showSuhosinInfo) $this->view->suhosinInfo = $this->lang->suhosinInfo;
             $this->view->bugs        = $bugs;
             $this->view->tasks       = $tasks;
             $this->view->editedTodos = $editedTodos;
-            $this->view->times       = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
-            $this->view->time        = $this->todo->now();
-            $this->view->header      = $header;
+            $this->view->times       = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+            $this->view->time        = date::now();
+            $this->view->title       = $title;
             $this->view->position    = $position;
 
             $this->display();
@@ -231,13 +249,13 @@ class todo extends control
         $this->loadModel('user')->setMenu($this->user->getPairs(), $todo->account);
         $this->lang->set('menugroup.todo', $from);
 
-        $this->view->header->title = "TODO #$todo->id $todo->name";
-        $this->view->position[]    = $this->lang->todo->view;
-        $this->view->todo          = $todo;
-        $this->view->times         = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
-        $this->view->users         = $this->user->getPairs('noletter');
-        $this->view->actions       = $this->loadModel('action')->getList('todo', $todoID);
-        $this->view->from          = $from;
+        $this->view->title      = "TODO #$todo->id $todo->name";
+        $this->view->position[] = $this->lang->todo->view;
+        $this->view->todo       = $todo;
+        $this->view->times      = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+        $this->view->users      = $this->user->getPairs('noletter');
+        $this->view->actions    = $this->loadModel('action')->getList('todo', $todoID);
+        $this->view->from       = $from;
 
         $this->display();
     }
@@ -266,26 +284,22 @@ class todo extends control
     }
 
     /**
-     * Mark status of a todo.
+     * Finish a todo.
      * 
      * @param  int    $todoID 
-     * @param  string $status   wait|doing|done
      * @access public
      * @return void
      */
-    public function mark($todoID, $status)
+    public function finish($todoID)
     {
-        $this->todo->mark($todoID, $status);
+        $this->todo->finish($todoID);
         $todo = $this->todo->getById($todoID);
-        if($todo->status == 'done')
+        if($todo->type == 'bug' or $todo->type == 'task')
         {
-            if($todo->type == 'bug' or $todo->type == 'task')
-            {
-                $confirmNote = 'confirm' . ucfirst($todo->type);
-                $confirmURL  = $this->createLink($todo->type, 'view', "id=$todo->idvalue");
-                $cancelURL   = $this->server->HTTP_REFERER;
-                die(js::confirm(sprintf($this->lang->todo->$confirmNote, $todo->idvalue), $confirmURL, $cancelURL, 'parent', 'parent'));
-            }
+            $confirmNote = 'confirm' . ucfirst($todo->type);
+            $confirmURL  = $this->createLink($todo->type, 'view', "id=$todo->idvalue");
+            $cancelURL   = $this->server->HTTP_REFERER;
+            die(js::confirm(sprintf($this->lang->todo->$confirmNote, $todo->idvalue), $confirmURL, $cancelURL, 'parent', 'parent'));
         }
         die(js::reload('parent'));
     }
@@ -299,7 +313,7 @@ class todo extends control
     public function import2Today()
     {
         $todoIDList = $this->post->todoIDList;
-        $today      = $this->todo->today();
+        $today      = date::today();
         $this->dao->update(TABLE_TODO)->set('date')->eq($today)->where('id')->in($todoIDList)->exec();
         die(js::locate($this->session->todoList));
     }
@@ -339,7 +353,7 @@ class todo extends control
             $users    = $this->loadModel('user')->getPairs('noletter');
             $bugs     = $this->loadModel('bug')->getUserBugPairs($account);
             $tasks    = $this->loadModel('task')->getUserTaskPairs($account);
-            $times    = $this->todo->buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+            $times    = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
 
             foreach($todos as $todo)
             {

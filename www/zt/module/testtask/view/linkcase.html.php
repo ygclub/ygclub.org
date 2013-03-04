@@ -2,11 +2,11 @@
 /**
  * The linkcase view file of testtask module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: linkcase.html.php 3794 2012-12-13 08:07:07Z wyd621@gmail.com $
+ * @version     $Id: linkcase.html.php 4411 2013-02-22 00:56:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -17,9 +17,15 @@
 <table class='table-1 colored tablesorter fixed'>
   <caption class='caption-tl'>
     <div class='f-left'><?php echo $lang->testtask->unlinkedCases;?></div>
-    <div class='f-right'><?php echo html::a($this->session->testtaskList, $lang->goback);?></div>
-    <div class='f-right'><?php echo html::a($this->createLink('testtask', 'linkcase', "taskID=$taskID&param=bybug"), $lang->testtask->linkByBug);?></div>
-    <div class='f-right'><?php echo html::a($this->createLink('testtask', 'linkcase', "taskID=$taskID&param=bystory"), $lang->testtask->linkByStory);?></div>
+    <div class='f-right'>
+      <?php
+      $lang->testtask->linkCase = $lang->testtask->linkByStory;
+      common::printIcon('testtask', 'linkCase', "taskID=$taskID&param=bystory");
+      $lang->testtask->linkCase = $lang->testtask->linkByBug;
+      common::printIcon('testtask', 'linkCase', "taskID=$taskID&param=bybug");
+      common::printRPN($this->session->testtaskList);
+      ?>
+    </div>
   </caption>
   <thead>
   <tr class='colhead'>
@@ -60,7 +66,9 @@
   <tfoot> 
   <tr>
     <td colspan='7'>
+      <?php if($cases):?>
       <div class='f-left'><?php echo html::selectAll() . html::selectReverse() . html::submitButton();?></div>
+      <?php endif;?>
       <div class='f-right'><?php $pager->show();?></div>
     </td>
   </tr>

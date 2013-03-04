@@ -2,11 +2,11 @@
 /**
  * The edit view of task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: edit.html.php 3788 2012-12-13 03:21:12Z zhujinyonging@gmail.com $
+ * @version     $Id: edit.html.php 4566 2013-03-03 02:10:12Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -46,7 +46,7 @@ userList               = "<?php echo join(',', array_keys($users));?>".split(','
           </fieldset>
         </td></tr>
       </table>
-      <div class='a-center'><?php echo html::submitButton() . html::linkButton($lang->goback, $this->inlink('view', "taskID=$task->id"));?></div>
+      <div class='a-center'><?php echo html::submitButton() . html::linkButton($lang->goback, $this->inlink('view', "taskID=$task->id")) .html::hidden('consumed', $task->consumed);?></div>
       <?php include '../../common/view/action.html.php';?>
     </td>
     <td class='divider'></td>
@@ -60,7 +60,7 @@ userList               = "<?php echo join(',', array_keys($users));?>".split(','
           </tr>  
           <tr>
             <th class='rowhead w-p20'><?php echo $lang->task->module;?></th>
-            <td><span id="moduleIdBox"><?php echo html::select('module', $modules, $task->module);?></span></td>
+            <td><span id="moduleIdBox"><?php echo html::select('module', $modules, $task->module, 'class="select-1"');?></span></td>
           </tr>  
           <tr>
             <th class='rowhead'><?php echo $lang->task->story;?></th>
@@ -109,7 +109,7 @@ userList               = "<?php echo join(',', array_keys($users));?>".split(','
           </tr>  
           <tr>
             <th class='rowhead'><?php echo $lang->task->consumed;?></th>
-            <td><?php echo html::input('consumed', $task->consumed, "class='text-1'");?></td>
+            <td><?php echo $task->consumed . ' '; common::printIcon('task', 'recordEstimate',   "taskID=$task->id", $task, 'list', '', '', 'iframe', true);?></td>
           </tr>  
           <tr>
             <th class='rowhead'><?php echo $lang->task->left;?></th>

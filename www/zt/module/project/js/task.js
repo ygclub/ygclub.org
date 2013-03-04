@@ -1,22 +1,22 @@
-/* Browse by module. */
-function browseByModule()
-{
-    $('#querybox').addClass('hidden');
-    $('#featurebar .active').removeClass('active');
-    $('#bymoduleTab').addClass('active');
-}
-
 $(function()
 {
-    $('#' + browseType + 'Tab').addClass('active');
+    setOuterBox();
     if(browseType == 'bysearch') ajaxGetSearchForm();
+    $('.iframe').colorbox({width:900, height:500, iframe:true, transition:'none', onCleanup:function(){parent.location.href=parent.location.href;}});
 });
 
-/* Browse by project. */
-function browseByProject()
+function showProject()
 {
-    $('#querybox').addClass('hidden');
-    $('#byProjectTab').addClass('active');
-    $('#featurebar .active').removeClass('active');
+    $('#sidebar').hide();
+    $('#project').show();
+    $('#project-divider').show();
+    $.cookie('projectBar', 'show');
 }
 
+function hideProject()
+{
+    $('#sidebar').show();
+    $('#project').hide();
+    $('#project-divider').hide();
+    $.cookie('projectBar', 'hide');
+}

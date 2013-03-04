@@ -2,11 +2,11 @@
 /**
  * The report module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     report
- * @version     $Id: en.php 3381 2012-08-09 09:25:12Z zhujinyonging@gmail.com $
+ * @version     $Id: en.php 4424 2013-02-22 03:19:24Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->report->common     = 'Report';
@@ -68,5 +68,18 @@ $lang->report->to            = 'to';
 $lang->report->taskTotal     = "Task Total";
 $lang->report->manhourTotal  = "Manhour Total";
 $lang->report->bugTotal      = "%s Bugs";
+$lang->report->unplanned     = 'unplanned';
+
+/* daily reminder. */
+$lang->report->idAB  = 'ID';
+$lang->report->bugTitle = 'Bug Title';
+$lang->report->taskName = 'Task Name';
+$lang->report->todoName = 'Todo Name';
+
+$lang->report->mailtitle        = new stdclass();
+$lang->report->mailtitle->begin = 'Notice : Your';
+$lang->report->mailtitle->bug   = " Bugs(%s),";
+$lang->report->mailtitle->task  = " Tasks(%s),";
+$lang->report->mailtitle->todo  = " Todos(%s),";
 
 $lang->report->proVersion = '<a href="http://www.zentao.net/goto.php?item=proversion&from=reportpage" target="_blank">Try pro version for more!</a>';

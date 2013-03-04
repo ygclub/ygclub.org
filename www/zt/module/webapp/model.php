@@ -2,7 +2,7 @@
 /**
  * The model file of webapp module of ZenTaoCMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yidong Wang <Yidong@cnezsoft.com>
  * @package     webapp
@@ -62,8 +62,6 @@ class webappModel extends model
             $module = trim($module, '/');
             $this->lang->webapp->menu->$moduleID = array('link' => "$module|webapp|index|module=$moduleID");
         }
-        $this->lang->webapp->menu->manageTree = array('link' => "{$this->lang->webapp->manageTree}|tree|browse|rootID=0&view=webapp", 'float' => 'right');
-        $this->lang->webapp->menu->create     = array('link' => "{$this->lang->webapp->create}|webapp|create", 'float' => 'right');
     }
 
 
@@ -153,6 +151,21 @@ class webappModel extends model
     }
 
     /**
+     * Add downloads of webapp by api.
+     * 
+     * @param  int    $webappID 
+     * @access public
+     * @return void
+     */
+    public function addDownloadByAPI($webappID)
+    {
+        $apiURL = $this->apiRoot . "downloadApp-$webappID.json";
+        $data   = $this->fetchAPI($apiURL);
+
+        return $data;
+    }
+
+    /**
      * Get webapps by status.
      * 
      * @param  string    $status 
@@ -206,7 +219,7 @@ class webappModel extends model
      */
     public function install($webappID)
     {
-        $data = $this->getAppInfoByAPI($webappID);
+        $data   = $this->getAppInfoByAPI($webappID);
         $webapp = $data->webapp;
 
         $installWebapp->appid     = $webapp->id;
@@ -215,14 +228,19 @@ class webappModel extends model
         $installWebapp->author    = $webapp->author;
         $installWebapp->url       = $webapp->url;
         $installWebapp->icon      = $webapp->icon ? $this->config->webapp->url . $webapp->icon : '';
-        $installWebapp->target    = $webapp->target;
+        $installWebapp->target    = empty($webapp->target) ? 'blank' : $webapp->target;
         $installWebapp->size      = $webapp->size;
+        $installWebapp->abstract  = $webapp->abstract;
         $installWebapp->desc      = $webapp->desc;
         $installWebapp->addedBy   = $this->app->user->account;
         $installWebapp->addedDate = helper::now();
 
         $this->dao->insert(TABLE_WEBAPP)->data($installWebapp)->autocheck()->exec();
-        return $this->dao->lastInsertID(); 
+        if(!dao::isError())
+        {
+            $this->addDownloadByAPI($webappID);
+            return $this->dao->lastInsertID(); 
+        }
     }
 
     /**

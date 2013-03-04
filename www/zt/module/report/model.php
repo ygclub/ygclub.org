@@ -2,11 +2,11 @@
 /**
  * The model file of report module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     report
- * @version     $Id: model.php 3819 2012-12-17 01:25:52Z wyd621@gmail.com $
+ * @version     $Id: model.php 4482 2013-02-27 02:21:18Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -86,9 +86,9 @@ EOT;
         $height  = $height . 'px';
         $maxDays = $this->config->project->maxBurnDay;
 
-        $dataJSON    = $flotJSON['data'];
-        $limitJSON   = $flotJSON['limit'];
-        $reflineJSON = $flotJSON['refline'];
+        $dataJSON     = $flotJSON['data'];
+        $limitJSON    = $flotJSON['limit'];
+        $baselineJSON = $flotJSON['baseline'];
 return <<<EOT
 <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="{$jsRoot}jquery/flot/excanvas.min.js"></script><![endif]-->
 <script language="javascript" type="text/javascript" src="{$jsRoot}jquery/flot/jquery.flot.min.js"></script>
@@ -97,9 +97,9 @@ return <<<EOT
 <script type="text/javascript">
 $(function () 
 {
-    var data    = $dataJSON;
-    var limit   = $limitJSON;
-    var refline = $reflineJSON;
+    var data     = $dataJSON;
+    var limit    = $limitJSON;
+    var baseline = $baselineJSON;
     function showTooltip(x, y, contents) 
     {
         $('<div id="tooltip">' + contents + '</div>').css
@@ -147,7 +147,7 @@ $(function ()
                 points: {show: true}
             },
             {
-                data:refline,
+                data:baseline,
                 color: "rgb(235, 12, 10)",
                 hoverable: false,
                 lines:  {show: true, lineWidth:0.5, lineType:'dashed', style:'dashed'},
@@ -313,6 +313,8 @@ EOT;
             ->fetchAll();
         foreach($stories as $story)
         {
+            if(!isset($projects[$story->project])) $projects[$story->project] = new stdclass();
+
             $projects[$story->project]->stories = isset($projects[$story->project]->stories) ? $projects[$story->project]->stories + 1 : 1;
         }
 
@@ -361,6 +363,18 @@ EOT;
             {
                 $plan = $plans[$story->plan];
                 $products[$plan->product]->plans[$story->plan]->status[$story->status] = isset($products[$plan->product]->plans[$story->plan]->status[$story->status]) ? $products[$plan->product]->plans[$story->plan]->status[$story->status] + 1 : 1;
+            }
+        }
+        $unplannedStories = $this->dao->select('product, id, status')->from(TABLE_STORY)->where('deleted')->eq(0)->andWhere('plan')->eq(0)->andWhere('product')->in(array_keys($products))->fetchGroup('product', 'id');
+        foreach($unplannedStories as $product => $stories)
+        {
+            $products[$product]->plans[0] = new stdClass();
+            $products[$product]->plans[0]->title = $this->lang->report->unplanned;
+            $products[$product]->plans[0]->begin = '';
+            $products[$product]->plans[0]->end   = '';
+            foreach($stories as $story) 
+            {
+                $products[$product]->plans[0]->status[$story->status] = isset($products[$product]->plans[0]->status[$story->status]) ? $products[$product]->plans[0]->status[$story->status] + 1 : 1;
             }
         }
         return $products;
@@ -455,5 +469,94 @@ EOT;
         }
         unset($assign['closed']);
         return $assign;
+    }
+
+    /**
+     * Get System URL.
+     * 
+     * @access public
+     * @return void
+     */
+    public function getSysURL()
+    {
+        /* Ger URL when run in shell. */
+        if(defined('IN_SHELL'))
+        {
+            $url = parse_url(trim($this->server->argv[1]));
+            $port = (empty($url['port']) or $url['port'] == 80) ? '' : $url['port'];
+            $host = empty($port) ? $url['host'] : $url['host'] . ':' . $port;
+            return $url['scheme'] . '://' . $host;
+        }
+        else
+        {
+            return common::getSysURL();
+        }
+    }
+
+    /**
+     * Get user bugs.
+     * 
+     * @access public
+     * @return void
+     */
+    public function getUserBugs()
+    {
+        $bugs = $this->dao->select('t1.id, t1.title, t2.account as user')
+            ->from(TABLE_BUG)->alias('t1')
+            ->leftJoin(TABLE_USER)->alias('t2')
+            ->on('t1.assignedTo = t2.account')
+            ->where('t1.assignedTo')->ne('')
+            ->andWhere('t1.assignedTo')->ne('closed')
+            ->andWhere('t1.deleted')->eq(0)
+            ->andWhere('t2.deleted')->eq(0)
+            ->fetchGroup('user');
+        return $bugs;
+    }
+
+    /**
+     * Get user tasks.
+     * 
+     * @access public
+     * @return void
+     */
+    public function getUserTasks()
+    {
+        $tasks = $this->dao->select('t1.id, t1.name, t2.account as user')
+            ->from(TABLE_TASK)->alias('t1')
+            ->leftJoin(TABLE_USER)->alias('t2')
+            ->on('t1.assignedTo = t2.account')
+            ->where('t1.assignedTo')->ne('')
+            ->andWhere('t1.deleted')->eq(0)
+            ->andWhere('t2.deleted')->eq(0)
+            ->andWhere('t1.status')->in('wait, doing')
+            ->fetchGroup('user');
+
+        return $tasks;
+    }
+
+    /**
+     * Get user todos.
+     * 
+     * @access public
+     * @return void
+     */
+    public function getUserTodos()
+    {
+        $stmt = $this->dao->select('t1.*, t2.account as user')
+            ->from(TABLE_TODO)->alias('t1')
+            ->leftJoin(TABLE_USER)->alias('t2')
+            ->on('t1.account = t2.account')
+            ->where('t1.status')->eq('wait')
+            ->orWhere('t1.status')->eq('doing')
+            ->query();
+
+        $todos = array();
+        while($todo = $stmt->fetch())
+        {
+            if($todo->type == 'task') $todo->name = $this->dao->findById($todo->idvalue)->from(TABLE_TASK)->fetch('name');
+            if($todo->type == 'bug')  $todo->name = $this->dao->findById($todo->idvalue)->from(TABLE_BUG)->fetch('title');
+            $todos[$todo->user][] = $todo;
+        }
+        return $todos;
     }
 }

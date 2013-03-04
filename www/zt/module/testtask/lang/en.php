@@ -2,11 +2,11 @@
 /**
  * The testtask module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: en.php 3860 2012-12-19 10:08:20Z wyd621@gmail.com $
+ * @version     $Id: en.php 4490 2013-02-27 03:27:05Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->testtask->index          = "Index";
@@ -25,7 +25,10 @@ $lang->testtask->results        = "Result";
 $lang->testtask->createBug      = "Bug(+)";
 $lang->testtask->assign         = 'Assign';
 $lang->testtask->cases          = 'Cases';
+$lang->testtask->pre            = 'Previous';
 $lang->testtask->next           = 'Next';
+$lang->testtask->start          = "Start";
+$lang->testtask->close          = "Close";
 
 $lang->testtask->common         = 'Test task';
 $lang->testtask->id             = 'ID';
@@ -44,6 +47,7 @@ $lang->testtask->linkVersion    = 'Version';
 $lang->testtask->lastRunAccount = "Run";
 $lang->testtask->lastRunTime    = 'Time';
 $lang->testtask->lastRunResult  = 'Result';
+$lang->testtask->report         = 'Report';
 
 $lang->testtask->statusList['wait']    = 'Pending';
 $lang->testtask->statusList['doing']   = 'In progress';

@@ -2,18 +2,18 @@
 /**
  * The view file of case module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
- * @version     $Id: view.html.php 3771 2012-12-12 01:40:52Z zhujinyonging@gmail.com $
+ * @version     $Id: view.html.php 4385 2013-02-19 07:23:06Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/colorize.html.php';?>
-<div id='titlebar' <?php if($case->deleted) echo "class='deleted'";?>>
-  <div id='main'>CASE #<?php echo $case->id . ' ' . $case->title;?></div>
+<div id='titlebar'>
+  <div id='main' <?php if($case->deleted) echo "class='deleted'";?>>CASE #<?php echo $case->id . ' ' . $case->title;?></div>
   <div>
     <?php
     $browseLink  = $app->session->caseList != false ? $app->session->caseList : $this->createLink('testcase', 'browse', "productID=$case->product");
@@ -22,10 +22,10 @@
     {
         ob_start();
 
-        common::printIcon('testtask', 'runCase', "runID=0&caseID=$case->id&version=$case->currentVersion");
-        common::printIcon('testtask', 'results', "runID=0&caseID=$case->id&version=$case->version");
+        common::printIcon('testtask', 'runCase', "runID=0&caseID=$case->id&version=$case->currentVersion", '', 'button', '', '', 'runCase');
+        common::printIcon('testtask', 'results', "runID=0&caseID=$case->id&version=$case->version", '', 'button', '', '', 'results');
 
-        common::printIcon('testcase', 'createBug', "product=$case->product&extra=caseID=$case->id,version=$case->version,runID=", '', 'button', 'createBug');
+        if($case->lastRunResult == 'fail') common::printIcon('testcase', 'createBug', "product=$case->product&extra=caseID=$case->id,version=$case->version,runID=", '', 'button', 'createBug');
 
         common::printDivider();
         common::printIcon('testcase', 'edit',"caseID=$case->id");
@@ -39,6 +39,10 @@
         $actionLinks = ob_get_contents();
         ob_clean();
         echo $actionLinks;
+    }
+    else
+    {
+        common::printRPN($browseLink);
     }
     ?>
   </div>
@@ -95,34 +99,34 @@
           <tr>
             <td class='rowhead w-p20'><?php echo $lang->testcase->module;?></td>
             <td>
-            <?php 
-            if(empty($modulePath))
-            {
-                echo "/";
-            }
-            else
-            {
-               foreach($modulePath as $key => $module)
-               {
-                   if(!common::printLink('testcase', 'browse', "productID=$case->product&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
-                   if(isset($modulePath[$key + 1])) echo $lang->arrow;
-               }
-            }
-            ?>
+              <?php 
+              if(empty($modulePath))
+              {
+                  echo "/";
+              }
+              else
+              {
+                 foreach($modulePath as $key => $module)
+                 {
+                     if(!common::printLink('testcase', 'browse', "productID=$case->product&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
+                     if(isset($modulePath[$key + 1])) echo $lang->arrow;
+                 }
+              }
+              ?>
             </td>
           </tr>
           <tr class='nofixed'>
             <td class='rowhead'><?php echo $lang->testcase->story;?></td>
             <td>
-<?php
-        if(isset($case->storyTitle)) echo html::a($this->createLink('story', 'view', "storyID=$case->story"), "#$case->story:$case->storyTitle");
-        if($case->story and $case->storyStatus == 'active' and $case->latestStoryVersion > $case->storyVersion)
-        {
-            echo "(<span class='warning'>{$lang->story->changed}</span> ";
-            echo html::a($this->createLink('testcase', 'confirmStoryChange', "caseID=$case->id"), $lang->confirm, 'hiddenwin');
-            echo ")";
-        }
-?>
+                <?php
+                if(isset($case->storyTitle)) echo html::a($this->createLink('story', 'view', "storyID=$case->story"), "#$case->story:$case->storyTitle");
+                if($case->story and $case->storyStatus == 'active' and $case->latestStoryVersion > $case->storyVersion)
+                {
+                    echo "(<span class='warning'>{$lang->story->changed}</span> ";
+                    echo html::a($this->createLink('testcase', 'confirmStoryChange', "caseID=$case->id"), $lang->confirm, 'hiddenwin');
+                    echo ")";
+                }
+                ?>
             </td>
           </tr>
           <tr>
@@ -132,17 +136,17 @@
           <tr>
             <td class='rowhead w-p20'><?php echo $lang->testcase->stage;?></td>
             <td>
-<?php 
-        if($case->stage)
-        {
-            $stags = explode(',', $case->stage);
-            foreach($stags as $stage)
-            {
-                isset($lang->testcase->stageList[$stage]) ? print($lang->testcase->stageList[$stage]) : print($stage);
-                echo "<br />";
-            }
-        }
-?>
+              <?php 
+              if($case->stage)
+              {
+                  $stags = explode(',', $case->stage);
+                  foreach($stags as $stage)
+                  {
+                      isset($lang->testcase->stageList[$stage]) ? print($lang->testcase->stageList[$stage]) : print($stage);
+                      echo "<br />";
+                  }
+              }
+              ?>
             </td>
           </tr>
           <tr>
@@ -168,15 +172,15 @@
           <tr>
             <td class='rowhead'><?php echo $lang->testcase->linkCase;?></td>
             <td>
-<?php
-        if(isset($case->linkCaseTitles))
-        {
-            foreach($case->linkCaseTitles as $linkCaseID => $linkCaseTitle)
-            {
-                echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID"), "#$linkCaseID $linkCaseTitle", '_blank') . '<br />';
-            }
-        }
-?>
+              <?php
+              if(isset($case->linkCaseTitles))
+              {
+                  foreach($case->linkCaseTitles as $linkCaseID => $linkCaseTitle)
+                  {
+                      echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID"), "#$linkCaseID $linkCaseTitle", '_blank') . '<br />';
+                  }
+              }
+              ?>
             </td>
           </tr>
         </table>

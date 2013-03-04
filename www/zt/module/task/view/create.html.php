@@ -2,11 +2,11 @@
 /**
  * The create view of task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: create.html.php 3887 2012-12-24 10:06:50Z wwccss $
+ * @version     $Id: create.html.php 4416 2013-02-22 01:45:01Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -15,14 +15,8 @@
 <?php include '../../common/view/autocomplete.html.php';?>
 <?php include '../../common/view/chosen.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
-<script> var holders = <?php echo json_encode($lang->task->placeholder);?></script>
-<script language='javascript'> var userList = "<?php echo join(',', array_keys($users));?>".split(',');</script>
-<script language='Javascript'>
-$(function()
-{
-     $("#preview").colorbox({width:960, height:500, iframe:true, transition:'elastic', speed:350, scrolling:true});
-})
-</script>
+<?php js::set('holders',  $lang->task->placeholder); ?>
+<?php js::set('userList', array_keys($users)); ?>
 <form method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
   <table align='center' class='table-1 a-left'> 
     <caption>
@@ -38,10 +32,12 @@ $(function()
       <th class='rowhead'><?php echo $lang->task->project;?></th>
       <td><?php echo $project->name;?></td>
     </tr>  
+    <?php if($project->type != 'sprint'):?>
     <tr>
       <th class='rowhead'><?php echo $lang->task->module;?></th>
       <td><span id='moduleIdBox'><?php echo html::select('module', $moduleOptionMenu, $moduleID, "class='select-3'");?></span></td>
     </tr>  
+    <?php endif;?>
     <tr>
       <th class='rowhead'><?php echo $lang->task->assignedTo;?></th>
       <td><?php echo html::select('assignedTo[]', $members, '', 'class=select-3');?></td>

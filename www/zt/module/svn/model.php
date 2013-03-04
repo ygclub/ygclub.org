@@ -2,7 +2,7 @@
 /**
  * The model file of svn module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     svn
@@ -428,6 +428,7 @@ class svnModel extends model
      */
     public function saveAction2PMS($objects, $log, $repoRoot = '')
     {
+        $action = new stdclass();
         $action->actor   = $log->author;
         $action->action  = 'svncommited';
         $action->date    = $log->date;

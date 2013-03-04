@@ -2,19 +2,22 @@
 /**
  * The html template file of index method of index module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     ZenTaoPMS
- * @version     $Id: index.html.php 3901 2012-12-25 06:42:39Z wwccss $
+ * @version     $Id: index.html.php 4129 2013-01-18 01:58:14Z wwccss $
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/sparkline.html.php';?>
 <?php include '../../common/view/colorize.html.php';?>
 <h3>
-  <?php echo html::a(inlink("index", "locate=no&status=undone&projectID=$project->id"), $lang->project->unDoneProjects);?>
-  <?php echo html::a(inlink("index", "locate=no&status=done&projectID=$project->id"), $lang->project->doneProjects);?>
+  <?php echo html::a(inlink("index", "locate=no&status=all&projectID=$project->id"), $lang->project->all);?>
+  <?php echo html::a(inlink("index", "locate=no&status=wait&projectID=$project->id"), $lang->project->statusList['wait']);?>
+  <?php echo html::a(inlink("index", "locate=no&status=doing&projectID=$project->id"), $lang->project->statusList['doing']);?>
+  <?php echo html::a(inlink("index", "locate=no&status=suspended&projectID=$project->id"), $lang->project->statusList['suspended']);?>
+  <?php echo html::a(inlink("index", "locate=no&status=done&projectID=$project->id"), $lang->project->statusList['done']);?>
 </h3>
 <table class='table-1 fixed colored'>
   <tr class='colhead'>

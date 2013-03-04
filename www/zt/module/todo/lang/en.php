@@ -2,11 +2,11 @@
 /**
  * The todo module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     todo
- * @version     $Id: en.php 3753 2012-12-11 05:51:16Z wwccss $
+ * @version     $Id: en.php 4480 2013-02-27 01:57:22Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->todo->common       = 'TODO';
@@ -17,10 +17,7 @@ $lang->todo->edit         = "Edit";
 $lang->todo->batchEdit    = "Batch edit";
 $lang->todo->view         = "Info";
 $lang->todo->viewAB       = "Info";
-$lang->todo->markDone     = "Undone";
-$lang->todo->markWait     = "Done";
-$lang->todo->markDoing    = "Done";
-$lang->todo->mark         = "Change status";
+$lang->todo->finish       = "Finish";
 $lang->todo->export       = "Export";
 $lang->todo->delete       = "Delete";
 $lang->todo->browse       = "Browse";
@@ -43,10 +40,6 @@ $lang->todo->desc        = 'Desc';
 $lang->todo->private     = 'Private';
 $lang->todo->idvalue     = 'Task or bug';
 
-$lang->todo->week         = '(l)';  // date function's param.
-$lang->todo->today        = 'Today';
-$lang->todo->weekDateList = '';
-$lang->todo->dayInFuture  = 'Future';
 $lang->todo->confirmBug   = 'This todo linked to bug #%s，chang it also?';
 $lang->todo->confirmTask  = 'This todo linked to task #%s，chang it also?';
 
@@ -70,17 +63,19 @@ $lang->todo->successMarked  = "Successfully changed status";;
 $lang->todo->thisIsPrivate  = 'This is a private todo。:)';
 $lang->todo->lblDisableDate = 'Set time lately';
 
-$lang->todo->thisWeekTodos   = 'This week';
-$lang->todo->lastWeekTodos   = 'Last week';
-$lang->todo->futureTodos     = 'Future';
-$lang->todo->allDaysTodos    = 'All';
-$lang->todo->allUndone       = 'Undone';
-$lang->todo->todayTodos      = 'Today';
-$lang->todo->yesterdayTodos  = 'Yesterday';
-$lang->todo->lastmonthTodos  = 'Last Month';
-$lang->todo->thisseasonTodos = 'This Season';
-$lang->todo->thisyearTodos   = 'This Year';
-$lang->todo->thismonthTodos  = 'This Month';
+$lang->todo->periods['today']      = 'Today';
+$lang->todo->periods['yesterday']  = 'Yesterday';
+$lang->todo->periods['thisWeek']   = 'This week';
+$lang->todo->periods['lastWeek']   = 'Last week';
+$lang->todo->periods['thisMonth']  = 'This month';
+$lang->todo->periods['lastmonth']  = 'Last month';
+$lang->todo->periods['thisSeason'] = 'This season';
+$lang->todo->periods['thisYear']   = 'This year';
+$lang->todo->periods['future']     = 'Future';
+$lang->todo->periods['before']     = 'Undone';
+$lang->todo->periods['all']        = 'All';
 
 $lang->todo->action = new stdclass();
-$lang->todo->action->marked  = array('main' => '$date, Change status to <stong>$extra</strong> by <strong>$actor</strong>。', 'extra' => $lang->todo->statusList);
+$lang->todo->action->finished = array('main' => '$date, Finished by <strong>$actor</strong>');
+$lang->todo->action->marked   = array('main' => '$date, Change status to <stong>$extra</strong> by <strong>$actor</strong>。', 'extra' => $lang->todo->statusList);
+

@@ -2,11 +2,11 @@
 /**
  * The browse view file of dept module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     dept
- * @version     $Id: browse.html.php 2605 2012-02-21 07:22:58Z wwccss $
+ * @version     $Id: browse.html.php 4157 2013-01-20 07:09:42Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -17,7 +17,7 @@
     <td class='side'>
       <form method='post' target='hiddenwin' action='<?php echo $this->createLink('dept', 'updateOrder');?>'>
         <table class='table-1'>
-          <caption><?php echo $header->title;?></caption>
+          <caption><?php echo $title;?></caption>
           <tr>
             <td>
               <div id='main'><?php echo $depts;?></div>
@@ -54,7 +54,8 @@
             </td>
           </tr>
           <tr>
-            <td class='a-center' colspan='2'>
+            <td></td>
+            <td>
               <?php echo html::submitButton() . html::resetButton();?>
               <input type='hidden' value='<?php echo $deptID;?>' name='parentDeptID' />
             </td>

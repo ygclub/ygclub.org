@@ -2,31 +2,32 @@
 /**
  * The edit file of bug module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: edit.html.php 3257 2012-07-02 06:25:41Z wwccss $
+ * @version     $Id: edit.html.php 4259 2013-01-24 05:49:40Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/chosen.html.php';?>
-<?php include '../../common/view/autocomplete.html.php';?>
-<?php include '../../common/view/alert.html.php';?>
-<?php include '../../common/view/kindeditor.html.php';?>
-<script language='Javascript'>
-changeProductConfirmed = false;
-changeProjectConfirmed = false;
-confirmChangeProduct   = '<?php echo $lang->bug->confirmChangeProduct;?>';
-oldProjectID           = '<?php echo $bug->project;?>';
-oldStoryID             = '<?php echo $bug->story;?>';
-oldTaskID              = '<?php echo $bug->task;?>';
-oldOpenedBuild         = '<?php echo $bug->openedBuild;?>';
-oldResolvedBuild       = '<?php echo $bug->resolvedBuild;?>';
-emptySelect            = "<select name='task' id='task'><option value=''></option></select>";
-userList               = "<?php echo join(',', array_keys($users));?>".split(',');
-</script>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/chosen.html.php';
+include '../../common/view/autocomplete.html.php';
+include '../../common/view/alert.html.php';
+include '../../common/view/kindeditor.html.php';
+js::set('page'                   , 'edit');
+js::set('changeProductConfirmed' , false);
+js::set('changeProjectConfirmed' , false);
+js::set('confirmChangeProduct'   , $lang->bug->confirmChangeProduct);
+js::set('oldProjectID'           , $bug->project);
+js::set('oldStoryID'             , $bug->story);
+js::set('oldTaskID'              , $bug->task);
+js::set('oldOpenedBuild'         , $bug->openedBuild);
+js::set('oldResolvedBuild'       , $bug->resolvedBuild);
+js::set('userList'               , array_keys($users));
+?>
+
 <form method='post' target='hiddenwin' enctype='multipart/form-data' id='dataform'>
 <div id='titlebar'>
   <div id='main'>

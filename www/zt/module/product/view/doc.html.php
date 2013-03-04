@@ -2,7 +2,7 @@
 /**
  * The doc view file of product module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     product
@@ -16,7 +16,7 @@
 <div class='yui-d0'>
 
   <table class='table-1 fixed colored tablesorter' align='center'>
-    <caption class='caption-tr'><?php common::printLink('doc', 'create', "libID=product&moduleID=0&productID={$product->id}&projectID=0&from=product", $lang->doc->create);?></caption>
+    <caption class='caption-tr'><?php common::printIcon('doc', 'create', "libID=product&moduleID=0&productID={$product->id}&projectID=0&from=product");?></caption>
     <thead>
       <tr class='colhead'>
         <th class='w-id'><?php echo $lang->idAB;?></th>
@@ -42,8 +42,8 @@
         <td>
           <?php 
           $vars = "doc={$doc->id}";
-          if(!common::printLink('doc', 'edit',   $vars, $lang->edit)) echo $lang->edit;
-          if(!common::printLink('doc', 'delete', $vars, $lang->delete, 'hiddenwin')) echo $lang->delete;
+          common::printIcon('doc', 'edit',   $vars);
+          common::printIcon('doc', 'delete', $vars, '', 'button', '', 'hiddenwin');
           ?>
         </td>
       </tr>

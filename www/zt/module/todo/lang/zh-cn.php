@@ -2,11 +2,11 @@
 /**
  * The todo module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     todo
- * @version     $Id: zh-cn.php 3753 2012-12-11 05:51:16Z wwccss $
+ * @version     $Id: zh-cn.php 4480 2013-02-27 01:57:22Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->todo->common       = 'TODO';
@@ -17,10 +17,7 @@ $lang->todo->edit         = "更新TODO";
 $lang->todo->batchEdit    = "批量编辑";
 $lang->todo->view         = "TODO详情";
 $lang->todo->viewAB       = "详情";
-$lang->todo->markDone     = "未完成";
-$lang->todo->markWait     = "已完成";
-$lang->todo->markDoing    = "已完成";
-$lang->todo->mark         = "更改状态";
+$lang->todo->finish       = "完成";
 $lang->todo->export       = "导出";
 $lang->todo->delete       = "删除TODO";
 $lang->todo->browse       = "浏览TODO";
@@ -43,10 +40,6 @@ $lang->todo->desc        = '描述';
 $lang->todo->private     = '私人事务';
 $lang->todo->idvalue     = '任务或Bug';
 
-$lang->todo->week         = '星期';
-$lang->todo->today        = '今天';
-$lang->todo->weekDateList = '一,二,三,四,五,六,天';
-$lang->todo->dayInFuture  = '暂不指定';
 $lang->todo->confirmBug   = '该Todo关联的是Bug #%s，需要修改它吗？';
 $lang->todo->confirmTask  = '该Todo关联的是Task #%s，需要修改它吗？';
 
@@ -70,17 +63,19 @@ $lang->todo->successMarked  = "成功切换状态！";
 $lang->todo->thisIsPrivate  = '这是一条私人事务。:)';
 $lang->todo->lblDisableDate = '暂时不设定时间';
 
-$lang->todo->thisWeekTodos   = '本周';
-$lang->todo->lastWeekTodos   = '上周';
-$lang->todo->futureTodos     = '暂不指定';
-$lang->todo->allDaysTodos    = '所有';
-$lang->todo->allUndone       = '之前未完';
-$lang->todo->todayTodos      = '今日';
-$lang->todo->yesterdayTodos  = '昨日';
-$lang->todo->lastmonthTodos  = '上月';
-$lang->todo->thisseasonTodos = '本季';
-$lang->todo->thisyearTodos   = '本年';
-$lang->todo->thismonthTodos  = '本月';
+$lang->todo->periods['today']      = '今日';
+$lang->todo->periods['yesterday']  = '昨日';
+$lang->todo->periods['thisWeek']   = '本周';
+$lang->todo->periods['lastWeek']   = '上周';
+$lang->todo->periods['thisMonth']  = '本月';
+$lang->todo->periods['lastmonth']  = '上月';
+$lang->todo->periods['thisSeason'] = '本季';
+$lang->todo->periods['thisYear']   = '本年';
+$lang->todo->periods['future']     = '待定';
+$lang->todo->periods['before']     = '未完';
+$lang->todo->periods['all']        = '所有';
 
 $lang->todo->action = new stdclass();
-$lang->todo->action->marked  = array('main' => '$date, 由 <strong>$actor</strong> 标记为<strong>$extra</strong>。', 'extra' => $lang->todo->statusList);
+$lang->todo->action->finished  = array('main' => '$date, 由 <strong>$actor</strong>完成');
+$lang->todo->action->marked    = array('main' => '$date, 由 <strong>$actor</strong> 标记为<strong>$extra</strong>。', 'extra' => $lang->todo->statusList);
+

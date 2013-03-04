@@ -2,7 +2,7 @@
 /**
  * The obtain view file of webapp module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yidong Wang <Yidong@cnezsoft.com>
  * @package     webapp
@@ -30,7 +30,7 @@
         </form>
       </div>
       <div class='box-title'><?php echo $lang->webapp->byCategory;?></div>
-      <div class='box-content' id='tree'>
+      <div class='box-content' class='tree'>
         <?php $moduleTree ? print($moduleTree) : print($lang->webapp->errorGetModules);?>
       </div>
     </td>
@@ -42,11 +42,36 @@
         <li>
           <table class='fixed exttable'>
             <tr>
-              <td rowspan='4' width='73' height='73'><img src='<?php echo empty($webapp->icon) ? '/theme/default/images/main/webapp-default.png' : $config->webapp->url . $webapp->icon?>' width='72' height='72' /></td>
-              <td class='webapp-name'><h4><?php echo $webapp->name?></h4></td>
+              <td rowspan='3' width='73' height='73' class='webapp-icon'><img src='<?php echo empty($webapp->icon) ? '/theme/default/images/main/webapp-default.png' : $config->webapp->url . $webapp->icon?>' width='72' height='72' /></td>
+              <td class='webapp-name' title='<?php echo $webapp->name?>'><?php echo $webapp->name?></td>
             </tr>
-            <tr><td><span title='<?php echo $webapp->desc?>'><?php echo empty($webapp->desc) ? '&nbsp;' : $webapp->desc?></span></td></tr>
-            <tr><td><?php echo isset($installeds[$webapp->id]) ? html::commonButton($lang->webapp->installed, "disabled='disabled' style='color:gray'") : html::a(inLink('install', "webappID={$webapp->id}"), $lang->webapp->install, '_self', "class='button-c iframe'")?></td></tr>
+            <tr><td valign='top'><div class='webapp-info' title='<?php echo $webapp->abstract?>'><?php echo empty($webapp->abstract) ? '&nbsp;' : $webapp->abstract?></div></td></tr>
+            <tr>
+              <td>
+              <?php
+                $url     = $webapp->url;
+                $method  = '';
+                $popup   = '';
+                $target  = '_self';
+                if($webapp->target == 'popup')
+                {
+                    $width  = 0;
+                    $height = 0;
+                    if($webapp->size) list($width, $height) = explode('x', $webapp->size);
+                    $method = "popup($width, $height);";
+                    $popup  = 'popup';
+                }
+                else
+                {
+                    $method = "popup(1024, 600);";
+                    $popup  = 'popup';
+                }
+                echo isset($installeds[$webapp->id]) ? html::commonButton($lang->webapp->installed, "disabled='disabled' style='color:gray'") : html::a(inLink('install', "webappID={$webapp->id}"), $lang->webapp->install, '_self', "class='button-c iframe'");
+                common::printLink('webapp', 'view', "webappID=$webapp->id&type=api", $lang->webapp->view, '',  "class='button-c apiapp'");
+                echo html::a($url, $lang->webapp->preview, '', "id='useapp$webapp->id' class='button-c $popup' onclick='$method'");
+              ?>
+              </td>
+            </tr>
           </table>
         </li>
         <?php endforeach;?>

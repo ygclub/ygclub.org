@@ -2,7 +2,7 @@
 /**
  * The control file of webapp of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2010 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yidong Wang <Yidong@cnezsoft.com>
  * @package     webapp
@@ -25,6 +25,7 @@ class webapp extends control
 
         $this->webapp->setMenu($module);
 
+        $this->view->title      = $this->lang->webapp->common;
         $this->view->webapps    = $webapps;
         $this->view->moduleTree = $this->loadModel('tree')->getTreeMenu(0, 'webapp', 0, array('treeModel', 'createWebappLink'));
         $this->view->module     = $module;
@@ -42,7 +43,7 @@ class webapp extends control
      * @access public
      * @return void
      */
-    public function obtain($type = 'byUpdatedTime', $param = '', $recTotal = 0, $recPerPage = 10, $pageID = 1)
+    public function obtain($type = 'byUpdatedTime', $param = '', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
         $this->webapp->setMenu();
 
@@ -64,6 +65,7 @@ class webapp extends control
             $webapps = $results->webapps;
         }
 
+        $this->view->title      = $this->lang->webapp->common . $this->lang->colon . $this->lang->webapp->obtain;
         $this->view->moduleTree = $this->webapp->getModulesByAPI();
         $this->view->webapps    = $webapps;
         $this->view->installeds = $this->webapp->getLocalApps('appid');
@@ -87,10 +89,11 @@ class webapp extends control
         {
             $this->webapp->update($webappID);
             if(dao::isError())die(js::error(dao::getError()));
-            die(js::reload('parent'));
+            die(js::reload('parent.parent'));
         }
 
-        $this->view->modules = $this->webapp->getModules();
+        $this->view->title   = $this->lang->webapp->common . $this->lang->colon . $this->lang->webapp->edit;
+        $this->view->modules = $this->loadModel('tree')->getOptionMenu(0, 'webapp');
         $this->view->webapp  = $this->webapp->getLocalAppByID($webappID);
         $this->display();
     }
@@ -112,7 +115,26 @@ class webapp extends control
 
         $this->webapp->setMenu();
 
-        $this->view->modules = $this->webapp->getModules();
+        $this->view->title   = $this->lang->webapp->common . $this->lang->colon . $this->lang->webapp->create;
+        $this->view->modules = $this->loadModel('tree')->getOptionMenu(0, 'webapp');
+        $this->display();
+    }
+
+    /**
+     * View app.
+     * 
+     * @param  int    $webappID 
+     * @param  string $type 
+     * @access public
+     * @return void
+     */
+    public function view($webappID, $type = 'local')
+    {
+        $this->view->title   = $this->lang->webapp->common . $this->lang->colon . $this->lang->webapp->edit;
+        $this->view->modules = $this->loadModel('tree')->getOptionMenu(0, 'webapp');
+        $this->view->users   = $this->loadModel('user')->getPairs('noletter');
+        $this->view->webapp  = $type == 'local' ? $this->webapp->getLocalAppByID($webappID) : $this->webapp->getAppInfoByAPI($webappID)->webapp;
+        $this->view->type    = $type;
         $this->display();
     }
 
@@ -134,9 +156,10 @@ class webapp extends control
                 die(js::reload('parent'));
             }
             echo js::alert($this->lang->webapp->successInstall);
-            die(js::locate(inlink('index'), 'parent.parent'));
+            die(js::reload('parent.parent'));
         }
 
+        $this->view->title   = $this->lang->webapp->common . $this->lang->colon . $this->lang->webapp->install;
         $this->view->modules = $this->webapp->getModules();
         $this->display();
     }

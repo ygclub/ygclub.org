@@ -2,11 +2,11 @@
 /**
  * The create view of todo module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     todo
- * @version     $Id: create.html.php 3418 2012-08-28 03:32:36Z wyd621@gmail.com $
+ * @version     $Id: create.html.php 4220 2013-01-22 07:26:33Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -19,7 +19,7 @@
     <tr>
       <th class='rowhead'><?php echo $lang->todo->date;?></th>
       <td><?php echo html::input('date', $date, "class='select-3 date'");?>
-      <input type='checkbox' id='switchDate' onclick='switchDateTodo(this);'><?php echo $lang->todo->futureTodos;?></td>
+      <input type='checkbox' id='switchDate' onclick='switchDateTodo(this);'> <?php echo $lang->todo->periods['future'];?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->todo->type;?></th>

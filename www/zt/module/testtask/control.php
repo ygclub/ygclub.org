@@ -2,11 +2,11 @@
 /**
  * The control file of testtask module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: control.php 3874 2012-12-24 01:01:12Z wwccss $
+ * @version     $Id: control.php 4508 2013-03-01 09:53:27Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 class testtask extends control
@@ -61,15 +61,15 @@ class testtask extends control
         $this->app->loadClass('pager', $static = true);
         $pager = pager::init($recTotal, $recPerPage, $pageID);
 
-        $this->view->header->title = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->common;
-        $this->view->position[]    = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]    = $this->lang->testtask->common;
-        $this->view->productID     = $productID;
-        $this->view->productName   = $this->products[$productID];
-        $this->view->pager         = $pager;
-        $this->view->orderBy       = $orderBy;
-        $this->view->tasks         = $this->testtask->getProductTasks($productID);
-        $this->view->users         = $this->loadModel('user')->getPairs('noclosed|noletter');
+        $this->view->title       = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->common;
+        $this->view->position[]  = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[]  = $this->lang->testtask->common;
+        $this->view->productID   = $productID;
+        $this->view->productName = $this->products[$productID];
+        $this->view->pager       = $pager;
+        $this->view->orderBy     = $orderBy;
+        $this->view->tasks       = $this->testtask->getProductTasks($productID);
+        $this->view->users       = $this->loadModel('user')->getPairs('noclosed|noletter');
 
         $this->display();
     }
@@ -133,6 +133,7 @@ class testtask extends control
 
             $projects = $this->dao->select('id, name')->from(TABLE_PROJECT)->where('id')->eq($projectID)->fetchPairs('id');
             $builds   = $this->dao->select('id, name')->from(TABLE_BUILD)->where('project')->eq($projectID)->fetchPairs('id');
+            $builds   = array('trunk' => 'Trunk') + $builds;
         }
 
         /* Create testtask from testtask of test.*/
@@ -146,9 +147,9 @@ class testtask extends control
         $productID  = $this->product->saveState($productID, $this->products);
         $this->testtask->setMenu($this->products, $productID);
 
-        $this->view->header->title   = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->create;
-        $this->view->position[]      = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testtask->create;
+        $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->create;
+        $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testtask->create;
 
         if($projectID != 0) 
         {
@@ -178,9 +179,9 @@ class testtask extends control
         $productID = $task->product;
         $this->testtask->setMenu($this->products, $productID);
 
-        $this->view->header->title   = "TASK #$task->id $task->name/" . $this->products[$productID];
-        $this->view->position[]      = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testtask->view;
+        $this->view->title      = "TASK #$task->id $task->name/" . $this->products[$productID];
+        $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testtask->view;
 
         $this->view->productID = $productID;
         $this->view->task      = $task;
@@ -237,9 +238,9 @@ class testtask extends control
         foreach($this->view->runs as $run) $testcaseIDs .= ',' . $run->case;
         $this->session->set('testcaseIDs', $testcaseIDs . ',');
 
-        $this->view->header->title   = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->cases;
-        $this->view->position[]      = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testtask->cases;
+        $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->cases;
+        $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testtask->cases;
 
         $this->view->productID   = $productID;
         $this->view->productName = $this->products[$productID];
@@ -288,15 +289,91 @@ class testtask extends control
         /* Set menu. */
         $this->testtask->setMenu($this->products, $productID);
 
-        $this->view->header->title   = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->edit;
-        $this->view->position[]      = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testtask->edit;
+        $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->edit;
+        $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testtask->edit;
 
         $this->view->task      = $task;
         $this->view->projects  = $this->product->getProjectPairs($productID);
         $this->view->builds    = $this->loadModel('build')->getProductBuildPairs($productID);
         $this->view->users     = $this->loadModel('user')->getPairs();
 
+        $this->display();
+    }
+
+    /**
+     * Start testtask.
+     * 
+     * @param  int    $taskID 
+     * @access public
+     * @return void
+     */
+    public function start($taskID)
+    {
+        $actions  = $this->loadModel('action')->getList('testtask', $taskID);
+
+        if(!empty($_POST))
+        {
+            $changes = $this->testtask->start($taskID);
+            if(dao::isError()) die(js::error(dao::getError()));
+
+            if($this->post->comment != '' or !empty($changes))
+            {
+                $actionID = $this->action->create('testtask', $taskID, 'Started', $this->post->comment);
+                $this->action->logHistory($actionID, $changes);
+            }
+            die(js::locate($this->createLink('testtask', 'view', "taskID=$taskID"), 'parent'));
+        }
+
+        /* Get task info. */
+        $testtask  = $this->testtask->getById($taskID);
+        $productID = $this->product->saveState($testtask->product, $this->products);
+
+        /* Set menu. */
+        $this->testtask->setMenu($this->products, $productID);
+
+        $this->view->testtask   = $testtask;
+        $this->view->title      = $testtask->name . $this->lang->colon . $this->lang->testtask->start;
+        $this->view->position[] = $this->lang->testtask->start;
+        $this->view->actions    = $actions;
+        $this->display();
+    }
+
+    /**
+     * Close testtask.
+     * 
+     * @param  int    $taskID 
+     * @access public
+     * @return void
+     */
+    public function close($taskID)
+    {
+        $actions  = $this->loadModel('action')->getList('testtask', $taskID);
+
+        if(!empty($_POST))
+        {
+            $changes = $this->testtask->close($taskID);
+            if(dao::isError()) die(js::error(dao::getError()));
+
+            if($this->post->comment != '' or !empty($changes))
+            {
+                $actionID = $this->action->create('testtask', $taskID, 'Closed', $this->post->comment);
+                $this->action->logHistory($actionID, $changes);
+            }
+            die(js::locate($this->createLink('testtask', 'view', "taskID=$taskID"), 'parent'));
+        }
+
+        /* Get task info. */
+        $testtask  = $this->testtask->getById($taskID);
+        $productID = $this->product->saveState($testtask->product, $this->products);
+
+        /* Set menu. */
+        $this->testtask->setMenu($this->products, $productID);
+
+        $this->view->testtask   = $this->testtask->getById($taskID);
+        $this->view->title      = $testtask->name . $this->lang->colon . $this->lang->close;
+        $this->view->position[] = $this->lang->close;
+        $this->view->actions    = $actions;
         $this->display();
     }
 
@@ -358,9 +435,9 @@ class testtask extends control
         /* Save session. */
         $this->testtask->setMenu($this->products, $productID);
 
-        $this->view->header->title   = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->linkCase;
-        $this->view->position[]      = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testtask->linkCase;
+        $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->linkCase;
+        $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testtask->linkCase;
 
         /* Get cases. */
         if($this->session->testcaseQuery == false) $this->session->set('testcaseQuery', ' 1 = 1');
@@ -432,21 +509,42 @@ class testtask extends control
      */
     public function runCase($runID, $caseID = 0, $version = 0)
     {
+        $preAndNext = $this->loadModel('common')->getPreAndNextObject('testcase', $caseID);
         if(!empty($_POST))
         {
             $this->testtask->createResult($runID);
             if(dao::isError()) die(js::error(dao::getError()));
-            echo js::reload('parent');
-            die(js::closeWindow());
+            if($preAndNext->next)
+            {
+                $nextRunID   = $runID ? $preAndNext->next->id : 0;
+                $nextCaseID  = $runID ? $preAndNext->next->case : $preAndNext->next->id;
+                $nextVersion = $preAndNext->next->version;
+                die(js::locate(inlink('runCase', "runID=$nextRunID&caseID=$nextCaseID&version=$nextVersion")));
+            }
+            else
+            {
+                echo js::reload('parent');
+                die(js::closeWindow());
+            }
         }
 
         if(!$caseID) $run = $this->testtask->getRunById($runID);
-        if($caseID)  $run->case = $this->loadModel('testcase')->getById($caseID, $version);
+        if($caseID)
+        {
+            $run = new stdclass();
+            $run->case = $this->loadModel('testcase')->getById($caseID, $version);
+        }
 
-        $nextCase   = '';
-        $caseID     = $caseID ? $caseID : $run->case->id;
-        $preAndNext = $this->loadModel('common')->getPreAndNextObject('testcase', $caseID);
+        $preCase  = '';
+        $nextCase = '';
+        $caseID   = $caseID ? $caseID : $run->case->id;
         if($runID and $preAndNext->next) $preAndNext->next = $this->dao->select('*')->from(TABLE_TESTRUN)->where('`case`')->eq($preAndNext->next->id)->fetch();
+        if($preAndNext->pre)
+        {
+            $preCase['runID']   = $runID ? $preAndNext->pre->id : 0;
+            $preCase['caseID']  = $runID ? $preAndNext->pre->case : $preAndNext->pre->id;
+            $preCase['version'] = $preAndNext->pre->version;
+        }
         if($preAndNext->next)
         {
             $nextCase['runID']   = $runID ? $preAndNext->next->id : 0;
@@ -455,6 +553,7 @@ class testtask extends control
         }
         
         $this->view->run      = $run;
+        $this->view->preCase  = $preCase;
         $this->view->nextCase = $nextCase;
 
         die($this->display());

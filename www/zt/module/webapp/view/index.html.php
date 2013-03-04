@@ -2,7 +2,7 @@
 /**
  * The browse view file of webapp module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     webapp
@@ -16,19 +16,17 @@
   <tr>
     <td>
       <ul id='webapps'>
-    <?php foreach($webapps as $webapp):?>
+        <?php foreach($webapps as $webapp):?>
         <li>
           <table class='fixed exttable' id='webapp<?php echo $webapp->id?>'>
             <tr>
-              <td rowspan='4' width='73' height='73'><img src='<?php echo empty($webapp->icon) ? '/theme/default/images/main/webapp-default.png' : ($webapp->addType == 'custom' ? '' : $config->webapp->url) . $webapp->icon?>' width='72' height='72' /></td>
-              <td class='webapp-name'><h4><?php echo $webapp->name?></h4></td>
+              <td rowspan='3' width='73' height='73' class='webapp-icon'><img src='<?php echo empty($webapp->icon) ? $config->webRoot . 'theme/default/images/main/webapp-default.png' : $webapp->icon?>' width='72' height='72' /></td>
+              <td class='webapp-name' title='<?php echo $webapp->name?>'><?php echo $webapp->name . "($webapp->author)"?></td>
             </tr>
-            <tr><td><span title='<?php echo $webapp->desc?>'><?php echo empty($webapp->desc) ? '&nbsp;' : $webapp->desc?></span></td></tr>
-            <tr><td><?php echo $lang->webapp->addTypeList[$webapp->addType];?></td></tr>
+            <tr><td valign='top'><div class='webapp-info' title='<?php echo $webapp->abstract?>'><?php echo empty($webapp->abstract) ? '&nbsp;' : $webapp->abstract?></div></td></tr>
             <tr>
               <td>
               <?php
-              $uninstallCode = html::a(inlink('uninstall',  "webapp=$webapp->id"), $lang->webapp->uninstall, 'hiddenwin',  "class='button-c'");
               $url     = $webapp->addType == 'custom' ? $webapp->url : $config->webapp->url . "/webapp-showapp-{$webapp->appid}.html";
               $method  = '';
               $popup   = '';
@@ -43,15 +41,15 @@
                   $method = "popup($width, $height);";
                   $popup  = 'popup';
               }
-              $useAppCode    = html::a($url, $lang->webapp->useapp, $target,  "id='useapp$webapp->id' class='button-c $popup' onclick='addView($webapp->id);$method'");
-              $editAppCode    = html::a(inlink('edit', "webappID=$webapp->id"), $lang->edit, '',  "class='button-c webapp'");
-              echo $useAppCode . $editAppCode . $uninstallCode;
+              echo html::a($url, $lang->webapp->useapp, $target,  "id='useapp$webapp->id' class='button-c $popup' onclick='addView($webapp->id);$method'");
+              common::printLink('webapp', 'view', "webappID=$webapp->id", $lang->webapp->view, '',  "class='button-c webapp'");
+              common::printLink('webapp', 'uninstall',  "webapp=$webapp->id", $lang->webapp->uninstall, 'hiddenwin',  "class='button-c'");
               ?>
               </td>
             </tr>
           </table>
         </li>
-    <?php endforeach;?>
+        <?php endforeach;?>
       </ul>
     </td>
   </tr>

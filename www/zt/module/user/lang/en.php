@@ -2,11 +2,11 @@
 /**
  * The user module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     user
- * @version     $Id: en.php 3889 2012-12-24 10:17:18Z wwccss $
+ * @version     $Id: en.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->user->common    = 'User';
@@ -17,6 +17,7 @@ $lang->user->account   = 'Account';
 $lang->user->password  = 'Password';
 $lang->user->password2 = 'Repeat password';
 $lang->user->role      = 'Role';
+$lang->user->group     = 'Group';
 $lang->user->realname  = 'Fullname';
 $lang->user->nickname  = 'Nickname';
 $lang->user->commiter  = 'Commit account';

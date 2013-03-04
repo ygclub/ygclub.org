@@ -2,11 +2,11 @@
 /**
  * The browse view file of product module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     product
- * @version     $Id: browse.html.php 3794 2012-12-13 08:07:07Z wyd621@gmail.com $
+ * @version     $Id: browse.html.php 4469 2013-02-27 00:54:49Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -57,25 +57,23 @@ var browseType = '<?php echo $browseType;?>';
           <thead>
           <tr class='colhead'>
             <?php $vars = "productID=$productID&browseType=$browseType&param=$moduleID&orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}";?>
-            <th class='w-id'> <?php common::printOrderLink('id',    $orderBy, $vars, $lang->idAB);?></th>
-            <th class='w-pri'><?php common::printOrderLink('pri',   $orderBy, $vars, $lang->priAB);?></th>
-            <th class='w-p30'><?php common::printOrderLink('title', $orderBy, $vars, $lang->story->title);?></th>
-            <th><?php common::printOrderLink('plan',       $orderBy, $vars, $lang->story->planAB);?></th>
-            <th><?php common::printOrderLink('source',     $orderBy, $vars, $lang->story->source);?></th>
-            <th><?php common::printOrderLink('openedBy',   $orderBy, $vars, $lang->openedByAB);?></th>
-            <th><?php common::printOrderLink('assignedTo', $orderBy, $vars, $lang->assignedToAB);?></th>
-            <th class='w-hour'><?php common::printOrderLink('estimate', $orderBy, $vars, $lang->story->estimateAB);?></th>
-            <th><?php common::printOrderLink('status', $orderBy, $vars, $lang->statusAB);?></th>
-            <th><?php common::printOrderLink('stage',  $orderBy, $vars, $lang->story->stageAB);?></th>
+            <th class='w-id'>  <?php common::printOrderLink('id',         $orderBy, $vars, $lang->idAB);?></th>
+            <th class='w-pri'> <?php common::printOrderLink('pri',        $orderBy, $vars, $lang->priAB);?></th>
+            <th class='w-p30'> <?php common::printOrderLink('title',      $orderBy, $vars, $lang->story->title);?></th>
+            <th>               <?php common::printOrderLink('plan',       $orderBy, $vars, $lang->story->planAB);?></th>
+            <th>               <?php common::printOrderLink('source',     $orderBy, $vars, $lang->story->source);?></th>
+            <th>               <?php common::printOrderLink('openedBy',   $orderBy, $vars, $lang->openedByAB);?></th>
+            <th>               <?php common::printOrderLink('assignedTo', $orderBy, $vars, $lang->assignedToAB);?></th>
+            <th class='w-hour'><?php common::printOrderLink('estimate',   $orderBy, $vars, $lang->story->estimateAB);?></th>
+            <th>               <?php common::printOrderLink('status',     $orderBy, $vars, $lang->statusAB);?></th>
+            <th>               <?php common::printOrderLink('stage',      $orderBy, $vars, $lang->story->stageAB);?></th>
             <th class='w-100px {sorter:false}'><?php echo $lang->actions;?></th>
           </tr>
           </thead>
           <tbody>
-          <?php $totalEstimate = 0.0;?>
           <?php foreach($stories as $key => $story):?>
           <?php
           $viewLink = $this->createLink('story', 'view', "storyID=$story->id");
-          $totalEstimate += $story->estimate; 
           $canView  = common::hasPriv('story', 'view');
           ?>
           <tr class='a-center'>
@@ -84,8 +82,8 @@ var browseType = '<?php echo $browseType;?>';
               <?php if($canView) echo html::a($viewLink, sprintf('%03d', $story->id)); else printf('%03d', $story->id);?>
             </td>
             <td><span class='<?php echo 'pri' . $lang->story->priList[$story->pri];?>'><?php echo $lang->story->priList[$story->pri]?></span></td>
-            <td class='a-left nobr'><nobr><?php echo html::a($viewLink, $story->title);?></nobr></td>
-            <td class='nobr'><?php echo $story->planTitle;?></td>
+            <td class='a-left' title="<?php echo $story->title?>"><nobr><?php echo html::a($viewLink, $story->title);?></nobr></td>
+            <td title="<?php echo $story->planTitle?>"><?php echo $story->planTitle;?></td>
             <td><?php echo $lang->story->sourceList[$story->source];?></td>
             <td><?php echo $users[$story->openedBy];?></td>
             <td><?php echo $users[$story->assignedTo];?></td>
@@ -116,15 +114,15 @@ var browseType = '<?php echo $browseType;?>';
                   if(common::hasPriv('story', 'batchEdit'))
                   {
                       $actionLink = $this->createLink('story', 'batchEdit', "from=productBrowse&productID=$productID&projectID=0&orderBy=$orderBy");
-                      echo html::commonButton($lang->story->batchEdit, "onclick=\"changeAction('productStoryForm', 'batchEdit', '$actionLink')\"");
+                      echo html::commonButton($lang->edit, "onclick=\"changeAction('productStoryForm', 'batchEdit', '$actionLink')\"");
                   }
                   if(common::hasPriv('story', 'batchClose') and strtolower($browseType) != 'closedbyme' and strtolower($browseType) != 'closedstory')
                   {
                       $actionLink = $this->createLink('story', 'batchClose', "from=productBrowse&productID=$productID&projectID=0&orderBy=$orderBy");
-                      echo html::commonButton($lang->story->batchClose, "onclick=\"changeAction('productStoryForm', 'batchClose', '$actionLink')\"");
+                      echo html::commonButton($lang->close, "onclick=\"changeAction('productStoryForm', 'batchClose', '$actionLink')\"");
                   }
               }
-              printf($lang->product->storySummary, count($stories), $totalEstimate);
+              echo $summary;
               ?>
               </div>
               <?php $pager->show();?>

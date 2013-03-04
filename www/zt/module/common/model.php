@@ -2,7 +2,7 @@
 /**
  * The model file of common module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     common
@@ -80,12 +80,13 @@ class commonModel extends model
         {
             $this->app->user = $this->session->user;
         }
-        elseif($this->app->company->guest)
+        elseif($this->app->company->guest or defined('IN_SHELL'))
         {
             $user             = new stdClass();
             $user->id         = 0;
             $user->account    = 'guest';
             $user->realname   = 'guest';
+            $user->role       = 'guest';
             $user->rights     = $this->loadModel('user')->authorize('guest');
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
@@ -100,11 +101,9 @@ class commonModel extends model
      */
     public function loadConfigFromDB()
     {
-        if(!isset($this->app->user->account)) return;
-
-        $account = $this->app->user->account;
+        /* Get configs of system and current user. */
+        $account = isset($this->app->user->account) ? $this->app->user->account : '';
         $config  = $this->loadModel('setting')->getSysAndPersonalConfig($account);
-
         $this->config->system   = isset($config['system']) ? $config['system'] : array();
         $this->config->personal = isset($config[$account]) ? $config[$account] : array();
 
@@ -139,11 +138,14 @@ class commonModel extends model
         if($module == 'user' and strpos('login|logout|deny', $method) !== false) return true;
         if($module == 'api'  and $method == 'getsessionid') return true;
 
-        if($this->loadModel('user')->isLogon() and strpos($method, 'ajax') === 0) return true;
+        if($this->loadModel('user')->isLogon())
+        {
+            if(stripos($method, 'ajax') !== false) return true;
+            if(stripos($method, 'downnotify') !== false) return true;
+        }
 
         if($module == 'misc' and $method == 'about') return true;
         if($module == 'misc' and $method == 'checkupdate') return true;
-        if($module == 'help' and $method == 'field') return true;
         return false;
     }
 
@@ -204,13 +206,10 @@ class commonModel extends model
 
         //printf($lang->todayIs, date(DT_DATE4));
         if(isset($app->user) and $app->user->account != 'guest')
-        {
             echo $app->user->realname . ', ';
-        }
         if(isset($app->user) and $app->user->account != 'guest')
         {
             echo html::a(helper::createLink('user', 'logout'), $lang->logout);
-            //echo html::a('../../bbs/logging.php?action=logout&formhash=5cb1ad4c', $lang->logout);
         }
         else
         {
@@ -251,11 +250,11 @@ class commonModel extends model
             $lang->menu = new stdclass();
 
             ksort($lang->menuOrder, SORT_ASC);
-            foreach($lang->menuOrder as $order)  
+            foreach($lang->menuOrder as $key)  
             {
-                $menu = $menus->$order; 
-                unset($menus->$order);
-                $lang->menu->$order = $menu;
+                $menu = $menus->$key; 
+                unset($menus->$key);
+                $lang->menu->$key = $menu;
             }
             foreach($menus as $key => $menu)
             {
@@ -411,7 +410,7 @@ class commonModel extends model
         global $lang;
         $mainMenu = $moduleName;
         if(isset($lang->menugroup->$moduleName)) $mainMenu = $lang->menugroup->$moduleName;
-        echo html::a(helper::createLink('my', 'index'), $lang->ZenTaoPMS) . $lang->arrow;
+        echo html::a(helper::createLink('my', 'index'), $lang->zentaoPMS) . $lang->arrow;
         if($moduleName != 'index')
         {
             list($menuLabel, $module, $method) = explode('|', $lang->menu->$mainMenu);
@@ -430,6 +429,24 @@ class commonModel extends model
         }
     }
 
+    /**
+     * Print the link for notify file.
+     * 
+     * @static
+     * @access public
+     * @return void
+     */
+    public static function printNotifyLink()
+    {
+        if(strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows') !== false)
+        {
+            global $app, $lang;
+            $notifyFile = $app->getBasePath() . 'www/data/notify/notify.zip';
+
+            if(!file_exists($notifyFile)) return false;
+            echo html::a(helper::createLink('misc', 'downNotify'), $lang->downNotify);
+        }
+    }
 
     /**
      * Diff two string. (see phpt)
@@ -490,15 +507,8 @@ class commonModel extends model
     {
         $preAndNextObject = new stdClass();
 
-        switch($type)
-        {
-            case 'story'    : $table = TABLE_STORY; break;
-            case 'task'     : $table = TABLE_TASK;  break;
-            case 'bug'      : $table = TABLE_BUG;   break;
-            case 'testcase' : $table = TABLE_CASE;  break;
-            case 'doc'      : $table = TABLE_DOC;   break;
-            default         : return $preAndNextObject;
-        }
+        if(strpos('story, task, bug, testcase, doc', $type) === false) return $preAndNextObject;
+        $table = $this->config->objectTables[$type];
 
         $typeIDs = $type . 'IDs';
         if($this->session->$typeIDs and strpos($this->session->$typeIDs, ',' . $objectID . ',') !== false)
@@ -516,7 +526,7 @@ class commonModel extends model
             $orderBy = $this->session->$orderBy;
             $orderBy = str_replace('`left`', 'left', $orderBy); // process the `left` to left.
 
-            if(empty($_SESSION[$queryCondition]) or $this->session->$typeOnlyCondition)
+            if(empty($queryCondition) or $this->session->$typeOnlyCondition)
             {
                 $objects = $this->dao->select('*')->from($table)
                     ->beginIF($queryCondition != false)->where($queryCondition)->fi()
@@ -529,7 +539,7 @@ class commonModel extends model
             }
 
             $tmpObjectIDs = array();
-            foreach($objects as $object) $tmpObjectIDs[$object->id] = (!$this->session->$typeOnlyCondition and $type == 'testcase') ? $object->case : $object->id;
+            foreach($objects as $object) $tmpObjectIDs[$object->id] = (!$this->session->$typeOnlyCondition and $type == 'testcase' and isset($object->case)) ? $object->case : $object->id;
             $objectIDs    = ',' . implode(',', $tmpObjectIDs) . ',';
             $this->session->set($type . 'IDs', $objectIDs);
         }

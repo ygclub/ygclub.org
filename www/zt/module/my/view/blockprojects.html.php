@@ -1,20 +1,12 @@
 <div class='block linkbox1' id='projectbox'>
 <?php if(count($projectStats) == 0):?>
 <table class='table-1 a-center bg-gray' height='138px'>
-  <caption><span class='icon-title'></span><?php echo $lang->my->home->projects;?></caption>
+  <caption><span class='icon-allProjects'>&nbsp;</span><?php echo $lang->my->home->projects;?></caption>
   <tr>
     <td valign='middle'>
       <table class='a-left bd-none' align='center'>
         <tr>
-          <td><span class='icon-notice'></span></td>
-          <td><?php printf($lang->my->home->noProjectsTip, $this->createLink('project', 'create'));?></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td class='h-30px'><?php echo $lang->my->home->otherNoTip;?></td>
-        </tr>
-        <tr>
-          <td><span class='icon-help'></span></td>
+          <td><?php echo html::a($this->createLink('project', 'create'), $lang->my->home->createProject);?></td>
           <td><?php echo $lang->my->home->help; ?></td>
         </tr>
       </table>
@@ -24,7 +16,7 @@
 <?php else:?>
   <table class='table-1 fixed colored'>
     <tr class='colhead'>
-      <th class='w-150px'><?php echo $lang->project->name;?></th>
+      <th class='w-150px'><div class='f-left'><span class='icon-allProjects'>&nbsp;</span> <?php echo $lang->project->name;?></div></th>
       <th><?php echo $lang->project->end;?></th>
       <th><?php echo $lang->statusAB;?></th>
       <th><?php echo $lang->project->totalEstimate;?></th>

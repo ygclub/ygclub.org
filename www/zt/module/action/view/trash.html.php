@@ -2,7 +2,7 @@
 /**
  * The trash view file of action module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     action
@@ -16,12 +16,12 @@
   <?php $vars = "orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}"; ?>
   <thead>
   <tr class='colhead'>
-    <th class='w-80px'><?php common::printOrderLink('objectType',  $orderBy, $vars, $lang->action->objectType);?></th>
-    <th class='w-id'>  <?php common::printOrderLink('objectID',    $orderBy, $vars, $lang->idAB);?></th>
+    <th class='w-80px'><?php common::printOrderLink('objectType', $orderBy, $vars, $lang->action->objectType);?></th>
+    <th class='w-id'>  <?php common::printOrderLink('objectID',   $orderBy, $vars, $lang->idAB);?></th>
     <th><?php echo $lang->action->objectName;?></th>
-    <th class='w-100px'><?php common::printOrderLink('actor',      $orderBy, $vars, $lang->action->actor);?></th>
-    <th class='w-150px'><?php common::printOrderLink('date',       $orderBy, $vars, $lang->action->date);?></th>
-    <th class='w-80px'><?php echo $lang->actions;?></th>
+    <th class='w-100px'><?php common::printOrderLink('actor',     $orderBy, $vars, $lang->action->actor);?></th>
+    <th class='w-150px'><?php common::printOrderLink('date',      $orderBy, $vars, $lang->action->date);?></th>
+    <th class='w-60px'><?php echo $lang->actions;?></th>
   </tr>
   </thead>
   <tbody>
@@ -35,8 +35,8 @@
     <td><?php echo $action->date;?></td>
     <td>
       <?php
-      common::printLink('action', 'undelete', "actionid=$action->id", $lang->action->undelete, 'hiddenwin');
-      common::printLink('action', 'hide',     "actionid=$action->id", $lang->action->hide,   'hiddenwin');
+      common::printIcon('action', 'undelete', "actionid=$action->id", '', 'list', '', 'hiddenwin');
+      common::printIcon('action', 'hideOne',  "actionid=$action->id", '', 'list', '', 'hiddenwin');
       ?>
     </td>
   </tr>
@@ -45,7 +45,12 @@
   <tfoot>
   <tr>
     <td colspan='6'>
-      <div class='f-left'><?php echo $lang->action->trashTips;?></div>
+      <?php if($trashes):?>
+      <div class='f-left'>
+        <?php echo html::linkButton($lang->action->hideAll, inlink('hideAll'), 'hiddenwin');?>
+        <?php echo $lang->action->trashTips;?>
+      </div>
+      <?php endif;?>
       <div><?php $pager->show();?></div>
     </td>
   </tr>

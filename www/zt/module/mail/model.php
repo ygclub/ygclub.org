@@ -2,11 +2,11 @@
 /**
  * The model file of mail module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     mail
- * @version     $Id: model.php 3782 2012-12-12 09:16:41Z wwccss $
+ * @version     $Id: model.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -164,7 +164,7 @@ class mailModel extends model
         $this->mta = self::$instance;
         $this->mta->CharSet = $this->config->encoding;
         $funcName = "set{$this->config->mail->mta}";
-        if(!method_exists($this, $funcName)) echo $this->app->error("The MTA {$this->config->mail->mta} not supported now.", __FILE__, __LINE__, $exit = false);
+        if(!method_exists($this, $funcName)) $this->app->error("The MTA {$this->config->mail->mta} not supported now.", __FILE__, __LINE__, $exit = true);
         $this->$funcName();
     }
 
@@ -367,6 +367,17 @@ class mailModel extends model
     {
         $this->mta->clearAddresses();
         $this->mta->clearAttachments();
+    }
+
+    /**
+     * Check system if there is a mail at least.
+     * 
+     * @access public
+     * @return bool | object 
+     */
+    public function mailExist()
+    {
+        return $this->dao->select('email')->from(TABLE_USER)->where('email')->ne('')->fetch();
     }
 
     /**

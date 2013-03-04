@@ -2,11 +2,11 @@
 /**
  * The profile view file of user module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     user
- * @version     $Id: profile.html.php 3791 2012-12-13 05:27:14Z wwccss $
+ * @version     $Id: profile.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -82,7 +82,7 @@
   </tr>  
   <tr>
     <th class='rowhead'><?php echo $lang->user->qq;?></th>
-    <td><?php echo $user->qq;?></td>
+    <td><?php if($user->qq) echo html::a("tencent://message/?uin=$user->qq", $user->qq);?></td>
   </tr>  
   <tr>
     <th class='rowhead'><?php echo $lang->user->yahoo;?></th>

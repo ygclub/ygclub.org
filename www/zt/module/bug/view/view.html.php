@@ -2,11 +2,11 @@
 /**
  * The view file of bug module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: view.html.php 3770 2012-12-12 01:40:19Z zhujinyonging@gmail.com $
+ * @version     $Id: view.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -22,13 +22,13 @@
     if(!$bug->deleted)
     {
         ob_start();
-        if($this->bug->isClickable($bug, 'confirmBug')) common::printIcon('bug', 'confirmBug', $params);
-        common::printIcon('bug', 'assignTo', $params);
-        if($this->bug->isClickable($bug, 'resolve'))  common::printIcon('bug', 'resolve', $params);
-        if($this->bug->isClickable($bug, 'close'))    common::printIcon('bug', 'close', $params);
-        if($this->bug->isClickable($bug, 'activate')) common::printIcon('bug', 'activate', $params);
+        common::printIcon('bug', 'confirmBug', $params, $bug);
+        common::printIcon('bug', 'assignTo',   $params);
+        common::printIcon('bug', 'resolve',    $params, $bug);
+        common::printIcon('bug', 'close',      $params, $bug);
+        common::printIcon('bug', 'activate',   $params, $bug);
 
-        if($this->bug->isClickable($bug, 'toStory')) common::printIcon('bug', 'toStory', "product=$bug->product&module=0&story=0&project=0&bugID=$bug->id", '', 'button', 'toStory');
+        common::printIcon('bug', 'toStory', "product=$bug->product&module=0&story=0&project=0&bugID=$bug->id", $bug, 'button', 'toStory');
         common::printIcon('bug', 'createCase', $convertParams, '', 'button', 'createCase');
 
         common::printDivider();
@@ -43,6 +43,10 @@
         $actionLinks = ob_get_contents();
         ob_end_clean();
         echo $actionLinks;
+    }
+    else
+    {
+        common::printRPN($browseLink);
     }
     ?>
   </div>

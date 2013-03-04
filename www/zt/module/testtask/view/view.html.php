@@ -2,21 +2,21 @@
 /**
  * The view file of case module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
- * @version     $Id: view.html.php 3775 2012-12-12 03:24:41Z zhujinyonging@gmail.com $
+ * @version     $Id: view.html.php 4141 2013-01-18 06:15:13Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/tablesorter.html.php';?>
 <table class='table-1'> 
-  <caption>TASK #<?php echo $task->id . ' ' . $task->name;?></caption>
+  <caption <?php if($task->deleted) echo "class='deleted'";?>>TASK #<?php echo $task->id . ' ' . $task->name;?></caption>
   <tr>
     <th class='rowhead'><?php echo $lang->testtask->name;?></th>
-    <td class='<?php if($task->deleted) echo 'deleted';?>'><?php echo $task->name;?>
+    <td><?php echo $task->name;?>
   </tr>  
   <tr>
     <th class='rowhead'><?php echo $lang->testtask->project;?></th>
@@ -50,18 +50,26 @@
     <th class='rowhead'><?php echo $lang->testtask->desc;?></th>
     <td class='content'><?php echo $task->desc;?></td>
   </tr>  
+  <tr>
+    <th class='rowhead'><?php echo $lang->testtask->report;?></th>
+    <td class='content'><?php echo $task->report;?></td>
+  </tr>  
 </table>
 <div class='a-center f-16px strong'>
   <?php
   $browseLink = $this->session->testtaskList ? $this->session->testtaskList : $this->createLink('testtask', 'browse', "productID=$task->product");
   if(!$task->deleted)
   {
-      common::printLink('testtask', 'cases',    "taskID=$task->id", $lang->testtask->cases);
-      common::printLink('testtask', 'linkcase', "taskID=$task->id", $lang->testtask->linkCaseAB);
-      common::printLink('testtask', 'edit',   "taskID=$task->id",$lang->edit);
-      common::printLink('testtask', 'delete', "taskID=$task->id", $lang->delete, 'hiddenwin');
-      echo html::a($browseLink, $lang->goback);
+      common::printIcon('testtask', 'start',    "taskID=$task->id", $task);
+      common::printIcon('testtask', 'close',    "taskID=$task->id", $task);
+      common::printIcon('testtask', 'cases',    "taskID=$task->id", $task);
+      common::printIcon('testtask', 'linkCase', "taskID=$task->id", $task);
+
+      common::printDivider();
+      common::printIcon('testtask', 'edit',     "taskID=$task->id");
+      common::printIcon('testtask', 'delete',   "taskID=$task->id", '', 'button', '', 'hiddenwin');
   }
+  common::printRPN($browseLink);
   ?>
 </div>
 <?php include '../../common/view/action.html.php';?>

@@ -2,11 +2,11 @@
 /**
  * The edit view of build module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     build
- * @version     $Id: edit.html.php 3531 2012-09-19 06:09:12Z chencongzhi520@gmail.com $
+ * @version     $Id: edit.html.php 4386 2013-02-19 07:37:45Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -65,7 +65,7 @@
                   <div class="contentDiv">
                     <table class='f-left table-1 fixed'>
                       <?php foreach($stories as $key => $story):?>
-                      <?php $storyLink = $this->createLink('story', 'view', "storyID=$story->id");?>
+                      <?php $storyLink = $this->createLink('story', 'view', "storyID=$story->id", '', true);?>
                       <tr class='a-center'>
                         <td class='w-id a-left' id='story'><input type='checkbox' name='stories[]' value="<?php echo $story->id;?>" <?php if(strpos(',' . $build->stories . ',', ',' . $story->id . ',') !== false) echo 'checked';?>> <?php echo sprintf('%03d', $story->id);?></td>
                         <td class='a-left nobr'><?php echo html::a($storyLink, $story->title, '', "class='preview'");?></td>
@@ -99,7 +99,7 @@
                   <div class='contentDiv'>
                     <table class='f-left table-1 fixed'>
                       <?php foreach($bugs as $bug):?>
-                      <?php $bugLink = $this->createLink('bug', 'view', "bugID=$bug->id");?>
+                      <?php $bugLink = $this->createLink('bug', 'view', "bugID=$bug->id", '', true);?>
                       <tr class='a-center'>
                         <td class='w-id a-left' id='bug'><input type='checkbox' name='bugs[]' value="<?php echo $bug->id;?>" <?php if(strpos(',' . $build->bugs . ',', ',' . $bug->id . ',') !== false) echo 'checked';?>> <?php echo sprintf('%03d', $bug->id);?></td>
                         <td class='a-left nobr'><?php echo html::a($bugLink, $bug->title, '', "class='preview'");?></td>

@@ -2,11 +2,11 @@
 /**
  * The view file of view method of todo module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     todo
- * @version     $Id: view.html.php 3753 2012-12-11 05:51:16Z wwccss $
+ * @version     $Id: view.html.php 4491 2013-02-27 03:35:41Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -20,7 +20,7 @@
   </tr>  
   <tr>
     <th class='rowhead'><?php echo $lang->todo->date;?></th>
-    <td><?php print($todo->date == TODOModel::DAY_IN_FUTURE ? $lang->todo->dayInFuture : date(DT_DATE1, strtotime($todo->date)));?></td>
+    <td><?php echo $todo->date == '20300101' ? $lang->todo->periods['future'] : date(DT_DATE1, strtotime($todo->date));?></td>
   </tr>  
   <tr>
     <th class='rowhead'><?php echo $lang->todo->type;?></th>
@@ -58,7 +58,7 @@
     </td>
   </tr>  
 </table>
-<div class='a-center f-16px strong'>
+<div class='a-center f-16px strong pb-10px'>
   <?php
   if($this->session->todoList)
   {
@@ -74,10 +74,10 @@
   }
   if($todo->account == $app->user->account)
   {
-      common::printLink('todo', 'edit',   "todoID=$todo->id", $lang->edit);
-      common::printLink('todo', 'delete', "todoID=$todo->id", $lang->delete, 'hiddenwin');
+      common::printIcon('todo', 'edit',   "todoID=$todo->id");
+      common::printIcon('todo', 'delete', "todoID=$todo->id", '', 'button', '', 'hiddenwin');
   }
-  echo html::a($browseLink, $lang->goback);
+  common::printRPN($browseLink);
   ?>
 </div>
 <?php $actionTheme = 'table'; include '../../common/view/action.html.php';?>

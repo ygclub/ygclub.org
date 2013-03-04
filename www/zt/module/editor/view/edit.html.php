@@ -2,7 +2,7 @@
 /**
  * The editor view file of dir module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yidong Wang <yidong@cnezsoft.com>
  * @package     editor
@@ -11,8 +11,7 @@
  */
 ?>
 <?php include '../../common/view/header.lite.html.php';?>
-<?php include '../../common/view/colorbox.html.php';?>
-<form method='post' target='hiddenwin' action='<?php echo inlink('save', "filePath=$safeFilePath&action=$action")?>' id='dataform'>
+<form method='post' target='hiddenwin' action='<?php echo inlink('save', "filePath=$safeFilePath&action=$action")?>'>
 <table class='table-1'>
   <?php if($filePath):?>        
   <caption>
@@ -29,9 +28,7 @@
   </tr>
   <?php endif?>
   <tr>
-    <td>
-    <?php echo html::textarea('fileContent', str_replace('&', '&amp;', $fileContent), "class='w-p100'")?>
-    </td>
+    <td><?php echo html::textarea('fileContent', str_replace('&', '&amp;', $fileContent), "class='w-p100'")?></td>
   </tr>
   <tr>
     <td>

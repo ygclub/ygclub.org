@@ -47,9 +47,10 @@ function loadFixedCSS()
  * @access public
  * @return string
  */
-function createLink(moduleName, methodName, vars, viewType)
+function createLink(moduleName, methodName, vars, viewType, isOnlyBody)
 {
-    if(!viewType) viewType = config.defaultView;
+    if(!viewType)   viewType   = config.defaultView;
+    if(!isOnlyBody) isOnlyBody = false;
     if(vars)
     {
         vars = vars.split('&');
@@ -78,7 +79,7 @@ function createLink(moduleName, methodName, vars, viewType)
     }
 
     /* if page has onlybody param then add this param in all link. the param hide header and footer. */
-    if(onlybody == 'yes')
+    if(onlybody == 'yes' || isOnlyBody)
     {
         var onlybody = config.requestType == 'PATH_INFO' ? "?onlybody=yes" : '&onlybody=yes';
         link = link + onlybody;
@@ -100,27 +101,6 @@ function shortcut()
     {
         location.href=createLink(objectType, 'view', "id=" + objectValue);
     }
-}
-
-/**
- * Set the titile of all objects which class is .nobr.
- * 
- * @access public
- * @return void
- */
-function setNowrapObjTitle()
-{
-    $('.nobr').each(function (i) 
-    {
-        if($.browser.mozilla) 
-        {
-            this.title = this.textContent;
-        }
-        else
-        {
-            this.title = this.innerText;
-        }
-    })
 }
 
 /**
@@ -339,7 +319,7 @@ function setHelpLink()
         $(this).after(' <a class="helplink ' + className + '" href=' + helpLink + ' target="_blank">?</a> ');
     });
 
-    if($('a.helplink').size()) $("a.helplink").colorbox({width:600, height:240, iframe:true, transition:'elastic', speed:350, scrolling:false});
+    if($('a.helplink').size()) $("a.helplink").colorbox({width:600, height:240, iframe:true, transition:'none', scrolling:false});
 }
 
 /**
@@ -459,7 +439,7 @@ function setOuterBox()
  */
 function setAbout()
 {
-    if($('a.about').size()) $("a.about").colorbox({width:900, height:330, iframe:true, transition:'elastic', speed:500, scrolling:false});
+    if($('a.about').size()) $("a.about").colorbox({width:900, height:330, iframe:true, transition:'none', scrolling:false});
 }
 
 /**
@@ -547,7 +527,7 @@ function setSubversionLink()
 /* Set the colorbox of export. */
 function setExport()
 {
-   if($('.export').size()) $(".export").colorbox({width:500, height:200, iframe:true, transition:'elastic', speed:350, scrolling:true});
+   if($('.export').size()) $(".export").colorbox({width:600, height:200, iframe:true, transition:'none', scrolling:true});
 }
 
 /**
@@ -567,6 +547,19 @@ function setMailto(mailto, contactListID)
         $('#' + mailto).val(users);
     });
 }
+
+/**
+ * Set comment. 
+ * 
+ * @access public
+ * @return void
+ */
+function setComment()
+{
+    $('#comment').toggle();
+    setTimeout(function() { $('#comment textarea').focus(); }, 50);
+}
+
 /**
  * Auto checked the checkbox of a row. 
  * 
@@ -662,6 +655,17 @@ function ajaxGetSearchForm()
             $('#querybox').html(data);
         });
     }
+}
+
+/**
+ * Hide the link of clearData.
+ * 
+ * @access public
+ * @return void
+ */
+function hideClearDataLink()
+{
+    if(typeof showDemoUsers == 'undefined' || !showDemoUsers) $('#submenuclearData').addClass('hidden');
 }
 
 /**
@@ -791,53 +795,50 @@ function selectItem(SelectID)
     }
 }
 
-/**
- * Save checked item to cookie when click a object.
- * 
- * @param  string $obj 
- * @access public
- * @return void
- */
-function getCheckedItem(obj)
-{
-  $(obj).click(function(){
-      var checkeds = '';
-      $(':checkbox').each(function(){
-          if($(this).attr('checked'))
-          {
-              var checkedVal = parseInt($(this).val());
-              if(checkedVal != 0) checkeds = checkeds + checkedVal + ',';
-          }
-      })
-      if(checkeds != '') checkeds = checkeds.substring(0, checkeds.length - 1);
-      $.cookie('checkedItem', checkeds, {expires:config.cookieLife, path:config.webRoot});
-  })
-}
-
 /* Ping the server every some minutes to keep the session. */
 needPing = true;
 
 /* When body's ready, execute these. */
 $(document).ready(function() 
 {
-    setNowrapObjTitle();
+    loadFixedCSS();
+    setForm();
+    saveWindowSize();
+    setDebugWin('white');
+    setOuterBox();
+
     setRequiredFields();
     setPlaceholder();
     setProductSwitcher();
     setProjectSwitcher();
-    setAbout();
     saveProduct();
     saveProject();
-    setForm();
-    setSubversionLink();
+
+    setAbout();
     setExport();
+    setSubversionLink();
+
     autoCheck();
     toggleSearch();
-    saveWindowSize();
-    loadFixedCSS();
-    getCheckedItem('.export');
-    $(window).resize(function(){saveWindowSize()});       // When window resized, call it again.
+
+    hideClearDataLink();
+
+    $(window).resize(function(){saveWindowSize()});   // When window resized, call it again.
     if(needPing) setTimeout('setPing()', 1000 * 60);  // After 5 minutes, begin ping.
+
+    $('.export').bind('click', function()
+    {
+        var checkeds = '';
+        $(':checkbox').each(function(){
+            if($(this).attr('checked'))
+            {
+                var checkedVal = parseInt($(this).val());
+                if(checkedVal != 0) checkeds = checkeds + checkedVal + ',';
+            }
+        })
+        if(checkeds != '') checkeds = checkeds.substring(0, checkeds.length - 1);
+        $.cookie('checkedItem', checkeds, {expires:config.cookieLife, path:config.webRoot});
+    });
 });
 
 /* CTRL+g, auto focus on the search box. */

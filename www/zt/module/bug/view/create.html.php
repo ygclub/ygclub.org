@@ -2,30 +2,32 @@
 /**
  * The create view of bug module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: create.html.php 3887 2012-12-24 10:06:50Z wwccss $
+ * @version     $Id: create.html.php 4259 2013-01-24 05:49:40Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/chosen.html.php';?>
-<?php include '../../common/view/autocomplete.html.php';?>
-<?php include '../../common/view/alert.html.php';?>
-<?php include '../../common/view/kindeditor.html.php';?>
-<script>var holders = <?php echo json_encode($lang->bug->placeholder);?></script>
-<script language='Javascript'>
-userList = "<?php echo join(',', array_keys($users));?>".split(',');
-</script>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/chosen.html.php';
+include '../../common/view/autocomplete.html.php';
+include '../../common/view/alert.html.php';
+include '../../common/view/kindeditor.html.php';
+js::set('holders', $lang->bug->placeholder);
+js::set('userList', array_keys($users));
+js::set('page', 'create');
+?>
+
 <form method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
   <table class='table-1'> 
     <caption><?php echo $lang->bug->create;?></caption>
     <tr>
       <th class='rowhead'><?php echo $lang->bug->lblProductAndModule;?></th>
       <td>
-        <?php echo html::select('product', $products, $productID, "onchange='loadAll(this.value)' class='select-3'");?>
+        <?php echo html::select('product', $products, $productID, "onchange=loadAll(this.value) class='select-3'");?>
         <span id='moduleIdBox'><?php echo html::select('module', $moduleOptionMenu, $moduleID, "onchange='setAssignedTo()'");?></span>
       </td>
      </tr>  
@@ -46,17 +48,13 @@ userList = "<?php echo join(',', array_keys($users));?>".split(',');
     </tr>
     <tr>
       <th class='rowhead'><?php echo $lang->bug->title;?></th>
-      <td><?php echo html::input('title', $title, "class='text-1'");?></td>
+      <td><?php echo html::input('title', $bugTitle, "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->bug->steps;?></th>
       <td>
-        <table class='w-p100 bd-none'>
-          <tr class='bd-none' valign='top'>
-            <td class='w-p85 bd-none padding-zero'><?php echo html::textarea('steps', $steps, "rows='10'");?></td>
-            <td class='bd-none pl-10px' id='tplBox'><?php echo $this->fetch('bug', 'buildTemplates');?></td>
-          </tr>
-        </table>
+        <div class='w-p85 bd-none padding-zero f-left'><?php echo html::textarea('steps', $steps, "rows='10'");?></div>
+        <div class='bd-none pl-10px f-left' id='tplBox'><?php echo $this->fetch('bug', 'buildTemplates');?></div>
       </td>
     </tr>  
     <tr>

@@ -2,11 +2,11 @@
 /**
  * The control file of case currentModule of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
- * @version     $Id: control.php 3874 2012-12-24 01:01:12Z wwccss $
+ * @version     $Id: control.php 4515 2013-03-02 06:46:34Z wwccss $
  * @link        http://www.zentao.net
  */
 class testcase extends control
@@ -89,6 +89,7 @@ class testcase extends control
                 ->andWhere('t1.deleted')->eq(0)
                 ->andWhere('t2.version > t1.storyVersion')
                 ->orderBy($orderBy)
+                ->page($pager)
                 ->fetchAll();
         }
         /* By search. */
@@ -121,7 +122,7 @@ class testcase extends control
         }
 
         /* save session .*/
-        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'testcase');
+        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'testcase', $browseType == 'needconfirm' ? false : true);
 
         /* Build the search form. */
         $this->config->testcase->search['params']['product']['values']= array($productID => $this->products[$productID], 'all' => $this->lang->testcase->allProduct);
@@ -131,7 +132,7 @@ class testcase extends control
         $this->loadModel('search')->setSearchParams($this->config->testcase->search);
 
         /* Assign. */
-        $this->view->header->title = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->common;
+        $this->view->title         = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->common;
         $this->view->position[]    = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
         $this->view->position[]    = $this->lang->testcase->common;
         $this->view->productID     = $productID;
@@ -185,7 +186,7 @@ class testcase extends control
         $type         = 'feature';
         $stage        = '';
         $pri          = 0;
-        $title        = '';
+        $caseTitle    = '';
         $precondition = '';
         $keywords     = '';
         $steps        = array();
@@ -199,7 +200,7 @@ class testcase extends control
             $stage        = $testcase->stage;
             $pri          = $testcase->pri;
             $storyID      = $testcase->story;
-            $title        = $testcase->title;
+            $caseTitle    = $testcase->title;
             $precondition = $testcase->precondition;
             $keywords     = $testcase->keywords;
             $steps        = $testcase->steps;
@@ -212,7 +213,7 @@ class testcase extends control
             $type     = $bug->type;
             $pri      = $bug->pri ? $bug->pri : $bug->severity;
             $storyID  = $bug->story;
-            $title    = $bug->title;
+            $caseTitle= $bug->title;
             $keywords = $bug->keywords;
             $steps    = $this->testcase->createStepsFromBug($bug->steps);
         }
@@ -227,12 +228,13 @@ class testcase extends control
             for($i = 1; $i <= $paddingCount; $i ++) $steps[] = $step;
         }
 
-        $header['title'] = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->create;
-        $position[]      = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
-        $position[]      = $this->lang->testcase->create;
+        $title      = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->create;
+        $position[] = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
+        $position[] = $this->lang->testcase->create;
 
         $users = $this->user->getPairs();
-        $this->view->header           = $header;
+        $this->view->title            = $title;
+        $this->view->caseTitle        = $caseTitle;
         $this->view->position         = $position;
         $this->view->productID        = $productID;
         $this->view->users            = $users;           
@@ -284,12 +286,12 @@ class testcase extends control
         $type         = 'feature';
         $title        = '';
 
-        $header['title'] = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->batchCreate;
-        $position[]      = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
-        $position[]      = $this->lang->testcase->batchCreate;
+        $title      = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->batchCreate;
+        $position[] = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
+        $position[] = $this->lang->testcase->batchCreate;
 
         $users = $this->user->getPairs();
-        $this->view->header           = $header;
+        $this->view->title            = $title;
         $this->view->position         = $position;
         $this->view->productID        = $productID;
         $this->view->users            = $users;           
@@ -319,9 +321,9 @@ class testcase extends control
         $productID = $case->product;
         $this->testcase->setMenu($this->products, $productID);
 
-        $this->view->header->title   = "CASE #$case->id $case->title - " . $this->products[$productID];
-        $this->view->position[]      = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->testcase->view;
+        $this->view->title      = "CASE #$case->id $case->title - " . $this->products[$productID];
+        $this->view->position[] = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[] = $this->lang->testcase->view;
 
         $this->view->case           = $case;
         $this->view->productName    = $this->products[$productID];
@@ -369,13 +371,14 @@ class testcase extends control
         $case = $this->testcase->getById($caseID);
         if(empty($case->steps))
         {
+            $step = new stdclass();
             $step->desc   = '';
             $step->expect = '';
             $case->steps[] = $step;
         }
         $productID       = $case->product;
         $currentModuleID = $case->module;
-        $header['title'] = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->edit;
+        $title           = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->edit;
         $position[]      = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
         $position[]      = $this->lang->testcase->edit;
 
@@ -383,7 +386,7 @@ class testcase extends control
         $this->testcase->setMenu($this->products, $productID);
 
         $users = $this->user->getPairs();
-        $this->view->header           = $header;
+        $this->view->title            = $title;
         $this->view->position         = $position;
         $this->view->productID        = $productID;
         $this->view->productName      = $this->products[$productID];
@@ -391,11 +394,8 @@ class testcase extends control
         $this->view->currentModuleID  = $currentModuleID;
         $this->view->users            = $users;
         $this->view->stories          = $this->story->getProductStoryPairs($productID);
-
-        $this->view->header   = $header;
-        $this->view->position = $position;
-        $this->view->case     = $case;
-        $this->view->actions  = $this->loadModel('action')->getList('case', $caseID);
+        $this->view->case             = $case;
+        $this->view->actions          = $this->loadModel('action')->getList('case', $caseID);
 
         $this->display();
     }
@@ -437,10 +437,10 @@ class testcase extends control
             $this->app->session->set('showSuhosinInfo', $showSuhosinInfo);
 
             /* Assign. */
-            $this->view->header->title   = $product->name . $this->lang->colon . $this->lang->testcase->batchEdit;
-            $this->view->position[]      = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
-            $this->view->position[]      = $this->lang->testcase->common;
-            $this->view->position[]      = $this->lang->testcase->batchEdit;
+            $this->view->title      = $product->name . $this->lang->colon . $this->lang->testcase->batchEdit;
+            $this->view->position[] = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
+            $this->view->position[] = $this->lang->testcase->common;
+            $this->view->position[] = $this->lang->testcase->batchEdit;
 
             if($showSuhosinInfo) $this->view->suhosinInfo = $this->lang->suhosinInfo;
             $this->view->moduleOptionMenu = $this->tree->getOptionMenu($productID, $viewType = 'case', $startModuleID = 0);

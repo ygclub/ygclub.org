@@ -2,11 +2,11 @@
 /**
  * The install module zh-tw file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     install
- * @version     $Id: zh-tw.php 3879 2012-12-24 06:24:54Z wyd621@gmail.com $
+ * @version     $Id: zh-tw.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->install = new stdclass();
@@ -128,8 +128,6 @@ $lang->install->groupList['TOP']['name']    = '高層管理';
 $lang->install->groupList['TOP']['desc']    = '高層管理';
 $lang->install->groupList['OTHERS']['name'] = '其他';
 $lang->install->groupList['OTHERS']['desc'] = '其他';
-$lang->install->groupList['guest']['name']  = '遊客';
-$lang->install->groupList['guest']['desc']  = '遊客';
 
 $lang->install->success = "安裝成功";
 

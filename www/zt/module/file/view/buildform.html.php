@@ -3,7 +3,6 @@
   /* Define the html code of a file row. */
   $fileRow = <<<EOT
   <div class='fileBox' id='fileBox\$i'>
-    <span class='icon'><span class='icon-file'></span>{$lang->file->common}<span class='fileID'>\$i</span></span>
     <input type='file' name='files[]' class='fileControl'  tabindex='-1' />
     <label tabindex='-1' class='fileLabel'>{$lang->file->label}</label>
     <input type='text' name='labels[]' class='text-3' tabindex='-1' /> 
@@ -11,11 +10,21 @@
     <input type='button' onclick='delFile(this)'  class='icon-delete' value='&nbsp;'></input>
   </div>
 EOT;
-  printf($lang->file->maxUploadSize, ini_get('upload_max_filesize'));
   for($i = 1; $i <= $fileCount; $i ++) echo str_replace('$i', $i, $fileRow);
 ?>
 </div>
 <script language='javascript'>
+/**
+ * Show the upload max filesize of config.  
+ */
+maxUploadInfo = "(<?php printf($lang->file->maxUploadSize, ini_get('upload_max_filesize'));?>)";
+$(function()
+{
+    parentTag = $('#fileform').parent();
+    if(parentTag.attr('tagName') == 'TD') parentTag.parent().find('th').append(maxUploadInfo); 
+    if(parentTag.attr('tagName') == 'FIELDSET') parentTag.find('legend').append(maxUploadInfo);
+});
+
 /**
  * Set the width of the file form.
  * 

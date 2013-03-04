@@ -2,11 +2,11 @@
 /**
  * The task group view file of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: grouptask.html.php 3635 2012-11-26 05:26:15Z wyd621@gmail.com $
+ * @version     $Id: grouptask.html.php 4143 2013-01-18 07:01:06Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -90,7 +90,7 @@
    ?>
     <tr id='<?php echo $task->id;?>' class='a-center child-of-node-<?php echo $groupKey;?>'>
       <td class='<?php echo $groupClass;?>'></td>
-      <td class='a-left'>&nbsp;<?php echo $task->id . $lang->colon; if(common::hasPriv('task', 'view')) echo html::a($this->createLink('task', 'view', "task=$task->id"), $task->name); else echo $task->name;?></td>
+      <td class='a-left'>&nbsp;<?php echo $task->id . $lang->colon; if(!common::printLink('task', 'view', "task=$task->id", $task->name)) echo $task->name;?></td>
       <td><span class='<?php echo 'pri' . $task->pri?>'><?php echo $task->pri;?></span></td>
       <td <?php echo $assignedToClass;?>><?php echo $task->assignedToRealName;?></td>
       <td><?php echo $users[$task->finishedBy];?></td>
@@ -101,8 +101,8 @@
       <td class=<?php if(isset($task->delay)) echo 'delayed';?>><?php if(substr($task->deadline, 0, 4) > 0) echo $task->deadline;?></td>
       <td class=<?php echo $task->status;?> ><?php echo $lang->task->statusList[$task->status];?></td>
       <td>
-        <?php if(common::hasPriv('task', 'edit'))   echo html::a($this->createLink('task', 'edit',   "taskid=$task->id"), $lang->edit);?>
-        <?php if(common::hasPriv('task', 'delete')) echo html::a($this->createLink('task', 'delete', "projectID=$task->project&taskid=$task->id"), $lang->delete, 'hiddenwin');?>
+        <?php common::printIcon('task', 'edit', "taskid=$task->id", '', 'list');?>
+        <?php common::printIcon('task', 'delete', "projectID=$task->project&taskid=$task->id", '', 'list', '', 'hiddenwin');?>
       </td>
     </tr>
     <?php endforeach;?>

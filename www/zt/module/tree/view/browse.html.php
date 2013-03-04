@@ -2,11 +2,11 @@
 /**
  * The browse view file of tree module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     tree
- * @version     $Id: browse.html.php 3804 2012-12-15 01:01:55Z wwccss $
+ * @version     $Id: browse.html.php 4461 2013-02-26 06:10:59Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -17,7 +17,7 @@
     <td class='side'>
       <form method='post' target='hiddenwin' action='<?php echo $this->createLink('tree', 'updateOrder', "root={$root->id}&viewType=$viewType");?>'>
         <table class='table-1'>
-          <caption><?php echo $header->title;?></caption>
+          <caption><?php echo $title;?></caption>
           <tr>
             <td>
               <div id='main'><?php echo $modules;?></div>
@@ -56,14 +56,14 @@
                   {
                       echo html::select('allProject', $allProject, '', 'onchange=syncProductOrProject(this,"project")');
                       echo html::select('projectModule', $projectModules, '');
-                      echo html::commonButton($lang->tree->syncFromProject, 'id=copyModule onclick=syncModule('.$currentProject.',"task")');
+                      echo html::commonButton($lang->tree->syncFromProject, "id='copyModule' onclick='syncModule($currentProject, \"task\")'");
                   }
                   echo '<br />';
               }
               elseif($viewType != 'story' and strpos($viewType, 'doc') === false and $viewType != 'webapp')
               {
                   echo html::select('productModule', $productModules, '', 'class=select-3');
-                  echo html::commonButton($lang->tree->syncFromProduct, 'onclick=syncModule('.$rootID.')');
+                  echo html::commonButton($lang->tree->syncFromProduct, 'onclick="syncModule('.$rootID.')"');
                   echo '<br />';
               }
               else if($viewType == 'story')
@@ -72,7 +72,7 @@
                   {
                       echo html::select('allProduct', $allProduct, '', 'onchange=syncProductOrProject(this,"product")');
                       echo html::select('productModule', $productModules, '');
-                      echo html::commonButton($lang->tree->syncFromProduct, 'id=copyModule onclick=syncModule('.$currentProduct.')');
+                      echo html::commonButton($lang->tree->syncFromProduct, "id='copyModule' onclick='syncModule($currentProduct, \"story\")'");
                   }
                   echo '<br />';
               }
@@ -105,6 +105,12 @@
   </tr>
 </table>
 <?php 
-if(strpos($viewType, 'doc') !== false) include '../../doc/view/footer.html.php';
-if($viewType != 'doc') include '../../common/view/footer.html.php';
+if(strpos($viewType, 'doc') !== false) 
+{
+    include '../../doc/view/footer.html.php';
+}
+else
+{
+    include '../../common/view/footer.html.php';
+}
 ?>

@@ -2,11 +2,11 @@
 /**
  * The company module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     company
- * @version     $Id: en.php 3536 2012-09-21 03:09:38Z zhujinyonging@gmail.com $
+ * @version     $Id: en.php 4438 2013-02-23 02:02:11Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->company->common   = 'Company';
@@ -30,11 +30,10 @@ $lang->company->phone    = 'Phone';
 $lang->company->fax      = 'Fax';
 $lang->company->address  = 'Address';
 $lang->company->zipcode  = 'Zipcode';
-$lang->company->website  = 'Web site';
-$lang->company->backyard = 'Internal Site';
-$lang->company->pms      = 'ZenTaoPMS Site';
-$lang->company->guest    = 'Guest visit';
-$lang->company->unlock   = 'Unlock';
+$lang->company->website  = 'Website';
+$lang->company->backyard = 'Intranet';
+$lang->company->pms      = 'Zentao';
+$lang->company->guest    = 'Guest';
 
 $lang->company->guestList[0] = 'Deny';
 $lang->company->guestList[1] = 'Allow';

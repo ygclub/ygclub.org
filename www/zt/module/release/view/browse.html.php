@@ -2,11 +2,11 @@
 /**
  * The browse view file of release module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     release
- * @version     $Id: browse.html.php 3577 2012-10-25 07:00:49Z chencongzhi520@gmail.com $
+ * @version     $Id: browse.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -15,7 +15,7 @@
 <table align='center' class='table-6 tablesorter'>
   <caption class='caption-tl'>
     <div class='f-left'><?php echo $lang->release->browse;?></div>
-    <div class='f-right'><?php common::printLink('release', 'create', "product=$product->id", $lang->release->create);?></div>
+    <div class='f-right'><?php common::printIcon('release', 'create', "product=$product->id");?></div>
   </caption>
   <thead>
   <tr class='colhead'>
@@ -23,7 +23,7 @@
     <th><?php echo $lang->release->name;?></th>
     <th><?php echo $lang->release->build;?></th>
     <th class='w-100px'><?php echo $lang->release->date;?></th>
-    <th class='w-80px'><?php echo $lang->actions;?></th>
+    <th class='w-60px'><?php echo $lang->actions;?></th>
   </tr>
   </thead>
   <tbody>
@@ -33,7 +33,7 @@
     <td><?php echo html::a(inlink('view', "release=$release->id"), $release->name);?></td>
     <td><?php echo $release->buildName;?></td>
     <td class='a-center'><?php echo $release->date;?></td>
-    <td class='a-right'>
+    <td class='a-center'>
       <?php
       common::printIcon('release', 'edit',   "release=$release->id", '', 'list');
       common::printIcon('release', 'delete', "release=$release->id", '', 'list', '', 'hiddenwin');

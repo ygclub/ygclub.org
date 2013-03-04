@@ -87,7 +87,7 @@ class html
         $newline = $newline ? "\n" : '';
 
         /* if page has onlybody param then add this param in all link. the param hide header and footer. */
-        if(strpos($href, 'onlybody=yes') === false and isset($_GET['onlybody']) and $_GET['onlybody'] == 'yes')
+        if(strpos($href, 'onlybody=yes') === false and isonlybody())
         {
             $onlybody = $config->requestType == 'PATH_INFO' ? "?onlybody=yes" : "&onlybody=yes";
             $href .= $onlybody;
@@ -451,23 +451,24 @@ EOT;
      * 
      * @param  string $label    the link title
      * @param  string $link     the link url
+     * @param  string $target   the target window
      * @param  string $misc     other params
      * @static
      * @access public
      * @return string
      */
-    public static function linkButton($label = '', $link = '', $misc = '')
+    public static function linkButton($label = '', $link = '', $target = 'self', $misc = '')
     {
         global $config;
 
         /* if page has onlybody param then add this param in all link. the param hide header and footer. */
-        if(strpos($link, 'onlybody=') === false and isset($_GET['onlybody']) and $_GET['onlybody'] == 'yes')
+        if(strpos($link, 'onlybody=') === false and isonlybody())
         {
             $onlybody = $config->requestType == 'PATH_INFO' ? "?onlybody=yes" : "&onlybody=yes";
             $link .= $onlybody;
         }
 
-        return " <input type='button' value='$label' $misc onclick='location.href=\"$link\"' class='button-c' /> ";
+        return " <input type='button' value='$label' $misc onclick='{$target}.location=\"$link\"' class='button-c' /> ";
     }
 
     /**
@@ -703,7 +704,9 @@ EOT;
     static public function reload($window = 'self')
     {
         $js  = self::start();
-        $js .=  "$window.location.href=$window.location.href";
+        $js .= "var href = $window.location.href;\n";
+        $js .= "$window.location.href = href.indexOf('#') < 0 ? href : href.substring(0, href.indexOf('#'));";
+
         $js .= self::end();
         return $js;
     }
@@ -767,6 +770,41 @@ EOT;
     {
         $js = self::start();
         $js .= $code;
+        $js .= self::end();
+        echo $js;
+    }
+
+    /**
+     * Set js value.
+     * 
+     * @param  string   $key 
+     * @param  mix      $value 
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function set($key, $value)
+    {
+        $js  = self::start(false);
+        if(is_array($value) or is_object($value))
+        {
+            $value = json_encode($value);
+            $js .= "$key = $value";
+        }
+        elseif(is_numeric($value))
+        {
+            $js .= "$key = $value";
+        }
+        elseif(is_bool($value))
+        {
+            $value = $value ? 'true' : 'false';
+            $js .= "$key = $value";
+        }
+        else
+        {
+            $value = addslashes($value);
+            $js .= "$key = '$value'";
+        }
         $js .= self::end();
         echo $js;
     }

@@ -2,11 +2,11 @@
 /**
  * The project module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: en.php 3835 2012-12-17 10:26:50Z wwccss $
+ * @version     $Id: en.php 4436 2013-02-23 01:40:51Z wwccss $
  * @link        http://www.zentao.net
  */
 /* Fields. */
@@ -49,10 +49,21 @@ $lang->project->totalConsumed = 'Done';
 $lang->project->totalLeft     = 'Left';
 $lang->project->progess       = 'Progess';
 $lang->project->viewBug       = 'View bug';
-$lang->project->createTesttask= 'Create testtask';
 $lang->project->noProduct     = 'No product';
 $lang->project->select        = '--select project--';
 $lang->project->createStory   = "Create story";
+$lang->project->all           = 'All';
+$lang->project->typeDesc      = 'No module in sprint, no burndown for waterfall, no story in OPS';
+
+$lang->project->start    = 'Start';
+$lang->project->activate = 'Activate';
+$lang->project->putoff   = 'Putoff';
+$lang->project->suspend  = 'Suspend';
+$lang->project->close    = 'Close';
+
+$lang->project->typeList['sprint']    = 'Sprint';
+$lang->project->typeList['waterfall'] = 'Waterfall';
+$lang->project->typeList['ops']       = 'OPS';
 
 $lang->project->endList[14]  = 'Two Weeks';
 $lang->project->endList[31]  = 'One Month';
@@ -73,10 +84,10 @@ $lang->project->basicInfo = 'Basic info';
 $lang->project->otherInfo = 'Other info';
 
 /* Lists. */
-$lang->project->statusList['']      = '';
-$lang->project->statusList['wait']  = 'Pending';
-$lang->project->statusList['doing'] = 'Progressing';
-$lang->project->statusList['done']  = 'Done';
+$lang->project->statusList['wait']      = 'Pending';
+$lang->project->statusList['doing']     = 'Progressing';
+$lang->project->statusList['suspended'] = 'Suspended';
+$lang->project->statusList['done']      = 'Done';
 
 $lang->project->aclList['open']    = 'Default(Having the priviledge of project module can visit this project)';
 $lang->project->aclList['private'] = 'Private(Only team members can visit)';
@@ -92,7 +103,7 @@ $lang->project->dynamic         = 'Dynamic';
 $lang->project->build           = 'Build';
 $lang->project->testtask        = 'Testtask';
 $lang->project->burn            = 'Burndown';
-$lang->project->computeBurn     = 'Update burndown';
+$lang->project->computeBurn     = 'Update';
 $lang->project->burnData        = 'Burndown data';
 $lang->project->team            = 'Team';
 $lang->project->doc             = 'Doc';
@@ -116,9 +127,9 @@ $lang->project->allTasks             = 'All';
 $lang->project->assignedToMe         = 'To me';
 
 $lang->project->statusSelects['']             = 'More';
-$lang->project->statusSelects['finishedbyme'] = 'Mydone'; 
+$lang->project->statusSelects['finishedbyme'] = 'Finished by me'; 
 $lang->project->statusSelects['wait']         = 'Pending';
-$lang->project->statusSelects['doing']        = 'Progressing';
+$lang->project->statusSelects['doing']        = 'Doing';
 $lang->project->statusSelects['done']         = 'Done'; 
 $lang->project->statusSelects['closed']       = 'Closed';
 $lang->project->statusSelects['delayed']      = 'Delayed';
@@ -151,13 +162,13 @@ $lang->project->beginAndEnd     = 'Begin and end';
 $lang->project->lblStats        = 'Stats';
 $lang->project->stats           = 'Total work hours is 『%s』hours, <br />Total estimate is『%s』hours,<br />Total confused is『%s』hours<br />Total left is『%s』hours';
 $lang->project->oneLineStats    = "Project『%s』, code is『%s』, products is『%s』,begin from『%s』to 『%s』,total estimate『%s』hours,consumed『%s』hours,left『%s』hours.";
-$lang->project->taskSummary     = "Total tasks shown: <strong>%s</strong>. Pending: <strong>%s</strong>. In progress: <strong>%s</strong>. Estimate: <strong>%s</strong> hrs. Consumed: <strong>%s</strong> hrs. Hours left: <strong>%s</strong>.";
+$lang->project->taskSummary     = "<strong>%s</strong> tasks in this page. Pending: <strong>%s</strong>. doing: <strong>%s</strong>. Est: <strong>%s</strong> h. Consumed: <strong>%s</strong> h. Left: <strong>%s</strong>.";
 $lang->project->memberHours     = "%s has <strong>%s</strong> workhours, ";
 $lang->project->groupSummary    = "<strong>%s</strong> tasks in this group, wait:<strong>%s</strong>, doing:<strong>%s</strong>, estimate <strong>%s</strong>, consumed <strong>%s</strong>, left <strong>%s</strong> hours.";
 $lang->project->wbs             = "WBS";
 $lang->project->batchWBS        = "Batch WBS";
 $lang->project->largeBurnChart  = 'View large';
-$lang->project->howToUpdateBurn = "<a href='%s' class='helplink'><i>How?</i></a>";
+$lang->project->howToUpdateBurn = "<a href='http://www.zentao.net/goto.php?item=burndown&lang=zh-cn' target='_blank'>How?</a>";
 $lang->project->whyNoStories    = "There no active stories to added to this project. Please check the linked product.";
 $lang->project->doneProjects    = 'Done';
 $lang->project->unDoneProjects  = 'Undone';
@@ -193,7 +204,8 @@ $lang->project->placeholder = new stdclass();
 $lang->project->placeholder->code = 'Project code';
 
 $lang->project->selectGroup = new stdclass();
-$lang->project->selectGroup->doing = '(Doing)';
-$lang->project->selectGroup->done  = '(Done)';
+$lang->project->selectGroup->doing     = '(doing)';
+$lang->project->selectGroup->suspended = '(suspended)';
+$lang->project->selectGroup->done      = '(done)';
 
-$lang->project->projectTasks = 'ProjectTasks';
+$lang->project->projectTasks = 'Projects';

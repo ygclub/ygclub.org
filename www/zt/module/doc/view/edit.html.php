@@ -2,7 +2,7 @@
 /**
  * The edit view of doc module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Jia Fu <fujia@cnezsoft.com>
  * @package     doc
@@ -65,4 +65,4 @@ $(document).ready(function()
     </tr>
   </table>
 </form>
-<?php include './footer.html.php';?>
+<?php include '../../common/view/footer.html.php';?>

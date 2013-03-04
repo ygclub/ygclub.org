@@ -2,11 +2,11 @@
 /**
  * The tree module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     tree
- * @version     $Id: en.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: en.php 4429 2013-02-22 06:43:07Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->tree = new stdclass();
@@ -22,7 +22,7 @@ $lang->tree->manageProduct     = 'Mange product module';
 $lang->tree->manageProject     = 'Manage project module';
 $lang->tree->manageBug         = 'Manage bug module';
 $lang->tree->manageCase        = 'Manage case module';
-$lang->tree->manageWebapp      = 'Manage web app type';
+$lang->tree->manageWebapp      = 'Manage web app category';
 $lang->tree->manageCustomDoc   = 'Manage doc library type';
 $lang->tree->updateOrder       = 'Update order';
 $lang->tree->manageChild       = 'Manage child';

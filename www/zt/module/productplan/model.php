@@ -2,11 +2,11 @@
 /**
  * The model file of productplan module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     productplan
- * @version     $Id: model.php 3450 2012-09-01 05:53:57Z wwccss $
+ * @version     $Id: model.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -85,7 +85,7 @@ class productplanModel extends model
      */
     public function create()
     {
-        $plan = fixer::input('post')->stripTags('title')->get();
+        $plan = fixer::input('post')->stripTags('title')->remove('delta')->get();
         $this->dao->insert(TABLE_PRODUCTPLAN)
             ->data($plan)
             ->autoCheck()

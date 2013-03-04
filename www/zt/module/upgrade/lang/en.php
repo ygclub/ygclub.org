@@ -2,11 +2,11 @@
 /**
  * The upgrade module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     upgrade
- * @version     $Id: en.php 3837 2012-12-18 03:05:26Z wyd621@gmail.com $
+ * @version     $Id: en.php 4500 2013-02-28 00:56:31Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->upgrade->common  = 'Upgrade';
@@ -66,3 +66,4 @@ $lang->upgrade->fromVersions['3_2']       = '3.2';
 $lang->upgrade->fromVersions['3_2_1']     = '3.2.1';
 $lang->upgrade->fromVersions['3_3']       = '3.3';
 $lang->upgrade->fromVersions['4_0_beta1'] = '4.0 BETA1';
+$lang->upgrade->fromVersions['4_0_beta2'] = '4.0 BETA2';

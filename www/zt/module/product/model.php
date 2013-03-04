@@ -2,11 +2,11 @@
 /**
  * The model file of product module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     product
- * @version     $Id: model.php 3871 2012-12-21 07:38:31Z chencongzhi520@gmail.com $
+ * @version     $Id: model.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -287,6 +287,29 @@ class productModel extends model
     }
     
     /**
+     * Close product.
+     * 
+     * @param  int    $productID.
+     * @access public
+     * @return void
+     */
+    public function close($productID)
+    {
+        $oldProduct = $this->getById($productID);
+        $now        = helper::now();
+        $product= fixer::input('post')
+            ->setDefault('status', 'closed')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_PRODUCT)->data($product)
+            ->autoCheck()
+            ->where('id')->eq((int)$productID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldProduct, $product);
+    }
+
+    /**
      * Get projects of a product in pairs.
      * 
      * @param  int    $productID 
@@ -551,5 +574,36 @@ class productModel extends model
                 ->fetchAll('id');
         }
         return $products;
+    }
+
+    /**
+     * Get the summary of product's stories.
+     * 
+     * @param  array    $stories 
+     * @access public
+     * @return string.
+     */
+    public function summary($stories)
+    {
+        $totalEstimate = 0.0;
+        foreach($stories as $key => $story) $totalEstimate += $story->estimate; 
+        return sprintf($this->lang->product->storySummary, count($stories), $totalEstimate);
+    }
+
+    /**
+     * Judge an action is clickable or not.
+     * 
+     * @param  object $product 
+     * @param  string $action 
+     * @access public
+     * @return void
+     */
+    public function isClickable($product, $action)
+    {
+        $action = strtolower($action);
+
+        if($action == 'close') return $product->status != 'closed';
+
+        return true;
     }
 }

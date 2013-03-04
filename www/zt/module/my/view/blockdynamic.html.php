@@ -1,4 +1,4 @@
-<div class='block'>
+<div class='dynamic'>
 <table class='table-1 colored fixed'>
   <caption>
     <div class='f-left'><span class='icon-dynamic'></span><?php echo $lang->my->home->latest;?></div>
@@ -14,7 +14,7 @@
 
       if(!$canView) continue;
       $user = isset($users[$action->actor]) ? $users[$action->actor] : $action->actor;
-      if($action->action == 'login' or $action->action == 'logout') $action->objectName = '';
+      if($action->action == 'login' or $action->action == 'logout') $action->objectName = $action->objectLabel = '';
       echo "<tr><td class='nobr' width='95%'>";
       printf($lang->my->home->action, $action->date, $user, $action->actionLabel, $action->objectLabel, $action->objectLink, $action->objectName);
       echo "</td><td class='divider'></td></tr>";

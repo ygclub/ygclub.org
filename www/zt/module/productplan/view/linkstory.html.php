@@ -2,11 +2,11 @@
 /**
  * The link story view of productplan module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     productplan
- * @version     $Id: linkstory.html.php 3635 2012-11-26 05:26:15Z wyd621@gmail.com $
+ * @version     $Id: linkstory.html.php 4135 2013-01-18 02:59:45Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -67,7 +67,7 @@
     <th><?php echo $lang->story->estimateAB;?></th>
     <th><?php echo $lang->statusAB;?></th>
     <th><?php echo $lang->story->stageAB;?></th>
-    <th class='w-p10 {sorter:false}'><?php echo $lang->actions?></th>
+    <th class='w-50px {sorter:false}'><?php echo $lang->actions?></th>
   </tr>
   </thead>
   <tbody>
@@ -81,7 +81,7 @@
     <td><?php echo $story->estimate;?></td>
     <td><?php echo $lang->story->statusList[$story->status];?></td>
     <td><?php echo $lang->story->stageList[$story->stage];?></td>
-    <td><?php common::printLink('productplan', 'unlinkStory', "story=$story->id", $lang->productplan->unlinkStory, 'hiddenwin');?></td>
+    <td><?php common::printIcon('productplan', 'unlinkStory', "story=$story->id", '', 'list', '', 'hiddenwin');?></td>
   </tr>
   <?php endforeach;?>
   </tbody>

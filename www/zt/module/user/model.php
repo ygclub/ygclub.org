@@ -2,11 +2,11 @@
 /**
  * The model file of user module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     user
- * @version     $Id: model.php 3887 2012-12-24 10:06:50Z wwccss $
+ * @version     $Id: model.php 4505 2013-03-01 01:57:08Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -152,6 +152,22 @@ class userModel extends model
     }
 
     /**
+     * Get roles for some users.
+     * 
+     * @param  string    $users 
+     * @access public
+     * @return array
+     */
+    public function getUserRoles($users)
+    {
+        $users = $this->dao->select('account, role')->from(TABLE_USER)->where('account')->in($users)->fetchPairs();
+        if(!$users) return array();
+
+        foreach($users as $account => $role) $users[$account] = zget($this->lang->user->roleList, $role, $role);
+        return $users;
+    }
+
+    /**
      * Get user info by ID.
      * 
      * @param  int    $userID 
@@ -201,7 +217,7 @@ class userModel extends model
             ->setDefault('join', '0000-00-00')
             ->setIF($this->post->password1 != false, 'password', md5($this->post->password1))
             ->setIF($this->post->password1 == false, 'password', '')
-            ->remove('password1, password2')
+            ->remove('group, password1, password2')
             ->get();
 
         $this->dao->insert(TABLE_USER)->data($user)
@@ -211,6 +227,13 @@ class userModel extends model
             ->check('account', 'account')
             ->checkIF($this->post->email != false, 'email', 'email')
             ->exec();
+        if($this->post->group)
+        {
+            $data = new stdClass();
+            $data->account = $this->post->account;
+            $data->group   = $this->post->group;
+            $this->dao->insert(TABLE_USERGROUP)->data($data)->exec();
+        }
     }
 
     /**
@@ -237,12 +260,15 @@ class userModel extends model
                 if($users->email[$i] and !validater::checkEmail($users->email[$i])) die(js::error(sprintf($this->lang->user->error->mail, $i+1)));
                 $users->password[$i] = (isset($prev['password']) and $users->ditto[$i] == 'on' and empty($users->password[$i])) ? $prev['password'] : $users->password[$i];
                 if(!validater::checkReg($users->password[$i], '|(.){6,}|')) die(js::error(sprintf($this->lang->user->error->password, $i+1)));
-                if(empty($users->role[$i])) die(js::error(sprintf($this->lang->user->error->role, $id)));
+                $role = $users->role[$i] == 'ditto' ? (isset($prev['role']) ? $prev['role'] : '') : $users->role[$i];
+                if(empty($role)) die(js::error(sprintf($this->lang->user->error->role, $i+1)));
 
+                $data[$i] = new stdclass();
                 $data[$i]->dept     = $users->dept[$i] == 'ditto' ? (isset($prev['dept']) ? $prev['dept'] : 0) : $users->dept[$i];
                 $data[$i]->account  = $users->account[$i];
                 $data[$i]->realname = $users->realname[$i];
-                $data[$i]->role     = $users->role[$i] == 'ditto' ? (isset($prev['role']) ? $prev['role'] : '') : $users->role[$i];
+                $data[$i]->role     = $role;
+                $data[$i]->group    = $users->group[$i] == 'ditto' ? (isset($prev['group']) ? $prev['group'] : '') : $users->group[$i];
                 $data[$i]->email    = $users->email[$i];
                 $data[$i]->gender   = $users->gender[$i];
                 $data[$i]->password = md5($users->password[$i]); 
@@ -250,12 +276,21 @@ class userModel extends model
                 $accounts[$i]     = $data[$i]->account;
                 $prev['dept']     = $data[$i]->dept;
                 $prev['role']     = $data[$i]->role;
+                $prev['group']    = $data[$i]->group;
                 $prev['password'] = $users->password[$i];
             }
         }
 
         foreach($data as $user)
         {
+            if($user->group)
+            {
+                $group = new stdClass();
+                $group->account = $user->account;
+                $group->group   = $user->group;
+                $this->dao->insert(TABLE_USERGROUP)->data($group)->exec();
+            }
+            unset($user->group);
             $this->dao->insert(TABLE_USER)->data($user)->autoCheck()->exec();
             if(dao::isError()) 
             {
@@ -504,7 +539,7 @@ class userModel extends model
         if($account == 'guest')
         {
             $sql = $this->dao->select('module, method')->from(TABLE_GROUP)->alias('t1')->leftJoin(TABLE_GROUPPRIV)->alias('t2')
-                ->on('t1.id = t2.group')->where('t1.name')->eq('guest');
+                ->on('t1.id = t2.group')->where('t1.role')->eq('guest');
         }
         else
         {

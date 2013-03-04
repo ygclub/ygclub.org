@@ -2,11 +2,11 @@
 /**
  * The common simplified chinese file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     ZenTaoPMS
- * @version     $Id: en.php 3864 2012-12-20 08:00:07Z wyd621@gmail.com $
+ * @version     $Id: en.php 4481 2013-02-27 02:20:43Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->arrow        = '<span class="icon-arrow">&nbsp; </span>';
@@ -16,8 +16,8 @@ $lang->dot          = '.';
 $lang->at           = ' at ';
 $lang->downArrow    = '↓';
 
-$lang->ZenTaoPMS    = 'ZenTaoPMS';
-$lang->welcome      = "Welcome to『%s』{$lang->colon} {$lang->ZenTaoPMS}";
+$lang->zentaoPMS    = 'ZenTaoPMS';
+$lang->welcome      = "Welcome to『%s』{$lang->colon} {$lang->zentaoPMS}";
 $lang->myControl    = "Dashboard";
 $lang->currentPos   = 'Current';
 $lang->logout       = 'Logout';
@@ -35,7 +35,6 @@ $lang->link         = 'Link';
 $lang->unlink       = 'Unlink';
 $lang->import       = 'Import';
 $lang->export       = 'Export';
-$lang->exportType   = 'Exprot Type';
 $lang->setFileName  = 'Filename:';
 $lang->activate     = 'Activate';
 $lang->submitting   = 'Saving...';
@@ -58,11 +57,11 @@ $lang->files        = 'Files ';
 $lang->unfold       = '+';
 $lang->fold         = '-';
 
-$lang->selectAll     = 'Select All';
-$lang->selectReverse = 'Select Reverse';
+$lang->selectAll     = 'All';
+$lang->selectReverse = 'Inverse';
 $lang->notFound      = 'Sorry, the object not found.';
-$lang->showAll       = '++ Show All ++';
-$lang->hideClosed    = '-- Hide Closed--';
+$lang->showAll       = '[[Show all projects]]';
+$lang->hideClosed    = '[[Show projects going]]';
 
 $lang->future       = 'Future';
 $lang->year         = 'Year';
@@ -86,7 +85,7 @@ $lang->menu->project  = 'Project|project|index';
 $lang->menu->qa       = 'Test|qa|index';
 $lang->menu->doc      = 'Doc|doc|index';
 $lang->menu->report   = 'Report|report|index';
-//$lang->menu->webapp   = 'Web App|webapp|index';
+$lang->menu->webapp   = 'App|webapp|index';
 $lang->menu->company  = 'Company|company|index';
 $lang->menu->admin    = 'Admin|admin|index';
 
@@ -115,8 +114,8 @@ $lang->exportFileTypeList['csv']  = 'csv';
 $lang->exportFileTypeList['xml']  = 'xml';
 $lang->exportFileTypeList['html'] = 'html';
 
-$lang->exportTypeList['all']      = 'Export ALL';
-$lang->exportTypeList['selected'] = 'Export Checked';
+$lang->exportTypeList['all']      = 'All records';
+$lang->exportTypeList['selected'] = 'Only checked';
 
 /* Support charset. */
 $lang->exportEncodeList['gbk']   = 'GBK';
@@ -194,11 +193,11 @@ $lang->project->menu->build     = array('link' => 'Build|project|build|projectID
 $lang->project->menu->testtask  = 'Testtask|project|testtask|projectID=%s';
 $lang->project->menu->team      = array('link' => 'Team|project|team|projectID=%s', 'alias' => 'managemembers');
 $lang->project->menu->doc       = array('link' => 'Doc|project|doc|porjectID=%s', 'subModule' => 'doc');
-$lang->project->menu->product   = array('link' => 'Product|project|manageproducts|projectID=%s', 'alias' => 'edit');
+$lang->project->menu->product   = array('link' => 'Product|project|manageproducts|projectID=%s', 'alias' => 'edit,start,suspend,delay,close');
 $lang->project->menu->view      = 'Manage|project|view|projectID=%s';
 $lang->project->menu->order     = 'Order|project|order|projectID=%s';
-$lang->project->menu->create    = array('link' => '<span class="icon-add1">&nbsp;</span>New|project|create', 'float' => 'right');
-$lang->project->menu->all       = array('link' => '<span class="icon-all">&nbsp;</span>Projects|project|index|locate=no&projectID=%s', 'float' => 'right');
+$lang->project->menu->create    = array('link' => '<span class="icon-add">&nbsp;</span>New|project|create', 'float' => 'right');
+$lang->project->menu->all       = array('link' => '<span class="icon-allProjects">&nbsp;</span>Projects|project|index|locate=no&status=all&projectID=%s', 'float' => 'right');
 
 $lang->task  = new stdclass();
 $lang->build = new stdclass();
@@ -210,7 +209,7 @@ $lang->bug = new stdclass();
 $lang->bug->menu = new stdclass();
 
 $lang->bug->menu->product  = '%s';
-$lang->bug->menu->bug      = array('link' => 'Bug|bug|browse|productID=%s', 'alias' => 'view,create,edit,resolve,close,activate,report,batchedit', 'subModule' => 'tree');
+$lang->bug->menu->bug      = array('link' => 'Bug|bug|browse|productID=%s', 'alias' => 'view,create,edit,resolve,close,activate,report,batchedit,confirmbug,assignto', 'subModule' => 'tree');
 $lang->bug->menu->testcase = array('link' => 'Test Case|testcase|browse|productID=%s', 'alias' => 'view,create,edit');
 $lang->bug->menu->testtask = array('link' => 'Test Task|testtask|browse|productID=%s');
 
@@ -220,7 +219,7 @@ $lang->testcase->menu = new stdclass();
 $lang->testcase->menu->product  = '%s';
 $lang->testcase->menu->bug      = array('link' => 'Bug|bug|browse|productID=%s');
 $lang->testcase->menu->testcase = array('link' => 'Test Case|testcase|browse|productID=%s', 'alias' => 'view,create,batchcreate,edit,batchedit', 'subModule' => 'tree');
-$lang->testcase->menu->testtask = array('link' => 'Test Task|testtask|browse|productID=%s', 'alias' => 'view,create,edit,linkcase,cases');
+$lang->testcase->menu->testtask = array('link' => 'Test Task|testtask|browse|productID=%s', 'alias' => 'view,create,edit,linkcase,cases,start,close,batchrun');
 
 $lang->testtask = new stdclass();
 $lang->testtask->menu = $lang->testcase->menu;
@@ -248,7 +247,9 @@ $lang->report->menu->staff   = array('link' => 'Company|report|workload');
 /* Resource menu. */
 $lang->webapp = new stdclass();
 $lang->webapp->menu = new stdclass();
-//$lang->webapp->menu->obtain   = array('link' => 'App Store|webapp|obtain');
+$lang->webapp->menu->obtain     = array('link' => '<span class="icon-webapp-obtain">&nbsp;</span>Store|webapp|obtain', 'float' => 'right');
+$lang->webapp->menu->manageTree = array('link' => "<span class='icon-webapp-manage'>&nbsp;</span>Catetory|tree|browse|rootID=0&view=webapp", 'float' => 'right');
+$lang->webapp->menu->create     = array('link' => "<span class='icon-webapp-create'>&nbsp;</span>Create|webapp|create", 'float' => 'right');
 
 /* Company menu. */
 $lang->company = new stdclass();
@@ -259,9 +260,9 @@ $lang->company->menu->dept         = array('link' => 'Department|dept|browse', '
 $lang->company->menu->browseGroup  = array('link' => 'Group|group|browse', 'subModule' => 'group');
 $lang->company->menu->edit         = array('link' => 'Company|company|edit');
 $lang->company->menu->dynamic      = 'Dynamic|company|dynamic|';
-$lang->company->menu->addGroup     = array('link' => '<span class="icon-add1">&nbsp;</span>Add Group|group|create', 'float' => 'right');
-$lang->company->menu->batchAddUser = array('link' => '<span class="icon-add1">&nbsp;</span>Batch Add|user|batchCreate', 'subModule' => 'user', 'float' => 'right');
-$lang->company->menu->addUser      = array('link' => '<span class="icon-add1">&nbsp;</span>Add User|user|create|dept=%s&from=company', 'subModule' => 'user', 'float' => 'right');
+$lang->company->menu->addGroup     = array('link' => '<span class="icon-add">&nbsp;</span>Add Group|group|create', 'float' => 'right');
+$lang->company->menu->batchAddUser = array('link' => '<span class="icon-add">&nbsp;</span>Batch Add|user|batchCreate', 'subModule' => 'user', 'float' => 'right');
+$lang->company->menu->addUser      = array('link' => '<span class="icon-add">&nbsp;</span>Add User|user|create|dept=%s&from=company', 'subModule' => 'user', 'float' => 'right');
 
 $lang->dept  = new stdclass();
 $lang->group = new stdclass();
@@ -278,7 +279,7 @@ $lang->admin->menu->index     = array('link' => 'Index|admin|index');
 $lang->admin->menu->extension = array('link' => 'Extension|extension|browse', 'subModule' => 'extension');
 $lang->admin->menu->editor    = array('link' => 'Scaffold|editor|index', 'subModule' => 'editor');
 $lang->admin->menu->mail      = array('link' => 'Email|mail|index', 'subModule' => 'mail');
-$lang->admin->menu->clearData = array('link' => 'Reset|admin|cleardata');
+$lang->admin->menu->clearData = array('link' => 'Clear data|admin|cleardata');
 $lang->admin->menu->convert   = array('link' => 'Import|convert|index', 'subModule' => 'convert');
 $lang->admin->menu->trashes   = array('link' => 'Trash|action|trash', 'subModule' => 'action');
 

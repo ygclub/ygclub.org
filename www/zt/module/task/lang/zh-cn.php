@@ -2,15 +2,15 @@
 /**
  * The task module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: zh-cn.php 3872 2012-12-24 00:50:43Z zhujinyonging@gmail.com $
+ * @version     $Id: zh-cn.php 4547 2013-03-02 14:55:28Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->task->index              = "任务一览";
-$lang->task->create             = "新增";
+$lang->task->create             = "建任务";
 $lang->task->batchCreate        = "批量添加";
 $lang->task->batchEdit          = "批量编辑";
 $lang->task->import             = "导入之前未完任务";
@@ -18,6 +18,7 @@ $lang->task->edit               = "编辑";
 $lang->task->delete             = "删除";
 $lang->task->view               = "查看任务";
 $lang->task->logEfforts         = "记录工时";
+$lang->task->record             = "工时";
 $lang->task->start              = "开始";
 $lang->task->finish             = "完成";
 $lang->task->close              = "关闭";
@@ -43,11 +44,14 @@ $lang->task->estimate          = '最初预计';
 $lang->task->estimateAB        = '预';
 $lang->task->left              = '预计剩余';
 $lang->task->leftAB            = '剩';
-$lang->task->consumed          = '已经消耗';
-$lang->task->consumedAB        = '耗';
+$lang->task->consumed          = '总消耗';
+$lang->task->consumedAB        = '消耗';
 $lang->task->hour              = '小时';
+$lang->task->consumedThisTime  = '工时';
+$lang->task->leftThisTime      = '剩余';
 $lang->task->estStarted        = '预计开始';
 $lang->task->realStarted       = '实际开始';
+$lang->task->date              = '日期';
 $lang->task->deadline          = '截止日期';
 $lang->task->deadlineAB        = '截止';
 $lang->task->status            = '任务状态';
@@ -74,6 +78,9 @@ $lang->task->closedReason      = '关闭原因';
 $lang->task->lastEditedBy      = '最后修改';
 $lang->task->lastEditedDate    = '最后修改日期';
 $lang->task->lastEdited        = '最后编辑';
+$lang->task->recordEstimate    = '工时';
+$lang->task->editEstimate      = '编辑工时';
+$lang->task->deleteEstimate    = '删除工时';
 
 $lang->task->ditto = '同上';
 
@@ -124,18 +131,21 @@ $lang->task->legendLife   = '任务的一生';
 $lang->task->legendDesc   = '任务描述';
 $lang->task->legendAction = '操作';
 
-$lang->task->ajaxGetUserTasks     = "接口:我的任务";
-$lang->task->ajaxGetProjectTasks  = "接口:项目任务";
-$lang->task->confirmDelete        = "您确定要删除这个任务吗？";
-$lang->task->copyStoryTitle       = "同需求";
-$lang->task->afterSubmit          = "添加之后";
-$lang->task->successSaved         = "成功添加，";
-$lang->task->delayWarning         = " <strong class='delayed f-14px'> 延期%s天 </strong>";
-$lang->task->remindBug            = "该任务为Bug转化得到，是否更新Bug:%s ?";
-$lang->task->confirmChangeProject = '修改项目会导致相应的所属模块、相关需求和指派人发生变化，确定吗？';
+$lang->task->ajaxGetUserTasks      = "接口:我的任务";
+$lang->task->ajaxGetProjectTasks   = "接口:项目任务";
+$lang->task->confirmDelete         = "您确定要删除这个任务吗？";
+$lang->task->confirmDeleteEstimate = "您确定要删除这个记录吗？";
+$lang->task->copyStoryTitle        = "同需求";
+$lang->task->afterSubmit           = "添加之后";
+$lang->task->successSaved          = "成功添加，";
+$lang->task->delayWarning          = " <strong class='delayed f-14px'> 延期%s天 </strong>";
+$lang->task->remindBug             = "该任务为Bug转化得到，是否更新Bug:%s ?";
+$lang->task->confirmChangeProject  = '修改项目会导致相应的所属模块、相关需求和指派人发生变化，确定吗？';
+$lang->task->confirmFinish         = '"预计剩余"为0，确认将任务状态改为"已完成"吗？';
 
 $lang->task->error = new stdclass();
-$lang->task->error->consumed = '"已经消耗"必须为数字';
+$lang->task->error->consumed      = '"已经消耗"必须为数字';
+$lang->task->error->consumedSmall = '"已经消耗"必须大于之前消耗';
 
 /* 统计报表。*/
 $lang->task->report = new stdclass();

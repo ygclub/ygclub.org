@@ -2,11 +2,11 @@
 /**
  * The testcase module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testcase
- * @version     $Id: zh-cn.php 3768 2012-12-12 00:44:35Z zhujinyonging@gmail.com $
+ * @version     $Id: zh-cn.php 4395 2013-02-20 02:42:10Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->testcase->id               = '用例编号';
@@ -101,7 +101,6 @@ $lang->testcase->legendVersion      = '版本历史';
 
 $lang->testcase->confirmDelete = '您确认要删除该测试用例吗？';
 $lang->testcase->same          = '同上';
-$lang->testcase->notes         = '(注：“用例类型”和“用例标题”必须填写，否则此行无效)';
 
 $lang->testcase->priList[3] = 3;
 $lang->testcase->priList[1] = 1;
@@ -115,6 +114,7 @@ $lang->testcase->typeList['performance'] = '性能测试';
 $lang->testcase->typeList['config']      = '配置相关';
 $lang->testcase->typeList['install']     = '安装部署';
 $lang->testcase->typeList['security']    = '安全相关';
+$lang->testcase->typeList['interface']   = '接口测试';
 $lang->testcase->typeList['other']       = '其他';
 
 $lang->testcase->stageList['']           = '';

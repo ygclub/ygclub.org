@@ -2,11 +2,11 @@
 /**
  * The productplan module English file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     productplan
- * @version     $Id: en.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: en.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 $lang->productplan->common    = 'Plan';
@@ -32,3 +32,10 @@ $lang->productplan->title   = 'Title';
 $lang->productplan->desc    = 'Desc';
 $lang->productplan->begin   = 'Begin';
 $lang->productplan->end     = 'End';
+
+$lang->productplan->endList[14]  = 'Two Weeks';
+$lang->productplan->endList[31]  = 'One Month';
+$lang->productplan->endList[62]  = 'Two Months';
+$lang->productplan->endList[93]  = 'Three Months';
+$lang->productplan->endList[186] = 'Half Of Year';
+$lang->productplan->endList[365] = 'One Year';

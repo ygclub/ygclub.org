@@ -2,11 +2,11 @@
 /**
  * The model file of case module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
- * @version     $Id: model.php 3855 2012-12-19 07:29:46Z zhujinyonging@gmail.com $
+ * @version     $Id: model.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -86,6 +86,7 @@ class testcaseModel extends model
         {
             if($cases->type[$i] != '' and $cases->title[$i] != '')
             {
+                $data[$i] = new stdclass();
                 $data[$i]->product    = $productID;
                 $data[$i]->module     = $cases->module[$i] == 'same' ? ($i == 0 ? 0 : $data[$i-1]->module) : $cases->module[$i];
                 $data[$i]->type       = $cases->type[$i] == 'same' ? ($i == 0 ? '' : $data[$i-1]->type) : $cases->type[$i]; 

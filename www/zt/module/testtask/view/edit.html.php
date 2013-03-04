@@ -2,11 +2,11 @@
 /**
  * The edit view of testtask module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: edit.html.php 3775 2012-12-12 03:24:41Z zhujinyonging@gmail.com $
+ * @version     $Id: edit.html.php 4341 2013-02-04 08:07:10Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -34,23 +34,27 @@
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testtask->begin;?></th>
-      <td><?php echo html::input('begin', $task->begin, "class='text-3 date'");?>
+      <td><?php echo html::input('begin', $task->begin, "class='text-3 date'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testtask->end;?></th>
-      <td><?php echo html::input('end', $task->end, "class='text-3 date'");?>
+      <td><?php echo html::input('end', $task->end, "class='text-3 date'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testtask->status;?></th>
-      <td><?php echo html::select('status', $lang->testtask->statusList, $task->status,  "class='select-3'");?>
+      <td><?php echo html::select('status', $lang->testtask->statusList, $task->status,  "class='select-3'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testtask->name;?></th>
-      <td><?php echo html::input('name', $task->name, "class='text-1'");?>
+      <td><?php echo html::input('name', $task->name, "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testtask->desc;?></th>
-      <td><?php echo html::textarea('desc', htmlspecialchars($task->desc), "rows=10 class='area-1'");?>
+      <td><?php echo html::textarea('desc', htmlspecialchars($task->desc), "rows=10 class='area-1'");?></td>
+    </tr>  
+    <tr>
+      <th class='rowhead'><?php echo $lang->testtask->report;?></th>
+      <td><?php echo html::textarea('report', htmlspecialchars($task->report), "rows=10 class='area-1'");?></td>
     </tr>  
     <tr>
       <td colspan='2' class='a-center'><?php echo html::submitButton() . html::resetButton();?> </td>

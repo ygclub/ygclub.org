@@ -2,11 +2,11 @@
 /**
  * The model file of test task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: model.php 3853 2012-12-19 05:41:11Z wyd621@gmail.com $
+ * @version     $Id: model.php 4139 2013-01-18 05:43:47Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -119,7 +119,7 @@ class testtaskModel extends model
      * @access  public
      * @return  array
      */
-    public function getByUser($account)
+    public function getByUser($account, $pager = null, $orderBy = 'id_desc')
     {
         return $this->dao->select('t1.*, t2.name AS projectName, t3.name AS buildName')
             ->from(TABLE_TESTTASK)->alias('t1')
@@ -127,7 +127,8 @@ class testtaskModel extends model
             ->leftJoin(TABLE_BUILD)->alias('t3')->on('t1.build = t3.id')
             ->where('t1.deleted')->eq(0)
             ->andWhere('t1.owner')->eq($account)
-            ->orderBy('id desc')
+            ->orderBy($orderBy)
+            ->page($pager)
             ->fetchAll();
     }
 
@@ -144,6 +145,49 @@ class testtaskModel extends model
         $task = fixer::input('post')->stripTags('name')->get();
         $this->dao->update(TABLE_TESTTASK)->data($task)->autoCheck()->batchcheck($this->config->testtask->edit->requiredFields, 'notempty')->where('id')->eq($taskID)->exec();
         if(!dao::isError()) return common::createChanges($oldTask, $task);
+    }
+
+    /**
+     * Start testtask.
+     * 
+     * @param  int    $taskID 
+     * @access public
+     * @return void
+     */
+    public function start($taskID)
+    {
+        $oldTesttask = $this->getById($taskID);
+        $testtask = fixer::input('post')
+            ->setDefault('status', 'doing')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_TESTTASK)->data($testtask)
+            ->autoCheck()
+            ->where('id')->eq((int)$taskID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldTesttask, $testtask);
+    }
+
+    /**
+     * Close testtask.
+     * 
+     * @access public
+     * @return void
+     */
+    public function close($taskID)
+    {
+        $oldTesttask = $this->getById($taskID);
+        $testtask = fixer::input('post')
+            ->setDefault('status', 'done')
+            ->remove('comment')->get();
+
+        $this->dao->update(TABLE_TESTTASK)->data($testtask)
+            ->autoCheck()
+            ->where('id')->eq((int)$taskID)
+            ->exec();
+
+        if(!dao::isError()) return common::createChanges($oldTesttask, $testtask);
     }
 
     /**
@@ -419,5 +463,23 @@ class testtaskModel extends model
             }
         }
         return $results;
+    }
+
+    /**
+     * Judge an action is clickable or not.
+     * 
+     * @param  object $product 
+     * @param  string $action 
+     * @access public
+     * @return void
+     */
+    public function isClickable($testtask, $action)
+    {
+        $action = strtolower($action);
+
+        if($action == 'start') return $testtask->status == 'wait';
+        if($action == 'close') return $testtask->status != 'done';
+
+        return true;
     }
 }

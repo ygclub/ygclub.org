@@ -2,11 +2,11 @@
 /**
  * The view file of story module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     story
- * @version     $Id: view.html.php 3569 2012-10-25 05:24:58Z zhujinyonging@gmail.com $
+ * @version     $Id: view.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -21,10 +21,10 @@
   {
       ob_start();
 
-      if($this->story->isClickable($story, 'change')) common::printIcon('story', 'change', "storyID=$story->id");
-      if($this->story->isClickable($story, 'review')) common::printIcon('story', 'review', "storyID=$story->id");
-      if($this->story->isClickable($story, 'close'))  common::printIcon('story', 'close',  "storyID=$story->id");
-      if($this->story->isClickable($story, 'activate'))  common::printIcon('story', 'activate',  "storyID=$story->id");
+      common::printIcon('story', 'change', "storyID=$story->id", $story);
+      common::printIcon('story', 'review', "storyID=$story->id", $story);
+      common::printIcon('story', 'close',  "storyID=$story->id", $story);
+      common::printIcon('story', 'activate',  "storyID=$story->id", $story);
       common::printIcon('story', 'createCase', "productID=$story->product&moduleID=0&from=&param=0&storyID=$story->id", '', 'button', 'createCase');
 
       common::printDivider();
@@ -39,6 +39,10 @@
       $actionLinks = ob_get_contents();
       ob_clean();
       echo $actionLinks;
+  }
+  else
+  {
+      common::printRPN($browseLink);
   }
   ?>
   </div>
@@ -182,7 +186,7 @@
                   {
                       @$projectName = $story->projects[$task->project]->name;
                       echo html::a($this->createLink('project', 'browse', "projectID=$task->project"), $projectName);
-                      echo '<span class="nobr">' . html::a($this->createLink('task', 'view', "taskID=$task->id"), "#$task->id $task->name") . '</span><br />';
+                      echo "<span title='$task->name'>" . html::a($this->createLink('task', 'view', "taskID=$task->id"), "#$task->id $task->name") . '</span><br />';
                   }
               }
               ?>
@@ -199,7 +203,7 @@
               <?php
               foreach($bugs as $bug)
               {
-                  echo '<span class="nobr">' . html::a($this->createLink('bug', 'view', "bugID=$bug->id"), "#$bug->id $bug->title") . '</span><br />';
+                  echo "<span title='#$bug->id $bug->title'>" . html::a($this->createLink('bug', 'view', "bugID=$bug->id"), "#$bug->id $bug->title") . '</span><br />';
               }
               ?>
             </td>
@@ -215,7 +219,7 @@
               <?php
               foreach($cases as $case)
               {
-                  echo '<span class="nobr">' . html::a($this->createLink('testcase', 'view', "caseID=$case->id"), "#$case->id $case->title") . '</span><br />';
+                  echo "<span title='#$case->id $case->title'>" . html::a($this->createLink('testcase', 'view', "caseID=$case->id"), "#$case->id $case->title") . '</span><br />';
               }
               ?>
             </td>
@@ -251,7 +255,7 @@
         <legend><?php echo $lang->story->legendFromBug;?></legend>
         <div>
           <?php
-          if(!empty($fromBug)) echo '<span class="nobr">' . html::a($this->createLink('bug', 'view', "bugID=$fromBug->id"), "#$fromBug->id $fromBug->title") . '</span><br />';
+          if(!empty($fromBug)) echo "<span title='#$fromBug->id $fromBug->title'>" . html::a($this->createLink('bug', 'view', "bugID=$fromBug->id"), "#$fromBug->id $fromBug->title") . '</span><br />';
           ?>
         </div>
       </fieldset>

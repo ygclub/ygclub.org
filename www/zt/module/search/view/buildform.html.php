@@ -2,11 +2,11 @@
 /**
  * The buildform view of search module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     search
- * @version     $Id: buildform.html.php 3878 2012-12-24 03:34:59Z zhujinyonging@gmail.com $
+ * @version     $Id: buildform.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -287,7 +287,7 @@ foreach($fieldParams as $fieldName => $param)
       echo html::hidden('module',     $module);
       echo html::hidden('actionURL',  $actionURL);
       echo html::hidden('groupItems', $groupItems);
-      echo html::submitButton($lang->search->common, "class='button-search' title='{$lang->search->common}'");
+      echo html::submitButton($lang->search->common);
       echo html::commonButton($lang->search->reset, 'onclick=resetForm();');
       echo html::commonButton($lang->save, 'onclick=saveQuery()');
       ?>

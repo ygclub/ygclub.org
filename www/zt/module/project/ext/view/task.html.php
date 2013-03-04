@@ -126,7 +126,11 @@ var browseType  = '<?php echo $browseType;?>';
           </tbody>
           <tfoot>
             <tr>
+              <?php if($app->user->account != 'guest'): ?>
               <?php $columns = $this->cookie->windowWidth > $this->config->wideSize ? 8 : 6;?>
+              <?php else:?>
+              <?php $columns = $this->cookie->windowWidth > $this->config->wideSize ? 7 : 5;?>
+              <?php endif;?>
               <td colspan='<?php echo $columns;?>'>
                 <div class='f-left'>
                 <?php

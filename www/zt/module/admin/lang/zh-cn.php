@@ -2,11 +2,11 @@
 /**
  * The admin module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     admin
- * @version     $Id: zh-cn.php 3742 2012-12-10 08:41:09Z wwccss $
+ * @version     $Id: zh-cn.php 4460 2013-02-26 02:28:02Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->admin->common  = '后台管理';
@@ -19,16 +19,17 @@ $lang->admin->welcome = '欢迎使用禅道管理软件后台管理系统';
 
 $lang->admin->browseCompany = '浏览公司';
 
-$lang->admin->clearData        = '清除数据';
-$lang->admin->confirmClearData = '您确认要清除数据吗？';
-$lang->admin->clearDataFailed  = '清除数据失败！';
-$lang->admin->clearDataSucceed = '清除数据成功！';
+$lang->admin->clearData             = '清除数据';
+$lang->admin->pleaseInputYes        = '确认清除数据请输入yes：';
+$lang->admin->confirmClearData      = '您确认要清除数据吗?';
+$lang->admin->clearDataFailed       = '清除数据失败！';
+$lang->admin->clearDataSuccessfully = '清除数据成功！';
 $lang->admin->clearDataDesc    = <<<EOT
-<strong><font color='red'>清除数据存在一定的风险，清楚数据之前，我们强烈建议您备份数据库及相应的数据文件，并保证清楚数据的时候，没有其他人进行操作。</font></strong>\n
+<strong><font color='red'>清除数据存在一定的风险，清楚数据之前，我们强烈建议您备份数据库及相应的数据文件，并保证清除数据的时候，没有其他人进行操作。</font></strong>\n
 清除数据对数据库的影响如下：
 1、清除数据不会对company, group, groupPriv表进行操作。
 2、如果安装的时候有导入demo数据，则会删除config表key=showDemoUsers的记录，并删除user表中的所有demo用户。
-3、对于其他表则进行全部清除操作。
+3、<font color='red'>对于其他表则进行全部清除操作。</font>
 EOT;
 
 $lang->admin->info = new stdclass();
@@ -54,3 +55,12 @@ $lang->admin->bind = new stdclass();
 $lang->admin->bind->caption  = '关联社区账号';
 $lang->admin->bind->action   = '关联';
 $lang->admin->bind->success  = "关联账户成功";
+
+$lang->admin->selectFlow = '您计划如何使用禅道？';
+
+$lang->admin->flowList['full']      = '所有功能（包括产品、项目、需求、计划、发布、任务、Bug、用例、测试任务和文档等功能。）';
+$lang->admin->flowList['onlyTest']  = '仅测试管理（包括产品、版本、Bug、用例、测试任务和文档管理等功能。)';
+$lang->admin->flowList['onlyTask']  = '仅任务管理（包括项目、任务和文档管理。)';
+$lang->admin->flowList['onlyStory'] = '仅需求管理（包括产品、需求、计划、发布和文档管理等功能。）';
+
+$lang->admin->flowNotice = "<span class='red'>注：如果您使用的不是所有功能，后续可以到“管理->插件”中，卸载相应的插件，即可重新使用禅道所有功能。</span>";

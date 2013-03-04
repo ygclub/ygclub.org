@@ -2,11 +2,11 @@
 /**
  * The model file of task module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     task
- * @version     $Id: model.php 3713 2012-12-04 01:58:47Z zhujinyonging@gmail.com $
+ * @version     $Id: model.php 4568 2013-03-03 02:24:34Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -88,59 +88,49 @@ class taskModel extends model
      */
     public function batchCreate($projectID)
     {
+        $this->loadModel('action');
         $now   = helper::now();
         $tasks = fixer::input('post')->get();
         $mails = array();
         for($i = 0; $i < $this->config->task->batchCreate; $i++)
         {
-            if($tasks->type[$i] != '' and $tasks->name[$i] != '' and $tasks->pri[$i] != 0)
-            {
-                $data[$i]->story        = $tasks->story[$i] != 'ditto' ? ($tasks->story[$i] ? $tasks->story[$i] : 0) : ($i == 0 ? 0 : $data[$i-1]->story);
-                $data[$i]->type         = $tasks->type[$i] == 'ditto' ? ($i == 0 ? '' : $data[$i-1]->type) : $tasks->type[$i];
-                $data[$i]->assignedTo   = $tasks->assignedTo[$i] == 'ditto' ? ($i == 0 ? '' : $data[$i-1]->assignedTo) : $tasks->assignedTo[$i];
-                $data[$i]->name         = $tasks->name[$i];
-                $data[$i]->desc         = $tasks->desc[$i];
-                $data[$i]->pri          = $tasks->pri[$i];
-                $data[$i]->estimate     = $tasks->estimate[$i];
-                $data[$i]->left         = $tasks->estimate[$i];
-                $data[$i]->project      = $projectID;
-                $data[$i]->deadline     = '0000-00-00';
-                $data[$i]->status       = 'wait';
-                $data[$i]->openedBy     = $this->app->user->account;
-                $data[$i]->openedDate   = $now;
-                $data[$i]->statusCustom = strpos(self::CUSTOM_STATUS_ORDER, 'wait') + 1;
-                if($tasks->story[$i] != '') $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
-                if($tasks->assignedTo[$i] != '') $data[$i]->assignedDate = $now;
+            if(empty($tasks->name[$i])) continue;
 
-                $this->dao->insert(TABLE_TASK)->data($data[$i])
-                    ->autoCheck()
-                    ->batchCheck($this->config->task->create->requiredFields, 'notempty')
-                    ->checkIF($data[$i]->estimate != '', 'estimate', 'float')
-                    ->exec();
+            $data[$i] = new stdclass();
+            $data[$i]->story        = $tasks->story[$i]      == 'ditto' ? (isset($data[$i-1]) ? $data[$i-1]->story : 0)      : ($tasks->story[$i] ? $tasks->story[$i] : 0);
+            $data[$i]->type         = $tasks->type[$i]       == 'ditto' ? (isset($data[$i-1]) ? $data[$i-1]->type  : 0)      : $tasks->type[$i];
+            $data[$i]->assignedTo   = $tasks->assignedTo[$i] == 'ditto' ? (isset($data[$i-1]) ? $data[$i-1]->assignedTo : 0) : $tasks->assignedTo[$i];
+            $data[$i]->name         = $tasks->name[$i];
+            $data[$i]->desc         = $tasks->desc[$i];
+            $data[$i]->pri          = $tasks->pri[$i];
+            $data[$i]->estimate     = $tasks->estimate[$i];
+            $data[$i]->left         = $tasks->estimate[$i];
+            $data[$i]->project      = $projectID;
+            $data[$i]->deadline     = '0000-00-00';
+            $data[$i]->status       = 'wait';
+            $data[$i]->openedBy     = $this->app->user->account;
+            $data[$i]->openedDate   = $now;
+            $data[$i]->statusCustom = strpos(self::CUSTOM_STATUS_ORDER, 'wait') + 1;
+            if($tasks->story[$i] != '') $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
+            if($tasks->assignedTo[$i] != '') $data[$i]->assignedDate = $now;
 
-                if(dao::isError()) 
-                {
-                    echo js::error(dao::getError());
-                    die(js::reload('parent'));
-                }
+            $this->dao->insert(TABLE_TASK)->data($data[$i])
+                ->autoCheck()
+                ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+                ->checkIF($data[$i]->estimate != '', 'estimate', 'float')
+                ->exec();
 
-                $taskID = $this->dao->lastInsertID();
-                if($tasks->story[$i] != false) $this->story->setStage($tasks->story[$i]);
-                $actionID = $this->loadModel('action')->create('task', $taskID, 'Opened', '');
-                $mails[$i]->taskID  = $taskID;
-                $mails[$i]->actionID = $actionID;
-            }
-            else
-            {
-                unset($tasks->story[$i]);
-                unset($tasks->type[$i]);
-                unset($tasks->name[$i]);
-                unset($tasks->desc[$i]);
-                unset($tasks->assignedTo[$i]);
-                unset($tasks->pri[$i]);
-                unset($tasks->estimate[$i]);
-            }
+            if(dao::isError()) die(js::error(dao::getError()));
+
+            $taskID = $this->dao->lastInsertID();
+            if($tasks->story[$i] != false) $this->story->setStage($tasks->story[$i]);
+            $actionID = $this->action->create('task', $taskID, 'Opened', '');
+            
+            $mails[$i]           = new stdclass();
+            $mails[$i]->taskID   = $taskID;
+            $mails[$i]->actionID = $actionID;
         }
+
         return $mails;
     }
 
@@ -184,6 +174,23 @@ class taskModel extends model
             ->get();
         $task->statusCustom = strpos(self::CUSTOM_STATUS_ORDER, $task->status) + 1;
 
+        if($task->consumed < $oldTask->consumed) 
+        {
+            die(js::error($this->lang->task->error->consumedSmall));
+        }
+        else if($task->consumed != $oldTask->consumed or $task->left != $oldTask->left)
+        {
+            $estimate = new stdClass();
+            $estimate->consumed = $task->consumed - $oldTask->consumed;
+            $estimate->left     = $task->left;
+            $estimate->task     = $taskID;
+            $estimate->account  = $this->app->user->account;
+            $estimate->date     = helper::now();
+
+            $this->dao->insert(TABLE_TASKESTIMATE)->data($estimate)
+                ->autoCheck()
+                ->exec();
+        }
         $this->dao->update(TABLE_TASK)->data($task)
             ->autoCheck()
             ->batchCheckIF($task->status != 'cancel', $this->config->task->edit->requiredFields, 'notempty')
@@ -218,6 +225,7 @@ class taskModel extends model
         $tasks      = array();
         $allChanges = array();
         $now        = helper::now();
+        $today      = date(DT_DATE1);
         $taskIDList = $this->post->taskIDList ? $this->post->taskIDList : array();
 
         /* Adjust whether the post data is complete, if not, remove the last element of $taskIDList. */
@@ -231,13 +239,12 @@ class taskModel extends model
                 $oldTask = $this->getById($taskID);
 
                 $task->name           = htmlspecialchars($this->post->names[$taskID]);
-                $task->module         = $this->post->modules[$taskID];
+                $task->module         = isset($this->post->modules[$taskID]) ? $this->post->modules[$taskID] : 0;
                 $task->type           = $this->post->types[$taskID];
                 $task->status         = $this->post->statuses[$taskID];
                 $task->assignedTo     = $task->status == 'closed' ? 'closed' : $this->post->assignedTos[$taskID];
                 $task->pri            = $this->post->pris[$taskID];
                 $task->estimate       = $this->post->estimates[$taskID];
-                $task->consumed       = $this->post->consumeds[$taskID];
                 $task->left           = $this->post->lefts[$taskID];
                 $task->finishedBy     = $this->post->finishedBys[$taskID];
                 $task->canceledBy     = $this->post->canceledBys[$taskID];
@@ -253,13 +260,27 @@ class taskModel extends model
                     $task->assignedDate = $this->post->assignedTos[$taskID] == $oldTask->assignedTo ? $oldTask->assignedDate : $now;
                 }
 
+                if($this->post->consumeds[$taskID])
+                {
+                    $record = new stdclass();
+                    $record->account  = $this->app->user->account;
+                    $record->task     = $taskID;
+                    $record->date     = $today;
+                    $record->left     = $task->left;
+                    $record->consumed = $this->post->consumeds[$taskID];
+                    $this->dao->insert(TABLE_TASKESTIMATE)->data($record)->autoCheck()->exec();
+
+                    $task->consumed = $oldTask->consumed + $record->consumed;
+                }
+
                 switch($task->status)
                 {
                     case 'done':
                     {
                         $task->left = 0;
-                        if(!$task->finishedBy)   $task->finishedBy = $this->app->user->account;
+                        if(!$task->finishedBy)   $task->finishedBy   = $this->app->user->account;
                         if(!$task->finishedDate) $task->finishedDate = $now;
+                        if($task->closedReason)  $task->closedDate   = $now;
                     }
                     break;
                     case 'cancel':
@@ -286,14 +307,6 @@ class taskModel extends model
                 }
                 if($task->assignedTo) $task->assignedDate = $now;
 
-                $tasks[$taskID] = $task;
-                unset($task);
-            }
-
-            /* Update task data. */
-            foreach($tasks as $taskID => $task)
-            {
-                $oldTask = $this->getById($taskID);
                 $this->dao->update(TABLE_TASK)->data($task)
                     ->autoCheck()
                     ->batchCheckIF($task->status != 'cancel', $this->config->task->edit->requiredFields, 'notempty')
@@ -313,6 +326,8 @@ class taskModel extends model
                     ->batchCheckIF($task->closedReason == 'cancel', 'finishedBy, finishedDate', 'empty')
                     ->where('id')->eq((int)$taskID)
                     ->exec();
+
+                if($task->status == 'done' and $task->closedReason) $this->dao->update(TABLE_TASK)->set('status')->eq('closed')->where('id')->eq($taskID)->exec();
 
                 if($oldTask->story != false) $this->loadModel('story')->setStage($oldTask->story);
                 if(!dao::isError()) 
@@ -366,7 +381,8 @@ class taskModel extends model
     public function start($taskID)
     {
         $oldTask = $this->getById($taskID);
-        $now     = helper::now();
+        if($this->post->consumed < $oldTask->consumed) die(js::error($this->lang->task->error->consumedSmall));
+        $now  = helper::now();
         $task = fixer::input('post')
             ->setDefault('status', 'doing')
             ->setDefault('lastEditedBy', $this->app->user->account)
@@ -379,8 +395,85 @@ class taskModel extends model
             ->check('consumed,left', 'float')
             ->where('id')->eq((int)$taskID)->exec();
 
+        /* Record consumed and left. */
+        $estimate = fixer::input('post')
+            ->setDefault('account', $this->app->user->account) 
+            ->setDefault('task', $taskID) 
+            ->setDefault('date', date(DT_DATE1)) 
+            ->remove('realStarted,comment')->get();
+        $estimate->consumed = $estimate->consumed - $oldTask->consumed; 
+        $this->addTaskEstimate($estimate);
+
         if($oldTask->story) $this->loadModel('story')->setStage($oldTask->story);
         if(!dao::isError()) return common::createChanges($oldTask, $task);
+    }
+
+    /**
+     * Record estimate and left of task. 
+     * 
+     * @param  int    $taskID 
+     * @access public
+     * @return void
+     */
+    public function recordEstimate($taskID)
+    {
+        $record    = fixer::input('post')->get();
+        $estimates = array();
+        $task      = $this->getById($taskID);
+        $oldStatus = $task->status;
+        foreach(array_keys($record->id) as $id)
+        {
+            if($record->dates[$id])
+            {
+                if(!$record->consumed[$id]) die(js::alert('ii')); 
+                $estimates[$id]->date     = $record->dates[$id];
+                $estimates[$id]->task     = $taskID;
+                $estimates[$id]->consumed = $record->consumed[$id];
+                $estimates[$id]->left     = $record->left[$id];
+                $estimates[$id]->work     = $record->work[$id];
+            }
+        }
+
+        $consumed = 0;
+        $left     = $task->left;
+        foreach($estimates as $estimate)
+        {
+            $consumed += $estimate->consumed;
+            $left      = $estimate->left;
+            $work      = $estimate->work;
+            $this->dao->insert(TABLE_TASKESTIMATE)->data($estimate) 
+                ->autoCheck()
+                ->exec();
+            $estimateID = $this->dao->lastInsertID();
+            $actionID   = $this->loadModel('action')->create('task', $taskID, 'RecordEstimate', '', $estimate->consumed);
+        }
+
+        if($left == 0)
+        {
+            $task->status = 'done'; 
+        }
+        else if($task->status == 'wait')
+        {
+            $task->status = 'doing'; 
+        }
+        $this->dao->update(TABLE_TASK)
+            ->set('consumed')->eq($task->consumed + $consumed)
+            ->set('`left`')->eq($left)
+            ->set('status')->eq($task->status)
+            ->where('id')->eq($taskID)
+            ->exec();
+
+        $oldTask = new stdClass();
+        $newTask = new stdClass();
+        $oldTask->consumed = $task->consumed;
+        $newTask->consumed = $task->consumed + $consumed;
+        $oldTask->left     = $task->left;
+        $newTask->left     = $left;
+        $oldTask->status   = $oldStatus;
+        $newTask->status   = $task->status;
+
+        $changes =  common::createChanges($oldTask, $newTask);
+        $this->action->logHistory($actionID, $changes);
     }
 
     /**
@@ -393,7 +486,8 @@ class taskModel extends model
     public function finish($taskID)
     {
         $oldTask = $this->getById($taskID);
-        $now     = helper::now();
+        if($this->post->consumed < $oldTask->consumed) die(js::error($this->lang->task->error->consumedSmall));
+        $now  = helper::now();
         $task = fixer::input('post')
             ->setDefault('left', 0)
             ->setDefault('assignedTo',   $oldTask->openedBy)
@@ -403,7 +497,18 @@ class taskModel extends model
             ->setDefault('finishedDate, lastEditedDate', $now) 
             ->remove('comment')->get();
 
-        if(!is_numeric($task->consumed)) die(js::error($this->lang->task->error->consumed));;
+        if(!is_numeric($task->consumed)) die(js::error($this->lang->task->error->consumed));
+
+        /* Record consumed and left. */
+        $consumed = $task->consumed - $oldTask->consumed; 
+        $estimate = fixer::input('post')
+            ->setDefault('account', $this->app->user->account) 
+            ->setDefault('task', $taskID) 
+            ->setDefault('date', date(DT_DATE1)) 
+            ->setDefault('left', 0)
+            ->remove('finishedDate,comment')->get();
+        $estimate->consumed = $estimate->consumed - $oldTask->consumed; 
+        if($estimate->consumed) $this->addTaskEstimate($estimate);
 
         $this->setStatus($task);
 
@@ -596,7 +701,7 @@ class taskModel extends model
             ->page($pager)
             ->fetchAll();
 
-        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'task');
+        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'task', $type == 'needconfirm' ? false : true);
 
         if($tasks) return $this->processTasks($tasks);
         return array();
@@ -636,7 +741,7 @@ class taskModel extends model
      * @access public
      * @return array
      */
-    public function getUserTasks($account, $type = 'assignedto', $limit = 0, $pager = null)
+    public function getUserTasks($account, $type = 'assignedto', $limit = 0, $pager = null, $orderBy="id_desc")
     {
         $type = strtolower($type);
         $tasks = $this->dao->select('t1.*, t2.id as projectID, t2.name as projectName, t3.id as storyID, t3.title as storyTitle, t3.status AS storyStatus, t3.version AS latestStoryVersion')
@@ -651,7 +756,7 @@ class taskModel extends model
             ->beginIF($type == 'finishedby')->andWhere('t1.finishedby')->eq($account)->fi()
             ->beginIF($type == 'closedby')->andWhere('t1.closedby')->eq($account)->fi()
             ->beginIF($type == 'canceledby')->andWhere('t1.canceledby')->eq($account)->fi()
-            ->orderBy('id desc')
+            ->orderBy($orderBy)
             ->beginIF($limit > 0)->limit($limit)->fi()
             ->page($pager)
             ->fetchAll();
@@ -724,6 +829,119 @@ class taskModel extends model
             ->fetchPairs();
         foreach($stories as $storyID) if(!isset($taskCounts[$storyID])) $taskCounts[$storyID] = 0;
         return $taskCounts;
+    }
+
+    /**
+     * Get task estimate. 
+     * 
+     * @param  int    $taskID 
+     * @access public
+     * @return object 
+     */
+    public function getTaskEstimate($taskID)
+    {
+        return $this->dao->select('*')
+          ->from(TABLE_TASKESTIMATE)  
+          ->where('task')->eq($taskID)
+          ->orderBy('id')
+          ->fetchAll();
+    }
+
+    /**
+     * Get estimate by id. 
+     * 
+     * @param  int    $estimateID 
+     * @access public
+     * @return object. 
+     */
+    public function getEstimateById($estimateID)
+    {
+        return $this->dao->select('*')
+          ->from(TABLE_TASKESTIMATE)  
+          ->where('id')->eq($estimateID)
+          ->fetch();
+    }
+
+    /**
+     * Update estimate. 
+     * 
+     * @param  int    $estimateID 
+     * @access public
+     * @return void
+     */
+    public function updateEstimate($estimateID)
+    {
+        $oldEstimate = $this->getEstimateById($estimateID);
+        $estimate    = fixer::input('post')->get();
+        $task        = $this->getById($oldEstimate->task);
+        $oldStatus   = $task->status;
+        $this->dao->update(TABLE_TASKESTIMATE)->data($estimate)
+            ->autoCheck()
+            ->check('consumed', 'notempty')
+            ->where('id')->eq((int)$estimateID)
+            ->exec();
+        $consumed     = $task->consumed + $estimate->consumed - $oldEstimate->consumed;
+        $lastEstimate = $this->dao->select('*')->from(TABLE_TASKESTIMATE)->where('task')->eq($task->id)->orderBy('id desc')->fetch();
+        if($lastEstimate and $estimateID == $lastEstimate->id)
+        {
+            $left = $estimate->left; 
+        }
+        else
+        {
+            $left = $task->left; 
+        }
+        if($left == 0) $task->status = 'done'; 
+        $this->dao->update(TABLE_TASK)
+            ->set('consumed')->eq($consumed)
+            ->set('`left`')->eq($left)
+            ->set('status')->eq($task->status)
+            ->where('id')->eq($task->id)
+            ->exec();
+
+        $oldTask = new stdClass();
+        $newTask = new stdClass();
+        $oldTask->consumed = $task->consumed;
+        $newTask->consumed = $consumed;
+        $oldTask->left     = $task->left;
+        $newTask->left     = $left;
+        $oldTask->status   = $oldStatus;
+        $newTask->status   = $task->status;
+        if(!dao::isError()) return common::createChanges($oldTask, $newTask);
+    }
+
+    /**
+     * Delete estimate. 
+     * 
+     * @param  int    $estimateID 
+     * @access public
+     * @return void
+     */
+    public function deleteEstimate($estimateID)
+    {
+        $estimate = $this->getEstimateById($estimateID);
+        $task     = $this->getById($estimate->task);
+        $this->dao->delete()->from(TABLE_TASKESTIMATE)->where('id')->eq($estimateID)->exec();
+        $lastEstimate = $this->dao->select('*')->from(TABLE_TASKESTIMATE)->where('task')->eq($estimate->task)->orderBy('id desc')->fetch();
+        $consumed  = $task->consumed - $estimate->consumed;
+        $left      = $lastEstimate->left;
+        $oldStatus = $task->status;
+        if($left == 0) $task->status = 'done'; 
+        $this->dao->update(TABLE_TASK)
+            ->set("consumed")->eq($consumed)
+            ->set('`left`')->eq($left)
+            ->set('status')->eq($task->status)
+            ->where('id')->eq($estimate->task)
+            ->exec();
+
+        $oldTask = new stdClass();
+        $newTask = new stdClass();
+        $oldTask->consumed = $task->consumed;
+        $newTask->consumed = $consumed;
+        $oldTask->left     = $task->left;
+        $newTask->left     = $left;
+        $oldTask->status   = $oldStatus;
+        $newTask->status   = $task->status;
+        if(!dao::isError()) return common::createChanges($oldTask, $newTask);
     }
 
     /**
@@ -813,7 +1031,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('project as name, count(*) as value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('project')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -833,7 +1051,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('module as name, count(*) as value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('module')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -853,7 +1071,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('assignedTo AS name, count(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('assignedTo')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -873,7 +1091,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('type AS  name, count(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('type')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -892,7 +1110,7 @@ class taskModel extends model
     {
         return $this->dao->select('pri AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('pri')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -908,7 +1126,7 @@ class taskModel extends model
     {
         return $this->dao->select('deadline AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('deadline')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -924,7 +1142,7 @@ class taskModel extends model
     {
         return $this->dao->select('estimate AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('estimate')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -940,7 +1158,7 @@ class taskModel extends model
     {
         return $this->dao->select('`left` AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('`left`')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -956,7 +1174,7 @@ class taskModel extends model
     {
         return $this->dao->select('consumed AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('consumed')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -972,7 +1190,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('finishedBy AS name, COUNT(finishedBy) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->andWhere('finishedBy')->ne('')
             ->groupBy('finishedBy')
             ->orderBy('value DESC')
@@ -993,7 +1211,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('closedReason AS name, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('closedReason')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -1018,7 +1236,7 @@ class taskModel extends model
     {
         $datas= $this->dao->select('DATE_FORMAT(finishedDate, "%Y-%m-%d") AS date, COUNT(*) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('date')
             ->having('date != "0000-00-00"')
             ->orderBy('finishedDate')
@@ -1043,7 +1261,7 @@ class taskModel extends model
     {
         $datas = $this->dao->select('status AS name, COUNT(status) AS value')
             ->from(TABLE_TASK)->alias('t1')
-            ->where($this->session->taskQueryCondition)
+            ->where($this->reportCondition())
             ->groupBy('status')
             ->orderBy('value DESC')
             ->fetchAll('name');
@@ -1075,5 +1293,29 @@ class taskModel extends model
         if($action == 'cancel')   return $task->status != 'done  ' and $task->status != 'closed' and $task->status != 'cancel';
 
         return true;
+    }
+
+    /**
+     * Get report condition from session.
+     * 
+     * @access public
+     * @return void
+     */
+    public function reportCondition()
+    {
+        if(!$this->session->taskOnlyCondition) return 'id in (' . preg_replace('/SELECT .* FROM/', 'SELECT t1.id FROM', $this->session->taskQueryCondition) . ')';
+        return $this->session->taskQueryCondition;
+    }
+
+    /**
+     * Add task estimate.
+     * 
+     * @param  object    $data 
+     * @access public
+     * @return void
+     */
+    public function addTaskEstimate($data)
+    {
+        $this->dao->insert(TABLE_TASKESTIMATE)->data($data)->autoCheck()->exec();
     }
 }

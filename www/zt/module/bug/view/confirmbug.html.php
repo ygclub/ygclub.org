@@ -2,7 +2,7 @@
 /**
  * The confirm file of bug module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
@@ -22,7 +22,7 @@
       <td colspan='2' class='a-center'>
         <?php echo html::submitButton($lang->bug->buttonConfirm);?>
         <input type='button' value='<?php echo $lang->bug->buttonToList;?>' class='button-s' 
-         onclick='location.href="<?php echo $this->session->bugList;?>"' />
+         onclick='location.href="<?php echo $this->server->http_referer;?>"' />
       </td>
     </tr>
   </table>

@@ -2,11 +2,11 @@
 /**
  * The runrun view file of testtask of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     testtask
- * @version     $Id: runcase.html.php 3860 2012-12-19 10:08:20Z wyd621@gmail.com $
+ * @version     $Id: runcase.html.php 4490 2013-02-27 03:27:05Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -37,6 +37,7 @@
     <tr class='a-center'>
       <td colspan='5'>
         <?php
+        if($preCase)  echo html::linkButton($lang->testtask->pre, inlink('runCase', "runID={$preCase['runID']}&caseID={$preCase['caseID']}&version={$preCase['version']}"));
         if(empty($run->case->steps))
         {
             echo html::submitButton($lang->testtask->pass, "onclick=$('#result').val('pass')");
@@ -45,7 +46,7 @@
         else
         {
             echo html::submitButton();
-            echo html::submitButton($lang->testtask->passAll, "onclick=$('#passall').val(1)");
+            echo html::submitButton($lang->testtask->pass, "onclick=$('#passall').val(1)");
         }
         echo html::hidden('case',    $run->case->id);
         echo html::hidden('version', $run->case->version);

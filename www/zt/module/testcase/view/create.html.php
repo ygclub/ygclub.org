@@ -2,11 +2,11 @@
 /**
  * The create view of case module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
- * @version     $Id: create.html.php 3455 2012-09-01 07:11:58Z wwccss $
+ * @version     $Id: create.html.php 4515 2013-03-02 06:46:34Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -37,17 +37,18 @@
     <tr>
       <th class='rowhead'><?php echo $lang->testcase->lblStory;?></th>
       <td>
-        <div id='storyIdBox'><?php echo html::select('story', $stories, $storyID, 'class="text-1" onchange=setPreview();');?></div>
+        <div id='storyIdBox'><?php echo html::select('story', $stories, $storyID, 'class="text-1" onchange=setPreview();');?>
         <?php if($storyID == 0): ?>
           <a href='' id='preview' class='iframe hidden'><?php echo $lang->preview;?></a>
         <?php else:?>
           <?php echo html::a($this->createLink('story', 'view', "storyID=$storyID"), $lang->preview, '', "class='iframe' id='preview'");?>
         <?php endif;?>
+        </div>
       </td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testcase->title;?></th>
-      <td><?php echo html::input('title', $title, "class='text-1'");?></td>
+      <td><?php echo html::input('title', $caseTitle, "class='text-1'");?></td>
     </tr>  
     <tr>
       <th class='rowhead'><?php echo $lang->testcase->precondition;?></th>

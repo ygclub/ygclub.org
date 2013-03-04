@@ -2,11 +2,11 @@
 /**
  * The team view file of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: team.html.php 2605 2012-02-21 07:22:58Z wwccss $
+ * @version     $Id: team.html.php 4143 2013-01-18 07:01:06Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -21,7 +21,7 @@
     <th><?php echo $lang->team->days;?></th>
     <th><?php echo $lang->team->hours;?></th>
     <th><?php echo $lang->team->totalHours;?></th>
-    <?php if(common::hasPriv('project', 'unlinkmember')) echo "<th>$lang->actions</th>";?>
+    <th><?php echo $lang->actions;?></th>
   </tr>
   </thead>
   <tbody>
@@ -30,7 +30,7 @@
   <tr class='a-center'>
     <td>
     <?php 
-    common::hasPriv('user', 'view') ? print(html::a($this->createLink('user', 'view', "account=$member->account"), $member->realname)) : print($member->realname);
+    if(!common::printLink('user', 'view', "account=$member->account", $member->realname)) print $member->realname;
     $memberHours = $member->days * $member->hours;
     $totalHours  += $memberHours;
     ?>
@@ -40,7 +40,7 @@
     <td><?php echo $member->days;?></td>
     <td><?php echo $member->hours;?></td>
     <td><?php echo $memberHours;?></td>
-    <?php if(common::hasPriv('project', 'unlinkmember')) echo "<td>" . html::a($this->createLink('project', 'unlinkmember', "projectID=$project->id&account=$member->account"), $lang->project->unlinkMember, 'hiddenwin') . '</td>';?>
+    <td><?php common::printIcon('project', 'unlinkMember', "projectID=$project->id&account=$member->account", '', 'list', '', 'hiddenwin');?></td>
   </tr>
   <?php endforeach;?>
   </tbody>     

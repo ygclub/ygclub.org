@@ -2,11 +2,11 @@
 /**
  * The control file of build module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     build
- * @version     $Id: control.php 3490 2012-09-02 07:31:12Z wwccss $
+ * @version     $Id: control.php 4154 2013-01-20 06:49:06Z wwccss $
  * @link        http://www.zentao.net
  */
 class build extends control
@@ -44,7 +44,7 @@ class build extends control
         $bugs    = $this->bug->getProjectBugs($projectID); 
 
         /* Assign. */
-        $this->view->header->title = $this->lang->build->create;
+        $this->view->title     = $this->lang->build->create;
         $this->view->products  = $this->project->getProducts($projectID);
         $this->view->projectID = $projectID;
         $this->view->users     = $this->user->getPairs();
@@ -89,14 +89,14 @@ class build extends control
         $bugs    = $this->bug->getProjectBugs($build->project); 
 
         /* Assign. */
-        $this->view->header->title = $this->lang->build->edit;
-        $this->view->position[]    = $this->lang->build->edit;
-        $this->view->products      = $this->project->getProducts($build->project);
-        $this->view->users         = $this->loadModel('user')->getPairs();
-        $this->view->build         = $build;
-        $this->view->stories       = $stories;
-        $this->view->bugs          = $bugs;
-        $this->view->orderBy       = $orderBy;
+        $this->view->title      = $this->lang->build->edit;
+        $this->view->position[] = $this->lang->build->edit;
+        $this->view->products   = $this->project->getProducts($build->project);
+        $this->view->users      = $this->loadModel('user')->getPairs();
+        $this->view->build      = $build;
+        $this->view->stories    = $stories;
+        $this->view->bugs       = $bugs;
+        $this->view->orderBy    = $orderBy;
         $this->display();
     }
                                                           
@@ -126,14 +126,14 @@ class build extends control
 
         /* Assign. */
         $projects = $this->project->getPairs();
-        $this->view->header->title = "BUILD #$build->id $build->name - " . $projects[$build->project];
-        $this->view->position[]    = $this->lang->build->view;
-        $this->view->products      = $this->project->getProducts($build->project);
-        $this->view->users         = $this->loadModel('user')->getPairs('noletter');
-        $this->view->build         = $build;
-        $this->view->stories       = $stories;
-        $this->view->bugs          = $bugs;
-        $this->view->actions       = $this->loadModel('action')->getList('build', $buildID);
+        $this->view->title      = "BUILD #$build->id $build->name - " . $projects[$build->project];
+        $this->view->position[] = $this->lang->build->view;
+        $this->view->products   = $this->project->getProducts($build->project);
+        $this->view->users      = $this->loadModel('user')->getPairs('noletter');
+        $this->view->build      = $build;
+        $this->view->stories    = $stories;
+        $this->view->bugs       = $bugs;
+        $this->view->actions    = $this->loadModel('action')->getList('build', $buildID);
         $this->display();
     }
  

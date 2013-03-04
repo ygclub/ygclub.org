@@ -2,11 +2,11 @@
 /**
  * The control file of install currentModule of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     install
- * @version     $Id: control.php 3760 2012-12-11 07:21:54Z zhujinyonging@gmail.com $
+ * @version     $Id: control.php 4297 2013-01-27 07:51:45Z wwccss $
  * @link        http://www.zentao.net
  */
 class install extends control
@@ -36,7 +36,7 @@ class install extends control
     {
         if(!isset($this->config->installed) or !$this->config->installed) $this->session->set('installing', true);
 
-        $this->view->header->title = $this->lang->install->welcome;
+        $this->view->title = $this->lang->install->welcome;
 
         if($release = $this->install->getLatestRelease()) $this->view->latestRelease = $release;
 
@@ -51,7 +51,7 @@ class install extends control
      */
     public function step1()
     {
-        $this->view->header->title  = $this->lang->install->checking;
+        $this->view->title          = $this->lang->install->checking;
         $this->view->phpVersion     = $this->install->getPhpVersion();
         $this->view->phpResult      = $this->install->checkPHP();
         $this->view->pdoResult      = $this->install->checkPDO();
@@ -75,7 +75,7 @@ class install extends control
      */
     public function step2()
     {
-        $this->view->header->title = $this->lang->install->setConfig;
+        $this->view->title = $this->lang->install->setConfig;
         $this->display();
     }
 
@@ -93,17 +93,17 @@ class install extends control
             if($return->result == 'ok')
             {
                 $this->view = (object)$_POST;
-                $this->view->app    = $this->app;
-                $this->view->lang   = $this->lang;
-                $this->view->config = $this->config;
-                $this->view->domain = $this->server->HTTP_HOST;
-                $this->view->header = new stdclass();
-                $this->view->header->title = $this->lang->install->saveConfig;
+                $this->view->app       = $this->app;
+                $this->view->lang      = $this->lang;
+                $this->view->config    = $this->config;
+                $this->view->domain    = $this->server->HTTP_HOST;
+                $this->view->title     = $this->lang->install->saveConfig;
+                $this->view->mysqldump = $this->install->getMySQLDump();
                 $this->display();
             }
             else
             {
-                $this->view->header->title = $this->lang->install->saveConfig;
+                $this->view->title = $this->lang->install->saveConfig;
                 $this->view->error = $return->error;
                 $this->display();
             }
@@ -131,11 +131,10 @@ class install extends control
             if(dao::isError()) echo js::alert($this->lang->install->errorImportDemoData);
 
             $this->loadModel('setting')->updateVersion($this->config->version);
-            $this->setting->setSN();
 			die(js::locate(inlink('step5'), 'parent'));
         }
 
-        $this->view->header->title = $this->lang->install->getPriv;
+        $this->view->title = $this->lang->install->getPriv;
         if(!isset($this->config->installed) or !$this->config->installed)
         {
             $this->view->error = $this->lang->install->errorNotSaveConfig;
@@ -156,6 +155,7 @@ class install extends control
 	 */
 	public function step5()
 	{
+        $this->view->title = $this->lang->install->success;
 		$this->display();
 		unset($_SESSION['installing']);
 		session_destroy();

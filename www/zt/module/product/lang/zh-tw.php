@@ -2,11 +2,11 @@
 /**
  * The product module zh-tw file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青島易軟天創網絡科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     product
- * @version     $Id: zh-tw.php 3823 2012-12-17 07:06:29Z wwccss $
+ * @version     $Id: zh-tw.php 4425 2013-02-22 03:25:33Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->product->common = '產品視圖';
@@ -18,6 +18,7 @@ $lang->product->edit   = "編輯產品";
 $lang->product->create = "新增產品";
 $lang->product->read   = "產品詳情";
 $lang->product->delete = "刪除產品";
+$lang->product->close  = "關閉";
 $lang->product->select = '--請選擇產品--';
 
 $lang->product->basicInfo = '基本信息';

@@ -2,7 +2,7 @@
 /**
  * The control file of editor of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yidong Wang <yidong@cnezsoft.com>
  * @package     editor
@@ -19,6 +19,8 @@ class editor extends control
      */
     public function index()
     {
+        $this->view->title      = $this->lang->editor->common;
+        $this->view->position[] = $this->lang->editor->common;
         $this->view->moduleList = $this->editor->getModules();
         $this->display();
     }

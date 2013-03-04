@@ -2,11 +2,11 @@
 /**
  * The model file of story module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     story
- * @version     $Id: model.php 3859 2012-12-19 08:29:23Z zhujinyonging@gmail.com $
+ * @version     $Id: model.php 4410 2013-02-21 09:44:35Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -195,6 +195,7 @@ class storyModel extends model
         {
             if($stories->title[$i] != '')
             {
+                $data[$i] = new stdclass();
                 $data[$i]->module     = $stories->module[$i] != 'same' ? $stories->module[$i] : ($i == 0 ? 0 : $data[$i-1]->module);
                 $data[$i]->plan       = $stories->plan[$i] == 'same' ? ($i != 0 ? $data[$i-1]->plan : 0) : ($stories->plan[$i] != '' ?     $stories->plan[$i] : 0);
                 $data[$i]->title      = $stories->title[$i];
@@ -374,6 +375,7 @@ class storyModel extends model
             {
                 $oldStory = $this->getById($storyID);
 
+                $story                 = new stdclass();
                 $story->lastEditedBy   = $this->app->user->account;
                 $story->lastEditedDate = $now;
                 $story->status         = $oldStory->status;
@@ -556,11 +558,12 @@ class storyModel extends model
 
             foreach($stories as $storyID => $story)
             {
+                if(!$story->closedReason) continue;
+
                 $oldStory = $this->getById($storyID);
 
                 $this->dao->update(TABLE_STORY)->data($story)
                     ->autoCheck()
-                    ->batchCheck($this->config->story->close->requiredFields, 'notempty')
                     ->checkIF($story->closedReason == 'duplicate',  'duplicateStory', 'notempty')
                     ->checkIF($story->closedReason == 'subdivided', 'childStories',   'notempty')
                     ->where('id')->eq($storyID)->exec();

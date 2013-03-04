@@ -2,20 +2,20 @@
 /**
  * The model file of action module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     action
- * @version     $Id: model.php 3859 2012-12-19 08:29:23Z zhujinyonging@gmail.com $
+ * @version     $Id: model.php 4507 2013-03-01 07:27:54Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php
 class actionModel extends model
 {
-    const CAN_UNDELETED = 1;    // The deleted object can be undeleted or not.
-    const BE_UNDELETED  = 0;    // The deleted object has been undeleted or not.
-    const BE_HIDDEN     = 2;
+    const BE_UNDELETED  = 0;    // The deleted object has been undeleted.
+    const CAN_UNDELETED = 1;    // The deleted object can be undeleted.
+    const BE_HIDDEN     = 2;    // The deleted object has been hidded.
 
     /**
      * Create a action.
@@ -42,7 +42,7 @@ class actionModel extends model
         $action->extra      = $extra;
 
         /* Get product and project for this object. */
-        $productAndProject  = $this->getProductAndProject($objectType, $objectID);
+        $productAndProject  = $this->getProductAndProject($action->objectType, $objectID);
         $action->product    = $productAndProject['product'];
         $action->project    = $productAndProject['project'];
 
@@ -119,7 +119,6 @@ class actionModel extends model
      */
     public function getProductAndProject($objectType, $objectID)
     {
-        $objectType  = strtolower($objectType);
         $emptyRecord = array('product' => ',0,', 'project' => 0);
 
         /* If objectType is product or project, return the objectID. */
@@ -134,7 +133,7 @@ class actionModel extends model
         /* Only process these object types. */
         if(strpos('story, productplan, release, task, build. bug, case, testtask, doc', $objectType) !== false)
         {
-            if(!isset($this->config->action->objectTables[$objectType])) return $emptyRecord;
+            if(!isset($this->config->objectTables[$objectType])) return $emptyRecord;
 
             /* Set fields to fetch. */
             if(strpos('story, productplan, case',  $objectType) !== false) $fields = 'product';
@@ -142,7 +141,7 @@ class actionModel extends model
             if($objectType == 'release') $fields = 'product, build';
             if($objectType == 'task')    $fields = 'project, story';
 
-            $record = $this->dao->select($fields)->from($this->config->action->objectTables[$objectType])->where('id')->eq($objectID)->fetch();
+            $record = $this->dao->select($fields)->from($this->config->objectTables[$objectType])->where('id')->eq($objectID)->fetch();
 
             /* Process story, release and task. */
             if($objectType == 'story')   $record->project = $this->dao->select('project')->from(TABLE_PROJECTSTORY)->where('story')->eq($objectID)->fetch('project');
@@ -236,7 +235,7 @@ class actionModel extends model
         foreach($typeTrashes as $objectType => $objectIds)
         {
             $objectIds   = array_unique($objectIds);
-            $table       = $this->config->action->objectTables[$objectType];
+            $table       = $this->config->objectTables[$objectType];
             $field       = $this->config->action->objectNameFields[$objectType];
             $objectNames[$objectType] = $this->dao->select("id, $field AS name")->from($table)->where('id')->in($objectIds)->fetchPairs();
         }
@@ -464,6 +463,7 @@ class actionModel extends model
      */
     public function transformActions($actions)
     {
+        $this->app->loadLang('todo');
         /* Get commiters. */
         $commiters = $this->loadModel('user')->getCommiters();
 
@@ -471,10 +471,10 @@ class actionModel extends model
         foreach($actions as $object) $objectTypes[$object->objectType][] = $object->objectID;
         foreach($objectTypes as $objectType => $objectIds)
         {
-            if(!isset($this->config->action->objectTables[$objectType])) continue;    // If no defination for this type, omit it.
+            if(!isset($this->config->objectTables[$objectType])) continue;    // If no defination for this type, omit it.
 
             $objectIds   = array_unique($objectIds);
-            $table       = $this->config->action->objectTables[$objectType];
+            $table       = $this->config->objectTables[$objectType];
             $field       = $this->config->action->objectNameFields[$objectType];
             if($table != '`zt_todo`')
             {
@@ -510,13 +510,7 @@ class actionModel extends model
             $action->objectLabel = isset($this->lang->action->label->$objectType) ? $this->lang->action->label->$objectType : $objectType;
 
             /* If action type is login or logout, needn't link. */
-            if($actionType == 'login' or $actionType == 'logout')
-            {
-                $action->objectLink  = '';
-                $action->objectLabel = '';
-                continue;
-            }
-            elseif($actionType == 'svncommited')
+            if($actionType == 'svncommited')
             {
                 $action->actor = isset($commiters[$action->actor]) ? $commiters[$action->actor] : $action->actor;
             }
@@ -545,12 +539,12 @@ class actionModel extends model
      */
     public function computeBeginAndEnd($period)
     {
-        $this->loadModel('todo');
+        $this->app->loadClass('date');
 
-        $today      = $this->todo->today();
-        $tomorrow   = $this->todo->tomorrow();
-        $yesterday  = $this->todo->yesterday();
-        $twoDaysAgo = $this->todo->twoDaysAgo();
+        $today      = date::today();
+        $tomorrow   = date::tomorrow();
+        $yesterday  = date::yesterday();
+        $twoDaysAgo = date::twoDaysAgo();
 
         $period = strtolower($period);
 
@@ -564,12 +558,12 @@ class actionModel extends model
         if($period == 'thisweek' or $period == 'lastweek')
         {
             $func = "get$period";
-            extract($this->todo->$func());
+            extract(date::$func());
             return array('begin' => $begin, 'end' => $end . ' 23:59:59');
         }
 
-        if($period == 'thismonth')  return $this->todo->getThisMonth();
-        if($period == 'lastmonth')  return $this->todo->getLastMonth();
+        if($period == 'thismonth')  return date::getThisMonth();
+        if($period == 'lastmonth')  return date::getLastMonth();
     }
 
     /**
@@ -618,17 +612,54 @@ class actionModel extends model
     }
 
     /**
-     * Hide object. 
+     * Undelete a record.
+     * 
+     * @param  int      $actionID 
+     * @access public
+     * @return void
+     */
+    public function undelete($actionID)
+    {
+        $action = $this->loadModel('action')->getById($actionID);
+        if($action->action != 'deleted') return;
+
+        /* Update deleted field in object table. */
+        $table = $this->config->objectTables[$action->objectType];
+        $this->dao->update($table)->set('deleted')->eq(0)->where('id')->eq($action->objectID)->exec();
+
+        /* Update action record in action table. */
+        $this->dao->update(TABLE_ACTION)->set('extra')->eq(ACTIONMODEL::BE_UNDELETED)->where('id')->eq($actionID)->exec();
+        $this->action->create($action->objectType, $action->objectID, 'undeleted');
+    }
+
+    /**
+     * Hide an object. 
      * 
      * @param  int    $actionID 
      * @access public
      * @return void
      */
-    public function hide($actionID)
+    public function hideOne($actionID)
     {
         $action = $this->getById($actionID);
         if($action->action != 'deleted') return;
+
         $this->dao->update(TABLE_ACTION)->set('extra')->eq(self::BE_HIDDEN)->where('id')->eq($actionID)->exec();
         $this->create($action->objectType, $action->objectID, 'hidden');
+    }
+
+    /**
+     * Hide all deleted objects.
+     * 
+     * @access public
+     * @return void
+     */
+    public function hideAll()
+    {
+        $this->dao->update(TABLE_ACTION)
+            ->set('extra')->eq(self::BE_HIDDEN)
+            ->where('action')->eq('deleted')
+            ->andWhere('extra')->eq(self::CAN_UNDELETED)
+            ->exec();
     }
 }

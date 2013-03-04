@@ -61,7 +61,7 @@ class helper
      * @access public
      * @return string the link string.
      */
-    static public function createLink($moduleName, $methodName = 'index', $vars = '', $viewType = '')
+    static public function createLink($moduleName, $methodName = 'index', $vars = '', $viewType = '', $onlybody = false)
     {
         global $app, $config;
         $link = $config->requestType == 'PATH_INFO' ? $config->webRoot : $_SERVER['PHP_SELF'];
@@ -108,7 +108,7 @@ class helper
         }
 
         /* if page has onlybody param then add this param in all link. the param hide header and footer. */
-        if(isset($_GET['onlybody']) and $_GET['onlybody'] == 'yes')
+        if($onlybody or isonlybody())
         {
             $onlybody = $config->requestType == 'PATH_INFO' ? "?onlybody=yes" : "&onlybody=yes";
             $link .= $onlybody;
@@ -399,17 +399,7 @@ class helper
     {
         $files = array();
         $dir = realpath($dir);
-        if(is_dir($dir))
-        {
-            if($dh = opendir($dir))
-            {
-                while(($file = readdir($dh)) !== false) 
-                {
-                    if(strpos($file, $pattern) !== false) $files[] = $dir . DIRECTORY_SEPARATOR . $file;
-                }
-                closedir($dh);
-            }
-        }
+        if(is_dir($dir)) $files = glob($dir . DIRECTORY_SEPARATOR . '*' . $pattern);
         return $files;
     }
 
@@ -510,6 +500,27 @@ function a($var)
 }
 
 /**
+ * When the $var has the $key, return it, esle result one default value.
+ * 
+ * @param  array|object    $var 
+ * @param  string|int      $key 
+ * @param  mixed           $valueWhenNone     value when the key not exits.
+ * @param  mixed           $valueWhenExists   value when the key exits.
+ * @access public
+ * @return void
+ */
+function zget($var, $key, $valueWhenNone = '', $valueWhenExists = '')
+{
+    $var = (array)$var;
+    if(isset($var[$key]))
+    {
+        if($valueWhenExists) return $valueWhenExists;
+        return $var[$key];
+    }
+    return $valueWhenNone;
+}
+
+/**
  * Judge the server ip is local or not.
  *
  * @access public
@@ -530,5 +541,23 @@ function isLocalIP()
  */
 function getWebRoot()
 {
-    return substr($_SERVER['SCRIPT_NAME'], 0, (strrpos($_SERVER['SCRIPT_NAME'], '/') + 1));
+    $path = $_SERVER['SCRIPT_NAME'];
+    if(defined('IN_SHELL'))
+    {
+        $url  = parse_url($_SERVER['argv'][1]);
+        $path = empty($url['path']) ? '/' : rtrim($url['path'], '/');
+        $path = empty($path) ? '/' : $path;
+    }
+    return substr($path, 0, (strrpos($path, '/') + 1));
+}
+
+/**
+ * Check exist onlybody param.
+ * 
+ * @access public
+ * @return void
+ */
+function isonlybody()
+{
+    return (isset($_GET['onlybody']) and $_GET['onlybody'] == 'yes');
 }

@@ -2,18 +2,18 @@
 /**
  * The bug view file of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: bug.html.php 3635 2012-11-26 05:26:15Z wyd621@gmail.com $
+ * @version     $Id: bug.html.php 4262 2013-01-24 08:48:56Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/colorize.html.php';?>
 <table class='table-1 fixed colored tablesorter'>
-  <caption class='caption-tl'>
+  <caption class='caption-tl pb-10px'>
     <div class='f-left'>
       <?php 
       echo $lang->project->bug;
@@ -42,7 +42,7 @@
     <td><?php echo html::a($this->createLink('bug', 'view', "bugID=$bug->id"), $bug->id, '_blank');?></td>
     <td><span class='<?php echo 'severity' . $lang->bug->severityList[$bug->severity]?>'><?php echo $lang->bug->severityList[$bug->severity]?></span></td>
     <td><span class='<?php echo 'pri' . $lang->bug->priList[$bug->pri]?>'><?php echo $lang->bug->priList[$bug->pri]?></span></td>
-    <td class='a-left nobr'><?php echo html::a($this->createLink('bug', 'view', "bugID=$bug->id"), $bug->title);?></td>
+    <td class='a-left' title="<?php echo $bug->title?>"><?php echo html::a($this->createLink('bug', 'view', "bugID=$bug->id"), $bug->title);?></td>
     <td><?php echo $users[$bug->openedBy];?></td>
     <td><?php echo $users[$bug->assignedTo];?></td>
     <td><?php echo $users[$bug->resolvedBy];?></td>

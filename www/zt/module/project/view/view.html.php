@@ -2,11 +2,11 @@
 /**
  * The view method view file of project module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     project
- * @version     $Id: view.html.php 3828 2012-12-17 07:15:34Z wwccss $
+ * @version     $Id: view.html.php 4199 2013-01-21 02:06:26Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
@@ -20,6 +20,12 @@
     if(!$project->deleted)
     {
         ob_start();
+        common::printIcon('project', 'start',    "projectID=$project->id", $project);
+        common::printIcon('project', 'activate', "projectID=$project->id", $project);
+        common::printIcon('project', 'putoff',   "projectID=$project->id", $project);
+        common::printIcon('project', 'suspend',  "projectID=$project->id", $project);
+        common::printIcon('project', 'close',    "projectID=$project->id", $project);
+
         common::printDivider();
         common::printIcon('project', 'edit', $params);
         common::printIcon('project', 'delete', $params, '', 'button', '', 'hiddenwin');
@@ -28,6 +34,10 @@
         $actionLinks = ob_get_contents();
         ob_end_clean();
         echo $actionLinks;
+    }
+    else
+    {
+        common::printRPN($browseLink);
     }
     ?>
   </div>
@@ -50,7 +60,7 @@
         <table class='table-1 a-left'>
           <tr>
             <th width='25%' class='a-right'><?php echo $lang->project->name;?></th>
-            <td <?php if($project->deleted) echo "class='deleted'";?>><?php echo $project->name;?></td>
+            <td><?php echo $project->name;?></td>
           </tr>
           <tr>
             <th class='rowhead'><?php echo $lang->project->code;?></th>
@@ -63,6 +73,10 @@
           <tr>
             <th class='rowhead'><?php echo $lang->project->days;?></th>
             <td><?php echo $project->days;?></td>
+          </tr>
+          <tr>
+            <th class='rowhead'><?php echo $lang->project->type;?></th>
+            <td><?php echo $lang->project->typeList[$project->type];?></td>
           </tr>
           <tr>
             <th class='rowhead'><?php echo $lang->project->goal;?></th>

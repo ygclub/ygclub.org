@@ -2,15 +2,15 @@
 /**
  * The story module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     story
- * @version     $Id: zh-cn.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: zh-cn.php 4395 2013-02-20 02:42:10Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 $lang->story->browse      = "需求列表";
-$lang->story->create      = "新增";
+$lang->story->create      = "提需求";
 $lang->story->createCase  = "建用例";
 $lang->story->batchCreate = "批量添加";
 $lang->story->change      = "变更";
@@ -163,7 +163,6 @@ $lang->story->affectedBugs         = '影响的Bug';
 $lang->story->affectedCases        = '影响的用例';
 
 $lang->story->specTemplate          = "建议参考的模板：作为一名<<i class='red'>某种类型的用户</i>>，我希望<<i class='red'>达成某些目的</i>>，这样可以<<i class='red'>开发的价值</i>>。";
-$lang->story->notes                 = '(注：如果“需求名称”为空，则表示不使用此行)';
 $lang->story->needNotReview         = '不需要评审';
 $lang->story->afterSubmit           = "添加之后";
 $lang->story->successSaved          = "需求成功添加，";

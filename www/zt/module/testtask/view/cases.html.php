@@ -2,7 +2,7 @@
 /**
  * The view file of case module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     case
@@ -56,7 +56,7 @@ var moduleID   = '<?php echo $moduleID;?>';
             <th class='w-100px'>   <?php common::printOrderLink('lastRunDate',   $orderBy, $vars, $lang->testtask->lastRunTime);?></th>
             <th class='w-80px'>    <?php common::printOrderLink('lastRunResult', $orderBy, $vars, $lang->testtask->lastRunResult);?></th>
             <th class='w-status'>  <?php common::printOrderLink('status',        $orderBy, $vars, $lang->statusAB);?></th>
-            <th class='w-120px {sorter: false}'><?php echo $lang->actions;?></th>
+            <th class='w-100px {sorter: false}'><?php echo $lang->actions;?></th>
           </tr>
         </thead>
         <tbody>
@@ -72,11 +72,11 @@ var moduleID   = '<?php echo $moduleID;?>';
             <td><?php if(!helper::isZeroDate($run->lastRunDate)) echo date(DT_MONTHTIME1, strtotime($run->lastRunDate));?></td>
             <td class='<?php echo $run->lastRunResult;?>'><?php if($run->lastRunResult) echo $lang->testcase->resultList[$run->lastRunResult];?></td>
             <td class='<?php echo $run->status;?>'><?php echo $lang->testtask->statusList[$run->status];?></td>
-            <td class='a-right'>
+            <td class='a-center'>
               <?php
-              common::printLink('testtask', 'runcase',    "id=$run->id", $lang->testtask->runCase, '', 'class="iframe"');
-              common::printLink('testtask', 'results',    "id=$run->id", $lang->testtask->results, '', 'class="iframe"');
-              common::printLink('testtask', 'unlinkcase', "id=$run->id", $lang->testtask->unlinkCase, 'hiddenwin');
+              common::printIcon('testtask', 'runCase',    "id=$run->id", '', 'list', '', '', 'iframe');
+              common::printIcon('testtask', 'results',    "id=$run->id", '', 'list', '', '', 'iframe');
+              common::printIcon('testtask', 'unlinkCase', "id=$run->id", '', 'list', '', 'hiddenwin');
               common::printIcon('testcase', 'createBug', "product=$productID&extra=projectID=$task->project,buildID=$task->build,caseID=$run->case,runID=$run->id", $run, 'list', 'createBug');
               ?>
             </td>
@@ -86,19 +86,21 @@ var moduleID   = '<?php echo $moduleID;?>';
         <tfoot>
           <tr>
             <td colspan='10'>
+              <?php if($runs):?>
               <div class='f-left'>
               <?php 
               echo html::selectAll() . html::selectReverse();
               if(common::hasPriv('testcase', 'batchEdit')):
               ?>
-              <input class='button-s' value="<?php echo $lang->testcase->batchEdit; ?>" type="button" onclick="casesform.action='<?php echo $this->createLink('testcase', 'batchEdit', "from=testtaskCases&productID=$productID");?>';casesform.submit();">
+              <input class='button-s' value="<?php echo $lang->edit; ?>" type="button" onclick="casesform.action='<?php echo $this->createLink('testcase', 'batchEdit', "from=testtaskCases&productID=$productID");?>';casesform.submit();">
               <?php endif;?>
               <?php if(common::hasPriv('testtask', 'batchAssign')):?>
               <?php echo html::select('assignedTo', $users);?>
-              <input class='button-s' value="<?php echo $lang->testtask->batchAssign; ?>" type="button" onclick="casesform.action='<?php echo inLink('batchAssign', "taskID=$task->id");?>';casesform.submit();">
-              <input class='button-s' value="<?php echo $lang->testtask->batchRun; ?>" type="button" onclick="casesform.action='<?php echo inLink('batchRUN', "productID=$productID&orderBy=id_desc&from=testtask");?>';casesform.submit();">
+              <input class='button-s' value="<?php echo $lang->testtask->assign; ?>" type="button" onclick="casesform.action='<?php echo inLink('batchAssign', "taskID=$task->id");?>';casesform.submit();">
+              <input class='button-s' value="<?php echo $lang->testtask->runCase; ?>" type="button" onclick="casesform.action='<?php echo inLink('batchRUN', "productID=$productID&orderBy=id_desc&from=testtask");?>';casesform.submit();">
               <?php endif;?>
               </div>
+              <?php endif;?>
               <?php echo $pager->show();?>
             </td>
           </tr>

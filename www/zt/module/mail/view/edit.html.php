@@ -2,7 +2,7 @@
 /**
  * The edit view file of mail module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <wwccss@cnezsoft.com>
  * @package     mail
@@ -59,7 +59,7 @@ include '../../common/view/header.html.php';
      <td colspan='2' class='a-center'>
        <?php 
        echo html::submitButton();
-       if($this->config->mail->turnon) echo html::linkButton($lang->mail->test, inlink('test'));
+       if($this->config->mail->turnon and $mailExist) echo html::linkButton($lang->mail->test, inlink('test'));
        ?>
      </td>
    </tr>

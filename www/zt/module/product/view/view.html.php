@@ -2,11 +2,11 @@
 /**
  * The view view of product module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     product
- * @version     $Id: view.html.php 3823 2012-12-17 07:06:29Z wwccss $
+ * @version     $Id: view.html.php 4129 2013-01-18 01:58:14Z wwccss $
  * @link        http://www.zentao.net
  */
 ?>
@@ -20,6 +20,8 @@
     if(!$product->deleted)
     {
         ob_start();
+        common::printIcon('product', 'close', "productID=$product->id", $product);
+
         common::printDivider();
         common::printIcon('product', 'edit', $params);
         common::printIcon('product', 'delete', $params, '', 'button', '', 'hiddenwin');
@@ -28,6 +30,10 @@
         $actionLinks = ob_get_contents();
         ob_end_clean();
         echo $actionLinks;
+    }
+    else
+    {
+        common::printRPN($browseLink);
     }
     ?>
   </div>

@@ -166,20 +166,19 @@ class control
         $this->pathFix  = $this->app->getPathFix();
         $this->viewType = $this->app->getViewType();
 
-        $this->view = new stdclass();
-        $this->view->header = new stdclass();
-
+        /* Load the model file auto. */
         $this->setModuleName($moduleName);
         $this->setMethodName($methodName);
-
-        /* Load the model file auto. */
         $this->loadModel();
 
-        /* Assign them to the view. */
-        $this->assign('app',    $app);
-        $this->assign('lang',   $lang);
-        $this->assign('config', $config);
+        /* Init the view vars.  */
+        $this->view = new stdclass();
+        $this->view->app    = $app;
+        $this->view->lang   = $lang;
+        $this->view->config = $config;
+        $this->view->title  = '';
 
+        /* Set super vars. */
         $this->setSuperVars();
     }
 
@@ -547,10 +546,10 @@ class control
      * @access  public
      * @return  string the link string.
      */
-    public function createLink($moduleName, $methodName = 'index', $vars = array(), $viewType = '')
+    public function createLink($moduleName, $methodName = 'index', $vars = array(), $viewType = '', $onlybody = false)
     {
         if(empty($moduleName)) $moduleName = $this->moduleName;
-        return helper::createLink($moduleName, $methodName, $vars, $viewType);
+        return helper::createLink($moduleName, $methodName, $vars, $viewType, $onlybody);
     }
 
     /**
@@ -562,9 +561,9 @@ class control
      * @access  public
      * @return  string  the link string.
      */
-    public function inlink($methodName = 'index', $vars = array(), $viewType = '')
+    public function inlink($methodName = 'index', $vars = array(), $viewType = '', $onlybody = false)
     {
-        return helper::createLink($this->moduleName, $methodName, $vars, $viewType);
+        return helper::createLink($this->moduleName, $methodName, $vars, $viewType, $onlybody);
     }
 
     /**

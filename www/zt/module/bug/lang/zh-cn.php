@@ -2,15 +2,15 @@
 /**
  * The bug module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     bug
- * @version     $Id: zh-cn.php 3772 2012-12-12 02:18:16Z wwccss $
+ * @version     $Id: zh-cn.php 4536 2013-03-02 13:39:37Z wwccss $
  * @link        http://www.zentao.net
  */
 /* 字段列表。*/
-$lang->bug->common           = '缺陷管理';
+$lang->bug->common           = 'Bug';
 $lang->bug->id               = 'Bug编号';
 $lang->bug->product          = '所属产品';
 $lang->bug->module           = '所属模块';
@@ -68,7 +68,7 @@ $lang->bug->toCase           = '生成用例';
 
 /* 方法列表。*/
 $lang->bug->index              = '首页';
-$lang->bug->create             = '创建';
+$lang->bug->create             = '提Bug';
 $lang->bug->confirmBug         = '确认';
 $lang->bug->edit               = '编辑';
 $lang->bug->batchEdit          =  '批量编辑';
@@ -77,7 +77,7 @@ $lang->bug->browse             = 'Bug列表';
 $lang->bug->view               = 'Bug详情';
 $lang->bug->resolve            = '解决';
 $lang->bug->close              = '关闭';
-$lang->bug->activate           = '激活Bug';
+$lang->bug->activate           = '激活';
 $lang->bug->reportChart        = '报表统计';
 $lang->bug->export             = '导出';
 $lang->bug->delete             = '删除';
@@ -143,7 +143,7 @@ $lang->bug->buttonActivate       = '激活';
 $lang->bug->buttonResolve        = '解决';
 $lang->bug->buttonClose          = '关闭';
 $lang->bug->buttonToList         = '返回';
-$lang->bug->buttonCreateTestcase = '建用例';
+$lang->bug->buttonCreateTestcase = '转用例';
 
 /* 交互提示。*/
 $lang->bug->confirmChangeProduct = '修改产品会导致相应的项目、需求和任务发生变化，确定吗？';

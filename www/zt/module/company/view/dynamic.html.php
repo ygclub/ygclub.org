@@ -2,7 +2,7 @@
 /**
  * The action->dynamic view file of dashboard module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     dashboard
@@ -48,7 +48,12 @@ var browseType = '<?php echo $browseType;?>';
   <?php $module = $action->objectType == 'case' ? 'testcase' : $action->objectType;?>
   <tr class='a-center'>
     <td><?php echo $action->date;?></td>
-    <td><?php isset($users[$action->actor]) ? print($users[$action->actor]) : print($action->actor);?></td>
+    <td>
+      <?php 
+      $actor = isset($users[$action->actor]) ? $users[$action->actor] : $action->actor;
+      echo strpos($actor, ':') === false ? $actor : substr($actor, strpos($actor, ':') + 1);
+      ?>
+    </td>
     <td><?php echo $action->actionLabel;?></td>
     <td><?php echo $lang->action->objectTypes[$action->objectType];?></td>
     <td><?php echo $action->objectID;?></td>

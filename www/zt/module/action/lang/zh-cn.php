@@ -2,18 +2,14 @@
 /**
  * The action module zh-cn file of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     action
- * @version     $Id: zh-cn.php 3864 2012-12-20 08:00:07Z wyd621@gmail.com $
+ * @version     $Id: zh-cn.php 4537 2013-03-02 13:58:47Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
-$lang->action->common   = '系统日志';
-$lang->action->trash    = '回收站';
-$lang->action->undelete = '还原';
-$lang->action->hide     = '隐藏';
-
+$lang->action->common     = '系统日志';
 $lang->action->product    = '产品';
 $lang->action->project    = '项目';
 $lang->action->objectType = '对象类型';
@@ -23,9 +19,16 @@ $lang->action->actor      = '操作者';
 $lang->action->action     = '动作';
 $lang->action->actionID   = '记录ID';
 $lang->action->date       = '日期';
-$lang->action->trashTips  = '提示：为了保证系统的完整性，禅道系统的删除都是标记删除。';
-$lang->action->textDiff   = '文本格式';
-$lang->action->original   = '原始格式';
+
+$lang->action->trash    = '回收站';
+$lang->action->undelete = '还原';
+$lang->action->hideOne  = '隐藏';
+$lang->action->hideAll  = '全部隐藏';
+
+$lang->action->trashTips      = '提示：为了保证系统的完整性，禅道系统的删除都是标记删除。';
+$lang->action->textDiff       = '文本格式';
+$lang->action->original       = '原始格式';
+$lang->action->confirmHideAll = '您确定要全部隐藏这些记录吗？';
 
 $lang->action->dynamic = new stdclass();
 $lang->action->dynamic->today      = '今天';
@@ -55,33 +58,38 @@ $lang->action->objectTypes['todo']        = 'TODO';
 
 /* 用来描述操作历史记录。*/
 $lang->action->desc = new stdclass();
-$lang->action->desc->common       = '$date, <strong>$action</strong> by <strong>$actor</strong>。' . "\n";
-$lang->action->desc->extra        = '$date, <strong>$action</strong> as <strong>$extra</strong> by <strong>$actor</strong>。' . "\n";
-$lang->action->desc->opened       = '$date, 由 <strong>$actor</strong> 创建。' . "\n";
-$lang->action->desc->created      = '$date, 由 <strong>$actor</strong> 创建。' . "\n";
-$lang->action->desc->changed      = '$date, 由 <strong>$actor</strong> 变更。' . "\n";
-$lang->action->desc->edited       = '$date, 由 <strong>$actor</strong> 编辑。' . "\n";
-$lang->action->desc->assigned     = '$date, 由 <strong>$actor</strong> 指派给 <strong>$extra</strong>。' . "\n";
-$lang->action->desc->closed       = '$date, 由 <strong>$actor</strong> 关闭。' . "\n";
-$lang->action->desc->deleted      = '$date, 由 <strong>$actor</strong> 删除。' . "\n";
-$lang->action->desc->deletedfile  = '$date, 由 <strong>$actor</strong> 删除了附件：<strong><i>$extra</i></strong>。' . "\n";
-$lang->action->desc->editfile     = '$date, 由 <strong>$actor</strong> 编辑了附件：<strong><i>$extra</i></strong>。' . "\n";
-$lang->action->desc->erased       = '$date, 由 <strong>$actor</strong> 删除。' . "\n";
-$lang->action->desc->undeleted    = '$date, 由 <strong>$actor</strong> 还原。' . "\n";
-$lang->action->desc->hidden       = '$date, 由 <strong>$actor</strong> 隐藏。' . "\n";
-$lang->action->desc->commented    = '$date, 由 <strong>$actor</strong> 添加备注。' . "\n";
-$lang->action->desc->activated    = '$date, 由 <strong>$actor</strong> 激活。' . "\n";
-$lang->action->desc->moved        = '$date, 由 <strong>$actor</strong> 移动，之前为 "$extra"。' . "\n";
-$lang->action->desc->confirmed    = '$date, 由 <strong>$actor</strong> 确认需求变动，最新版本为<strong>#$extra</strong>。' . "\n";
-$lang->action->desc->bugconfirmed = '$date, 由 <strong>$actor</strong> 确认Bug。' . "\n";
-$lang->action->desc->frombug      = '$date, 由 <strong>$actor</strong> Bug转化而来，Bug编号为 <strong>$extra</strong>。';
-$lang->action->desc->started      = '$date, 由 <strong>$actor</strong> 启动。' . "\n";
-$lang->action->desc->canceled     = '$date, 由 <strong>$actor</strong> 取消。' . "\n";
-$lang->action->desc->svncommited  = '$date, 由 <strong>$actor</strong> 提交代码，版本为<strong>#$extra</strong>。' . "\n";
-$lang->action->desc->finished     = '$date, 由 <strong>$actor</strong> 完成。' . "\n";
-$lang->action->desc->diff1        = '修改了 <strong><i>%s</i></strong>，旧值为 "%s"，新值为 "%s"。<br />' . "\n";
-$lang->action->desc->diff2        = '修改了 <strong><i>%s</i></strong>，区别为：' . "\n" . "<blockquote>%s</blockquote>" . "\n<div class='hidden'>%s</div>";
-$lang->action->desc->diff3        = '将文件名 %s 改为 %s 。' . "\n";
+$lang->action->desc->common         = '$date, <strong>$action</strong> by <strong>$actor</strong>。' . "\n";
+$lang->action->desc->extra          = '$date, <strong>$action</strong> as <strong>$extra</strong> by <strong>$actor</strong>。' . "\n";
+$lang->action->desc->opened         = '$date, 由 <strong>$actor</strong> 创建。' . "\n";
+$lang->action->desc->created        = '$date, 由 <strong>$actor</strong> 创建。' . "\n";
+$lang->action->desc->changed        = '$date, 由 <strong>$actor</strong> 变更。' . "\n";
+$lang->action->desc->edited         = '$date, 由 <strong>$actor</strong> 编辑。' . "\n";
+$lang->action->desc->assigned       = '$date, 由 <strong>$actor</strong> 指派给 <strong>$extra</strong>。' . "\n";
+$lang->action->desc->closed         = '$date, 由 <strong>$actor</strong> 关闭。' . "\n";
+$lang->action->desc->deleted        = '$date, 由 <strong>$actor</strong> 删除。' . "\n";
+$lang->action->desc->deletedfile    = '$date, 由 <strong>$actor</strong> 删除了附件：<strong><i>$extra</i></strong>。' . "\n";
+$lang->action->desc->editfile       = '$date, 由 <strong>$actor</strong> 编辑了附件：<strong><i>$extra</i></strong>。' . "\n";
+$lang->action->desc->erased         = '$date, 由 <strong>$actor</strong> 删除。' . "\n";
+$lang->action->desc->undeleted      = '$date, 由 <strong>$actor</strong> 还原。' . "\n";
+$lang->action->desc->hidden         = '$date, 由 <strong>$actor</strong> 隐藏。' . "\n";
+$lang->action->desc->commented      = '$date, 由 <strong>$actor</strong> 添加备注。' . "\n";
+$lang->action->desc->activated      = '$date, 由 <strong>$actor</strong> 激活。' . "\n";
+$lang->action->desc->moved          = '$date, 由 <strong>$actor</strong> 移动，之前为 "$extra"。' . "\n";
+$lang->action->desc->confirmed      = '$date, 由 <strong>$actor</strong> 确认需求变动，最新版本为<strong>#$extra</strong>。' . "\n";
+$lang->action->desc->bugconfirmed   = '$date, 由 <strong>$actor</strong> 确认Bug。' . "\n";
+$lang->action->desc->frombug        = '$date, 由 <strong>$actor</strong> Bug转化而来，Bug编号为 <strong>$extra</strong>。';
+$lang->action->desc->started        = '$date, 由 <strong>$actor</strong> 启动。' . "\n";
+$lang->action->desc->delayed        = '$date, 由 <strong>$actor</strong> 延期。' . "\n";
+$lang->action->desc->suspended      = '$date, 由 <strong>$actor</strong> 挂起。' . "\n";
+$lang->action->desc->recordestimate = '$date, 由 <strong>$actor</strong> 记录工时，消耗 <strong>$extra</strong> 小时。';
+$lang->action->desc->editestimate   = '$date, 由 <strong>$actor</strong> 编辑工时。';
+$lang->action->desc->deleteestimate = '$date, 由 <strong>$actor</strong> 删除工时。';
+$lang->action->desc->canceled       = '$date, 由 <strong>$actor</strong> 取消。' . "\n";
+$lang->action->desc->svncommited    = '$date, 由 <strong>$actor</strong> 提交代码，版本为<strong>#$extra</strong>。' . "\n";
+$lang->action->desc->finished       = '$date, 由 <strong>$actor</strong> 完成。' . "\n";
+$lang->action->desc->diff1          = '修改了 <strong><i>%s</i></strong>，旧值为 "%s"，新值为 "%s"。<br />' . "\n";
+$lang->action->desc->diff2          = '修改了 <strong><i>%s</i></strong>，区别为：' . "\n" . "<blockquote>%s</blockquote>" . "\n<div class='hidden'>%s</div>";
+$lang->action->desc->diff3          = '将文件名 %s 改为 %s 。' . "\n";
 
 /* 用来显示动态信息。*/
 $lang->action->label = new stdclass();
@@ -110,10 +118,11 @@ $lang->action->label->totask              = '转任务';
 $lang->action->label->svncommited         = '提交代码';
 $lang->action->label->linked2plan         = '关联计划';
 $lang->action->label->unlinkedfromplan    = '移除计划';
+$lang->action->label->marked              = '编辑了';
 $lang->action->label->linked2project      = '关联项目';
 $lang->action->label->unlinkedfromproject = '移除项目';
-$lang->action->label->marked              = '编辑了';
 $lang->action->label->started             = '开始了';
+$lang->action->label->recorded            = '记录了工时';
 $lang->action->label->canceled            = '取消了';
 $lang->action->label->finished            = '完成了';
 $lang->action->label->login               = '登录系统';
@@ -133,7 +142,7 @@ $lang->action->label->testtask    = '测试任务|testtask|view|caseID=%s';
 $lang->action->label->todo        = 'todo|todo|view|todoID=%s';
 $lang->action->label->doclib      = '文档库|doc|browse|libID=%s';
 $lang->action->label->doc         = '文档|doc|view|docID=%s';
-$lang->action->label->user        = '用户';
+$lang->action->label->user        = '用户|user|view|account=%s';
 $lang->action->label->space       = '　';
 
 /* Object type. */
@@ -182,7 +191,6 @@ $lang->action->search->label['linked2plan']         = $lang->action->label->link
 $lang->action->search->label['unlinkedfromplan']    = $lang->action->label->unlinkedfromplan;   
 $lang->action->search->label['linked2project']      = $lang->action->label->linked2project;     
 $lang->action->search->label['unlinkedfromproject'] = $lang->action->label->unlinkedfromproject;
-$lang->action->search->label['marked']              = $lang->action->label->marked;             
 $lang->action->search->label['started']             = $lang->action->label->started;            
 $lang->action->search->label['canceled']            = $lang->action->label->canceled;           
 $lang->action->search->label['finished']            = $lang->action->label->finished;           

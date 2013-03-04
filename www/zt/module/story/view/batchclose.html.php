@@ -2,7 +2,7 @@
 /**
  * The batch close view of story module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Congzhi Chen <congzhi@cnezsoft.com>
  * @package     story
@@ -52,7 +52,7 @@
       </td>
       <?php endif;?>
 
-      <td><?php echo html::textarea("comments[$story->id]", '', "rows='1' class='area-1'");?></td>
+      <td><?php echo html::input("comments[$story->id]", '', "class='area-1'");?></td>
     </tr>  
     <?php endforeach;?>
     <?php if(isset($suhosinInfo)):?>

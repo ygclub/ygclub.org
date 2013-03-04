@@ -2,18 +2,18 @@
 /**
  * The view of productplan module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     productplan
- * @version     $Id: view.html.php 3635 2012-11-26 05:26:15Z wyd621@gmail.com $
+ * @version     $Id: view.html.php 4307 2013-01-29 03:03:32Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/tablesorter.html.php';?>
+<div id='titlebar' <?php if($plan->deleted) echo "class='deleted'";?>>PLAN #<?php echo $plan->id . ' ' . $plan->title;?></div>
 <table class='cont-rt5'>
-  <caption>PLAN #<?php echo $plan->id . ' ' . $plan->title;?></caption>
   <tr valign='top'>
     <td>
       <fieldset>
@@ -26,11 +26,11 @@
        $browseLink = $this->session->productPlanList ? $this->session->productPlanList : inlink('browse', "planID=$plan->id");
        if(!$plan->deleted)
        {
-          common::printLink('productplan', 'edit',     "planID=$plan->id", $lang->edit);
-          common::printLink('productplan', 'linkstory',"planID=$plan->id", $lang->productplan->linkStory);
-          common::printLink('productplan', 'delete',   "planID=$plan->id", $lang->delete, 'hiddenwin');
+          common::printIcon('productplan', 'linkStory',"planID=$plan->id");
+          common::printIcon('productplan', 'edit',     "planID=$plan->id");
+          common::printIcon('productplan', 'delete',   "planID=$plan->id", '', 'button', '', 'hiddenwin');
        }
-       echo html::a($browseLink, $lang->goback);
+       common::printRPN($browseLink);
       ?>
       </div>
       <table class='table-1 tablesorter a-center'>
@@ -45,7 +45,7 @@
           <th><?php echo $lang->story->estimateAB;?></th>
           <th><?php echo $lang->statusAB;?></th>
           <th><?php echo $lang->story->stageAB;?></th>
-          <th class='w-p10 {sorter:false}'><?php echo $lang->actions?></th>
+          <th class='w-50px {sorter:false}'><?php echo $lang->actions?></th>
         </tr>
         </thead>
         <tbody>
@@ -64,7 +64,7 @@
             <td><?php echo $story->estimate;?></td>
             <td><?php echo $lang->story->statusList[$story->status];?></td>
             <td><?php echo $lang->story->stageList[$story->stage];?></td>
-            <td><?php common::printLink('productplan', 'unlinkStory', "story=$story->id", $lang->productplan->unlinkStory, 'hiddenwin');?></td>
+            <td><?php common::printIcon('productplan', 'unlinkStory', "story=$story->id", '', 'list', '', 'hiddenwin');?></td>
           </tr>
           <?php endforeach;?>
         </tbody>
@@ -78,7 +78,7 @@
         <table class='table-1 a-left'>
           <tr>
             <th width='25%' class='a-right'><?php echo $lang->productplan->title;?></th> 
-            <td <?php if($plan->deleted) echo "class='deleted'";?>><?php echo $plan->title;?></th>
+            <td><?php echo $plan->title;?></th>
           </tr>
           <tr>
             <th class='rowhead'><?php echo $lang->productplan->begin;?></th>

@@ -2,7 +2,7 @@
 /**
  * The control file of mail module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 QingDao Nature Easy Soft Network Technology Co,LTD (www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Yangyang Shi <shiyangyang@cnezsoft.com>
  * @package     mail
@@ -11,6 +11,12 @@
  */
 class mail extends control
 {
+    /**
+     * The index page, goto edit page or detect page.
+     * 
+     * @access public
+     * @return void
+     */
     public function index()
     {
         if($this->config->mail->turnon) $this->locate(inlink('edit'));
@@ -40,7 +46,7 @@ class mail extends control
             die(js::locate(inlink('edit'), 'parent'));
         }
 
-        $this->view->header->title = $this->lang->mail->detect;
+        $this->view->title      = $this->lang->mail->detect;
         $this->view->position[] = html::a(inlink('index'), $this->lang->mail->common);
         $this->view->position[] = $this->lang->mail->detect;
 
@@ -66,16 +72,17 @@ class mail extends control
         elseif($this->session->mailConfig)
         {
             $mailConfig = $this->session->mailConfig;
-                   }
+        }
         else
         {
             $this->locate(inlink('detect'));
         }
 
-        $this->view->header->title = $this->lang->mail->edit;
+        $this->view->title      = $this->lang->mail->edit;
         $this->view->position[] = html::a(inlink('index'), $this->lang->mail->common);
         $this->view->position[] = $this->lang->mail->edit;
 
+        $this->view->mailExist   = $this->mail->mailExist();
         $this->view->mailConfig  = $mailConfig;
         $this->display();
     }
@@ -90,38 +97,31 @@ class mail extends control
     {
         if(!empty($_POST))
         {
-            $mailConfig = <<<EOT
-<?php
-\$config->mail->turnon         = {$this->post->turnon};
-\$config->mail->mta            = 'smtp';
-\$config->mail->fromAddress    = "{$this->post->fromAddress}"; 
-\$config->mail->fromName       = "{$this->post->fromName}";
-\$config->mail->smtp->host     = "{$this->post->host}";
-\$config->mail->smtp->port     = "{$this->post->port}";
-\$config->mail->smtp->auth     = {$this->post->auth};
-\$config->mail->smtp->username = "{$this->post->username}";
-\$config->mail->smtp->password = "{$this->post->password}";
-\$config->mail->smtp->secure   = "{$this->post->secure}";
-\$config->mail->smtp->debug    = {$this->post->debug};
-EOT;
+            $mailConfig = new stdclass();
+            $mailConfig->smtp = new stdclass();
 
-            /* Output config to the extconfig file of mail */
-            $configPath = $this->app->getModuleExtPath('mail', 'config');
-            $configFile = $configPath . 'zzzemail.php';
-            $saved      = false;
-            if(is_file($configFile)  and is_writable($configFile)) $saved = file_put_contents($configFile, $mailConfig);
-            if(!is_file($configFile) and is_writable($configPath)) $saved = file_put_contents($configFile, $mailConfig);
+            $mailConfig->turnon         = $this->post->turnon;
+            $mailConfig->mta            = 'smtp';
+            $mailConfig->fromAddress    = $this->post->fromAddress; 
+            $mailConfig->fromName       = $this->post->fromName;
+            $mailConfig->smtp->host     = $this->post->host;
+            $mailConfig->smtp->port     = $this->post->port;
+            $mailConfig->smtp->auth     = $this->post->auth;
+            $mailConfig->smtp->username = $this->post->username;
+            $mailConfig->smtp->password = $this->post->password;
+            $mailConfig->smtp->secure   = $this->post->secure;
+            $mailConfig->smtp->debug    = $this->post->debug;
 
-            if($saved) $this->session->set('mailConfig', '');
+            $this->loadModel('setting')->setItems('system.mail', $mailConfig);
+            if(dao::isError()) die(js::error(dao::getError()));
 
-            $this->view->header->title = $this->lang->mail->save;
+            $this->session->set('mailConfig', '');
+
+            $this->view->title      = $this->lang->mail->save;
             $this->view->position[] = html::a(inlink('index'), $this->lang->mail->common);
             $this->view->position[] = $this->lang->mail->save;
 
-            $this->view->mailConfig = $mailConfig;
-            $this->view->configPath = $configPath;
-            $this->view->configFile = $configFile;
-            $this->view->saved      = $saved;
+            $this->view->mailExist   = $this->mail->mailExist();
             $this->display();
         }
     }

@@ -2,16 +2,15 @@
 /**
  * The story view file of dashboard module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     dashboard
- * @version     $Id: story.html.php 3635 2012-11-26 05:26:15Z wyd621@gmail.com $
+ * @version     $Id: story.html.php 4469 2013-02-27 00:54:49Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/tablesorter.html.php';?>
 <div id='featurebar'>
   <div class='f-left'>
     <?php
@@ -23,18 +22,19 @@
   </div>
 </div>
 <table class='table-1 tablesorter fixed'>
+  <?php $vars = "type=$type&orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage&pageID=$pageID"; ?>
   <thead>
     <tr class='colhead'>
-      <th class='w-id'><?php echo $lang->idAB;?></th>
-      <th class='w-pri'><?php echo $lang->priAB;?></th>
-      <th class='w-200px'><?php echo $lang->story->product;?></th>
-      <th><?php echo $lang->story->title;?></th>
-      <th class='w-150px'><?php echo $lang->story->plan;?></th>
-      <th class='w-user'><?php echo $lang->openedByAB;?></th>
-      <th class='w-hour'><?php echo $lang->story->estimateAB;?></th>
-      <th class='w-status'><?php echo $lang->statusAB;?></th>
-      <th class='w-100px'><?php echo $lang->story->stageAB;?></th>
-      <th class='w-80px {sorter:false}'><?php echo $lang->actions;?></th>
+      <th class='w-id'>    <?php common::printOrderLink('id',           $orderBy, $vars, $lang->idAB);?></th>
+      <th class='w-pri'>   <?php common::printOrderLink('pri',          $orderBy, $vars, $lang->priAB);?></th>
+      <th class='w-200px'> <?php common::printOrderLink('productTitle', $orderBy, $vars, $lang->story->product);?></th>
+      <th>                 <?php common::printOrderLink('title',        $orderBy, $vars, $lang->story->title);?></th>
+      <th class='w-150px'> <?php common::printOrderLink('planTitle',    $orderBy, $vars, $lang->story->plan);?></th>
+      <th class='w-user'>  <?php common::printOrderLink('openedBy',     $orderBy, $vars, $lang->openedByAB);?></th>
+      <th class='w-hour'>  <?php common::printOrderLink('estimate',     $orderBy, $vars, $lang->story->estimateAB);?></th>
+      <th class='w-status'><?php common::printOrderLink('status',       $orderBy, $vars, $lang->statusAB);?></th>
+      <th class='w-100px'> <?php common::printOrderLink('stage',        $orderBy, $vars, $lang->story->stageAB);?></th>
+      <th class='w-80px'><?php echo $lang->actions;?></th>
     </tr>
   </thead>
   <tbody>

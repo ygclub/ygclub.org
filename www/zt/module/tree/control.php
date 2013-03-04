@@ -2,11 +2,11 @@
 /**
  * The control file of tree module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
+ * @copyright   Copyright 2009-2013 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @license     LGPL (http://www.gnu.org/licenses/lgpl.html)
  * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
  * @package     tree
- * @version     $Id: control.php 3826 2012-12-17 07:11:59Z wwccss $
+ * @version     $Id: control.php 4510 2013-03-02 05:28:19Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
 class tree extends control
@@ -43,6 +43,7 @@ class tree extends control
             $this->loadModel('doc');
             if($rootID == 'product' or $rootID == 'project')
             {
+                $viewType = $rootID . 'doc';
                 $lib = new stdclass();
                 $lib->id   = $rootID;
                 $lib->name = $this->lang->doc->systemLibs[$rootID];
@@ -71,9 +72,9 @@ class tree extends control
             $this->view->currentProduct = $currentProduct;
             $this->view->productModules = $this->tree->getOptionMenu($currentProduct, 'story');
 
-            $header['title'] = $product->name . $this->lang->colon . $this->lang->tree->manageProduct;
-            $position[]      = html::a($this->createLink('product', 'browse', "product=$rootID"), $product->name);
-            $position[]      = $this->lang->tree->manageProduct;
+            $title      = $product->name . $this->lang->colon . $this->lang->tree->manageProduct;
+            $position[] = html::a($this->createLink('product', 'browse', "product=$rootID"), $product->name);
+            $position[] = $this->lang->tree->manageProduct;
         }
         elseif($viewType == 'task')
         {
@@ -90,9 +91,9 @@ class tree extends control
             $this->view->currentProject = $currentProject;
             $this->view->projectModules = $this->tree->getOptionMenu($currentProject, 'task');
 
-            $header['title'] = $project->name . $this->lang->colon . $this->lang->tree->manageProject;
-            $position[]      = html::a($this->createLink('project', 'task', "projectID=$rootID"), $project->name);
-            $position[]      = $this->lang->tree->manageProject;
+            $title      = $project->name . $this->lang->colon . $this->lang->tree->manageProject;
+            $position[] = html::a($this->createLink('project', 'task', "projectID=$rootID"), $project->name);
+            $position[] = $this->lang->tree->manageProject;
         }
         elseif($viewType == 'bug')
         {
@@ -101,9 +102,9 @@ class tree extends control
             $this->lang->tree->menuOrder = $this->lang->bug->menuOrder;
             $this->lang->set('menugroup.tree', 'qa');
 
-            $header['title'] = $product->name . $this->lang->colon . $this->lang->tree->manageBug;
-            $position[]      = html::a($this->createLink('bug', 'browse', "product=$rootID"), $product->name);
-            $position[]      = $this->lang->tree->manageBug;
+            $title      = $product->name . $this->lang->colon . $this->lang->tree->manageBug;
+            $position[] = html::a($this->createLink('bug', 'browse', "product=$rootID"), $product->name);
+            $position[] = $this->lang->tree->manageBug;
         }
         elseif($viewType == 'case')
         {
@@ -112,9 +113,9 @@ class tree extends control
             $this->lang->tree->menuOrder = $this->lang->testcase->menuOrder;
             $this->lang->set('menugroup.tree', 'qa');
 
-            $header['title'] = $product->name . $this->lang->colon . $this->lang->tree->manageCase;
-            $position[]      = html::a($this->createLink('testcase', 'browse', "product=$rootID"), $product->name);
-            $position[]      = $this->lang->tree->manageCase;
+            $title      = $product->name . $this->lang->colon . $this->lang->tree->manageCase;
+            $position[] = html::a($this->createLink('testcase', 'browse', "product=$rootID"), $product->name);
+            $position[] = $this->lang->tree->manageCase;
         }
         elseif(strpos($viewType, 'doc') !== false)
         {
@@ -123,9 +124,9 @@ class tree extends control
             $this->lang->tree->menuOrder = $this->lang->doc->menuOrder;
             $this->lang->set('menugroup.tree', 'doc');
 
-            $header['title'] = $lib->name . $this->lang->colon . $this->lang->tree->manageCustomDoc;
-            $position[]      = html::a($this->createLink('doc', 'browse', "libID=$rootID"), $lib->name);
-            $position[]      = $this->lang->tree->manageCustomDoc;
+            $title      = $lib->name . $this->lang->colon . $this->lang->tree->manageCustomDoc;
+            $position[] = html::a($this->createLink('doc', 'browse', "libID=$rootID"), $lib->name);
+            $position[] = $this->lang->tree->manageCustomDoc;
         }
         elseif(strpos($viewType, 'webapp') !== false)
         {
@@ -133,16 +134,17 @@ class tree extends control
             $this->lang->tree->menu      = $this->lang->webapp->menu;
             $this->lang->set('menugroup.tree', 'webapp');
 
-            $header['title'] = $this->lang->tree->manageWebapp;
-            $position[]      = $this->lang->tree->manageWebapp;
+            $title      = $this->lang->tree->manageWebapp;
+            $position[] = $this->lang->tree->manageWebapp;
 
+            $root = new stdclass();
             $root->name = $this->lang->tree->manageWebapp;
             $root->id   = 0;
             $this->view->root = $root;
         }
 
         $parentModules = $this->tree->getParents($currentModuleID);
-        $this->view->header          = $header;
+        $this->view->title           = $title;
         $this->view->position        = $position;
         $this->view->rootID          = $rootID;
         $this->view->viewType        = $viewType;
@@ -169,7 +171,7 @@ class tree extends control
             die(js::reload('parent'));
         }
         $module = $this->tree->getById($moduleID);
-        if($module->owner == null)
+        if($module->owner == null and $module->root != 0)
         {
            $module->owner = $this->loadModel('product')->getById($module->root)->QD;
         }
