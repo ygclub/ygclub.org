@@ -1,6 +1,6 @@
 <?php
-$lang->myControl    = "阳光项目动态";
-$lang->menu->my       = '<span id="mainbg">&nbsp;</span>阳光项目动态|my|index';
+$lang->myControl    = "首页";
+$lang->menu->my       = '<span id="mainbg">&nbsp;</span>首页|my|index';
 $lang->agileTraining  = '';
 $lang->donate = '';
 $lang->proVersion = '';

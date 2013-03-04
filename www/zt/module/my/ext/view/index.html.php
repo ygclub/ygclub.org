@@ -13,14 +13,6 @@
 <?php include '../../../common/view/sparkline.html.php';?>
 <?php include '../../../common/view/colorize.html.php';?>
 <?php css::import($defaultTheme . 'index.css',   $config->version);?>
-<table class='cont' id='row1'>
-  <tr valign='top'>
-    <td width='66%' style='padding-right:20px'>
-      <?php include './blockprojects.html.php';?>
-    </td>
-  </tr>
-  <tr valign='top'>
-    <td width='33%' style='padding-right:20px'><?php include './blocktasks.html.php';?></td>
-  </tr>
-</table>
+     <?php include './blockprojects.html.php';?>
+    <?php if($app->user->account != 'guest') include './blocktasks.html.php';?>
 <?php include '../../../common/view/footer.html.php';?>

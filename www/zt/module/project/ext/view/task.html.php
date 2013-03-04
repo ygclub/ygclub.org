@@ -49,7 +49,7 @@ var browseType  = '<?php echo $browseType;?>';
           <?php $vars = "projectID=$project->id&status=$status&parma=$param&orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage"; ?>
           <thead>
           <tr class='colhead'>
-            <th class='w-id'>    <?php common::printOrderLink('id',        $orderBy, $vars, $lang->idAB);?></th>
+            <th class='w-pri'>    <?php common::printOrderLink('id',        $orderBy, $vars, $lang->idAB);?></th>
             <th class='w-pri'>   <?php common::printOrderLink('pri',       $orderBy, $vars, $lang->task->pri);?></th>
             <th class='w-p30'>   <?php common::printOrderLink('name',      $orderBy, $vars, $lang->task->name);?></th>
             <th class='w-status'><?php common::printOrderLink('status',    $orderBy, $vars, $lang->statusAB);?></th>
@@ -62,8 +62,9 @@ var browseType  = '<?php echo $browseType;?>';
             <th class='w-70px'>  <?php common::printOrderLink('deadline',  $orderBy, $vars, $lang->task->deadline);?></th>
 
 
-
+            <?php if($app->user->account != 'guest'): ?>
             <th class='w-100px {sorter:false}'><?php echo $lang->actions;?></th>
+            <?php endif;?>
           </tr>
           </thead>
           <?php  
@@ -107,6 +108,7 @@ var browseType  = '<?php echo $browseType;?>';
 
             <td class=<?php if(isset($task->delay)) echo 'delayed';?>><?php if(substr($task->deadline, 0, 10) > 0) echo substr($task->deadline, 0, 10);?></td>
 
+            <?php if($app->user->account != 'guest'): ?>
             <td class='a-center'>
               <?php
               if($browseType == 'needconfirm') common::printLink('task', 'confirmStoryChange', "taskid=$task->id", $lang->confirm, 'hiddenwin');
@@ -118,6 +120,7 @@ var browseType  = '<?php echo $browseType;?>';
               if($this->task->isClickable($task, 'edit'))   common::printIcon('task', 'edit',"taskID=$task->id", '', 'list');
               ?>
             </td>
+            <?php endif;?>
           </tr>
           <?php endforeach;?>
           </tbody>

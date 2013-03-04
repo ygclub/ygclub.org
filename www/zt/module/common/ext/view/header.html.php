@@ -11,7 +11,7 @@ include '../../view/chosen.html.php';
     <tr>
       <td class='w-p50'>
         <?php
-        echo "<span id='companyname'>{$app->company->name}</span> ";
+        echo "<span id='companyname'>" . html::a('index.php', '阳光项目管理系统') . "</span> ";
         if($app->company->website)  echo html::a($app->company->website,  $lang->company->website,  '_blank');
         if($app->company->backyard) echo html::a($app->company->backyard, $lang->company->backyard, '_blank');
         ?>
