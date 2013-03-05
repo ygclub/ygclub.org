@@ -11,10 +11,10 @@ wp/wp-config.php
 
 phpmyadmin
 pma
-zt/tmp/*
-zt/module/ucenter/config.php
-zt/config/*
-zt/module/mail/ext/config/*
+pm/tmp/*
+pm/module/ucenter/config.php
+pm/config/*
+pm/module/mail/ext/config/*
 
 *~
 *.swp

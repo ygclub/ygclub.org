@@ -1,0 +1,56 @@
+---
+name: UCenter整合
+code: UCenter
+type: extension
+copyright: 武汉思古科技有限公司 2012
+site: http://www.sigutech.cn
+author: 'xiaong<xiaong@sigutech.cn>'
+abstract: >
+  整合UCenter用户模块，实现用户管理同步、登录/登出同步等
+desc: >
+  这个插件是用来同步UCenter用户中心功能的，实现用户管理同步、登录/登出同步等。
+install: |
+  1. 通过禅道的插件管理来进行安装。
+    1.1 使用管理员身份登录禅道，访问插件管理。
+    1.2 打开获得插件页面，搜索找到本插件。
+    1.3 选择自动安装，按照页面提示即可。
+  2. 手工安装，将代码解压缩，然后将目录拷贝到禅道对应的目录，比如module拷贝到zentao的module。
+  3. 在UCenter上增加禅道为UCenter应用，拷贝UCenter生成的配置信息至禅道系统的module/ucenter/config.php中保存即可。
+releases:
+  0:
+    entaoversion: all
+    charge: free
+    date: 2012-5-21
+    license: LGPL
+    changelog: 修改使其支持禅道4.0beta2
+  1:
+    entaoversion: all
+    charge: free
+    date: 2012-5-21
+    license: LGPL
+    changelog: 修改使其支持禅道3.2
+  2:
+    zentaoversion: all
+    charge: free
+    date: 2012-5-21
+    license: LGPL
+    changelog: 修改使其支持禅道3.1
+  3:
+    zentaoversion: all
+    charge: free
+    date: 2012-3-11
+    license: LGPL
+    changelog: |
+      1.采用页面跳转方式进行同步登录，避免其它应用无法连接时可能造成的无法跳转进系统页；
+      2.采用页面表单填写UCenter参数配置项；
+      3.增加同步禅道用户至UCenter的功能；
+      4.修复post方式同步UCenter的相关Bug；
+      5.增加UCenter模块权限设置项目（需注意的是，但用户所在组的权限中无“UCenter”->“同步登录”权限时，该用户将不会同步登录）。
+  1.0beta:
+    zentaoversion: all
+    charge: free
+    date: 2012-2-25
+    license: LGPL
+    changelog: 首次发布
+  1.3:
+    zentaoversion: all
