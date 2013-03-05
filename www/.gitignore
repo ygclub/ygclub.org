@@ -2,6 +2,7 @@
 answer/config.php
 bbs/config.inc.php
 bbs/forumdata/*.lock
+/bbs/forumdata/threadcaches/*
 uc/data/config.inc.php
 wiki/api/ucconfig.inc.php
 wiki/config.php
@@ -12,8 +13,8 @@ phpmyadmin
 pma
 zt/tmp/*
 zt/module/ucenter/config.php
-zt/config/config.php
-zt/config/my.php
+zt/config/*
+zt/module/mail/ext/config/*
 
 *~
 *.swp
