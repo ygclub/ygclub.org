@@ -34,6 +34,7 @@ $clientTheme  = $this->app->getClientTheme();
   if(isset($pageCss)) css::internal($pageCss);
 
   echo html::icon($webRoot . 'favicon.ico');
+  if($_COOKIE['lang'] != 'zh-cn') $app->setClientLang('zh-cn');
   ?>
 </head>
 <body>
