@@ -16,6 +16,7 @@ pm/tmp/*
 pm/module/ucenter/config.php
 pm/config/*
 pm/module/mail/ext/config/*
+pm/www/data/upload/*
 
 *~
 *.swp
