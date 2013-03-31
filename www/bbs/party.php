@@ -113,6 +113,9 @@ if (defined('IN_PARTY')){
 			}
 			// 管理权限
 			$mPerm = $joined = 0;
+            if ($party['uid']==$discuz_uid || $adminid==1 || $adminid==2 || $adminid==3){
+                $mPerm = 1;
+            }
 			if ($party['uid']==$discuz_uid){
 				$mPerm = $joined = 1;
 			}else{
@@ -1001,7 +1004,8 @@ function sc_admin(){
 		if (!in_array($discuz_uid,$thisnb)){
 			showmessage("你没有权限使用召集功能的后台","index.php");
 		}
-	}
+    }
+    return true;
 }
 
 // 自定义部分队列
