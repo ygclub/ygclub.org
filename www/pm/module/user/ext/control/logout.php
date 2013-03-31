@@ -6,16 +6,16 @@ class myuser extends user
     public function logout($referer = 0)
     {
         $this->loadModel('action')->create('user', $this->app->user->id, 'logout');
-
-        
-
         session_destroy();
-        setcookie('za', false);
-        setcookie('zp', false);
-		//这里开始同步ucenter logout
+
+        setcookie('keepLogin', false, 0, $this->config->webRoot);
+        setcookie('za', false, 0, $this->config->webRoot);
+        setcookie('zp', false, 0, $this->config->webRoot);
+        setcookie('sid', false, 0, $this->config->webRoot);
+        
+        //这里开始同步ucenter logout
         $this->loadModel('ucenter');
         $synlogout=$this->ucenter->uc_syn_logout();
-	    echo $synlogout;
 
         $vars = !empty($referer) ? "referer=$referer" : '';
 

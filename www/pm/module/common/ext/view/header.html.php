@@ -29,6 +29,7 @@ include 'chosen.html.php';
             <?php echo $lang->user->password;?>：
             <input size='10' type='password' name='password' />
             <!-- <?php echo html::checkBox('keepLogin', $lang->user->keepLogin, $keepLogin);?> -->
+            <input type='hidden' name='keepLogin[]' value='on'  id='keepLoginon' />
             <?php echo html::submitButton($lang->login, "style='height:20px;font-size:11px;padding:0'"); ?>
             </form>
         <?php endif; ?>
