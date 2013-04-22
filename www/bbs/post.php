@@ -149,6 +149,7 @@ $digestcheck = empty($addtodigest) ? '' : 'checked="checked"';
 $subject = isset($subject) ? dhtmlspecialchars(censor(trim($subject))) : '';
 $subject = !empty($subject) ? str_replace("\t", ' ', $subject) : $subject;
 $message = isset($message) ? censor(trim($message)) : '';
+$message = preg_replace('/table=98%,rgb\([^\)]+\)/','table=98%',$message);
 $polloptions = isset($polloptions) ? censor(trim($polloptions)) : '';
 $readperm = isset($readperm) ? intval($readperm) : 0;
 $price = isset($price) ? intval($price) : 0;
