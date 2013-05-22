@@ -7,7 +7,7 @@ require_once DISCUZ_ROOT."./forumdata/cache/cache_forums.php";
 // 展示所有人的活动统计
 if ($discuz_uid)
 {
-    $today = strtotime(date('Y-m-d'));
+    $today = strtotime(date('Y-m-d')) + 86399;
     if ($starttime == '' || $endtime == '')
     {
         $starttime =date('Y-m-01',strtotime(date('Y',$today).'-'.(date('m',$today)-1).'-01'));
@@ -17,7 +17,7 @@ if ($discuz_uid)
     $starttime_template = $starttime;
     $endtime_template = $endtime;
     $starttime = strtotime($starttime);
-    $endtime = strtotime($endtime);
+    $endtime = strtotime($endtime) + 86399;
     $total_day = floor(($endtime - $starttime)/86400);
 
     $verifiedArr = array('1'=> '等待确认','2'=> '取消申请','3'=> '拒绝申请','4'=> '已确认','5'=> '下次参加');
@@ -33,7 +33,7 @@ if ($discuz_uid)
             $sql .= "AND pe.verified = 4 ";
             $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
             $sql .= $starttime != '' ? "AND p.showtime>'".$starttime."' " : '';
-            $sql .= $endtime != '' ? "AND p.showtime<='".$endtime."' " : '';
+            $sql .= $endtime != '' ? "AND pe.dateline<='".$endtime."' " : '';
             $sql .= $username != '' ? "AND pe.username like '%{$username}%' " : '';
             $act_user_list = array();
             $act_user_total_count = array();
@@ -74,7 +74,7 @@ if ($discuz_uid)
             $sql .= "AND pe.verified = 4 ";
             $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
             $sql .= $starttime != '' ? "AND p.showtime>'".$starttime."' " : '';
-            $sql .= $endtime != '' ? "AND p.showtime<='".$endtime."' " : '';
+            $sql .= $endtime != '' ? "AND pe.dateline<='".$endtime."' " : '';
             $sql .= "ORDER BY p.showtime DESC";
             $act_user_list = array();
             $user_name = '';
@@ -100,7 +100,7 @@ if ($discuz_uid)
                     }
                     $user_name = $act_user['username'];
                     $act_user['config'] = unserialize($act_user['config']); 
-                    $act_user['showtime'] = gmdate('Y-m-d H:i',$act_user['showtime']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$act_user['showtime']+3600*$_DSESSION['timeoffset'])].")";
+                    $act_user['showtime_gm'] = gmdate('Y-m-d H:i',$act_user['showtime']+3600*$_DSESSION['timeoffset'])." (".$party_date[gmdate('N',$act_user['showtime']+3600*$_DSESSION['timeoffset'])].")";
                     $act_user['checkin_txt'] = $checkAttr[$act_user['checkin']];
                     $act_user_list[$act_user['class']]['tlist'][$act_user['tid']] = $act_user;
                     $total_count ++;

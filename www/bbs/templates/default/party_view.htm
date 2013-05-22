@@ -41,7 +41,7 @@
                             <!--{/if}-->
                         <!--{/if}-->
                         
-                        <!--{if $thread['authorid']==$discuz_uid || $adminid==1}-->
+                        <!--{if $thread['authorid']==$discuz_uid || $mPerm}-->
 						<a href="post.php?action=edit&fid=$fid&tid=$tid&pid=$post[pid]" title='编辑' style="font-weight:normal;font-size:13px;">[编辑帖子]</a>  
                         <a href="party.php?act=complete&tid=$tid" style="font-weight:normal;font-size:13px;">[编辑活动资料]</a>
 						<a href='party.php?act=onoff&for=on&tid=$tid' class='openorclose'>[开]</a></span>  
