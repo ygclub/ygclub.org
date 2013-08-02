@@ -2,7 +2,8 @@
 answer/config.php
 bbs/config.inc.php
 bbs/forumdata/*.lock
-/bbs/forumdata/threadcaches/*
+bbs/forumdata/threadcaches/*
+bbs/uc_client/data/cache/*
 uc/data/config.inc.php
 wiki/api/ucconfig.inc.php
 wiki/config.php
