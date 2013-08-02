@@ -1,0 +1,66 @@
+@import "../mf-variables.less";
+
+.border-radius ( @radius: 3px ) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+}
+
+.boxshadow(@horizontalOffset, @verticalOffset, @blurRadius, @spreadDistance, @color) {
+	box-shadow: @horizontalOffset @verticalOffset @blurRadius @spreadDistance @color;
+}
+
+.box-sizing( @value ) {
+	-moz-box-sizing: @value;
+	-o-box-sizing: @value;
+	-webkit-box-sizing: @value;
+	box-sizing: @value;
+}
+
+.background-size( @width: auto, @height: auto ) {
+	/* use -webkit prefix for older android browsers eg. nexus 1 */
+	-moz-background-size: @width @height;
+	-o-background-size: @width @height;
+	-webkit-background-size: @width @height;
+	background-size: @width @height;
+}
+
+.overlayListItem() {
+	color: #666;
+	border: none;
+	position: relative;
+	border-bottom: solid 1px #999999;
+	border-bottom: solid 1px #eee;
+	padding: @searchResultPaddingVertical @searchBoxMarginLeft;
+	font-size: 0.9em;
+	a {
+		display: block;
+		text-decoration: none;
+		color: #666;
+
+		&:active,
+		&:hover,
+		&:visited {
+			text-decoration: none;
+			color: #666;
+		}
+	}
+
+	&:hover {
+		background-color: #ACD1E9;
+	}
+}
+
+.text-with-shadow( @color:white ){
+  color: @color;
+  text-shadow:  0 -1px 0 fade( black, 25% );
+}
+
+.vertical-gradient ( @startColor: gray, @endColor: white ) {
+	background-color: @endColor;
+	background-image: -moz-linear-gradient( top, @startColor, @endColor ); // Firefox 3.6+
+	background-image: -ms-linear-gradient( top, @startColor, @endColor );  // IE10
+	background-image: -webkit-gradient( linear, left top, left bottom, color-stop( 0%, @startColor ), color-stop( 100%, @endColor ) ); // Safari 4+, Chrome 2+ 
+	background-image: -webkit-linear-gradient( top, @startColor, @endColor ); // Safari 5.1+, Chrome 10+
+	background-image: linear-gradient( @startColor, @endColor ); // Standard
+}

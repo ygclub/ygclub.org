@@ -8,6 +8,10 @@ wiki/api/ucconfig.inc.php
 wiki/config.php
 wiki/plugins/ucenter/ucconfig.inc.php
 wp/wp-config.php
+mediawiki/LocalSettings.php
+mediawiki/extensions/Auth_UC/Auth_UCenter.php
+mediawiki/extensions/Auth_UC/config.inc.php
+mediawiki/images/*
 
 phpmyadmin
 pma

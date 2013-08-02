@@ -1,0 +1,150 @@
+/* escapeOverlay */
+/* Search and navigation menu
+moved from beta_common.css in
+Change-Id: Id7715a83f8dc42cbdb23d8cbf982801606236f7c
+*/
+@import "../mf-mixins.less";
+
+html.page-loading,
+html.jsSearch {
+	input.searchSubmit {
+		display: none;
+	}
+}
+
+@inputThirdHeight: round( @searchBoxHeight / 3 ) - 1;
+
+input.searchSubmit {
+	position: absolute;
+	top: @searchMarginTop + 1px;
+	right: 0;
+	padding-top: @inputThirdHeight;
+	padding-bottom: @inputThirdHeight;
+	font-size: @inputThirdHeight;
+}
+
+input.search {
+	-webkit-appearance: none;
+	line-height: normal;
+	background: none;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	.border-radius( 3px );
+	margin-top: 0;
+	width: 99%;
+	border: @searchBorderHeight solid #c9c9c9;
+	outline: none;
+	padding: 0;
+	width: 100%;
+	margin-top: @searchMarginTop;
+	height: @searchBoxHeight;
+	vertical-align: middle; /* don't use line height here as placeholder on ripple positions incorrectly */
+	background-color: white; /* remove fennec default background */
+	padding-left: 2px;
+	&::-webkit-search-cancel-button {
+		-webkit-appearance: none;
+	}
+
+	&:focus {
+		outline: none;
+	}
+
+	/* visual indication that search is happening */
+	&.searching {
+		background-color: #eee;
+	}
+}
+
+.hasSecondaryNav .full-screen-search #mw-mf-searchForm,
+#mw-mf-searchForm {
+		padding: 0 @ribbonclosedwidth 0 @searchBoxMarginLeft;
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+
+	.clearlink {
+		top: @searchMarginTop;
+		right: 8px;
+		width: 24px;
+		height: @searchBoxHeight;
+		background: url(../common/images/close-button-beta.png) no-repeat scroll 0 0 transparent;
+		margin: 0;
+		display: none;
+		background-position: right center;
+		.background-size( auto, 12px );
+		cursor: pointer;
+		position: absolute;
+	}
+}
+
+body.beta {
+	#mw-mf-searchForm {
+		padding-right: @searchBarPaddingRight + @secondaryNavWidth;
+	}
+}
+
+#results {
+	display: none;
+	width: 100%;
+}
+
+.full-screen-search {
+
+	#mw-mf-header {
+		z-index: 2;
+		color: white;
+		.vertical-gradient( @searchBoxColor, darken( @searchBoxColor, 2.75% ) );
+	}
+
+	#results,
+	#mw-mf-searchForm.notEmpty .clearlink,
+	button.escapeOverlay {
+		display: block;
+	}
+
+	#mw-mf-page-left,
+	#mw-mf-main-menu-button,
+	#footer,
+	#zero-rated-banner-red,
+	#zero-rated-banner,
+	#mw-mf-logo,
+	#content_wrapper,
+	.goButton {
+		display: none !important;
+	}
+
+	#mw-mf-sq {
+		margin-right: 0;
+	}
+
+	#results {
+		left: 0;
+		width: 100% !important;
+		max-height: 99999px;
+		border: none;
+		z-index: 1;
+		background-color: #E6E6E6;
+		position: relative;
+		opacity: 1;
+	}
+
+	ul.suggestions-results {
+		padding: 0;
+		position: relative;
+		padding-bottom: 20px;
+		cursor: pointer;
+		margin: 0;
+		background-color: white;
+		list-style: none;
+
+		li.suggestions-result {
+			.overlayListItem();
+		}
+	}
+}
+
+/* samsung galaxy s gt-19000 */
+@media all and ( max-width:240px ) {
+	#mw-mf-search {
+		font-size: 0.8em;
+	}
+}

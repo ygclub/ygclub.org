@@ -1,0 +1,48 @@
+@import "../mf-mixins.less";
+
+a.watch-this-article {
+	background-image: url(images/watch.png);
+	background-position: right center;
+	.background-size( auto, 22px );
+	position: absolute;
+	top: 0;
+	right: 0;
+	text-indent: -9999px;
+	background-repeat: no-repeat;
+
+	&.watched {
+		background-image: url(images/watched.png);
+	}
+}
+
+.full-screen-search #mw-mf-searchForm a.watch-this-article {
+	display: none;
+}
+
+.suggestions-result a.watch-this-article {
+	right: @contentMarginRight;
+	top: @searchResultPaddingVertical;
+	height: @searchResultPaddingVertical * 2;
+	width: @searchResultPaddingVertical * 2;
+}
+
+#mw-mf-menu-page {
+	a.watch-this-article {
+		position: relative;
+		display: block;
+	}
+}
+
+/* notification */
+#mf-notification div.watch-action {
+	background-image: url(images/watch.png);
+	padding-left: 40px;
+	background-repeat: no-repeat;
+	background-position: 8px center;
+	background-size: 24px 24px;
+
+	&.watched {
+		background-image: url(images/watched.png);
+	}
+}
+

@@ -1,0 +1,161 @@
+/* escapeOverlay */
+/* Search and navigation menu
+moved from beta_common.css in
+Change-Id: Id7715a83f8dc42cbdb23d8cbf982801606236f7c
+*/
+html.page-loading input.searchSubmit,
+html.jsSearch input.searchSubmit {
+  display: none;
+}
+input.searchSubmit {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  font-size: 9px;
+}
+input.search {
+  -webkit-appearance: none;
+  line-height: normal;
+  background: none;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin-top: 0;
+  width: 99%;
+  border: 1px solid #c9c9c9;
+  outline: none;
+  padding: 0;
+  width: 100%;
+  margin-top: 9px;
+  height: 30px;
+  vertical-align: middle;
+  /* don't use line height here as placeholder on ripple positions incorrectly */
+
+  background-color: white;
+  /* remove fennec default background */
+
+  padding-left: 2px;
+  /* visual indication that search is happening */
+
+}
+input.search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+input.search:focus {
+  outline: none;
+}
+input.search.searching {
+  background-color: #eee;
+}
+.hasSecondaryNav .full-screen-search #mw-mf-searchForm,
+#mw-mf-searchForm {
+  padding: 0 20px 0 40px;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+.hasSecondaryNav .full-screen-search #mw-mf-searchForm .clearlink,
+#mw-mf-searchForm .clearlink {
+  top: 9px;
+  right: 8px;
+  width: 24px;
+  height: 30px;
+  background: url(../common/images/close-button-beta.png) no-repeat scroll 0 0 transparent;
+  margin: 0;
+  display: none;
+  background-position: right center;
+  /* use -webkit prefix for older android browsers eg. nexus 1 */
+
+  -moz-background-size: auto 12px;
+  -o-background-size: auto 12px;
+  -webkit-background-size: auto 12px;
+  background-size: auto 12px;
+  cursor: pointer;
+  position: absolute;
+}
+body.beta #mw-mf-searchForm {
+  padding-right: 50px;
+}
+#results {
+  display: none;
+  width: 100%;
+}
+.full-screen-search #mw-mf-header {
+  z-index: 2;
+  color: white;
+  background-color: #f3f3f3;
+  background-image: -moz-linear-gradient(top, #fafafa, #f3f3f3);
+  background-image: -ms-linear-gradient(top, #fafafa, #f3f3f3);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(100%, #f3f3f3));
+  background-image: -webkit-linear-gradient(top, #fafafa, #f3f3f3);
+  background-image: linear-gradient(#fafafa, #f3f3f3);
+}
+.full-screen-search #results,
+.full-screen-search #mw-mf-searchForm.notEmpty .clearlink,
+.full-screen-search button.escapeOverlay {
+  display: block;
+}
+.full-screen-search #mw-mf-page-left,
+.full-screen-search #mw-mf-main-menu-button,
+.full-screen-search #footer,
+.full-screen-search #zero-rated-banner-red,
+.full-screen-search #zero-rated-banner,
+.full-screen-search #mw-mf-logo,
+.full-screen-search #content_wrapper,
+.full-screen-search .goButton {
+  display: none !important;
+}
+.full-screen-search #mw-mf-sq {
+  margin-right: 0;
+}
+.full-screen-search #results {
+  left: 0;
+  width: 100% !important;
+  max-height: 99999px;
+  border: none;
+  z-index: 1;
+  background-color: #E6E6E6;
+  position: relative;
+  opacity: 1;
+}
+.full-screen-search ul.suggestions-results {
+  padding: 0;
+  position: relative;
+  padding-bottom: 20px;
+  cursor: pointer;
+  margin: 0;
+  background-color: white;
+  list-style: none;
+}
+.full-screen-search ul.suggestions-results li.suggestions-result {
+  color: #666;
+  border: none;
+  position: relative;
+  border-bottom: solid 1px #999999;
+  border-bottom: solid 1px #eee;
+  padding: 12px 40px;
+  font-size: 0.9em;
+}
+.full-screen-search ul.suggestions-results li.suggestions-result a {
+  display: block;
+  text-decoration: none;
+  color: #666;
+}
+.full-screen-search ul.suggestions-results li.suggestions-result a:active,
+.full-screen-search ul.suggestions-results li.suggestions-result a:hover,
+.full-screen-search ul.suggestions-results li.suggestions-result a:visited {
+  text-decoration: none;
+  color: #666;
+}
+.full-screen-search ul.suggestions-results li.suggestions-result:hover {
+  background-color: #ACD1E9;
+}
+/* samsung galaxy s gt-19000 */
+@media all and (max-width: 240px) {
+  #mw-mf-search {
+    font-size: 0.8em;
+  }
+}
