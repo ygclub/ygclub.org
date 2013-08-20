@@ -708,7 +708,7 @@ class LoginForm extends SpecialPage {
 			wfDebug( __METHOD__ . ": user does not exist\n" );
 			return self::NOT_EXISTS;
 		}
-		echo "<script>alert('check normal')</script>";
+//		echo "<script>alert('check normal')</script>";
 		if ( !$wgAuth->authenticate( $user->getName(), $this->mPassword ) ) {
 			wfDebug( __METHOD__ . ": \$wgAuth->authenticate() returned false, aborting\n" );
 			return self::WRONG_PLUGIN_PASS;
@@ -722,6 +722,7 @@ class LoginForm extends SpecialPage {
 			return self::ABORTED;
 		}
 
+//		echo "<script>alert('authenticate failed, try to create account')</script>";
 		wfDebug( __METHOD__ . ": creating account\n" );
 		$status = $this->initUser( $user, true );
 

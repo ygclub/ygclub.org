@@ -46,10 +46,30 @@ if ( !function_exists( 'version_compare' ) || version_compare( phpversion(), '5.
 	wfPHPVersionError( 'index.php' );
 }
 
+# The Following code is used to generate hdwiki page redirect
+# written by chaosconst for ygclub.org
+#
+function curPageURL() 
+{
+  $pageURL = 'http://';
+  $pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+  return $pageURL;
+}
+$url = curPageURL();
+if ((strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
+
+  $url = str_replace("/wiki/","/hdwiki/",$url);
+
+  header("Location: ".$url);   
+  exit;
+}
+
+
 # Initialise common code.  This gives us access to GlobalFunctions, the
 # AutoLoader, and the globals $wgRequest, $wgOut, $wgUser, $wgLang and
 # $wgContLang, amongst others; it does *not* load $wgTitle
 require __DIR__ . '/includes/WebStart.php';
+
 
 $mediaWiki = new MediaWiki();
 $mediaWiki->run();
