@@ -13,6 +13,7 @@ mediawiki/LocalSettings.php
 mediawiki/extensions/Auth_UC/Auth_UCenter.php
 mediawiki/extensions/Auth_UC/config.inc.php
 mediawiki/images/*
+mediawiki/extensions/DataValues
 
 phpmyadmin
 pma
