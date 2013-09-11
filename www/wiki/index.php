@@ -56,11 +56,16 @@ function curPageURL()
   return $pageURL;
 }
 $url = curPageURL();
-if ((strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
+if ((strstr($url,"pic-view")!=false) || (strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
 
   $url = str_replace("/wiki/","/hdwiki/",$url);
 
   header("Location: ".$url);   
+  exit;
+}
+if (strstr($url,"UserLogin")!=false) {
+  header("Location: "."http://www.ygclub.org/bbs/logging.php?action=login");   
+  echo "hello";
   exit;
 }
 
