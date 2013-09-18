@@ -56,7 +56,7 @@ function curPageURL()
   return $pageURL;
 }
 $url = curPageURL();
-if ((strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
+if ((strstr($url,"pic-view")!=false) || (strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
 
   $url = str_replace("/wiki/","/hdwiki/",$url);
 
