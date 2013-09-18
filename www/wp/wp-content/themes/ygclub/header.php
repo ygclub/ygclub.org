@@ -47,8 +47,9 @@
                 
                 <ul id="menu_l">
                 	<li id="home" <?php if (is_home())  echo " class=\"current_page_item\""; ?>><a href="<?php bloginfo('url'); ?>">首页</a></li>
-        		<?php wp_list_pages('sort_column=menu_order&title_li='); ?>
-                	<li><a href="http://www.ygclub.org/wiki/index.php?doc-view-59.html" title="联系我们">联系我们</a></li>
+        		<!-- <?php wp_list_pages('sort_column=menu_order&title_li='); ?> -->
+                	<li><a href="/wiki/index.php?title=%E9%98%B3%E5%85%89%E4%BB%8B%E7%BB%8D" title="关于我们">关于我们</a></li>
+                	<li><a href="/wiki/index.php?title=%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC" title="联系我们">联系我们</a></li>
                 </ul>
                 
                 <div id="nav_r"></div>

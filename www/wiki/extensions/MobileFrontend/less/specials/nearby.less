@@ -1,0 +1,58 @@
+@import "../mixins.less";
+
+.mw-mf-overlay .message {
+	font-size: 1.2em;
+	text-align: center;
+	padding: 8px;
+	border-bottom: solid 1px @headerBorderBottom;
+}
+
+.error {
+	color: #C85353;
+	background-color: #FAE1E1;
+	border: none;
+	.content {
+		margin-top: 0;
+		p {
+			margin-bottom: 0;
+		}
+	}
+}
+
+ul.a-to-z {
+	li {
+		.proximity {
+			font-size: .8em;
+			text-transform: none;
+		}
+	}
+}
+
+// FIXME: has to be button to have precendence over button styling. Would be nice to be just .refresh
+button.refresh {
+	background: rgba(0, 0, 0, 0) url(images/refresh.png) no-repeat center center;
+	margin: 0;
+	text-indent: -9999px;
+	overflow: hidden;
+	width: 24px;
+	height: @headerHeight;
+	background-size: 24px 25px;
+	border: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.client-js {
+	// note this also means non-ResourceLoader enabled browsers hence not using tag
+	.noscript {
+		display: none;
+	}
+}
+
+.mw-mf-overlay .content .listThumb {
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin-right: 20px;
+}

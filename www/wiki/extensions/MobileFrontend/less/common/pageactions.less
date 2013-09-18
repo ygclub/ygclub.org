@@ -1,0 +1,89 @@
+@import "../mixins.less";
+
+// FIXME: hide in stable till talk code is stable
+.stable #ca-talk,
+// hide menu items when not possible to use
+.client-nojs #ca-watch.cta,
+.client-nojs #ca-edit,
+.client-nojs #ca-upload,
+#ca-talk.selected {
+	display: none;
+}
+
+#section_0 {
+	margin: 14px @contentMarginRight 0 @contentMarginLeft;
+	padding-bottom: 9px;
+	border-bottom: dotted 1px #CACACA;
+}
+
+#page-actions {
+	padding: 8px @contentMarginRight 8px @contentMarginLeft - 8;
+	// end hacks
+	border-bottom: solid 1px #CACACA;
+	height: 30px;
+
+	li,
+	.watch-this-article {
+		.background-size( auto, 30px );
+	}
+	li {
+		cursor: pointer;
+		position: relative;
+		height: 30px;
+		width: 40px;
+		text-indent: -9999px;
+		background-position: 50% 0;
+		background-repeat: no-repeat;
+
+		// FIXME: use .cloaked class
+		// file inputs are notoriously difficult to style
+		input {
+			opacity: 0;
+		}
+
+		input,
+		a {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+	}
+}
+
+.watch-this-article {
+	background-image: url(images/pagemenu/watch.png);
+	&.watched {
+		background-image: url(images/pagemenu/watched.png);
+	}
+}
+
+#ca-edit {
+	background-image: url(images/pagemenu/edit-locked.png);
+	margin-right: 17px;
+	&.enabled {
+		background-image: url(images/pagemenu/edit.png);
+	}
+}
+
+#ca-talk {
+	margin-right: 14px;
+	background-image: url(images/pagemenu/talk.png);
+}
+
+#ca-upload {
+	margin-right: 19px;
+	background-image: url(images/pagemenu/upload-locked.png);
+	input {
+		display: none;
+	}
+	&.enabled {
+		background-image: url(images/pagemenu/upload.png);
+		input {
+			display: inline-block;
+		}
+	}
+}

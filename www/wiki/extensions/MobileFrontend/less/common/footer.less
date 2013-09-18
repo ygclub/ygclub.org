@@ -1,0 +1,62 @@
+/* FOOTER
+initially moved from beta_common.css in
+Change-Id: I48bcdc43e72f2a9b60e6d1bfe877d79ad80b6d5d
+*/
+@import "../variables.less";
+
+#footer {
+	padding: 2em @contentMarginRight 1.5em @contentMarginLeft;
+	margin: 2em 0 0;
+	border-top: 1px solid #aaa;
+	clear: both; /* cancel any floating in the content */
+	font-size: @baseFontSize * 0.9;
+
+	h2 {
+		display: inline;
+		margin: 0;
+		line-height: inherit;
+		font-weight: bold;
+		font-size: @baseFontSize;
+
+		img {
+			height: 1em;
+		}
+	}
+
+	ul {
+		text-align: center;
+		list-style: none;
+		margin: 0;
+
+		li {
+			line-height: 1.2;
+			padding: 0 0 .7em;
+		}
+
+		ul {
+			display: inline
+		}
+
+		ul li,
+		&.footer-places li {
+			display: inline;
+			padding: 0 8px;
+			border-right: 1px solid #aaa;
+
+			&:last-child {
+				border: none;
+			}
+		}
+	}
+}
+
+// FIXME: remove when all cached pages have new footer HTML
+// (change to be deployed May 14, 2013)
+#content_footer {
+	margin: 1em 0 0;
+
+	.separator {
+		margin: 0 .35em 0 0;
+		border-right: 1px solid #aaa;
+	}
+}

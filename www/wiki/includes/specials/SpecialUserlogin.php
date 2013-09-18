@@ -732,7 +732,7 @@ class LoginForm extends SpecialPage {
 			return self::ABORTED;
 		}
 
-		echo "<script>location.reload();</script>";
+		//echo "<script>location.reload();</script>";
 
 		return self::SUCCESS;
 	}

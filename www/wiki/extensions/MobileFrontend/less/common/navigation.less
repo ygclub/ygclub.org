@@ -1,0 +1,73 @@
+@import "../mixins.less";
+
+@InfoBoxWLogoSize: 98px;
+@overlayAlertTipColor: black;
+@overlayAlertWarningColor: orange;
+@overlayAlertSuccessColor: green;
+@overlayAlertErrorBorderColor: #D00;
+@overlayAlertErrorBackgroundColor: #FAE1E1;
+@overlayAlertPaddingHorizontal: 1em;
+@overlayAlertPadding: 0.5em @overlayAlertPaddingHorizontal;
+@overlayBorderWidth: 1px;
+@watchThisArticleSize: 22px;
+
+// FIXME: Refactor when pageactions.less moves to stable
+.watch-this-article {
+	background-image: url(images/watch.png);
+	background-position: center center;
+	.background-size( auto, @watchThisArticleSize );
+	position: absolute;
+	top: 0;
+	right: 0;
+	text-indent: -9999px;
+	background-repeat: no-repeat;
+
+	&.watched {
+		background-image: url(images/watched.png);
+	}
+}
+
+.search.error,
+.error {
+	border: solid @overlayBorderWidth @overlayAlertErrorBorderColor;
+	background-color: @overlayAlertErrorBackgroundColor;
+}
+
+.alert {
+	padding: @overlayAlertPadding;
+	background-repeat: no-repeat;
+	background-position: @overlayAlertPaddingHorizontal center;
+	margin-bottom: 1em;
+	min-height: 64px;
+	font-size: @baseFontSize;
+
+	&.warning {
+		border: solid @overlayBorderWidth @overlayAlertWarningColor;
+	}
+
+	&.success {
+		padding-left: ( 80px + @overlayAlertPadding );
+		border: solid @overlayBorderWidth @overlayAlertSuccessColor;
+		background-image: url(images/success.png);
+	}
+
+	h2 {
+		font-family: @fontFamily;
+		font-size: 100%;
+		font-weight: bold;
+		margin: 0 0 8px 0;
+	}
+}
+
+#content {
+	.alert {
+		margin: 0;
+	}
+}
+
+html,
+body {
+	background: #fff;
+	height: 100%;
+}
+

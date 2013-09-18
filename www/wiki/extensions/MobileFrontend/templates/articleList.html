@@ -1,0 +1,22 @@
+{{#error}}
+<div class="alert error">
+	<div class="content">
+		{{#heading}}<h2>{{heading}}</h2>{{/heading}}
+		<p>{{guidance}}</p>
+	</div>
+</div>
+{{/error}}
+{{#loadingMessage}}
+<div class="content loading">{{loadingMessage}}</div>
+{{/loadingMessage}}
+<ul class="page-list a-to-z actionable">
+	{{#pages}}
+	<li title="{{title}}">
+		<a href="{{url}}" class="title" name="{{anchor}}" data-latlng="{{latitude}},{{longitude}}" data-title="{{title}}">
+			<div class="listThumb {{pageimageClass}}" style="{{listThumbStyleAttribute}}"></div>
+			<h2>{{{heading}}}</h2>
+			<div class="info proximity">{{proximity}}</div>
+		</a>
+	</li>
+	{{/pages}}
+</ul>

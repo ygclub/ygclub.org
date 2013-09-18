@@ -22,7 +22,6 @@ define( 'MOBILEFRONTEND', 'MobileFrontend' );
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'MobileFrontend',
-	'version' => '0.7.0',
 	'author' => array( 'Patrick Reilly', 'Max Semenik', 'Jon Robson', 'Arthur Richards' ),
 	'descriptionmsg' => 'mobile-frontend-desc',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:MobileFrontend',
@@ -33,34 +32,52 @@ $wgExtensionMessagesFiles['MobileFrontend'] = "$cwd/MobileFrontend.i18n.php";
 $wgExtensionMessagesFiles['MobileFrontendAlias'] = "$cwd/MobileFrontend.alias.php";
 
 // autoload extension classes
-
 $autoloadClasses = array (
 	'ExtMobileFrontend' => 'MobileFrontend.body',
-	'MobileFrontendSiteModule' => 'MobileFrontend.body',
+	'MobileFrontendHooks' => 'MobileFrontend.hooks',
 
-	'Mobile_Detect' => 'Mobile_Detect',
 	'DeviceDetection' => 'DeviceDetection',
-	'HtmlFormatter' => 'HtmlFormatter',
+  'Mobile_Detect' => 'Mobile_Detect',
+  'HtmlDeviceProperties' => 'DeviceDetection',
 	'MobileContext' => 'MobileContext',
-	'MobileFormatter' => 'MobileFormatter',
 	'WmlContext' => 'WmlContext',
+	'WmlDeviceProperties' => 'DeviceDetection',
+
+	'ExtractFormatter' => 'formatters/ExtractFormatter',
+	'HtmlFormatter' => 'formatters/HtmlFormatter',
+	'MobileFormatter' => 'formatters/MobileFormatter',
+	'MobileFormatterHTML' => 'formatters/MobileFormatterHTML',
+	'MobileFormatterWML' => 'formatters/MobileFormatterWML',
 
 	'ApiMobileView' => 'api/ApiMobileView',
 	'ApiParseExtender' => 'api/ApiParseExtender',
 	'ApiQueryExtracts' => 'api/ApiQueryExtracts',
 
-	'SpecialMobileFeedback' => 'specials/SpecialMobileFeedback',
+	'MFResourceLoaderModule' => 'modules/MFResourceLoaderModule',
+	'MobileSiteModule' => 'modules/MobileSiteModule',
+
+	'SpecialUploads' => 'specials/SpecialUploads',
+	'SpecialMobileUserlogin' => 'specials/SpecialMobileUserlogin',
+	'SpecialMobileDiff' => 'specials/SpecialMobileDiff',
 	'SpecialMobileOptions' => 'specials/SpecialMobileOptions',
 	'SpecialMobileMenu' => 'specials/SpecialMobileMenu',
+	'SpecialMobileWatchlist' => 'specials/SpecialMobileWatchlist',
+	'SpecialNearby' => 'specials/SpecialNearby',
+	'MobileSpecialPage' => 'specials/MobileSpecialPage',
 
+	'MinervaTemplate' => 'skins/MinervaTemplate',
+	'MobileTemplate' => 'skins/MobileTemplate',
+	'MobileTemplateBeta' => 'skins/MobileTemplateBeta',
+	'MobileTemplateAlpha' => 'skins/MobileTemplateAlpha',
+	'MobileTemplateWML' => 'skins/MobileTemplateWML',
+	'SkinMinerva' => 'skins/SkinMinerva',
 	'SkinMobile' => 'skins/SkinMobile',
-	'SkinMobileTemplate' => 'skins/SkinMobileTemplate',
-	'SkinMobileBase' => 'skins/SkinMobileBase',
+	'SkinMobileBeta' => 'skins/SkinMobileBeta',
+	'SkinMobileAlpha' => 'skins/SkinMobileAlpha',
 	'SkinMobileWML' => 'skins/SkinMobileWML',
-	'SkinMobileTemplateWML' => 'skins/SkinMobileTemplateWML',
+	'UserLoginAndCreateTemplate' => 'skins/UserLoginAndCreateTemplate',
 	'UserLoginMobileTemplate' => 'skins/UserLoginMobileTemplate',
-
-	'MFCompatCheck' => 'MFCompatCheck',
+	'UserAccountCreateMobileTemplate' => 'skins/UserAccountCreateMobileTemplate',
 );
 
 foreach ( $autoloadClasses as $className => $classFilename ) {
@@ -78,145 +95,98 @@ $wgHooks['APIGetParamDescription'][] = 'ApiParseExtender::onAPIGetParamDescripti
 $wgHooks['APIGetDescription'][] = 'ApiParseExtender::onAPIGetDescription';
 $wgHooks['OpenSearchXml'][] = 'ApiQueryExtracts::onOpenSearchXml';
 
-$wgSpecialPages['MobileFeedback'] = 'SpecialMobileFeedback';
+$wgHooks['LinksUpdate'][] = 'MobileFrontendHooks::onLinksUpdate';
+
+$wgHooks['RequestContextCreateSkin'][] = 'MobileFrontendHooks::onRequestContextCreateSkin';
+$wgHooks['SkinTemplateOutputPageBeforeExec'][] = 'MobileFrontendHooks::onSkinTemplateOutputPageBeforeExec';
+$wgHooks['BeforePageRedirect'][] = 'MobileFrontendHooks::onBeforePageRedirect';
+$wgHooks['ResourceLoaderTestModules'][] = 'MobileFrontendHooks::onResourceLoaderTestModules';
+$wgHooks['GetCacheVaryCookies'][] = 'MobileFrontendHooks::onGetCacheVaryCookies';
+$wgHooks['ResourceLoaderGetConfigVars'][] = 'MobileFrontendHooks::onResourceLoaderGetConfigVars';
+$wgHooks['SpecialPage_initList'][] = 'MobileFrontendHooks::onSpecialPage_initList';
+$wgHooks['ListDefinedTags'][] = 'MobileFrontendHooks::onListDefinedTags';
+$wgHooks['RecentChange_save'][] = 'MobileFrontendHooks::onRecentChange_save';
+$wgHooks['AbuseFilter-generateUserVars'][] = 'MobileFrontendHooks::onAbuseFilterGenerateUserVars';
+$wgHooks['AbuseFilter-builder'][] = 'MobileFrontendHooks::onAbuseFilterBuilder';
+$wgHooks['SpecialPageBeforeExecute'][] = 'MobileFrontendHooks::onSpecialPageBeforeExecute';
+$wgHooks['UserLoginComplete'][] = 'MobileFrontendHooks::onUserLoginComplete';
+$wgHooks['UserLoginForm'][] = 'MobileFrontendHooks::onUserLoginForm';
+$wgHooks['UserCreateForm'][] = 'MobileFrontendHooks::onUserCreateForm';
+$wgHooks['BeforePageDisplay'][] = 'MobileFrontendHooks::onBeforePageDisplay';
+$wgHooks['CustomEditor'][] = 'MobileFrontendHooks::onCustomEditor';
+$wgHooks['GetPreferences'][] = 'MobileFrontendHooks::onGetPreferences';
+$wgHooks['Gadgets::allowLegacy'][] = 'MobileFrontendHooks::onAllowLegacyGadgets';
+$wgHooks['UnitTestsList'][] = 'MobileFrontendHooks::onUnitTestsList';
+$wgHooks['CentralAuthLoginRedirectData'][] = 'MobileFrontendHooks::onCentralAuthLoginRedirectData';
+$wgHooks['CentralAuthSilentLoginRedirect'][] = 'MobileFrontendHooks::onCentralAuthSilentLoginRedirect';
+$wgHooks['UserRequiresHTTPS'][] = 'MobileFrontendHooks::onUserRequiresHTTPS';
+
+$wgSpecialPages['MobileDiff'] = 'SpecialMobileDiff';
 $wgSpecialPages['MobileOptions'] = 'SpecialMobileOptions';
 $wgSpecialPages['MobileMenu'] = 'SpecialMobileMenu';
 
 function efMobileFrontend_Setup() {
-	global $wgExtMobileFrontend;
-	$wgExtMobileFrontend = new ExtMobileFrontend( RequestContext::getMain() );
-	$wgExtMobileFrontend->attachHooks();
-}
+	global $wgMFNearby, $wgSpecialPages, $wgSpecialPageGroups;
 
-// Unit tests
-$wgHooks['UnitTestsList'][] = 'efExtMobileFrontendUnitTests';
-
-/**
- * @param $files array
- * @return bool
- */
-function efExtMobileFrontendUnitTests( &$files ) {
-	$dir = dirname( __FILE__ ) . '/tests';
-	$files[] = "$dir/ApiParseExtenderTest.php";
-	$files[] = "$dir/MobileContextTest.php";
-	$files[] = "$dir/MobileFrontendTest.php";
-	$files[] = "$dir/DeviceDetectionTest.php";
-	$files[] = "$dir/HtmlFormatterTest.php";
-	$files[] = "$dir/MobileFormatterTest.php";
-	return true;
+	if ( $wgMFNearby ) {
+		$wgSpecialPages['Nearby'] = 'SpecialNearby';
+		$wgSpecialPageGroups['Nearby'] = 'pages';
+	}
 }
 
 // ResourceLoader modules
-$localBasePath = dirname( __FILE__ );
-$remoteExtPath = 'MobileFrontend';
+require_once( "$cwd/includes/Resources.php" );
 
-$wgResourceModules['mobile.head'] = array(
-	'styles' => array(),
-	'scripts' => array( 'javascripts/common/main.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile'] = array(
-	'styles' => array( 'stylesheets/common/reset.css', 'stylesheets/common/mf-common.css', 'stylesheets/common/mf-footer.css',
-		'stylesheets/common/mf-typography.css', 'stylesheets/common/mf-navigation.css',
-		'stylesheets/modules/mf-search.css',
-		'stylesheets/specials/contact-us.css', 'stylesheets/modules/mf-banner.css',
-		'stylesheets/specials/mf-settings.css',
-		'stylesheets/specials/mf-login.css',
-		'stylesheets/modules/mf-toggle.css',
-		'stylesheets/common/mf-hacks.css',
-		'stylesheets/common/mf-enwp.css' ),
-	'scripts' => array( 'javascripts/common/mf-application.js',
-		'javascripts/common/mf-history.js',
-		'javascripts/common/mf-settings.js', 'javascripts/modules/mf-search.js',
-		'javascripts/modules/mf-banner.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile.beta.jquery'] = array(
-	'styles' => array( 'stylesheets/modules/mf-watchlist.css' ),
-	'scripts' => array(
-		'javascripts/modules/mf-cleanuptemplates.js',
-		'javascripts/modules/mf-toggle-dynamic.js',
-		'javascripts/modules/mf-random.js',
-		'javascripts/actions/mf-edit.js', // FIXME: only serve when action=edit
-		'javascripts/modules/mf-watchlist.js', 'javascripts/modules/mf-languages.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile.beta.jquery.eventlog'] = array(
-	'scripts' => array( 'javascripts/externals/eventlog.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile.production-only'] = array(
-	'styles' => array( 'stylesheets/modules/mf-toggle.css' ),
-	'scripts' => array( 'javascripts/modules/mf-toggle.js' ),
-	'raw' => true,
-	'localBasePath' => dirname( __FILE__ ),
-	'remoteExtPath' => 'MobileFrontend',
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile.beta'] = $wgResourceModules['mobile'];
-
-$wgResourceModules['mobile.beta']['styles'][] = 'stylesheets/modules/mf-cleanuptemplates.css';
-$wgResourceModules['mobile.beta']['styles'][] = 'stylesheets/actions/mf-edit.css'; // FIXME: only serve me when action=edit
-
-$wgResourceModules['mobile.filePage'] = array(
-	'styles' => array( 'stylesheets/specials/filepage.css' ),
-	'scripts' => array( 'javascripts/specials/filepage.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-$wgResourceModules['mobile.production-jquery'] = array(
-	'styles' => array( 'stylesheets/modules/mf-references.css' ),
-	'scripts' => array(
-		'javascripts/common/mf-navigation.js',
-		'javascripts/common/mf-notification.js',
-		'javascripts/modules/mf-references.js' ),
-	'raw' => true,
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
-
-$wgResourceModules['mobile.site'] = array(
-	'class' => 'MobileFrontendSiteModule',
-	'targets' => 'mobile',
-);
-
-// Resources to be loaded on desktop version of site
-$wgResourceModules['mobile.desktop'] = array(
-	'scripts' => array( 'javascripts/desktop/unset_stopmobileredirect.js' ),
-	'dependencies' => array( 'jquery.cookie' ),
-	'localBasePath' => $localBasePath,
-	'remoteExtPath' => $remoteExtPath,
-	'targets' => 'mobile',
-);
+unset( $cwd );
 
 /**
  * Begin configuration variables
  */
 
 /**
- * Path to the logo used in the mobile view
+ * The default skin for MobileFrontend
+ * Defaults to MobileSkin
+ */
+$wgMFDefaultSkinClass = 'SkinMobile';
+
+/*
+ * Allow editing (uploading) to external CentralAuth-enabled wikis where
+ * the user might not be logged in.
+ */
+$wgMFUseCentralAuthToken = false;
+
+/**
+ * An api to which any photos should be uploaded
+ * e.g. $wgMFPhotoUploadEndpoint = 'https://commons.wikimedia.org/w/api.php';
+ * Defaults to the current wiki
+ */
+$wgMFPhotoUploadEndpoint = '';
+
+/**
+ * An optional alternative api to query for nearby pages
+ * e.g. https://en.m.wikipedia.org/w/api.php
  *
- * Should be 22px tall at most
+ * If set forces nearby to operate in JSONP mode
+ * @var String
+ */
+$wgMFNearbyEndpoint = '';
+
+/**
+ * Namespace(s) where Special:Nearby should search. Should be one or more of NS_* constants, pipe-separated
+ * @var int|string
+ */
+$wgMFNearbyNamespace = NS_MAIN;
+
+/**
+ * The wiki id/dbname for where photos are uploaded, if photos are uploaded to
+ * a wiki other than the local wiki (eg commonswiki).
+ * @var string
+ */
+$wgMFPhotoUploadWiki = null;
+
+/**
+ * Path to the logo used in the login/signup form
+ * The standard height is 72px
  */
 $wgMobileFrontendLogo = false;
 
@@ -256,59 +226,6 @@ $wgMobileUrlTemplate = '';
 $wgMobileFrontendFormatCookieExpiry = null;
 
 /**
- * When set to true, the feedback form will post to a remote wiki, which
- * must also be configured.
- * @param bool
- */
-$wgMFRemotePostFeedback = false;
-$wgMFRemotePostFeedbackUrl = null;
-$wgMFRemotePostFeedbackUsername = null;
-$wgMFRemotePostFeedbackPassword = null;
-$wgMFRemotePostFeedbackArticle = null;
-
-/**
- * Configure the href links for the various links that appear on the
- * MobileFrontend feedback form.
- *
- * These can be any value that you can use as an href value in <a href="">,
- * eg "GeneralFeedback", "http://mysite.com/wiki/GeneralFeedback",
- *   "mailto:someone@example.com"
- *
- * Leaving a value empty will default to a value of '#'
- *
- * Alternatively, you can invoke the 'MobileFrontendOverrideFeedbackLinks' hook
- * rather than just set this var in your LocalSettings. This is really useful
- * if you have more complicated/variable needs for setting up this configuration
- * var that you might not want running on every single page load.
- */
-$wgMFFeedbackLinks = array(
-	'General' => '', // General feedback
-	'ArticlePersonal' => '', // Regarding me, a person, or a company I work for
-	'ArticleFactual' => '', // Regarding a factual error
-	'ArticleOther' => '', // Regarding another problem
-);
-
-$wgExtMobileFrontend = null;
-
-/**
- * A fallback URL for a 'contact us' page if one cannot be dynamically
- * determined for the project (using wfMessage( 'contact-us' )). This is only
- * used in non-beta mode.
- */
-$wgMFFeedbackFallbackURL = '#';
-
-/**
- * Set properties in ExtMobileFrontend to arbitrary values
- * CAUTION: this should not be used in production environments
- *
- * This array can consist of key => value pairs, mapping to
- * '<property_name>' => <property_value>
- * Any properties you try to set that do not exist in ExtMobileFrontend will
- * be ignored.
- */
-$wgMFConfigProperties = array();
-
-/**
  * Make the classes, tags and ids stripped from page content configurable.
  * Each item will be stripped from the page.
  * See $itemsToRemove for more information.
@@ -317,9 +234,14 @@ $wgMFRemovableClasses = array();
 
 /**
  * Make the logos configurable.
- * Key for site.
- * Key for logo.
- * Example: array('site' => 'mysite', 'logo' => 'mysite_logo.png');
+ *
+ * 'logo' is the principle logo for your site, 'copyright' is the copyright
+ * logo to be used in the footer of your site.
+ *
+ * Example: array(
+ * 	'logo' => 'mysite_logo.png',
+ *	'copyright' => 'mysite_copyright_logo.png',
+ * 	);
  */
 $wgMFCustomLogos = array();
 
@@ -333,14 +255,6 @@ $wgMFExtendOpenSearchXml = false;
  * to mix mobile and non-mobile pages in its search results, creating confusion.
  */
 $wgMFNoindexPages = true;
-
-/**
- * Which pages should be included in mobile.site
- */
-$wgMobileSiteResourceLoaderModule = array(
-	'MediaWiki:Mobile.css' => array( 'type' => 'style' ),
-	'MediaWiki:Mobile.js' => array( 'type' => 'script' ),
-);
 
 /**
  * Set the domain of the stopMobileRedirect cookie
@@ -362,21 +276,6 @@ $wgMFStopRedirectCookieHost = null;
 $wgMFEnableDesktopResources = false;
 
 /**
- * Log events to a (currently Wikimedia-specific) logging endpoint in beta mode.
- * When off, events will still log to local console.
- *
- * Defaults to false.
- */
-$wgMFLogEvents = false;
-
-
-/**
- * Whether to use ResourceLoader, filtered to mobile target.
- * If not, old method of loading will be used for all scripts.
- */
-$wgMFEnableResourceLoader = true;
-
-/**
  * Whether to append ™ to the sitename in page footer, or
  * ® to the sitename for alt text in footer if using a custom copyright logo.
  *
@@ -385,3 +284,96 @@ $wgMFEnableResourceLoader = true;
  * You can also edit the 'mobile-frontend-footer-sitename' message directly.
  */
 $wgMFTrademarkSitename = false;
+
+/**
+ * Name of the class used for mobile device detection, must be inherited from
+ * IDeviceDetector.
+ */
+$wgDeviceDetectionClass = 'DeviceDetection';
+
+/**
+ * Will force login-related links to use https if set to true, otherwise
+ * login-related links will use whatever protocol is in use by the user
+ */
+$wgMFForceSecureLogin = false;
+
+/**
+ * Whether geodata related functionality should be enabled
+ *
+ * Defaults to false.
+ */
+$wgMFNearby = false;
+
+/**
+ * The range in meters that should be searched to find nearby pages on Special:Nearby (defaults to 10km)
+ */
+$wgMFNearbyRange = 10000;
+
+/**
+ * Pages with smaller parsed HTML size are not cached
+ * Set to 0 to cache everything or to some large value to disable caching completely
+ */
+$wgMFMinCachedPageSize = 64 * 1024;
+
+/**
+ * Set this to true to automatically show mobile view depending on people's user-agent.
+ * WARNING: Make sure that your caching infrastructure is configured appropriately, to avoid
+ * people receiving cached versions of pages intended for someone else's devices.
+ */
+$wgMFAutodetectMobileView = false;
+
+/**
+ * Whether or not to show the upload CTA to logged out users.
+ * Note there are a couple of exceptions:
+ * it will show on page visits that come from the nearby page
+ * it will be overriden in beta and alpha modes of the site
+ */
+$wgMFEnablePhotoUploadCTA = true;
+
+/**
+ * (wiki)text to append to photo description during photo upload.
+ */
+$wgMFPhotoUploadAppendToDesc = '';
+
+/**
+ * Whether or not to display site notices
+ * @var bool
+ */
+$wgMFEnableSiteNotice = false;
+
+/**
+ * Whether or not to enable the use of the X-Analytics HTTP response header
+ *
+ * This header is used for analytics purposes.
+ * @see https://www.mediawiki.org/wiki/Analytics/Kraken/Data_Formats/X-Analytics
+ * @var bool
+ */
+$wgMFEnableXAnalyticsLogging = false;
+
+/**
+ * Whether or not anonymous (not logged in) users should be able to edit.
+ */
+$wgMFAnonymousEditing = false;
+
+/**
+ * A css selector which is used by mf-photo.js to test whether to prompt the user photo uploads on
+ * the current page. When the selector matches no elements the photo uploader will show.
+ * This is an advanced config variable so use caution in editing.
+ */
+$wgMFLeadPhotoUploadCssSelector = 'img, .navbox';
+
+/**
+ * Enable CSS animations in all browsers that support them
+ * @var bool
+ */
+$wgMFEnableCssAnimations = true;
+
+/**
+ * DB key of the category which members will never display mobile view
+ */
+$wgMFNoMobileCategory = false;
+
+/**
+ * Prefixed names of pages that will never display mobile view
+ */
+$wgMFNoMobilePages = array();

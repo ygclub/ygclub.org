@@ -1,0 +1,128 @@
+@import "buttons.less";
+@import 'mainmenu.less';
+
+/* Header */
+.header form {
+	height: @headerHeight;
+}
+
+.header {
+	z-index: 2;
+	.vertical-gradient( @searchBoxColor, @searchBoxColorTo );
+	border-bottom: 1px solid #e2e2e2;
+	line-height: @headerHeight;
+	text-align: center;
+	min-height: @headerHeight;
+	overflow: hidden;
+	position: relative;
+	padding: 0 @searchBarPaddingRight 0 @searchBarPaddingLeft;
+
+	h1, h2 {
+		font-size: @baseFontSize * 1.6;
+		margin: round( @headerHeight*0.22 ) 0 0;
+	}
+}
+
+// FIXME: Delete when Echo moves to stable
+.stable .header {
+	padding-right: 10px;
+}
+
+/* Menu buttons */
+#mw-mf-menu-page,
+#mw-mf-main-menu-button,
+#user-button {
+	display: inline-block; //?
+	height: @headerHeight;
+	width: @searchBarPaddingLeft;
+	position: absolute;
+	top: 0;
+}
+
+// FIXME: hide Echo Notifications button in stable
+.stable #user-button {
+	display: none;
+}
+
+/* hamburger */
+// FIXME: make consistent with user-button
+#mw-mf-main-menu-button {
+	background-image: url(images/menu/lowres/main.png);
+	.background-size( 24px, 30px );
+	overflow: hidden;
+	background-repeat: no-repeat;
+	z-index: 2;
+	left: 0;
+	border-radius: 5px 5px 5px;
+	background-position: center center;
+	&:active {
+		background-color: darken( @searchBoxColor, 0.4% );
+	}
+}
+
+.client-js {
+	#mw-mf-main-menu-button {
+		/* @embed */background-image: url(images/menu/main.png);
+	}
+}
+
+/* Search */
+input.search {
+	-webkit-appearance: none;
+	outline: none;
+	width: 100%;
+	height: @headerElementHeight;
+	// FIXME: unable to check but the important may not be needed for Nokia S60;
+	background-color: white !important; /* remove fennec default background also see bug 36490 */
+	.box-sizing( border-box );
+	&::-webkit-search-cancel-button {
+		-webkit-appearance: none;
+	}
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.searchSubmit {
+	position: absolute;
+	top: ( @headerHeight - @headerElementHeight ) / 2;
+	margin: 0;
+	right: 0;
+	padding: 0 !important;
+	width: @headerElementHeight;
+}
+
+.client-nojs {
+	.search-box {
+		padding-right: @headerElementHeight + 4px;
+	}
+}
+
+.search-box {
+	position: relative;
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+#mw-mf-menu-page {
+	display: none;
+}
+
+.client-js {
+	.searchSubmit {
+		display: none;
+	}
+
+	#mw-mf-menu-page {
+		display: block;
+	}
+}
+
+/* samsung galaxy s gt-19000 */
+@media all and ( max-width:240px ) {
+	.search-box input.search {
+		font-size: 0.8em;
+		padding-left: 0;
+	}
+}
+

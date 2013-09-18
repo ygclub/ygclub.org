@@ -1,0 +1,25 @@
+<div class="header">
+	<button class="cancel">{{closeMsg}}</button>
+</div>
+<div class="spinner loading"></div>
+<textarea cols="40" rows="10" placeholder="{{placeholder}}"></textarea>
+<div class="preview">
+	<h2>{{previewMsg}}</h2>
+	<div class="content"></div>
+</div>
+<div class="position-fixed buttonBar button-bar-centered initial-bar">
+	{{#isNewEditor}}
+	<div><p>{{guiderMsg}}</p></div>
+	{{/isNewEditor}}
+	<button class="cancel inline">{{cancelMsg}}</button>
+	<button class="continue" disabled>{{continueMsg}}</button>
+</div>
+<div class="position-fixed buttonBar button-bar-centered save-bar">
+	<input class="summary" placeholder="{{summaryMsg}}" />
+	<button class="inline back">{{keepEditingMsg}}</button>
+	<button class="save">{{saveMsg}}</button>
+	<p class="license">{{{licenseMsg}}}</p>
+</div>
+<div class="position-fixed buttonBar button-bar-centered saving-bar loading">
+	<p>{{waitMsg}}</p>
+</div>

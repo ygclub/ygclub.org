@@ -1,9 +1,6 @@
 <?php
 
 class ApiQueryExtracts extends ApiQueryBase {
-	const SECTION_MARKER_START = "\1\2";
-	const SECTION_MARKER_END = "\2\1";
-
 	/**
 	 * @var ParserOptions
 	 */
@@ -29,8 +26,7 @@ class ApiQueryExtracts extends ApiQueryBase {
 		$limit = intval( $params['limit'] );
 		if ( $limit > 1 && !$params['intro'] ) {
 			$limit = 1;
-			///@todo:
-			//$result->setWarning( "Provided limit was too large for requests for whole article extracts, lowered to $limit" );
+			$result->setWarning( "exlimit was too large for a whole article extracts request, lowered to $limit" );
 		}
 		if ( isset( $params['continue'] ) ) {
 			$continue = intval( $params['continue'] );
@@ -40,13 +36,15 @@ class ApiQueryExtracts extends ApiQueryBase {
 			$titles = array_slice( $titles, $continue, null, true );
 		}
 		$count = 0;
+		/** @var Title $t */
 		foreach ( $titles as $id => $t ) {
 			if ( ++$count > $limit ) {
 				$this->setContinueEnumParameter( 'continue', $continue + $count - 1 );
 				break;
 			}
 			$text = $this->getExtract( $t );
-			$text = $this->truncate( $text );
+			$pageName = $t->getText();
+			$text = $this->truncate( $text, $pageName );
 			if ( $this->params['plaintext'] ) {
 				$text = $this->doSections( $text );
 			}
@@ -143,7 +141,7 @@ class ApiQueryExtracts extends ApiQueryBase {
 
 	private function getFirstSection( $text, $plainText ) {
 		if ( $plainText ) {
-			$regexp = '/^(.*?)(?=' . self::SECTION_MARKER_START . ')/s';
+			$regexp = '/^(.*?)(?=' . ExtractFormatter::SECTION_MARKER_START . ')/s';
 		} else {
 			$regexp = '/^(.*?)(?=<h[1-6]\b)/s';
 		}
@@ -205,11 +203,17 @@ class ApiQueryExtracts extends ApiQueryBase {
 		return trim( $text );
 	}
 
-	private function truncate( $text ) {
+	/**
+	 * Truncate the given text to a certain number of characters or sentences
+	 * @param string $text The text to truncate
+	 * @param string $pageName Title of the page (for debugging)
+	 * @return string
+	 */
+	private function truncate( $text, $pageName ) {
 		if ( $this->params['chars'] ) {
 			return $this->getFirstChars( $text, $this->params['chars'] );
 		} elseif ( $this->params['sentences'] ) {
-			return $this->getFirstSentences( $text, $this->params['sentences'] );
+			return $this->getFirstSentences( $text, $this->params['sentences'], $pageName );
 		}
 		return $text;
 	}
@@ -241,9 +245,10 @@ class ApiQueryExtracts extends ApiQueryBase {
 	 *
 	 * @param string $text
 	 * @param int $requestedSentenceCount
+	 * @param string $pageName Title of the page (for debugging)
 	 * @return string
 	 */
-	private function getFirstSentences( $text, $requestedSentenceCount ) {
+	private function getFirstSentences( $text, $requestedSentenceCount, $pageName ) {
 		wfProfileIn( __METHOD__ );
 		// Based on code from OpenSearchXml by Brion Vibber
 		$endchars = array(
@@ -256,11 +261,15 @@ class ApiQueryExtracts extends ApiQueryBase {
 		$endgroup = implode( '|', $endchars );
 		$end = "(?:$endgroup)";
 		$sentence = ".+?$end+";
-		$regexp = "/^($sentence){{$requestedSentenceCount}}/u";
+		$regexp = "/^($sentence){1,{$requestedSentenceCount}}/u";
 		$matches = array();
-		if( preg_match( $regexp, $text, $matches ) ) {
+		$res = preg_match( $regexp, $text, $matches );
+		if( $res ) {
 			$text = $matches[0];
 		} else {
+			if ( $res === false ) {
+				wfDebugLog( 'mobile', "Regular expresssion compilation failure. Page: $pageName; RegEx: $regexp" );
+			}
 			// Just return the first line
 			$lines = explode( "\n", $text );
 			$text = trim( $lines[0] );
@@ -288,7 +297,7 @@ class ApiQueryExtracts extends ApiQueryBase {
 
 	private function doSections( $text ) {
 		$text = preg_replace_callback(
-			"/" . self::SECTION_MARKER_START . '(\d)'. self::SECTION_MARKER_END . "(.*?)$/m",
+			"/" . ExtractFormatter::SECTION_MARKER_START . '(\d)'. ExtractFormatter::SECTION_MARKER_END . "(.*?)$/m",
 			array( $this, 'sectionCallback' ),
 			$text
 		);
@@ -321,6 +330,7 @@ class ApiQueryExtracts extends ApiQueryBase {
 			'sentences' => array(
 				ApiBase::PARAM_TYPE => 'integer',
 				ApiBase::PARAM_MIN => 1,
+				ApiBase::PARAM_MAX => 10,
 			),
 			'limit' => array(
 				ApiBase::PARAM_DFLT => 1,
@@ -332,7 +342,7 @@ class ApiQueryExtracts extends ApiQueryBase {
 			'intro' => false,
 			'plaintext' => false,
 			'sectionformat' => array(
-				ApiBase::PARAM_TYPE => ExtractFormatter::$sectionFormats,
+				ApiBase::PARAM_TYPE => array( 'plain', 'wiki', 'raw' ),
 				ApiBase::PARAM_DFLT => 'wiki',
 			),
 			'continue' => array(
@@ -376,58 +386,10 @@ class ApiQueryExtracts extends ApiQueryBase {
 
 
 	public function getHelpUrls() {
-		return 'https://www.mediawiki.org/wiki/Extension:MobileFrontend#New_API';
+		return 'https://www.mediawiki.org/wiki/Extension:MobileFrontend#prop.3Dextracts';
 	}
 
 	public function getVersion() {
 		return __CLASS__ . ': $Id$';
-	}
-}
-
-class ExtractFormatter extends HtmlFormatter {
-	private $plainText;
-	private $sectionFormat;
-
-	public static $sectionFormats = array(
-		'plain',
-		'wiki',
-		'raw',
-	);
-
-	public function __construct( $text, $plainText, $sectionFormat ) {
-		parent::__construct( HtmlFormatter::wrapHTML( $text ) );
-		$this->plainText = $plainText;
-		$this->sectionFormat = $sectionFormat;
-
-		$this->removeImages();
-		$this->remove( array( 'table', 'div', '.editsection', 'sup.reference', 'span.coordinates',
-			'span.geo-multi-punct', 'span.geo-nondefault', '.noexcerpt', '.error' )
-		);
-		if ( $plainText ) {
-			$this->flattenAllTags();
-		} else {
-			$this->flatten( array( 'span', 'a' ) );
-		}
-	}
-
-	public function getText( $dummy = null ) {
-		$this->filterContent();
-		$text = parent::getText();
-		if ( $this->plainText ) {
-			$text = html_entity_decode( $text );
-			$text = str_replace( "\r", "\n", $text ); // for Windows
-			$text = preg_replace( "/\n{3,}/", "\n\n", $text ); // normalise newlines
-		}
-		return $text;
-	}
-
-	public function onHtmlReady( $html ) {
-		if ( $this->plainText ) {
-			$html = preg_replace( '/\s*(<h([1-6])\b)/i',
-				"\n\n" . ApiQueryExtracts::SECTION_MARKER_START . '$2' . ApiQueryExtracts::SECTION_MARKER_END . '$1' ,
-				$html
-			);
-		}
-		return $html;
 	}
 }

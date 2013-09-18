@@ -1,17 +1,13 @@
 <?php
 
-class SpecialMobileOptions extends UnlistedSpecialPage {
+class SpecialMobileOptions extends MobileSpecialPage {
 	/**
 	 * @var Title
 	 */
 	private $returnToTitle;
 	private $subpage;
 	private $options = array(
-		'BetaOptIn' => array( 'get' => 'betaOptInGet', 'post' => 'betaOptInPost' ),
-		'BetaOptOut' => array( 'get' => 'betaOptOutGet', 'post' => 'betaOptOutPost' ),
 		'Language' => array( 'get' => 'chooseLanguage' ),
-		'EnableImages' => array( 'get' => 'enableImages' ),
-		'DisableImages' => array( 'get' => 'disableImages' )
 	);
 
 	public function __construct() {
@@ -20,7 +16,6 @@ class SpecialMobileOptions extends UnlistedSpecialPage {
 
 	public function execute( $par = '' ) {
 		$context = MobileContext::singleton();
-		$out = $this->getOutput();
 
 		$this->returnToTitle = Title::newFromText( $this->getRequest()->getText( 'returnto' ) );
 		if ( !$this->returnToTitle ) {
@@ -30,27 +25,23 @@ class SpecialMobileOptions extends UnlistedSpecialPage {
 		$this->setHeaders();
 		$context->setForceMobileView( true );
 		$context->setContentTransformations( false );
-		if( $par == '' ) {
+		if ( isset( $this->options[$par] ) ) {
+			$this->subpage = $par;
+			$option = $this->options[$par];
+
+			if ( $this->getRequest()->wasPosted() && isset( $option['post'] ) ) {
+				$func = $option['post'];
+			} else {
+				$func = $option['get'];
+			}
+			$this->$func();
+		} else {
 			if ( $this->getRequest()->wasPosted() ) {
 				$this->submitSettingsForm();
 			} else {
 				$this->getSettingsForm();
 			}
-			return;
-		} elseif ( !isset( $this->options[$par] ) ) {
-			$out->showErrorPage( 'error', 'mobile-frontend-unknown-option', array( $par ) );
-			return;
 		}
-
-		$this->subpage = $par;
-		$option = $this->options[$par];
-
-		if ( $this->getRequest()->wasPosted() && isset( $option['post'] ) ) {
-			$func = $option['post'];
-		} else {
-			$func = $option['get'];
-		}
-		$this->$func();
 	}
 
 	private function getSettingsForm() {
@@ -66,8 +57,11 @@ class SpecialMobileOptions extends UnlistedSpecialPage {
 			);
 		}
 
+		$betaEnabled = $context->isBetaGroupMember();
+		$alphaEnabled = $context->isAlphaGroupMember();
+
 		$imagesChecked = $context->imagesDisabled() ? '' : 'checked'; // images are off when disabled
-		$imagesBeta = $context->isBetaGroupMember() ? 'checked' : '';
+		$imagesBeta = $betaEnabled ? 'checked' : '';
 		$disableMsg = $this->msg( 'mobile-frontend-images-status' )->parse();
 		$betaEnableMsg = $this->msg( 'mobile-frontend-settings-beta' )->parse();
 		$betaDescriptionMsg = $this->msg( 'mobile-frontend-opt-in-explain' )->parse();
@@ -77,11 +71,48 @@ class SpecialMobileOptions extends UnlistedSpecialPage {
 			$this->msg( 'mobile-frontend-off' )->escaped() .'</span>';
 		$action = $this->getTitle()->getLocalURL();
 		$html = Html::openElement( 'form',
-			array( 'class' => 'mw-mf-settings', 'method' => 'POST', 'action' => $action )
+			array( 'class' => 'mw-mf-settings content', 'method' => 'POST', 'action' => $action )
 		);
 		$aboutMessage = $this->msg( 'mobile-frontend-settings-description' )->parse();
 		$token = Html::hidden( 'token', $context->getMobileToken() );
 		$returnto = Html::hidden( 'returnto', $this->returnToTitle->getFullText() );
+
+		$alphaEnableMsg = wfMessage( 'mobile-frontend-settings-alpha' )->parse();
+		$alphaChecked = $alphaEnabled ? 'checked' : '';
+		$alphaDescriptionMsg = wfMessage( 'mobile-frontend-settings-alpha-description' )->text();
+
+		$betaSetting = <<<HTML
+		<li>
+			{$betaEnableMsg}
+			<div class="mw-mf-checkbox-css3">
+				<input type="checkbox" name="enableBeta"
+				{$imagesBeta}>{$onoff}
+			</div>
+		</li>
+		<li class="mw-mf-settings-description">
+				{$betaDescriptionMsg}
+		</li>
+HTML;
+		$alphaSetting = '';
+		if ( $betaEnabled ) {
+
+			if ( $alphaEnabled ) {
+				$betaSetting = '<input type="hidden" name="enableBeta" value="checked">';
+			}
+
+			$alphaSetting .= <<<HTML
+			<li>
+				{$alphaEnableMsg}
+				<div class="mw-mf-checkbox-css3">
+					<input type="checkbox" name="enableAlpha"
+					{$alphaChecked}>{$onoff}
+				</div>
+			</li>
+			<li class="mw-mf-settings-description">
+					{$alphaDescriptionMsg}
+			</li>
+HTML;
+		}
 
 		$html .= <<<HTML
 	<p>
@@ -95,16 +126,8 @@ class SpecialMobileOptions extends UnlistedSpecialPage {
 				{$imagesChecked}>{$onoff}
 			</span>
 		</li>
-		<li>
-			{$betaEnableMsg}
-			<div class="mw-mf-checkbox-css3">
-				<input type="checkbox" name="enableBeta"
-				{$imagesBeta}>{$onoff}
-			</div>
-		</li>
-		<li class="mw-mf-settings-description">
-				{$betaDescriptionMsg}
-		</li>
+		{$betaSetting}
+		{$alphaSetting}
 		<li>
 			<input type="submit" id="mw-mf-settings-save" value="{$saveSettings}">
 		</li>
@@ -171,11 +194,16 @@ HTML;
 			wfDebug( __METHOD__ . "(): token mismatch\n" );
 			//return; // Display something here?
 		}
-		$inBeta = $request->getBool( 'enableBeta' );
+		if ( $request->getBool( 'enableAlpha' ) ) {
+			$group = 'alpha';
+		} elseif ( $request->getBool( 'enableBeta' ) ) {
+			$group = 'beta';
+		} else {
+			$group = '';
+		}
+		$context->setMobileMode( $group );
 		$imagesDisabled = !$request->getBool( 'enableImages' );
 		$context->setDisableImagesCookie( $imagesDisabled );
-		$context->setOptInOutCookie( $inBeta ? '1' : '' );
-		$context->setBetaGroupMember( $inBeta );
 
 		$returnToTitle = Title::newFromText( $request->getText( 'returnto' ) );
 		if ( $returnToTitle ) {
@@ -197,97 +225,5 @@ HTML;
 		} else {
 			return $t->getLocalURL( $params );
 		}
-	}
-
-	private function showEnquiryForm( $headingMsg, $textMsg, $yesButtonMsg, $noButtonMsg ) {
-		$out = $this->getOutput();
-		$out->setPageTitle( $this->msg( $headingMsg ) );
-
-		$out->addHTML( '
-			<p>' . $this->msg( $textMsg )->parse() . '</p>
-			<div id="disableButtons">'
-				. Html::openElement( 'form',
-					array(
-							'method' => 'POST',
-							'action' => $this->getTitle( $this->subpage )->getLocalURL(),
-						)
-					)
-				. Html::element( 'input',
-					array(
-						'name' => 'returnto',
-						'type' => 'hidden',
-						'value' => $this->returnToTitle->getFullText(),
-					)
-				)
-				. Html::element( 'button',
-					array(
-							'id' => 'disableButton',
-							'type' => 'submit',
-						),
-					$this->msg( $yesButtonMsg )->text()
-					)
-				. Html::closeElement( 'form' )
-				. Html::openElement( 'form',
-					array(
-							'method' => 'GET',
-							'action' => $this->returnToTitle->getLocalURL(),
-						)
-					)
-				. Html::element( 'button',
-					array(
-							'id' => 'backButton',
-							'type' => 'submit',
-						),
-					$this->msg( $noButtonMsg )->text()
-					)
-				. Html::closeElement( 'form' )
-			. '</div>'
-		);
-	}
-
-	private function doReturnTo() {
-		$params = array();
-		$params['t'] = md5( time() ); // this is a hack to get around the 304 response and local browser cache
-		$this->getOutput()->sendCacheControl(); // cache should already be private
-		$this->getRequest()->response()->header( 'Location: '
-			. MobileContext::singleton()->getMobileUrl( wfExpandUrl( $this->returnToTitle->getFullURL( $params ) ) ) );
-		exit;
-	}
-
-	private function betaOptInGet() {
-		$this->showEnquiryForm(
-			'mobile-frontend-opt-in-message',
-			'mobile-frontend-opt-in-explain',
-			'mobile-frontend-opt-in-yes-button',
-			'mobile-frontend-opt-in-no-button'
-		);
-	}
-
-	private function betaOptInPost() {
-		MobileContext::singleton()->setOptInOutCookie( true );
-		$this->doReturnTo();
-	}
-
-	private function betaOptOutGet() {
-		$this->showEnquiryForm(
-			'mobile-frontend-opt-out-message',
-			'mobile-frontend-opt-out-explain',
-			'mobile-frontend-opt-out-yes-button',
-			'mobile-frontend-opt-out-no-button'
-		);
-	}
-
-	private function betaOptOutPost() {
-		MobileContext::singleton()->setOptInOutCookie( false );
-		$this->doReturnTo();
-	}
-
-	private function enableImages( $enable = true ) {
-		MobileContext::singleton()->setDisableImagesCookie( !$enable );
-		$this->doReturnTo();
-	}
-
-	private function disableImages() {
-		$this->enableImages( false );
 	}
 }

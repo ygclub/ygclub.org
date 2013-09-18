@@ -70,9 +70,10 @@ function aidencode($aid) {
 
 function clearcookies() {
 	global $discuz_uid, $discuz_user, $discuz_pw, $discuz_secques, $adminid, $credits;
-	foreach(array('sid', 'auth', 'visitedfid', 'onlinedetail', 'loginuser', 'activationauth', 'indextype') as $k) {
+	foreach(array('duoshuo_token', 'sid', 'auth', 'visitedfid', 'onlinedetail', 'loginuser', 'activationauth', 'indextype') as $k) {
 		dsetcookie($k);
 	}
+	setcookie('duoshuo_token','',time()-3600,'/wiki'); 
 	$discuz_uid = $adminid = $credits = 0;
 	$discuz_user = $discuz_pw = $discuz_secques = '';
 }

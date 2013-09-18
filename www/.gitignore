@@ -5,15 +5,18 @@ bbs/forumdata/*.lock
 bbs/forumdata/threadcaches/*
 bbs/uc_client/data/cache/*
 uc/data/config.inc.php
-wiki/api/ucconfig.inc.php
-wiki/config.php
-wiki/plugins/ucenter/ucconfig.inc.php
+hdwiki/api/ucconfig.inc.php
+hdwiki/config.php
+hdwiki/plugins/ucenter/ucconfig.inc.php
 wp/wp-config.php
-mediawiki/LocalSettings.php
-mediawiki/extensions/Auth_UC/Auth_UCenter.php
-mediawiki/extensions/Auth_UC/config.inc.php
-mediawiki/images/*
-mediawiki/extensions/DataValues
+wiki/LocalSettings.php
+wiki/extensions/Auth_UC/Auth_UCenter.php
+wiki/extensions/Auth_UC/config.inc.php
+wiki/api/ucconfig.inc.php
+wiki/images/*
+wiki/extensions/DataValues
+wiki/baidu.xml
+
 
 phpmyadmin
 pma
@@ -23,10 +26,21 @@ pm/module/ucenter/config.php
 pm/config/*
 pm/module/mail/ext/config/*
 pm/www/data/upload/*
+w
+ctrip
+hdwiki/data
+hdwiki/uploads
+media
+sky
+uc/data/install.lock
 
 *~
 *.swp
+.*.swp
 *.bak
+*.kate-swp
+.project
+.settings
 
 # Compiled source #
 ###################
@@ -70,6 +84,7 @@ Thumbs.db
 
 ## Xbbs ###
 .idea
+
 #*.doc
 xbbs/config/config_global.php
 xbbs/config/config_ucenter.php

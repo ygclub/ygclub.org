@@ -2,6 +2,7 @@
 
 /**
  * Extends API action=parse with mobile goodies
+ * See https://www.mediawiki.org/wiki/Extension:MobileFrontend#Extended_action.3Dparse
  */
 class ApiParseExtender {
 	/**
@@ -65,29 +66,25 @@ class ApiParseExtender {
 			$data = $module->getResultData();
 			$params = $module->extractRequestParams();
 			if ( isset( $data['parse']['text'] ) && isset( $params['mobileformat'] ) ) {
+				wfProfileIn( __METHOD__ . '-mobiletransform' );
 				$result = $module->getResult();
 				$result->reset();
 
 				$title = Title::newFromText( $data['parse']['title'] );
-				$context = new WmlContext();
-				$context->setCurrentUrl( $title->getCanonicalURL() );
-				$context->setRequestedSegment( isset( $params['section'] )
-					? $params['section'] + 1 // Segment numbers start from 1
-					: 0
-				);
-				$context->setUseFormat( 'wml' ); // Force WML links just in case
-				$context->setOnlyThisSegment( isset( $params['section'] ) );
-				$mf = new MobileFormatter( MobileFormatter::wrapHTML( $data['parse']['text']['*'] ),
-					$title,
-					ExtMobileFrontend::parseContentFormat( $params['mobileformat'] ),
-					$context
-				);
+				$html = MobileFormatter::wrapHTML( $data['parse']['text']['*'] );
+				if ( MobileContext::parseContentFormat( $params['mobileformat'] ) === 'WML' ) {
+					// @todo: make mobileformat accept only HTML on July 25, 2013
+					$module->setWarning( 'mobileformat=wml is not supported anymore' );
+				}
+				$mf = new MobileFormatterHTML( $html, $title );
 				$mf->removeImages( $params['noimages'] );
 				$mf->setIsMainPage( $params['mainpage'] );
+				$mf->enableExpandableSections( !$params['mainpage'] );
 				$mf->filterContent();
 				$data['parse']['text'] = $mf->getText();
 
 				$result->addValue( null, $module->getModuleName(), $data['parse'] );
+				wfProfileOut( __METHOD__ . '-mobiletransform' );
 			}
 			wfProfileOut( __METHOD__ );
 		}

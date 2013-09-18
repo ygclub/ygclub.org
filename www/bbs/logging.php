@@ -16,14 +16,10 @@ require_once DISCUZ_ROOT.'./include/login.func.php';
 require_once DISCUZ_ROOT.'./uc_client/client.php';
 
 
-if($action == 'logout' && !empty($formhash)) {
+if($action == 'logout' ) {
 
 	if($_DCACHE['settings']['frameon'] && $_DCOOKIE['frameon'] == 'yes') {
 		$extrahead .= '<script>if(top != self) {parent.leftmenu.location.reload();}</script>';
-	}
-
-	if($formhash != FORMHASH) {
-		showmessage('logout_succeed', dreferer());
 	}
 
 	$ucsynlogout = $allowsynlogin ? uc_user_synlogout() : '';

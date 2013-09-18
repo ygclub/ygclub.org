@@ -4,9 +4,10 @@ class ApiMobileView extends ApiBase {
 	/**
 	 * Increment this when changing the format of cached data
 	 */
-	const CACHE_VERSION = 3;
+	const CACHE_VERSION = 4;
 
-	private $followRedirects, $noHeadings, $mainPage, $noTransform;
+	private $followRedirects, $noHeadings, $mainPage, $noTransform, $variant, $offset, $maxlen;
+
 	/**
 	 * @var File
 	 */
@@ -28,19 +29,28 @@ class ApiMobileView extends ApiBase {
 
 		$prop = array_flip( $params['prop'] );
 		$sectionProp = array_flip( $params['sectionprop'] );
+		$this->variant = $params['variant'];
 		$this->followRedirects = $params['redirect'] == 'yes';
 		$this->noHeadings = $params['noheadings'];
 		$this->noTransform = $params['notransform'];
+		$this->offset = $params['offset'];
+		$this->maxlen = $params['maxlen'];
+
+		if ( $this->offset === 0 && $this->maxlen === 0 ) {
+			$this->offset = -1; // Disable text splitting
+		} elseif ( $this->maxlen === 0 ) {
+			$this->maxlen = PHP_INT_MAX;
+		}
 
 		$title = Title::newFromText( $params['page'] );
 		if ( !$title ) {
 			$this->dieUsageMsg( array( 'invalidtitle', $params['page'] ) );
 		}
-		if ( $title->getNamespace() == NS_FILE ) {
+		if ( $title->inNamespace( NS_FILE ) ) {
 			$this->file = wfFindFile( $title );
 		}
 		if ( !$title->exists() && !$this->file ) {
-			$this->dieUsageMsg( array( 'missingtitle', $params['page'] ) );
+			$this->dieUsageMsg( array( 'notanarticle', $params['page'] ) );
 		}
 		$this->mainPage = $title->isMainPage();
 		if ( $this->mainPage && $this->noHeadings ) {
@@ -49,10 +59,15 @@ class ApiMobileView extends ApiBase {
 		}
 		if ( isset( $prop['normalizedtitle'] ) && $title->getPrefixedText() != $params['page'] ) {
 			$this->getResult()->addValue( null, $this->getModuleName(),
-				array( 'normalizedtitle' => $title->getPrefixedText() )
+				array( 'normalizedtitle' => $title->getPageLanguage()->convert( $title->getPrefixedText() ) )
 			);
 		}
 		$data = $this->getData( $title, $params['noimages'] );
+		if ( isset( $prop['lastmodified'] ) ) {
+			$this->getResult()->addValue( null, $this->getModuleName(),
+				array( 'lastmodified' => $data['lastmodified'] )
+			);
+		}
 		$result = array();
 		$missingSections = array();
 		$requestedSections = isset( $params['sections'] )
@@ -72,7 +87,7 @@ class ApiMobileView extends ApiBase {
 				}
 				$section['id'] = $i;
 				if ( isset( $prop['text'] ) && isset( $requestedSections[$i] ) && isset( $data['text'][$i] ) ) {
-					$section[$textElement] = $this->prepareSection( $data['text'][$i] );
+					$section[$textElement] = $this->stringSplitter( $this->prepareSection( $data['text'][$i] ) );
 					unset( $requestedSections[$i] );
 				}
 				if ( isset( $data['refsections'][$i] ) ) {
@@ -85,7 +100,7 @@ class ApiMobileView extends ApiBase {
 			foreach ( array_keys( $requestedSections ) as $index ) {
 				$section = array( 'id' => $index );
 				if ( isset( $data['text'][$index] ) ) {
-					$section[$textElement] = $data['text'][$index];
+					$section[$textElement] = $this->stringSplitter( $data['text'][$index] );
 				} else {
 					$missingSections[] = $index;
 				}
@@ -95,9 +110,40 @@ class ApiMobileView extends ApiBase {
 		if ( count( $missingSections ) && isset( $prop['text'] ) ) {
 			$this->setWarning( 'Section(s) ' . implode( ', ', $missingSections ) . ' not found' );
 		}
+		if ( $this->maxlen < 0 ) {
+			// There is more data available
+			$this->getResult()->addValue( null, $this->getModuleName(),
+				array( 'continue-offset' => $params['offset'] + $params['maxlen'] )
+			);
+		}
 		$this->getResult()->setIndexedTagName( $result, 'section' );
 		$this->getResult()->addValue( null, $this->getModuleName(), array( 'sections' => $result ) );
+
 		wfProfileOut( __METHOD__ );
+	}
+
+	private function stringSplitter( $text ) {
+		if ( $this->offset < 0  ) {
+			return $text; // NOOP - string splitting mode is off
+		} elseif ( $this->maxlen < 0 ) {
+			return ''; // Limit exceeded
+		}
+		$textLen = mb_strlen( $text );
+		$start = $this->offset;
+		$len = $textLen - $start;
+		if ( $len > 0 ) {
+			// At least part of the $text should be included
+			if ( $len > $this->maxlen ) {
+				$len = $this->maxlen;
+				$this->maxlen = -1;
+			} else {
+				$this->maxlen -= $len;
+			}
+			$this->offset = 0;
+			return mb_substr( $text, $start, $len );
+		}
+		$this->offset -= $textLen;
+		return '';
 	}
 
 	private function prepareSection( $html ) {
@@ -120,7 +166,7 @@ class ApiMobileView extends ApiBase {
 	}
 
 	private function getData( Title $title, $noImages ) {
-		global $wgMemc, $wgUseTidy;
+		global $wgMemc, $wgUseTidy, $wgMFMinCachedPageSize;
 
 		wfProfileIn( __METHOD__ );
 		$wp = WikiPage::factory( $title );
@@ -136,7 +182,8 @@ class ApiMobileView extends ApiBase {
 		}
 		$latest = $wp->getLatest();
 		if ( $this->file ) {
-			$key = wfMemcKey( 'mf', 'mobileview', self::CACHE_VERSION, $noImages, $latest, $this->noTransform, $this->file->getSha1() );
+			$key = wfMemcKey( 'mf', 'mobileview', self::CACHE_VERSION, $noImages,
+				$latest, $this->noTransform, $this->file->getSha1(), $this->variant );
 			$cacheExpiry = 3600;
 		} else {
 			$parserOptions = $wp->makeParserOptions( $this );
@@ -151,25 +198,24 @@ class ApiMobileView extends ApiBase {
 		if ( $this->file ) {
 			$html = $this->getFilePage( $title );
 		} else {
+			wfProfileIn( __METHOD__ . '-parserOutput' );
 			$parserOutput = $wp->getParserOutput( $parserOptions );
 			if ( !$parserOutput ) {
 				throw new MWException( __METHOD__ . ": PoolCounter didn't return parser output" );
 			}
 			$html = $parserOutput->getText();
 			$cacheExpiry = $parserOutput->getCacheExpiry();
+			wfProfileOut( __METHOD__ . '-parserOutput' );
 		}
 
 		wfProfileIn( __METHOD__ . '-MobileFormatter' );
-		$mf = new MobileFormatter( MobileFormatter::wrapHTML( $html ),
-			$title,
-			'HTML'
-		);
-		$mf->removeImages( $noImages );
 		if ( !$this->noTransform ) {
+			$mf = new MobileFormatterHTML( MobileFormatter::wrapHTML( $html ), $title );
+			$mf->removeImages( $noImages );
 			$mf->filterContent();
 			$mf->setIsMainPage( $this->mainPage );
+			$html = $mf->getText();
 		}
-		$html = $mf->getText();
 		wfProfileOut( __METHOD__ . '-MobileFormatter' );
 
 		if ( $this->mainPage || $this->file ) {
@@ -177,11 +223,15 @@ class ApiMobileView extends ApiBase {
 				'sections' => array(),
 				'text' => array( $html ),
 				'refsections' => array(),
+				'lastmodified' => $wp->getTimestamp(),
 			);
 		} else {
 			wfProfileIn( __METHOD__ . '-sections' );
 			$data = array();
 			$data['sections'] = $parserOutput->getSections();
+			for ( $i = 0; $i < count( $data['sections'] ); $i++ ) {
+				$data['sections'][$i]['line'] = $title->getPageLanguage()->convert( $data['sections'][$i]['line'] );
+			}
 			$chunks = preg_split( '/<h(?=[1-6]\b)/i', $html );
 			if ( count( $chunks ) != count( $data['sections'] ) + 1 ) {
 				wfDebug( __METHOD__ . "(): mismatching number of sections from parser and split. oldid=$latest\n" );
@@ -203,21 +253,28 @@ class ApiMobileView extends ApiBase {
 				}
 				$data['text'][] = $chunk;
 			}
+			$data['lastmodified'] = $wp->getTimestamp();
 			wfProfileOut( __METHOD__ . '-sections' );
 		}
-		// store for the same time as original parser output
-		$wgMemc->set( $key, $data, $cacheExpiry );
+		// Don't store small pages to decrease cache size requirements
+		if ( strlen( $html ) >= $wgMFMinCachedPageSize ) {
+			// store for the same time as original parser output
+			$wgMemc->set( $key, $data, $cacheExpiry );
+		}
 		wfProfileOut( __METHOD__ );
 		return $data;
 	}
 
 	private function getFilePage( Title $title ) {
 		//HACK: HACK: HACK:
+		wfProfileIn( __METHOD__ );
 		$page = new ImagePage( $title );
 		$page->setContext( $this->getContext() );
 		$page->view();
 		global $wgOut;
-		return $wgOut->getHTML();
+		$html = $wgOut->getHTML();
+		wfProfileOut( __METHOD__ );
+		return $html;
 	}
 
 	public function getAllowedParams() {
@@ -237,6 +294,7 @@ class ApiMobileView extends ApiBase {
 					'text',
 					'sections',
 					'normalizedtitle',
+					'lastmodified',
 				)
 			),
 			'sectionprop' => array(
@@ -252,9 +310,23 @@ class ApiMobileView extends ApiBase {
 				ApiBase::PARAM_ISMULTI => true,
 				ApiBase::PARAM_DFLT => 'toclevel|line',
 			),
+			'variant' => array(
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_DFLT => false,
+			),
 			'noimages' => false,
 			'noheadings' => false,
 			'notransform' => false,
+			'offset' => array(
+				ApiBase::PARAM_TYPE => 'integer',
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_DFLT => 0,
+			),
+			'maxlen' => array(
+				ApiBase::PARAM_TYPE => 'integer',
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_DFLT => 0,
+			),
 		);
 	}
 
@@ -269,25 +341,20 @@ class ApiMobileView extends ApiBase {
 				' text            - HTML of selected section(s)',
 				' sections        - information about all sections on page',
 				' normalizedtitle - normalized page title',
+				' lastmodified    - MW timestamp for when the page was last modified, e.g. "20130730174438"',
 			),
 			'sectionprop' => 'What information about sections to get',
+			'variant' => "Convert content into this language variant",
 			'noimages' => 'Return HTML without images',
 			'noheadings' => "Don't include headings in output",
 			'notransform' => "Don't transform HTML into mobile-specific version",
+			'offset' => 'Pretend all text result is one string, and return the substring starting at this point',
+			'maxlen' => 'Pretend all text result is one string, and limit result to this length',
 		);
 	}
 
 	public function getDescription() {
 		return 'Returns data needed for mobile views';
-	}
-
-	public function getPossibleErrors() {
-		return array_merge( parent::getPossibleErrors(),
-			array(
-				array( 'missingtitle' ),
-				array( 'invalidtitle' ),
-			)
-		);
 	}
 
 	public function getExamples() {

@@ -643,11 +643,11 @@ class SkinTemplate extends Skin {
 				'href' => $href,
 				'active' => $active
 			);
-			#$personal_urls['logout'] = array(
-			#	'text' => $this->msg( 'userlogout' )->text(),
-			#	'href' => '/bbs/logging.php?action=logout',
-			#	'active' => false
-			#);
+			$personal_urls['logout'] = array(
+				'text' => $this->msg( 'userlogout' )->text(),
+				'href' => '/bbs/logging.php?action=logout',
+				'active' => false
+			);
 		} else {
 			$useCombinedLoginLink = $this->useCombinedLoginLink();
 			$loginlink = $this->getUser()->isAllowed( 'createaccount' ) && $useCombinedLoginLink

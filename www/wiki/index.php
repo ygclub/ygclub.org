@@ -63,6 +63,11 @@ if ((strstr($url,"doc-")!=false) || (strstr($url,"category-")!=false)) {
   header("Location: ".$url);   
   exit;
 }
+if (strstr($url,"UserLogin")!=false) {
+  header("Location: "."http://www.ygclub.org/bbs/logging.php?action=login");   
+  echo "hello";
+  exit;
+}
 
 
 # Initialise common code.  This gives us access to GlobalFunctions, the

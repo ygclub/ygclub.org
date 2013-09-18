@@ -1,0 +1,66 @@
+/* the following definitions exist to deal with certain inline styles
+present in wikitext.
+This file should not need to exist
+IMPORTANT: do not use selectors containing attribute notation e.g. [style] [colspan]
+	as they are known to damage the ios app
+*/
+table {
+  border-spacing: 0 !important;
+  float: none !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+table.geography td {
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.thumb .thumbinner {
+  margin: 5px auto;
+  max-width: 100%;
+}
+img.tex,
+.image img,
+.thumb img {
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+}
+.thumb .thumbcaption {
+  width: 100%;
+  margin: 5px 10px 0;
+  text-align: center;
+  width: auto !important;
+}
+/* bug 20030 */
+.thumb .noresize {
+  width: 100%;
+  overflow-x: auto;
+}
+.thumb .noresize img {
+  max-width: none !important;
+}
+.thumb .thumbinner > div {
+  float: none !important;
+  width: auto !important;
+  clear: both !important;
+}
+/* Galleries */
+/* See https://www.mediawiki.org/wiki/Help:Images#Rendering_a_gallery_of_images */
+ul.gallery {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+ul.gallery li.gallerybox {
+  width: auto !important;
+}
+ul.gallery li.gallerybox > div {
+  width: auto !important;
+}
+ul.gallery li.gallerybox > div > div.thumb {
+  width: auto !important;
+}
+.editsection,
+.mw-editsection {
+  display: none;
+}

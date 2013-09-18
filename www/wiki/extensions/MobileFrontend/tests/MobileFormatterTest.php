@@ -10,7 +10,7 @@ class MobileFormatterTest extends MediaWikiTestCase {
 	public function testHtmlTransform( $input, $expected, $callback = false ) {
 		$t = Title::newFromText( 'Mobile' );
 		$input = str_replace( "\r", '', $input ); // "yay" to Windows!
-		$mf = new MobileFormatter( MobileFormatter::wrapHTML( $input ), $t, 'HTML' );
+		$mf = new MobileFormatterHTML( MobileFormatter::wrapHTML( $input ), $t );
 		if ( $callback ) {
 			$callback( $mf );
 		}
@@ -25,14 +25,9 @@ class MobileFormatterTest extends MediaWikiTestCase {
 		};
 		$longLine = "\n" . str_repeat( 'A', 5000 );
 		$summarySection = '<div id="content_0" class="content_block openSection"></div>';
-		$anchor = '<a id="anchor_1" href="#section_1" class="section_anchors back_to_top">&#8593;Jump back a section</a>';
+		$anchor = '<a id="anchor_1" href="#section_1" class="section_anchors">&#8593;Jump back a section</a>';
 
 		return array(
-			// down with infoboxes
-			array(
-				'<div class="infobox">Insanity!</div>',
-				'',
-			),
 			// remove magnifying glass
 			array(
 				'<div class="thumb tright"><div class="thumbinner" style="width:222px;"><a href="/wiki/File:Foo.jpg" class="image">

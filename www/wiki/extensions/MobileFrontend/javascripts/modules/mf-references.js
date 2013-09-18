@@ -1,88 +1,39 @@
-/*global document, window, mw, jQuery, navigator */
-/*jslint sloppy: true, white:true, maxerr: 50, indent: 4, plusplus: true*/
 ( function( M, $ ) {
-var references = ( function() {
-		var inBeta = M.setting( 'beta' ),
-			popup = M.navigation.popup;
+	var Drawer = M.require( 'Drawer' ), ReferencesDrawer, drawer;
 
-		function collect() {
-			var references = {};
-			$( 'ol.references li' ).each( function() {
-				references[ $( this ).attr( 'id' ) ] = {
-					html: $( this ).html()
-				};
-			} );
-			return references;
-		}
+	ReferencesDrawer = Drawer.extend( {
+		className: 'drawer position-fixed text references',
+		template: M.template.get( 'ReferencesDrawer' )
+	} );
 
-		/*
-		init
-			options:
-				onClickReference: <function>
-					Define a handler that is run upon clicking a reference
-		*/
-		function setupReferences( container, options ) {
-			var lastLink, data, html, href, references = collect();
-			container = container || $( '#content' )[ 0 ];
-			function cancelBubble( ev ) {
-				ev.stopPropagation();
-			}
+	function getReference( id ) {
+		// escape dots in id so that jQuery doesn't treat them as CSS classes
+		id = id.replace( /\./g, '\\.' );
+		return $( 'ol.references li' + id ).html();
+	}
 
-			function close() {
-				lastLink = null;
-				popup.close();
-			}
-			$( '.mw-cite-backlink a' ).click( close );
+	function showReference( ev ) {
+		drawer.render( {
+			title: $( this ).text(),
+			text: getReference( $( this ).attr( 'href' ) )
+		} );
+		// use setTimeout so that browser calculates dimensions before show()
+		setTimeout( $.proxy( drawer, 'show' ), 0 );
+		ev.preventDefault();
+	}
 
-			function clickReference( ev ) {
-				var $popup;
+	function setup( $container ) {
+		$container = $container || $( '#content' );
+		$container.find( 'sup a' ).off( 'click' ).on( 'click', showReference );
+		$container.find( '.mw-cite-backlink a' ).off( 'click' );
+	}
 
-				href = $( this ).attr( 'href' );
-				data = href && href.charAt( 0 ) === '#' ?
-					references[ href.substr( 1, href.length ) ] : null;
+	$( function() {
+		drawer = new ReferencesDrawer();
+		setup();
+	} );
+	M.on( 'section-rendered references-loaded', setup );
 
-				if ( !popup.isVisible() || lastLink !== href ) {
-					lastLink = href;
-					if ( data ) {
-						html = '<h3>' + $( this ).text() + '</h3>' + data.html;
-					} else {
-						html = $( '<a />' ).text( $(this).text() ).
-							attr( 'href', href ).appendTo( '<div />' ).parent().html();
-					}
-					$popup = popup.show( html );
-					$popup.find( 'div sup a' ).click( clickReference );
-				} else {
-					close();
-				}
-				if ( options && options.onClickReference ) {
-					options.onClickReference( ev );
-				}
-				ev.preventDefault();
-				cancelBubble( ev );
-			}
-			$( 'sup a', container ).unbind( 'click' ).
-				click( clickReference ).each( function() {
-					this.ontouchstart = cancelBubble;
-				} );
-		}
-
-		function init() {
-			if ( inBeta ) {
-				$( window ).on( 'mw-mf-page-loaded', function() {
-					setupReferences( $( '#content' )[ 0 ] );
-				} ).on( 'mw-mf-section-rendered', function( ev, container ) {
-					setupReferences( container );
-				} );
-			} else {
-				setupReferences.apply( this, arguments );
-			}
-		}
-		return {
-			init: init,
-			setupReferences: setupReferences
-		};
-	}() );
-
-	M.registerModule( 'references', references );
+	M.define( 'references', { setup: setup } );
 
 }( mw.mobileFrontend, jQuery ) );

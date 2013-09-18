@@ -4,6 +4,8 @@
  * @group MobileFrontend
  */
 class MobileContextTest extends MediaWikiTestCase {
+	private $savedGlobals;
+
 	/**
 	* PHP 5.3.2 introduces the ReflectionMethod::setAccessible() method to allow the invocation of
 	* protected and private methods directly through the Reflection API
@@ -20,12 +22,14 @@ class MobileContextTest extends MediaWikiTestCase {
 
 	protected function setUp() {
 		parent::setUp();
+		$this->savedGlobals = $GLOBALS;
 		$context = new DerivativeContext( RequestContext::getMain() );
 		$context->setRequest( new FauxRequest() );
 		MobileContext::singleton()->setContext( $context );
 	}
 
 	protected function tearDown() {
+		$GLOBALS = $this->savedGlobals;
 		MobileContext::setInstance( null ); //refresh it
 		parent::tearDown();
 	}
@@ -39,6 +43,7 @@ class MobileContextTest extends MediaWikiTestCase {
 
 	public function testGetMobileUrl() {
 		global $wgMobileUrlTemplate;
+
 		$wgMobileUrlTemplate = "%h0.m.%h1.%h2";
 		$this->assertEquals( 'http://en.m.wikipedia.org/wiki/Article', MobileContext::singleton()->getMobileUrl( 'http://en.wikipedia.org/wiki/Article' ) );
 		$this->assertEquals( '//en.m.wikipedia.org/wiki/Article', MobileContext::singleton()->getMobileUrl( '//en.wikipedia.org/wiki/Article' ) );
@@ -46,19 +51,39 @@ class MobileContextTest extends MediaWikiTestCase {
 
 	public function testParseMobileUrlTemplate() {
 		global $wgMobileUrlTemplate;
+
 		$wgMobileUrlTemplate = "%h0.m.%h1.%h2/path/morepath";
 		$this->assertEquals( '%h0.m.%h1.%h2', MobileContext::singleton()->parseMobileUrlTemplate( 'host' ) );
 		$this->assertEquals( '/path/morepath', MobileContext::singleton()->parseMobileUrlTemplate( 'path' ) );
 		$this->assertEquals( array( 'host' => '%h0.m.%h1.%h2', 'path' => '/path/morepath' ), MobileContext::singleton()->parseMobileUrlTemplate() );
 	}
 
-	public function testUpdateMobileUrlHost() {
+	/**
+	 * @dataProvider updateMobileUrlHostProvider
+	 */
+	public function testUpdateMobileUrlHost( $url, $expected, $urlTemplate ) {
 		global $wgMobileUrlTemplate;
+
 		$updateMobileUrlHost = self::getMethod( "updateMobileUrlHost" );
-		$wgMobileUrlTemplate = "%h0.m.%h1.%h2";
-		$parsedUrl = wfParseUrl( "http://en.wikipedia.org/wiki/Gustavus_Airport" );
+		$wgMobileUrlTemplate = $urlTemplate;
+		$parsedUrl = wfParseUrl( $url );
 		$updateMobileUrlHost->invokeArgs( MobileContext::singleton(), array( &$parsedUrl ) );
-		$this->assertEquals( "http://en.m.wikipedia.org/wiki/Gustavus_Airport", wfAssembleUrl( $parsedUrl ) );
+		$this->assertEquals( $expected, wfAssembleUrl( $parsedUrl ) );
+	}
+
+	public function updateMobileUrlHostProvider() {
+		return array(
+			array(
+				'http://en.wikipedia.org/wiki/Gustavus_Airport',
+				'http://en.m.wikipedia.org/wiki/Gustavus_Airport',
+				'%h0.m.%h1.%h2',
+			),
+			array(
+				'https://wikimediafoundation.org/wiki/FAQ',
+				'https://m.wikimediafoundation.org/wiki/FAQ',
+				'm.%h0.%h1',
+			),
+		);
 	}
 
 	/**
@@ -74,32 +99,51 @@ class MobileContextTest extends MediaWikiTestCase {
 
 	public function updateDesktopUrlQueryProvider() {
 		return array(
-			array( 'http://en.m.wikipedia.org/wiki/Gustavus_Airport?useformat=mobile&mobileaction=toggle_desktop_view', 'http://en.m.wikipedia.org/wiki/Gustavus_Airport?mobileaction=toggle_desktop_view' ),
+			array(
+				'http://en.m.wikipedia.org/wiki/Gustavus_Airport?useformat=mobile&mobileaction=toggle_desktop_view',
+				'http://en.m.wikipedia.org/wiki/Gustavus_Airport?mobileaction=toggle_desktop_view'
+			),
 		);
 	}
 
 	/**
 	 * @dataProvider updateDesktopUrlHostProvider
 	 */
-	public function testUpdateDesktopUrlHost( $mobile, $desktop ) {
-		$this->markTestSkipped('PHP parse_url() does not play nice with Unicode in URL');
-		global $wgMobileUrlTemplate;
+	public function testUpdateDesktopUrlHost( $mobile, $desktop, $server ) {
+		global $wgServer;
+
 		$updateMobileUrlHost = self::getMethod( "updateDesktopUrlHost" );
-		$wgMobileUrlTemplate = "%h0.m.%h1.%h2";
+		$wgServer = $server;
 		$parsedUrl = wfParseUrl( $mobile );
-		$updateMobileUrlHost->invokeArgs( MobileContext::singleton(), array( &$parsedUrl ) );
+		$updateMobileUrlHost->invokeArgs(
+			MobileContext::singleton(),
+			array( &$parsedUrl ) );
 		$this->assertEquals( $desktop, wfAssembleUrl( $parsedUrl ) );
 	}
 
 	public function updateDesktopUrlHostProvider() {
 		return array(
-			array( 'http://en.m.wikipedia.org/wiki/Gustavus_Airport', 'http://en.wikipedia.org/wiki/Gustavus_Airport' ),
-			array( 'http://bm.m.wikipedia.org/wiki/Nyɛ_fɔlɔ', 'http://bm.wikipedia.org/wiki/Nyɛ_fɔlɔ' ),
+			array(
+				'http://bm.m.wikipedia.org/wiki/' . urlencode( 'Nyɛ_fɔlɔ' ),
+				'http://bm.wikipedia.org/wiki/' . urlencode( 'Nyɛ_fɔlɔ' ),
+				'//bm.wikipedia.org',
+			),
+			array(
+				'http://en.m.wikipedia.org/wiki/Gustavus_Airport',
+				'http://en.wikipedia.org/wiki/Gustavus_Airport',
+				'//en.wikipedia.org',
+			),
+			array(
+				'https://m.wikimediafoundation.org/wiki/FAQ',
+				'https://wikimediafoundation.org/wiki/FAQ',
+				'//wikimediafoundation.org',
+			),
 		);
 	}
 
 	public function testUpdateMobileUrlPath() {
 		global $wgMobileUrlTemplate, $wgScriptPath;
+
 		$wgScriptPath = '/wiki';
 		$updateMobileUrlHost = self::getMethod( "updateMobileUrlPath" );
 		$wgMobileUrlTemplate = "/mobile/%p";
@@ -143,26 +187,6 @@ class MobileContextTest extends MediaWikiTestCase {
 	}
 
 	/**
-	 * @dataProvider isMobileDeviceProvider
-	 */
-	public function testIsMobileDevice( $isDevice, $msg, $xDevice = null ) {
-		$testMethod = ( $isDevice ) ? 'assertTrue' : 'assertFalse';
-
-		if ( !is_null( $xDevice ) ) {
-			MobileContext::singleton()->getRequest()->setHeader( 'X-Device', $xDevice );
-		}
-
-		$this->$testMethod( MobileContext::singleton()->isMobileDevice(), $msg );
-	}
-
-	public function isMobileDeviceProvider() {
-		return array(
-			array( false, 'Nothing set' ),
-			array( true, 'HTTP_X_DEVICE = webkit', 'webkit' ),
-		);
-	}
-
-	/**
 	 * @dataProvider isFauxMobileDeviceProvider
 	 */
 	public function testIsFauxMobileDevice( $isFauxDevice, $msg, $useformat = null ) {
@@ -186,7 +210,7 @@ class MobileContextTest extends MediaWikiTestCase {
 	/**
 	 * @dataProvider shouldDisplayMobileViewProvider
 	 */
-	public function testShouldDisplayMobileView( $shouldDisplay, $xDevice = null, $requestVal = array(), $msg = null ) {
+	public function testShouldDisplayMobileView( $shouldDisplay, $xWap = null, $requestVal = array(), $msg = null ) {
 		$testMethod = ( $shouldDisplay ) ? 'assertTrue' : 'assertFalse';
 
 		$request = MobileContext::singleton()->getRequest();
@@ -200,8 +224,8 @@ class MobileContextTest extends MediaWikiTestCase {
 			}
 		}
 
-		if ( !is_null( $xDevice ) ) {
-			MobileContext::singleton()->getRequest()->setHeader( 'X-Device', $xDevice );
+		if ( !is_null( $xWap ) ) {
+			MobileContext::singleton()->getRequest()->setHeader( 'X-WAP', $xWap );
 		}
 
 		$this->$testMethod( MobileContext::singleton()->shouldDisplayMobileView(), $msg );
@@ -210,36 +234,14 @@ class MobileContextTest extends MediaWikiTestCase {
 	public function shouldDisplayMobileViewProvider() {
 		return array(
 			array( false, null, array() ),
-			array( true, 'webkit', array() ),
-			array( false, 'webkit', array( 'action' => 'edit' ) ),
-			array( false, 'webkit', array( 'useformat' => 'desktop' ) ),
+			array( true, 'yes', array() ),
+			array( true, 'no', array() ),
+			array( false, 'yes', array( 'useformat' => 'desktop' ) ),
 			array( true, null, array( 'useformat' => 'mobile-wap' ) ),
-			array( false, null, array( 'useformat' => 'mobile-wap', 'action' => 'edit' ) ),
 			array( false, null, array( 'useformat' => 'mobile-wap', 'action' => 'history' ) ),
 			array( false, null, array( 'useformat' => 'desktop' ) ),
 			array( true, null, array( 'useformat' => 'mobile' ) ),
-			array( false, null, array( 'useformat' => 'mobile', 'action' => 'edit' ) ),
 			array( false, null, array( 'useformat' => 'mobile', 'action' => 'history' ) ),
-		);
-	}
-
-	/**
-	 * @dataProvider getXDeviceProvider
-	 */
-	public function testGetXDevice( $xDevice = null ) {
-		if ( is_null( $xDevice ) ) {
-			MobileContext::singleton()->getRequest()->setHeader( 'X-Device', $xDevice );
-			$assert = $xDevice;
-		} else {
-			$assert = '';
-		}
-		$this->assertEquals( $assert, MobileContext::singleton()->getXDevice() );
-	}
-
-	public function getXDeviceProvider() {
-		return array(
-			array( 'webkit' ),
-			array( null ),
 		);
 	}
 
@@ -307,7 +309,6 @@ class MobileContextTest extends MediaWikiTestCase {
 		global $wgCookieExpiration, $wgMobileFrontendFormatCookieExpiry;
 		$getUseFormatCookieExpiry = self::getMethod( 'getUseFormatCookieExpiry' );
 
-		$origMFCookieExpiry = $wgMobileFrontendFormatCookieExpiry;
 		$startTime = time();
 		$wgMobileFrontendFormatCookieExpiry = 60;
 		$mfCookieExpected = $startTime + 60;
@@ -316,9 +317,6 @@ class MobileContextTest extends MediaWikiTestCase {
 		$wgMobileFrontendFormatCookieExpiry = null;
 		$defaultMWCookieExpected = $startTime + $wgCookieExpiration;
 		$this->assertTrue( $defaultMWCookieExpected == $getUseFormatCookieExpiry->invokeArgs( MobileContext::singleton(), array( $startTime ) ), 'Using default MediaWiki cookie expiry.' );
-
-		// reset global back to original value
-		$wgMobileFrontendFormatCookieExpiry = $origMFCookieExpiry;
 	}
 
 	public function testGetStopMobileRedirectCookieDomain(){
@@ -329,5 +327,136 @@ class MobileContextTest extends MediaWikiTestCase {
 		$this->assertEquals( $context->getStopMobileRedirectCookieDomain(), '.wikipedia.org' );
 		$wgMFStopRedirectCookieHost = 'foo.bar.baz';
 		$this->assertEquals( $context->getStopMobileRedirectCookieDomain(), 'foo.bar.baz' );
+	}
+
+	public function testIsLocalUrl() {
+		global $wgServer;
+		$this->assertTrue( MobileContext::isLocalUrl( $wgServer ) );
+		$this->assertFalse( MobileContext::isLocalUrl( 'http://www.google.com' ) );
+	}
+
+	/**
+	 * @dataProvider addAnalyticsLogItemProvider
+	 */
+	public function testAddAnalyticsLogItem( $key, $val ) {
+		$context = MobileContext::singleton();
+		$context->addAnalyticsLogItem( $key, $val );
+		$logItems = $context->getAnalyticsLogItems();
+		$trimmedKey = trim( $key );
+		$trimmedVal = trim( $val );
+		$this->assertTrue( isset( $logItems[$trimmedKey] ) );
+		$this->assertEquals( $logItems[$trimmedKey], $trimmedVal );
+	}
+
+	public function addAnalyticsLogItemProvider() {
+		return array(
+			array( 'mf-m', 'a' ),
+			array( ' mf-m', 'b ' ),
+		);
+	}
+
+	/**
+	 * @dataProvider getXAnalyticsHeaderProvider
+	 */
+	public function testGetXAnalyticsHeader( $logItems, $expectedHeader ){
+		$context = MobileContext::singleton();
+		foreach( $logItems as $key => $val ) {
+			$context->addAnalyticsLogItem( $key, $val );
+		}
+		$this->assertEquals( $context->getXAnalyticsHeader(), $expectedHeader );
+	}
+
+	public function getXAnalyticsHeaderProvider() {
+		return array(
+			array(
+				array( 'mf-m' => 'a', 'zero' => '502-13' ),
+				'X-Analytics: mf-m=a;zero=502-13',
+			),
+			// check key/val trimming
+			array(
+				array( '  foo' => '  bar  ', 'baz' => ' blat ' ),
+				'X-Analytics: foo=bar;baz=blat'
+			),
+			// check urlencoding key/val pairs
+			array(
+				array( 'foo' => 'bar baz', 'blat' => '$blammo' ),
+				'X-Analytics: foo=bar+baz;blat=%24blammo'
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider addAnalyticsLogItemFromXAnalyticsProvider
+	 */
+	public function testAddAnalyticsLogItemFromXAnalytics( $analyticsItem, $key, $val ){
+			$context = MobileContext::singleton();
+			$context->addAnalyticsLogItemFromXanalytics( $analyticsItem );
+			$logItems = $context->getAnalyticsLogItems();
+			$this->assertTrue( isset( $logItems[$key] ) );
+			$this->assertEquals( $logItems[$key], $val );
+	}
+
+	public function addAnalyticsLogItemFromXAnalyticsProvider() {
+		return array(
+			array( 'mf-m=a', 'mf-m', 'a' ),
+			// check key/val trimming
+			array( ' mf-m=a ', 'mf-m', 'a' ),
+			// check urldecode
+			array( 'foo=bar+%24blat', 'foo', 'bar $blat' ),
+		);
+	}
+
+	/**
+	 * @dataProvider getMobileHostTokenProvider
+	 */
+	public function testGetMobileHostToken( $domainTemplate, $result ) {
+		$context = MobileContext::singleton();
+		$this->assertEquals( $context->getMobileHostToken( $domainTemplate ), $result );
+	}
+
+	public function getMobileHostTokenProvider() {
+		return array(
+			array( '%h1.m.%h2.%h3', 'm.' ),
+			array( '', '' ),
+			array( 'bananas.%h2.%h3', 'bananas.' ),
+		);
+	}
+
+	/**
+	 * @dataProvider optInProvider
+	 */
+	public function testOptIn( array $cookies, $isAlpha, $isBeta ) {
+		$ctx = new RequestContext();
+		$ctx->setRequest( new MFFauxRequest( $cookies ) );
+		MobileContext::setInstance( null );
+		$mobileContext = MobileContext::singleton();
+		$mobileContext->setContext( $ctx );
+		$this->assertEquals( $isAlpha, $mobileContext->isAlphaGroupMember() );
+		$this->assertEquals( $isBeta, $mobileContext->isBetaGroupMember() );
+	}
+
+	public function optInProvider() {
+		return array(
+			array( array(), false, false ),
+			array( array( 'optin' => '1' ), false, true ),
+			array( array( 'optin' => 'beta' ), false, true ),
+			array( array( 'optin' => 'alpha' ), true, true ),
+			array( array( 'optin' => 'foobar' ), false, false ),
+			array( array( 'optin' => '1', 'mf_alpha' => '1' ), true, true ),
+			array( array( 'mf_alpha' => '1' ), true, true ),
+			array( array( 'mf_alpha' => 'foobar' ), false, false ),
+		);
+	}
+}
+
+class MFFauxRequest extends FauxRequest {
+	private $cookies;
+
+	public function __construct( array $cookies ) {
+		$this->cookies = $cookies;
+	}
+
+	public function getCookie( $key, $prefix = null, $default = null ) {
+		return isset( $this->cookies[$key] ) ? $this->cookies[$key] : $default;
 	}
 }

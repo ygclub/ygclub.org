@@ -1,0 +1,29 @@
+@import "../mixins.less";
+
+a.watch-this-article {
+	&.loading {
+		background-image: @ajaxLoadingImage;
+	}
+}
+
+.animations .beta,
+.animations .alpha {
+	.watch-this-article {
+		.transition( transform .5s );
+
+		&.watched {
+			.transform( rotate(72deg) );
+		}
+	}
+}
+
+li a.watch-this-article {
+	right: 8px;
+	top: 0;
+	bottom: 0;
+	height: 100%;
+	width: @searchResultPaddingVertical * 2;
+	background-position: center center;
+	margin: 0;
+}
+

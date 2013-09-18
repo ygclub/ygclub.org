@@ -1,0 +1,86 @@
+# robots.txt file from 18dao wiki project
+# add for www.18dao.cn by jamesqi 2008-9-27
+
+User-agent: *
+Disallow: /User*
+Disallow: /QC*
+Disallow: /Note*
+Disallow: /Task*
+
+Disallow: /skins
+Disallow: /Special:Random
+Disallow: /Special%3ARandom
+Disallow: /Special:Search
+Disallow: /Special%3ASearch
+Disallow: /Special:Recentchangeslinked/
+Disallow: /Special%3ARecentchangeslinked/
+Disallow: /index.php?title=Special:Random
+Disallow: /index.php?title=Special:%3ARandom
+Disallow: /index.php?title=Special:Search
+Disallow: /index.php?title=Special:%3ASearch
+Disallow: /*action*
+Disallow: /*oldid=*
+Disallow: /*diff
+
+Crawl-delay: 5           # set to 5 seconds to wait between successive requests to the same server
+Request-rate: 1/5         # maximum rate is one page every 5 seconds
+
+# Some bots are known to be trouble, particularly those designed to copy
+# entire sites. Please obey robots.txt.
+User-agent: sitecheck.internetseer.com
+Disallow: /
+
+User-agent: Zealbot
+Disallow: /
+
+User-agent: MSIECrawler
+Disallow: /
+
+User-agent: SiteSnagger
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: Fetch
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: TeleportPro
+Disallow: /
+
+User-agent: WebZIP
+Disallow: /
+
+User-agent: linko
+Disallow: /
+
+User-agent: HTTrack
+Disallow: /
+
+User-agent: Microsoft.URL.Control
+Disallow: /
+
+User-agent: Xenu
+Disallow: /
+
+User-agent: larbin
+Disallow: /
+
+User-agent: libwww
+Disallow: /
+
+User-agent: ZyBORG
+Disallow: /
+
+User-agent: Download Ninja
+Disallow: /
+
