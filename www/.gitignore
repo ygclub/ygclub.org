@@ -16,7 +16,7 @@ wiki/api/ucconfig.inc.php
 wiki/images/*
 wiki/extensions/DataValues
 wiki/baidu.xml
-
+wiki/.htaccess
 
 phpmyadmin
 pma
@@ -33,6 +33,9 @@ hdwiki/uploads
 media
 sky
 uc/data/install.lock
+apc.php
+test.php
+piwik
 
 *~
 *.swp
