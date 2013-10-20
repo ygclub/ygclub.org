@@ -1,16 +1,25 @@
 # For ygclub #
 answer/config.php
-bbs/config.inc.php
-bbs/forumdata/*.lock
-bbs/forumdata/threadcaches/*
+
+bbs/config/config_ucenter.php
+bbs/config/config_global.php
 bbs/uc_client/data/cache/*
+bbs/data/backup*
+bbs/data/*.lock
+
 uc/data/config.inc.php
+uc/data/install.lock
+uc/data/upgrade.lock
+
 hdwiki/api/ucconfig.inc.php
 hdwiki/config.php
 hdwiki/plugins/ucenter/ucconfig.inc.php
+hdwiki/data
+hdwiki/uploads
+
 wp/wp-config.php
+
 wiki/LocalSettings.php
-wiki/extensions/Auth_UC/Auth_UCenter.php
 wiki/extensions/Auth_UC/config.inc.php
 wiki/api/ucconfig.inc.php
 wiki/images/*
@@ -18,21 +27,19 @@ wiki/extensions/DataValues
 wiki/baidu.xml
 wiki/.htaccess
 
-phpmyadmin
-pma
-mad
 pm/tmp/*
 pm/module/ucenter/config.php
 pm/config/*
 pm/module/mail/ext/config/*
 pm/www/data/upload/*
+
+phpmyadmin
+pma
+mad
 w
 ctrip
-hdwiki/data
-hdwiki/uploads
 media
 sky
-uc/data/install.lock
 apc.php
 test.php
 piwik
@@ -84,19 +91,8 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
-
 ## Xbbs ###
 .idea
 
 #*.doc
-xbbs/config/config_global.php
-xbbs/config/config_ucenter.php
-xbbs/uc_server/data/config.inc.php
-wiki/plugins/mapabc/*.doc
-xbbs/data/cache
-xbbs/data/log
-xbbs/uc_client/data/cache
-xbbs/data/*.lock
-xbbs/data/template
-xbbs/data/diy
-xbbs/data/sysdata
+

@@ -46,6 +46,7 @@
 error_reporting(E_ALL); // Debug
 include './extensions/Auth_UC/config.inc.php';
 include './extensions/Auth_UC/uc_client/client.php';
+require 'JWT.php';
 // First check if class has already been defined.
 if (!class_exists('AuthPlugin'))
 {
@@ -56,76 +57,16 @@ if (!class_exists('AuthPlugin'))
 	require_once './includes/AuthPlugin.php';
 }
 
-function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
-	
-	$discuz_auth_key = md5("fae418gwxyaAOXJw".$_SERVER['HTTP_USER_AGENT']);
-
-	$ckey_length = 4;
-	$key = md5($key ? $key : $discuz_auth_key);
-	$keya = md5(substr($key, 0, 16));
-	$keyb = md5(substr($key, 16, 16));
-	$keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length): substr(md5(microtime()), -$ckey_length)) : '';
-
-	$cryptkey = $keya.md5($keya.$keyc);
-	$key_length = strlen($cryptkey);
-
-	$string = $operation == 'DECODE' ? base64_decode(substr($string, $ckey_length)) : sprintf('%010d', $expiry ? $expiry + time() : 0).substr(md5($string.$keyb), 0, 16).$string;
-	$string_length = strlen($string);
-
-	$result = '';
-	$box = range(0, 255);
-
-	$rndkey = array();
-	for($i = 0; $i <= 255; $i++) {
-		$rndkey[$i] = ord($cryptkey[$i % $key_length]);
-	}
-
-	for($j = $i = 0; $i < 256; $i++) {
-		$j = ($j + $box[$i] + $rndkey[$i]) % 256;
-		$tmp = $box[$i];
-		$box[$i] = $box[$j];
-		$box[$j] = $tmp;
-	}
-
-	for($a = $j = $i = 0; $i < $string_length; $i++) {
-		$a = ($a + 1) % 256;
-		$j = ($j + $box[$a]) % 256;
-		$tmp = $box[$a];
-		$box[$a] = $box[$j];
-		$box[$j] = $tmp;
-		$result .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
-	}
-
-	if($operation == 'DECODE') {
-		if((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16)) {
-			return substr($result, 26);
-		} else {
-			return '';
-		}
-	} else {
-		return $keyc.str_replace('=', '', base64_encode($result));
-	}
-
-}
-
 $wgExtensionFunctions[] = 'uc_login_hook';
 function uc_login_hook() {
-	global $wgUser, $wgRequest, $wgAuth;
-
-
+    global $wgUser, $wgRequest, $wgAuth;
+    include_once '../bbs/config/config_global.php';
 	// 获取当前用户的 UID 和 用户名 
-	$_config = array();
-	$_config['cookie']['cookiepre'] = 'ygclub_';
-	$_config['cookie']['cookiedomain'] = '';
-	$_config['cookie']['cookiepath'] = '/';
-	$_config['security']['authkey'] = '67fe8eMA9PX9Lno1';
-
-	$dbhost = 'localhost';			// 数据库服务器
-	$dbuser = '';			// 数据库用户名
-	$dbpw = '';				// 数据库密码
-	$dbname = '';			// 数据库名
-	$tablepre="ygclub_";
-
+    $dbhost = $_config['db'][1]['dbhost'];
+    $dbuser = $_config['db'][1]['dbuser'];
+    $dbpw = $_config['db'][1]['dbpw'];
+    $dbname = $_config['db'][1]['dbname'];
+    $tablepre = UC_DBTABLEPRE;
 	$user = User::newFromSession();
 
 	if(substr($_config['cookie']['cookiepath'], 0, 1) != '/') {
@@ -133,26 +74,24 @@ function uc_login_hook() {
 	}
 	$cookiepre =  $_config['cookie']['cookiepre'] . substr(md5($_config['cookie']['cookiepath'] . '|' .  $_config['cookie']['cookiedomain']), 0, 4) . '_';//COOKIE前缀
 
-	$auth = 'ygclub_auth';//存储用户信息的COOKIE名
+	$auth = $cookiepre.'auth';//存储用户信息的COOKIE名
 	$saltkey = $_COOKIE[ $cookiepre . 'saltkey'];//解密auth用到的key
 
+	$discuz_auth_key = md5($_config['security']['authkey'] . $saltkey);//x2的密钥
+	$auth_value = uc_authcode($_COOKIE[$auth],'DECODE',$discuz_auth_key);
+	//	   echo "<script>window.onunload=function();</script>";
+//		   echo "<script>alert('cookie=".$_COOKIE[$auth]."');</script>";
+	//	   echo "<script>alert('auth_value=".$auth_value."');</script>";
 
-	//$auth_value = uc_authcode($_COOKIE[$auth],'DECODE',$discuz_auth_key);
-	$cookie_decode = authcode($_COOKIE[$auth], 'DECODE');
+	if(!empty($auth_value)) { 
 
-	list($discuz_pw, $discuz_secques, $discuz_uid) = empty($_COOKIE[$auth]) ? array('', '', 0) : daddslashes(explode("\t", authcode($_COOKIE[$auth], 'DECODE')), 1);
-	#echo "<script>alert('cookie=".$_COOKIE[$auth]."');</script>";
-	#echo "<script>alert('cookie_decode=".$cookie_decode."');</script>";
-	#echo "<script>alert('discuz_uid=".$discuz_uid."');</script>";
+		list($ygclub_password,$ygclub_uid) = explode("\t", $auth_value); 
 
-	if(!empty($discuz_uid)) { 
-		$ygclub_password=$discuz_pw;
-		$ygclub_uid=$discuz_uid;
 	} else { 
 		$user->doLogout(); // Logout mismatched user.
 		return ;
-	}
-
+    }
+//    error_reporting(E_ALL);
 	// Connect to database.
 	$connect = mysql_connect($dbhost, $dbuser, $dbpw, true);
 
@@ -171,6 +110,15 @@ function uc_login_hook() {
 
 
 	//	$ygclub_username=uc_id2name($ygclub_uid);
+
+	$token = array(
+		"short_name"=>"ygwiki",
+		"user_key"=>$ygclub_uid,
+		"name"=>$ygclub_username,
+	);
+	$wgDuoshuoSecret = '9d19f04122e26bddb9cca306197d7a04';
+	$duoshuoToken = JWT::encode($token, $wgDuoshuoSecret);
+	setcookie('duoshuo_token',  $duoshuoToken);
 
 
 	// For a few special pages, don't do anything.
@@ -216,7 +164,7 @@ function uc_login_hook() {
 		// Authenticate user data will automatically create new users.
 		$loginForm = new LoginForm( $params );
 		$result = $loginForm->authenticateUserData();
-		//echo "<script>alert('wpName=".urlencode($wgAuth->getCanonicalName($ygclub_username))."auth complete:".$result."');</script>";
+//		echo "<script>alert('wpName=".urlencode($wgAuth->getCanonicalName($ygclub_username))."auth complete:".$result."');</script>";
 
 		switch ( $result ) {
 			case LoginForm :: SUCCESS :
@@ -326,13 +274,13 @@ class Auth_UCenter extends AuthPlugin
 		//		echo "<script>alert('username(".$username.")auth passed!');</script>";
 		//如果来自同步登陆则通过认证
 		if ($password == "SUMMERBEGIN") return true;
-
-		list($uid, $username1, $password, $email) = uc_user_login(iconv("UTF-8", "UTF-8", $username), $password);
-
-		if ($uid > 0 ) {
-			uc_user_synlogin($uid);
-			return true;
-		}
+//
+//		list($uid, $username1, $password, $email) = uc_user_login(iconv("UTF-8", "UTF-8", $username), $password);
+//
+//		if ($uid > 0 ) {
+//			uc_user_synlogin($uid);
+//			return true;
+//		}
 
 		return false;
 
@@ -489,15 +437,15 @@ class Auth_UCenter extends AuthPlugin
 
 		//echo "<BR>Start init---";
 
-		if($data = uc_get_user(iconv("UTF-8", "UTF-8", $username))) { //Get information from UC
-			list($uid, $username1, $email) = $data;
-			//$username=iconv("GBK", "UTF-8", $username);
-			//echo "init uname1:".$username1;
-			//echo $email.$uid;
-			$user->mEmail=$email; //Get email from UC
-			$user->mid=$uid; //Get address from UC
-		}
-
+//		if($data = uc_get_user(iconv("UTF-8", "UTF-8", $username))) { //Get information from UC
+//			list($uid, $username1, $email) = $data;
+//			//$username=iconv("GBK", "UTF-8", $username);
+//			//echo "init uname1:".$username1;
+//			//echo $email.$uid;
+//			$user->mEmail=$email; //Get email from UC
+//			$user->mid=$uid; //Get address from UC
+//		}
+//
 		$this->updateUser($user);
 		$user->setToken();
 
@@ -710,18 +658,19 @@ class Auth_UCenter extends AuthPlugin
 		//echo "<BR>Start Exist---";
 
 		//---------------------------------------------------------------------------------------------------
-		if($data = uc_get_user(iconv("UTF-8", "UTF-8", $username))) {
-			list($uid, $username1, $email) = $data;	
-			//$username=iconv("GBK", "UTF-8", $username);
-			//echo "Exist username :".$username;
-			//echo "---Exist username1 :".$username1;
-			return true;
-		} else {
-			//echo 'No such user:'.$username;
-			//echo iconv("UTF-8", "GBK", $username);
-			return false;
-		}
+//		if($data = uc_get_user(iconv("UTF-8", "UTF-8", $username))) {
+//			list($uid, $username1, $email) = $data;	
+//			//$username=iconv("GBK", "UTF-8", $username);
+//			//echo "Exist username :".$username;
+//			//echo "---Exist username1 :".$username1;
+//			return true;
+//		} else {
+//			//echo 'No such user:'.$username;
+//			//echo iconv("UTF-8", "GBK", $username);
+//			return false;
+//		}
 
+        return true;
 	}
 
 	/**
