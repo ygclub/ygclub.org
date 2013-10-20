@@ -1,8 +1,20 @@
 <?php
-require_once "include/common.inc.php";
-$thisrc = "act.php";
+define('APPTYPEID', 0);
+require './source/class/class_core.php';
+define('CURSCRIPT', 'act');
 
-require_once DISCUZ_ROOT."./forumdata/cache/cache_forums.php";
+$discuz = C::app();
+$discuz->init();
+if(!$_G['uid']) {
+    showmessage('not_loggedin', '', array(), array('login' => true));
+}
+
+$discuz_uid = $_G['uid'];
+$navigation = ' <em>&rsaquo;</em> <a href="act.php">阳光活动统计<a/>';
+$starttime = $_GET['starttime'];
+$endtime = $_GET['endtime'];
+$uid = $_GET['uid'];
+$username = $_GET['username'];
 
 // 展示所有人的活动统计
 if ($discuz_uid)
@@ -29,7 +41,8 @@ if ($discuz_uid)
         if($endtime <= $today)
         {
             $sql = 'SELECT pe.uid, pe.username, p.class, p.tid, t.subject  FROM ';
-            $sql .= "{$tablepre}partyers as pe LEFT JOIN {$tablepre}party as p on pe.tid = p.tid LEFT JOIN {$tablepre}threads as t on p.tid = t.tid where 1 ";
+            $sql .= DB::table('ygclub_partyers') . " as pe LEFT JOIN " . DB::table('ygclub_party') . " as p on pe.tid = p.tid ";
+            $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid where 1 ";
             $sql .= "AND pe.verified = 4 ";
             $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
             $sql .= $starttime != '' ? "AND p.showtime>'".$starttime."' " : '';
@@ -41,9 +54,8 @@ if ($discuz_uid)
 
             $party_class_count = array();
             foreach($partyClass as $value) $party_class_count[$value] = 0;
-
-            $query = $db->query($sql);
-            while ($act_user = $db->fetch_array($query))
+            $result = DB::fetch_all($sql);
+            foreach($result as $act_user)
             {
                 if(in_array($act_user['class'], $partyClass))
                 {
@@ -61,7 +73,7 @@ if ($discuz_uid)
             $party_uniq_user_count = count($act_user_total_count);
         }
 
-        include template("act_index");
+        include template("ygclub/act_index");
     }
     else
     {
@@ -69,7 +81,8 @@ if ($discuz_uid)
         {
             $uid = intval($uid);
             $sql = 'SELECT pe.uid, pe.username, pe.config, pe.checkin, p.class, p.tid, p.ctid, p.showtime, t.subject  FROM ';
-            $sql .= "{$tablepre}partyers as pe LEFT JOIN {$tablepre}party as p on pe.tid = p.tid LEFT JOIN {$tablepre}threads as t on p.tid = t.tid where 1 ";
+            $sql .= DB::table('ygclub_partyers') . " as pe LEFT JOIN " . DB::table('ygclub_party') . " as p on pe.tid = p.tid ";
+            $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid where 1 ";
             $sql .= "AND pe.uid = '{$uid}'";
             $sql .= "AND pe.verified = 4 ";
             $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
@@ -80,11 +93,12 @@ if ($discuz_uid)
             $user_name = '';
             $total_count = 0;
             $total_checkin_count = 0;
-            $query = $db->query($sql);
             $party_class_count = array();
             foreach($partyClass as $value) $party_class_count[$value] = 0;
             $checkAttr = array('0'=>'待确认', '1'=>'已参加', '2'=>'未参加');
-            while ($act_user = $db->fetch_array($query))
+            $result = DB::fetch_all($sql);
+            
+            foreach($result as $act_user)
             {
                 if(in_array($act_user['class'], $partyClass))
                 {
@@ -107,12 +121,13 @@ if ($discuz_uid)
                 }
             }
         }
+        $navigation .= ' <em>&rsaquo;</em> ' . $user_name;
 
-        include template('act_user_index');
+        include template('ygclub/act_user_index');
     }
 }
 else
 {
-    include template('act_index');
+    include template('ygclub/act_index');
 }
 ?> 
