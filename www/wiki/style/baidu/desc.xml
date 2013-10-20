@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="default" version="1.0.1" active="true">
+<author><![CDATA[小兵归来]]></author>
+<authorurl><![CDATA[http://www.wiki511.com]]></authorurl>
+<name><![CDATA[仿百度百科]]></name>
+<tag><![CDATA[ 蓝色 三栏布局]]></tag>
+<desc><![CDATA[For HDwiki5.0  utf-8 版本 。
+小兵倾情奉献。
+在后台全局设置兼容以前模板。]]></desc>
+<sitename><![CDATA[http://www.wiki511.com]]></sitename>
+<weburl><![CDATA[http://kaiyuan.hudong.com/bbs/viewthread.php?tid=13278&highlight=%E4%BB%BF%E7%99%BE%E5%BA%A6%E7%99%BE%E7%A7%91%E7%89%88]]></weburl>
+<version><![CDATA[5.0]]></version>
+<hdversion><![CDATA[5.0]]></hdversion>
+<copyright><![CDATA[banma@vip.qq.com]]></copyright>
+<sql><![CDATA[INSERT INTO wiki_block (theme,file,area,areaorder,block,fun,tpl,params) VALUES]]></sql>
+<charset><![CDATA[UTF-8]]></charset>
+</theme>
