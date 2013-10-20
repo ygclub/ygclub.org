@@ -677,7 +677,12 @@ elseif($_GET['act']=='checkin'){
                         {
                             $value['usertask'] = '旁听';
                         }
-                    }
+		    }
+
+		    if(is_array($value['config']['课程']))
+		    {
+			$value['config']['class'] = $value['config']['课程'];
+		    }
                     if(is_array($value['config']['class']))
                     {
                         foreach($value['config']['class'] as $lesson)
