@@ -64,7 +64,7 @@ if ((strstr($url,"pic-view")!=false) || (strstr($url,"doc-")!=false) || (strstr(
   exit;
 }
 if (strstr($url,"UserLogin")!=false) {
-  header("Location: "."http://www.ygclub.org/bbs/logging.php?action=login");   
+  header("Location: "."http://www.ygclub.org/bbs/member.php?mod=logging&action=login");   
   echo "hello";
   exit;
 }

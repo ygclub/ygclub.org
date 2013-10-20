@@ -645,7 +645,7 @@ class SkinTemplate extends Skin {
 			);
 			$personal_urls['logout'] = array(
 				'text' => $this->msg( 'userlogout' )->text(),
-				'href' => '/bbs/logging.php?action=logout',
+				'href' => '/bbs/member.php?mod=logging&action=logout',
 				'active' => false
 			);
 		} else {
@@ -661,7 +661,7 @@ class SkinTemplate extends Skin {
 			$login_id = $this->showIPinHeader() ? 'anonlogin' : 'login';
 			$login_url = array(
 				'text' => $this->msg( $loginlink )->text(),
-				'href' => '/bbs/logging.php?action=login',
+				'href' => '/bbs/member.php?mod=logging&action=login',
 				'active' => $title->isSpecial( 'Userlogin' ) && ( $loginlink == 'nav-login-createaccount' || !$is_signup ),
 				'class' => $wgSecureLogin ? 'link-https' : ''
 			);

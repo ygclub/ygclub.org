@@ -84,3 +84,5 @@ Disallow: /
 User-agent: Download Ninja
 Disallow: /
 
+user-agent: AhrefsBot
+disallow: /
