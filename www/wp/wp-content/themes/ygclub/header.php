@@ -20,6 +20,7 @@
 }
 ?>
 </title>
+
 <link rel="stylesheet" type="text/css" href="<?php bloginfo('stylesheet_url'); ?>" />
 <link rel="alternate" type="application/atom+xml" title="<?php bloginfo('name'); ?> Atom" href="<?php bloginfo('atom_url'); ?>" />
 <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS" href="<?php bloginfo('rss2_url'); ?>" />
@@ -34,24 +35,22 @@
 	<div id="container">
     
 		<div id="header">
-        	<div id="statu_bar">
-
-                	<a href="http://www.ygclub.org/bbs" title="阳光论坛">阳光论坛</a> | <a href="http://www.ygclub.org/wiki" title="阳光百科">阳光百科</a>
-
-            </div>
             
-            <h1 id="logo">阳光志愿者</h1>
+            <h1 id="logo"><a href="<?php bloginfo('url'); ?>" title="阳光志愿者">阳光志愿者</a></h1>
             
             <div id="nav">
             	<div id="nav_l"></div>
                 
                 <ul id="menu_l">
                 	<li id="home" <?php if (is_home())  echo " class=\"current_page_item\""; ?>><a href="<?php bloginfo('url'); ?>">首页</a></li>
-        		<!-- <?php wp_list_pages('sort_column=menu_order&title_li='); ?> -->
-                	<li><a href="/wiki/index.php?title=%E9%98%B3%E5%85%89%E4%BB%8B%E7%BB%8D" title="关于我们">关于我们</a></li>
+			<li id="bbs"><a href="/bbs" title="阳光论坛">阳光论坛</a></li>
+                        <li id="wiki"><a href="/wiki" title="阳光百科">阳光百科</a></li>
+        					<?php wp_list_pages('sort_column=menu_order&title_li='); ?>
+                	<li><a href="bbs/thread-4734-1-1.html" title="加入我们">加入我们</a></li>
                 	<li><a href="/wiki/index.php?title=%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC" title="联系我们">联系我们</a></li>
                 </ul>
                 
                 <div id="nav_r"></div>
             </div>
         </div>
+

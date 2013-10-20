@@ -119,9 +119,11 @@ a img { border: none; }
 
 h1#logo{
 	width:280px;
-	height:100px;
-	background:url(images/logo.png) no-repeat left;
+	height:40px;
+	background:url(images/small_logo.gif) no-repeat left;
 	text-indent:-1000em;
+	margin-top:10px;
+	margin-bottom:5px;
 	}
 #nav{
 	width:898px;

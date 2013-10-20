@@ -1,7 +1,7 @@
 ﻿        <div id="sidebar">
         	<h3>关注我们</h3>
         		<div id="sina_weibo">
-              <iframe width="100%" height="220" class="share_self"  frameborder="0" scrolling="no" src="http://service.t.sina.com.cn/widget/WeiboShow.php?width=0&height=220&fansRow=2&ptype=0&speed=300&skin=3&isTitle=0&noborder=1&isWeibo=1&isFans=0&uid=1729744050&verifier=b1fc848b"></iframe> 
+              <iframe width="100%" height="350" class="share_self"  frameborder="0" scrolling="no" src="http://service.t.sina.com.cn/widget/WeiboShow.php?width=0&height=350&fansRow=2&ptype=0&speed=300&skin=3&isTitle=0&noborder=1&isWeibo=1&isFans=0&uid=1729744050&verifier=b1fc848b"></iframe> 
             </div>
             <div id="ygclub_elsewhere">
                 <h3>阳光俱乐部在：</h3>
