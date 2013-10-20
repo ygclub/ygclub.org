@@ -303,7 +303,7 @@ else
         if($_SESSION['85827X19X504'] != '')
         {
             $bbs_username = addslashes($_SESSION['85827X19X504']);
-            $query = "SELECT uid FROM ygclub_members WHERE username = '$bbs_username'";
+            $query = "SELECT uid FROM ygclub_uc_members WHERE username = '$bbs_username'";
             $result = db_execute_num($query);
             list($uid) = $result->FetchRow();
             if(empty($uid))
