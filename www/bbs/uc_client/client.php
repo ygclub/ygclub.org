@@ -1,10 +1,10 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: client.php 919 2009-01-21 01:25:32Z zhaoxiongfei $
+	$Id: client.php 1079 2011-04-02 07:29:36Z zhengqingpeng $
 */
 
 if(!defined('UC_API')) {
@@ -14,8 +14,8 @@ if(!defined('UC_API')) {
 error_reporting(0);
 
 define('IN_UC', TRUE);
-define('UC_CLIENT_VERSION', '1.5.0');
-define('UC_CLIENT_RELEASE', '20090121');
+define('UC_CLIENT_VERSION', '1.6.0');
+define('UC_CLIENT_RELEASE', '20110501');
 define('UC_ROOT', substr(__FILE__, 0, -10));
 define('UC_DATADIR', UC_ROOT.'./data/');
 define('UC_DATAURL', UC_API.'/data');
@@ -208,7 +208,15 @@ function uc_fopen($url, $limit = 0, $post = '', $cookie = '', $bysocket = FALSE,
 		$out .= "Connection: Close\r\n";
 		$out .= "Cookie: $cookie\r\n\r\n";
 	}
-	$fp = @fsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+
+	if(function_exists('fsockopen')) {
+		$fp = @fsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+	} elseif (function_exists('pfsockopen')) {
+		$fp = @pfsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+	} else {
+		$fp = false;
+	}
+
 	if(!$fp) {
 		return '';
 	} else {
@@ -289,8 +297,8 @@ function uc_friend_ls($uid, $page = 1, $pagesize = 10, $totalnum = 10, $directio
 	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
 }
 
-function uc_user_register($username, $password, $email, $questionid = '', $answer = '') {
-	return call_user_func(UC_API_FUNC, 'user', 'register', array('username'=>$username, 'password'=>$password, 'email'=>$email, 'questionid'=>$questionid, 'answer'=>$answer));
+function uc_user_register($username, $password, $email, $questionid = '', $answer = '', $regip = '') {
+	return call_user_func(UC_API_FUNC, 'user', 'register', array('username'=>$username, 'password'=>$password, 'email'=>$email, 'questionid'=>$questionid, 'answer'=>$answer, 'regip' => $regip));
 }
 
 function uc_user_login($username, $password, $isuid = 0, $checkques = 0, $questionid = '', $answer = '') {
@@ -301,12 +309,24 @@ function uc_user_login($username, $password, $isuid = 0, $checkques = 0, $questi
 
 function uc_user_synlogin($uid) {
 	$uid = intval($uid);
-	$return = uc_api_post('user', 'synlogin', array('uid'=>$uid));
+	if(@include UC_ROOT.'./data/cache/apps.php') {
+		if(count($_CACHE['apps']) > 1) {
+			$return = uc_api_post('user', 'synlogin', array('uid'=>$uid));
+		} else {
+			$return = '';
+		}
+	}
 	return $return;
 }
 
 function uc_user_synlogout() {
-	$return = uc_api_post('user', 'synlogout', array());
+	if(@include UC_ROOT.'./data/cache/apps.php') {
+		if(count($_CACHE['apps']) > 1) {
+			$return = uc_api_post('user', 'synlogout', array());
+		} else {
+			$return = '';
+		}
+	}
 	return $return;
 }
 
@@ -373,15 +393,15 @@ function uc_pm_checknew($uid, $more = 0) {
 	return (!$more || UC_CONNECT == 'mysql') ? $return : uc_unserialize($return);
 }
 
-function uc_pm_send($fromuid, $msgto, $subject, $message, $instantly = 1, $replypmid = 0, $isusername = 0) {
+function uc_pm_send($fromuid, $msgto, $subject, $message, $instantly = 1, $replypmid = 0, $isusername = 0, $type = 0) {
 	if($instantly) {
 		$replypmid = @is_numeric($replypmid) ? $replypmid : 0;
-		return call_user_func(UC_API_FUNC, 'pm', 'sendpm', array('fromuid'=>$fromuid, 'msgto'=>$msgto, 'subject'=>$subject, 'message'=>$message, 'replypmid'=>$replypmid, 'isusername'=>$isusername));
+		return call_user_func(UC_API_FUNC, 'pm', 'sendpm', array('fromuid'=>$fromuid, 'msgto'=>$msgto, 'subject'=>$subject, 'message'=>$message, 'replypmid'=>$replypmid, 'isusername'=>$isusername, 'type' => $type));
 	} else {
 		$fromuid = intval($fromuid);
-		$subject = urlencode($subject);
-		$msgto = urlencode($msgto);
-		$message = urlencode($message);
+		$subject = rawurlencode($subject);
+		$msgto = rawurlencode($msgto);
+		$message = rawurlencode($message);
 		$replypmid = @is_numeric($replypmid) ? $replypmid : 0;
 		$replyadd = $replypmid ? "&pmid=$replypmid&do=reply" : '';
 		$apiurl = uc_api_url('pm_client', 'send', "uid=$fromuid", "&msgto=$msgto&subject=$subject&message=$message$replyadd");
@@ -393,22 +413,26 @@ function uc_pm_send($fromuid, $msgto, $subject, $message, $instantly = 1, $reply
 }
 
 function uc_pm_delete($uid, $folder, $pmids) {
-	return call_user_func(UC_API_FUNC, 'pm', 'delete', array('uid'=>$uid, 'folder'=>$folder, 'pmids'=>$pmids));
+	return call_user_func(UC_API_FUNC, 'pm', 'delete', array('uid'=>$uid, 'pmids'=>$pmids));
 }
 
 function uc_pm_deleteuser($uid, $touids) {
 	return call_user_func(UC_API_FUNC, 'pm', 'deleteuser', array('uid'=>$uid, 'touids'=>$touids));
 }
 
-function uc_pm_readstatus($uid, $uids, $pmids = array(), $status = 0) {
-	return call_user_func(UC_API_FUNC, 'pm', 'readstatus', array('uid'=>$uid, 'uids'=>$uids, 'pmids'=>$pmids, 'status'=>$status));
+function uc_pm_deletechat($uid, $plids, $type = 0) {
+	return call_user_func(UC_API_FUNC, 'pm', 'deletechat', array('uid'=>$uid, 'plids'=>$plids, 'type'=>$type));
+}
+
+function uc_pm_readstatus($uid, $uids, $plids = array(), $status = 0) {
+	return call_user_func(UC_API_FUNC, 'pm', 'readstatus', array('uid'=>$uid, 'uids'=>$uids, 'plids'=>$plids, 'status'=>$status));
 }
 
 function uc_pm_list($uid, $page = 1, $pagesize = 10, $folder = 'inbox', $filter = 'newpm', $msglen = 0) {
 	$uid = intval($uid);
 	$page = intval($page);
 	$pagesize = intval($pagesize);
-	$return = call_user_func(UC_API_FUNC, 'pm', 'ls', array('uid'=>$uid, 'page'=>$page, 'pagesize'=>$pagesize, 'folder'=>$folder, 'filter'=>$filter, 'msglen'=>$msglen));
+	$return = call_user_func(UC_API_FUNC, 'pm', 'ls', array('uid'=>$uid, 'page'=>$page, 'pagesize'=>$pagesize, 'filter'=>$filter, 'msglen'=>$msglen));
 	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
 }
 
@@ -417,19 +441,50 @@ function uc_pm_ignore($uid) {
 	return call_user_func(UC_API_FUNC, 'pm', 'ignore', array('uid'=>$uid));
 }
 
-function uc_pm_view($uid, $pmid, $touid = 0, $daterange = 1) {
+function uc_pm_view($uid, $pmid = 0, $touid = 0, $daterange = 1, $page = 0, $pagesize = 10, $type = 0, $isplid = 0) {
 	$uid = intval($uid);
 	$touid = intval($touid);
+	$page = intval($page);
+	$pagesize = intval($pagesize);
 	$pmid = @is_numeric($pmid) ? $pmid : 0;
-	$return = call_user_func(UC_API_FUNC, 'pm', 'view', array('uid'=>$uid, 'pmid'=>$pmid, 'touid'=>$touid, 'daterange'=>$daterange));
+	$return = call_user_func(UC_API_FUNC, 'pm', 'view', array('uid'=>$uid, 'pmid'=>$pmid, 'touid'=>$touid, 'daterange'=>$daterange, 'page' => $page, 'pagesize' => $pagesize, 'type'=>$type, 'isplid'=>$isplid));
 	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
 }
 
-function uc_pm_viewnode($uid, $type = 0, $pmid = 0) {
+function uc_pm_view_num($uid, $touid, $isplid) {
 	$uid = intval($uid);
+	$touid = intval($touid);
+	$isplid = intval($isplid);
+	return call_user_func(UC_API_FUNC, 'pm', 'viewnum', array('uid' => $uid, 'touid' => $touid, 'isplid' => $isplid));
+}
+
+function uc_pm_viewnode($uid, $type, $pmid) {
+	$uid = intval($uid);
+	$type = intval($type);
 	$pmid = @is_numeric($pmid) ? $pmid : 0;
-	$return = call_user_func(UC_API_FUNC, 'pm', 'viewnode', array('uid'=>$uid, 'pmid'=>$pmid, 'type'=>$type));
+	$return = call_user_func(UC_API_FUNC, 'pm', 'viewnode', array('uid'=>$uid, 'type'=>$type, 'pmid'=>$pmid));
 	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
+}
+
+function uc_pm_chatpmmemberlist($uid, $plid = 0) {
+	$uid = intval($uid);
+	$plid = intval($plid);
+	$return = call_user_func(UC_API_FUNC, 'pm', 'chatpmmemberlist', array('uid'=>$uid, 'plid'=>$plid));
+	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
+}
+
+function uc_pm_kickchatpm($plid, $uid, $touid) {
+	$uid = intval($uid);
+	$plid = intval($plid);
+	$touid = intval($touid);
+	return call_user_func(UC_API_FUNC, 'pm', 'kickchatpm', array('uid'=>$uid, 'plid'=>$plid, 'touid'=>$touid));
+}
+
+function uc_pm_appendchatpm($plid, $uid, $touid) {
+	$uid = intval($uid);
+	$plid = intval($plid);
+	$touid = intval($touid);
+	return call_user_func(UC_API_FUNC, 'pm', 'appendchatpm', array('uid'=>$uid, 'plid'=>$plid, 'touid'=>$touid));
 }
 
 function uc_pm_blackls_get($uid) {
@@ -474,9 +529,9 @@ function uc_tag_get($tagname, $nums = 0) {
 function uc_avatar($uid, $type = 'virtual', $returnhtml = 1) {
 	$uid = intval($uid);
 	$uc_input = uc_api_input("uid=$uid");
-	$uc_avatarflash = UC_API.'/images/camera.swf?inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&ucapi='.urlencode(str_replace('http://', '', UC_API)).'&avatartype='.$type;
+	$uc_avatarflash = UC_API.'/images/camera.swf?inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&ucapi='.urlencode(str_replace('http://', '', UC_API)).'&avatartype='.$type.'&uploadSize=2048';
 	if($returnhtml) {
-		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="447" height="477" id="mycamera" align="middle">
+		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="253" id="mycamera" align="middle">
 			<param name="allowScriptAccess" value="always" />
 			<param name="scale" value="exactfit" />
 			<param name="wmode" value="transparent" />
@@ -484,19 +539,18 @@ function uc_avatar($uid, $type = 'virtual', $returnhtml = 1) {
 			<param name="bgcolor" value="#ffffff" />
 			<param name="movie" value="'.$uc_avatarflash.'" />
 			<param name="menu" value="false" />
-			<embed src="'.$uc_avatarflash.'" quality="high" bgcolor="#ffffff" width="447" height="477" name="mycamera" align="middle" allowScriptAccess="always" allowFullScreen="false" scale="exactfit"  wmode="transparent" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+			<embed src="'.$uc_avatarflash.'" quality="high" bgcolor="#ffffff" width="450" height="253" name="mycamera" align="middle" allowScriptAccess="always" allowFullScreen="false" scale="exactfit"  wmode="transparent" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 		</object>';
 	} else {
 		return array(
-			'width', '447',
-			'height', '477',
+			'width', '450',
+			'height', '253',
 			'scale', 'exactfit',
 			'src', $uc_avatarflash,
 			'id', 'mycamera',
 			'name', 'mycamera',
 			'quality','high',
 			'bgcolor','#ffffff',
-			'wmode','transparent',
 			'menu', 'false',
 			'swLiveConnect', 'true',
 			'allowScriptAccess', 'always'

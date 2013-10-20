@@ -3,9 +3,9 @@ $_CACHE['apps'] = array (
   1 => 
   array (
     'appid' => '1',
-    'type' => 'DISCUZ',
+    'type' => 'DISCUZX',
     'name' => '阳光志愿者',
-    'url' => 'http://cloud.ygclub.org/bbs',
+    'url' => 'http://www.ygclub.org/bbs',
     'ip' => '',
     'viewprourl' => '/space-uid-%s.html',
     'apifilename' => 'uc.php',
@@ -16,15 +16,16 @@ $_CACHE['apps'] = array (
     'extra' => false,
     'tagtemplates' => '<?xml version="1.0" encoding="ISO-8859-1"?>
 <root>
- <item id="template"><![CDATA[<a href="{url}" target="_blank">{subject}</a>]]></item>
- <item id="fields">
- <item id="subject"><![CDATA[标题]]></item>
- <item id="uid"><![CDATA[用户 ID]]></item>
- <item id="username"><![CDATA[发帖者]]></item>
- <item id="dateline"><![CDATA[日期]]></item>
- <item id="url"><![CDATA[主题地址]]></item>
- </item>
+	<item id="template"><![CDATA[<a href="{url}" target="_blank">{subject}</a>]]></item>
+	<item id="fields">
+		<item id="subject"><![CDATA[标题]]></item>
+		<item id="uid"><![CDATA[用户 ID]]></item>
+		<item id="username"><![CDATA[发帖者]]></item>
+		<item id="dateline"><![CDATA[日期]]></item>
+		<item id="url"><![CDATA[主题地址]]></item>
+	</item>
 </root>',
+    'allowips' => '',
   ),
   7 => 
   array (
@@ -51,13 +52,14 @@ $_CACHE['apps'] = array (
  <item id="url"><![CDATA[数据连接]]></item>
  </item>
 </root>',
+    'allowips' => '',
   ),
   8 => 
   array (
     'appid' => '8',
     'type' => 'OTHER',
     'name' => 'HDWIKI',
-    'url' => 'http://cloud.ygclub.org/wiki',
+    'url' => 'http://www.ygclub.org/wiki',
     'ip' => '',
     'viewprourl' => '/bbs/space-uid-%s.html',
     'apifilename' => 'uc.php',
@@ -70,6 +72,7 @@ $_CACHE['apps'] = array (
 <root>
  <item id="template"><![CDATA[]]></item>
 </root>',
+    'allowips' => '',
   ),
   11 => 
   array (
@@ -89,13 +92,14 @@ $_CACHE['apps'] = array (
 <root>
  <item id="template"><![CDATA[]]></item>
 </root>',
+    'allowips' => '',
   ),
   12 => 
   array (
     'appid' => '12',
-    'type' => 'OTHER',
+    'type' => 'UCHOME',
     'name' => 'mediawiki',
-    'url' => 'http://cloud.ygclub.org/mediawiki/extensions/Auth_UC',
+    'url' => 'http://www.ygclub.org/wiki/extensions/Auth_UC',
     'ip' => '',
     'viewprourl' => '',
     'apifilename' => 'uc.php',
@@ -108,6 +112,7 @@ $_CACHE['apps'] = array (
 <root>
  <item id="template"><![CDATA[]]></item>
 </root>',
+    'allowips' => '',
   ),
 );
 
