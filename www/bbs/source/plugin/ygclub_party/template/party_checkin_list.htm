@@ -81,7 +81,7 @@ function check_all(form, prefix) {
         <!--{loop $result_list $k $v}-->
         <tr<!--{if $k%2 == 1}--> class="odd"<!--{/if}-->>
             <td class="author1">
-<a href="space.php?uid=$v[uid]" target="_blank">$v[username]</a>
+                <cite><a href="home.php?mod=space&uid=$v[uid]" c="1">$v[username]</a></cite>
             </td>
 			<td class="state">
                     <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>

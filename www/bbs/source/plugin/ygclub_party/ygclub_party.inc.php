@@ -678,9 +678,9 @@ elseif($_GET['act']=='checkin'){
                             $value['usertask'] = '旁听';
                         }
                     }
-                    if(is_array($value['config']['课程']))
+                    if(is_array($value['config']['class']))
                     {
-                        foreach($value['config']['课程'] as $lesson)
+                        foreach($value['config']['class'] as $lesson)
                         {
                             $sum_list[$lesson][$value['usertask']]['detail'][$value['uid']] = $value;
                         }
@@ -697,12 +697,13 @@ elseif($_GET['act']=='checkin'){
                 {
                     foreach($detail['detail'] as $user_id => $user_info)
                     {
-                        $temp_sum[] = '<a href="space.php?uid=' . $user_info['uid'] . '" target="_blank">' . $user_info['username'] . '</a>';
+                        $temp_sum[] = '<cite><a href="home.php?mod=space&uid=' . $user_info['uid'] . '" c="1">' . $user_info['username'] . '</a></cite>';
                     }
                     $sum_list[$lesson][$usertask]['sum'] = join(', ', $temp_sum);
                     unset($temp_sum);
                 }
             }
+
             $temp = $sum_list[$other_task];
             unset($sum_list[$other_task]);
             $sum_list[$other_task] = $temp;
