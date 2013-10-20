@@ -1,10 +1,10 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: app.php 885 2008-12-16 01:13:36Z monkey $
+	$Id: app.php 1059 2011-03-01 07:25:09Z monkey $
 */
 
 !defined('IN_UC') && exit('Access Denied');
@@ -34,7 +34,6 @@ class appcontrol extends base {
 	function onadd() {
 		$ucfounderpw = getgpc('ucfounderpw', 'P');
 		$apptype = getgpc('apptype', 'P');
-		$apptype = getgpc('apptype', 'P');
 		$appname = getgpc('appname', 'P');
 		$appurl = getgpc('appurl', 'P');
 		$appip = getgpc('appip', 'P');
@@ -42,6 +41,7 @@ class appcontrol extends base {
 		$appcharset = getgpc('appcharset', 'P');
 		$appdbcharset = getgpc('appdbcharset', 'P');
 		$apptagtemplates = getgpc('apptagtemplates', 'P');
+		$appallowips = getgpc('allowips', 'P');
 
 		if(md5(md5($ucfounderpw).UC_FOUNDERSALT) == UC_FOUNDERPW || (strlen($ucfounderpw) == 32 && $ucfounderpw == md5(UC_FOUNDERPW))) {
 			@ob_start();
@@ -52,7 +52,20 @@ class appcontrol extends base {
 			if(empty($app)) {
 				$authkey = $this->_generate_key();
 				$apptagtemplates = $this->serialize($apptagtemplates, 1);
-				$this->db->query("INSERT INTO ".UC_DBTABLEPRE."applications SET name='$appname', url='$appurl', ip='$appip', authkey='$authkey', viewprourl='$viewprourl', synlogin='1', charset='$appcharset', dbcharset='$appdbcharset', type='$apptype', recvnote='1', tagtemplates='$apptagtemplates'");
+				$this->db->query("INSERT INTO ".UC_DBTABLEPRE."applications SET
+					name='$appname',
+					url='$appurl',
+					ip='$appip',
+					authkey='$authkey',
+					viewprourl='$viewprourl',
+					synlogin='1',
+					charset='$appcharset',
+					dbcharset='$appdbcharset',
+					type='$apptype',
+					recvnote='1',
+					tagtemplates='$apptagtemplates',
+					allowips='$appallowips'
+					");
 				$appid = $this->db->insert_id();
 
 				$_ENV['app']->alter_app_table($appid, 'ADD');
