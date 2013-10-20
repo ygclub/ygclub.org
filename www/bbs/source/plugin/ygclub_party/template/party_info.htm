@@ -1,0 +1,175 @@
+{eval
+
+global $party;
+function tpl_ygclub_party_info () {
+global $party;
+
+}
+
+<!--{block return}-->
+<style type="text/css">
+    #party_info {font-size:14px}
+    #party_info tr th {text-align:center;width:200px;}
+</style>
+
+<div class="pbm cl">
+    <table id="party_info" cellspacing="0" cellpadding="0" class="dt">
+        <tbody>
+            <!--{if $party[_mPerm] == '1'}-->
+            <tr>
+                <th><strong style="color:#8b0a00">活动管理</strong></th>
+                <td colspan="3">
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=print" target="_blank" title="打印名单">[打印名单]</a></span>
+                    <!--{if $party[closed] == '1'}-->
+                    <button onclick="showDialog($('close_open_party').innerHTML,'info','开启活动',null,1);return false;" class="pn pnc"><span>开启活动</span></button>
+                    <!--{else}-->
+                    <button onclick="showDialog($('close_open_party').innerHTML,'info','关闭活动',null,1);return false;" class="pn"><span>关闭活动</span></button>
+                    <!--{/if}-->
+                    <!--{if $party['_notshow']}-->
+                    <span style="color:#aaa">[编辑签到信息]</span>
+                    <span style="color:#aaa">[关联总结帖]</span>
+                    <!--{else}-->
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=checkin" title="编辑签到信息">[编辑签到信息]</a></span>
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=relec" title="关联总结帖">[关联总结帖]</a></span>
+                    <!--{/if}-->
+                    <div id="close_open_party" style="display:none">
+                        <form name="close_open_party_form" id="close_open_party_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$party[tid]}&act=onoff&for=<!--{if $party[closed] == '0'}-->off<!--{else}-->on<!--{/if}-->" onsubmit="ajaxpost(this.id, 'return_close_open_party', 'return_close_open_party', 'onerror');return false;">
+                            <input type="hidden" name="formhash" value="{FORMHASH}" />
+                            <input type="hidden" name="handlekey" value="close_open_party" />
+                            <div class="c">
+                                <div class="actfm">
+			        	<table cellpadding="0" cellspacing="0" class="actl">
+                                        <tr>
+                                            <td>
+                                            <!--{if $party[closed] == '1'}-->
+                                            开启活动
+                                            <!--{else}-->
+                                            关闭活动
+                                            <!--{/if}-->
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="o pns">
+                                <button type="submit" name="close_open_party_submit" value="true" class="pn pnc"><span>提交</span></button>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <!--{/if}-->
+
+            <tr>
+                <th>{lang ygclub_party:inviter_phone}</th>
+                <td>
+                    <!--{if $party['_current_user_verified'] == 4}-->
+                    {$party[phone]}
+                    <!--{else}-->
+                    (已通过人员可见)
+                    <!--{/if}-->
+                </td>
+                <th>{lang ygclub_party:class}</th>
+                <td>{$party[class]}</td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:showtime}</th>
+                <td>{$party[_showtime]}</td>
+                <th>{lang ygclub_party:starttimefrom}</th>
+                <td>{$party[_starttimefrom]}</td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:starttimeto}</th>
+                <td>{$party[_starttimeto]}</td>
+                <th rowspan="3">{lang ygclub_party:status}</th>
+                <td rowspan="3">
+                    <img src="source/plugin/ygclub_party/images/party_<!--{if $party[closed] == '0'}-->on<!--{else}-->end<!--{/if}-->.gif" />
+                </td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:number_limited}</th>
+                <td>{$party[_number]}({$party[_gender]})</td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:already_confirmed}/{lang ygclub_party:applied}</th>
+                <td><strong class="rq">{$party[_verified][4]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][4]['followed']}<!--{/if}--></strong> / {$party[_verified][all]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][all]['followed']}<!--{/if}--></td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:approved_partyers}</th>
+                <td colspan="3">{$party[_approved_username_list_html]}</td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:marks_stat}</th>
+                <td colspan="3">
+                    <!--{loop $party[_marks_list] $k $v}-->
+		    $v(<font color="red"><!--{if $party[_marks_count][$k] >0}-->$party[_marks_count][$k]<!--{else}-->0<!--{/if}--></font>);&nbsp;
+                    <!--{/loop}-->
+                </td>
+            </tr>
+            <tr>
+                <th>签到人员</th>
+                <td colspan="3">
+                    <!--{if $party['_checkin']['count'] == 0}-->
+                    暂无签到信息
+                    <!--{else}-->
+                    $party['_checkin_username_list_html']
+                    <br />
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=checkin&step=list" title="签到信息" style="color:green">[查看签到信息详情]</a></span>
+                    <!--{/if}-->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="pbm cl">
+    <center>
+    <dl>
+        <dt></dt>
+        <dd>
+            <!--{if $party['_current_user_verified'] == 0}-->
+            <a href="{$_SERVER[REQUEST_URI]}#ygclub_party_sign_form_anchor" class="pn" style="padding:3px 5px">{lang ygclub_party:i_join}</a>
+            <!--{elseif $party['_current_user_verified'] == 1}-->
+            你已申请参加活动，请耐心等待召集人或管理员的审核。审核前你可以  <a href="plugin.php?id=ygclub_party&act=editp&pid={$party['_current_user_pid']}" class="pn pnc">[编辑报名信息]</a>
+            <!--{elseif $party['_current_user_verified'] == 2}-->
+            你已被取消参加此次活动
+            <!--{elseif $party['_current_user_verified'] == 4}-->
+            你已成功申请参加活动。如遇特殊原因不能继续参加活动，请提前取消。<br />若需要取消，请点击：
+            <button onclick="showDialog($('single_partyer_operate').innerHTML,'info','下次参加',null,1);return false;" class="pn pnc"><span>下次参加</span></button>
+            <!--{elseif $party['_current_user_verified'] == 5}-->
+            你已退出本次活动
+            <!--{/if}-->
+        </dd>
+    </dl>
+</center>
+</div>
+
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}
+
+{eval
+
+
+global $party;
+function tpl_ygclub_party_partyers_list () {
+global $party;
+
+}
+<!--{block return}-->
+<br />
+<div id="ygclub_party_passed_partyers"></div>
+<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=PassUsers','ygclub_party_passed_partyers');</script>
+<div id="ygclub_party_nopassed_partyers"></div>
+<script type="text/javascript">ajaxget('plugin.php?id=ygclub_party&tid={$party[tid]}&act=list&step=noPassUsers','ygclub_party_nopassed_partyers');</script>
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}

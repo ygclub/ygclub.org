@@ -1,0 +1,47 @@
+<!--{template common/header}-->
+<style type="text/css">
+    table.tableline{border-collapse: collapse; width:80%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:#eee;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+</style>
+
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+    <div class="content">
+
+  <form method="get">
+    <input type="text" name="starttime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$starttime_template" readonly="readonly" />
+    <input type="text" name="endtime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$endtime_template" readonly="readonly"/ >
+    <input type="submit" value="提交">
+  </form>
+  <br />
+  <span>
+共注册新人 $users_count 名，$users_link
+  </span>
+<br />
+<br />
+    <!--{if $discuz_uid > 0 }-->
+<table cellspacing="0" cellpadding="0" class="tableline">
+  <!--{loop $fids $k $v}-->
+  <tr align='center' class='t1'>
+    <th colspan="2">$v[fid_name]</th>
+  </tr>
+		<!--{loop $v[fids] $b}-->
+  <tr align='left' class='t2'>
+    <td bgcolor="#FFFFFF">$b[subject_link]</td>
+    <td bgcolor="#FFFFFF">$b[author_link]</td>
+  </tr>
+		<!--{/loop}-->
+	<!--{/loop}-->
+</table>
+    <!--{else}-->
+        <center>
+            请先<a href="logging.php?action=login">登录</a>
+        </center>
+    <!--{/if}-->
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{$_G[setting][jspath]}calendar.js?{VERHASH}"></script>
+<!--{template common/footer}-->

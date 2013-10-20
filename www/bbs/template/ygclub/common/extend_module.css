@@ -1,0 +1,32 @@
+/** forum::viewthread,group::viewthread,forum::trade,forum::misc **/
+.pls {
+background: #F5FAE7;
+border-right: 1px solid #cee3c2;
+}
+.ad .pls {
+background: #cee3c2;
+}
+.ad .plc {
+background: #cee3c2;}
+/** end **/
+/** forum::forumdisplay,forum::viewthread,forum::modcp,forum::collection,group,home::space,home::task,home::follow,search::forum,search::group,member::groupexpiry,misc::ranklist,misc::stat,misc::tag,forum::guide,portal::block **/
+/* tl --> Thread list modify by lushnis */
+body{
+  background: #67b400 none !important;
+}
+.tl th .tdpre, .tl td.fn .tdpre { background-image: url({STYLEIMGDIR}/preview.png); }
+.tl th, .tl td {
+	padding: 5px 0;
+	border-bottom: 1px solid #f5f5f5;
+}
+.tl th em, .tl th em a {
+	color: #669900;
+}
+#nv_search #ft {
+  margin: 0px !important;
+  text-align: left !important;
+}
+/** end **/
+/** search::forum,search::group **/
+a { color: #666}
+/** end **/

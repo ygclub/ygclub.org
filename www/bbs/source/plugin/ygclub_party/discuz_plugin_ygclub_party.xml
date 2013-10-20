@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<root>
+	<item id="Title"><![CDATA[Discuz! Plugin]]></item>
+	<item id="Version"><![CDATA[X3]]></item>
+	<item id="Time"><![CDATA[2013-09-30 14:14]]></item>
+	<item id="From"><![CDATA[Discuz! Board (http://www.ygclub.org/bbs/)]]></item>
+	<item id="Data">
+		<item id="plugin">
+			<item id="available"><![CDATA[1]]></item>
+			<item id="adminid"><![CDATA[1]]></item>
+			<item id="name"><![CDATA[阳光活动管理]]></item>
+			<item id="identifier"><![CDATA[ygclub_party]]></item>
+			<item id="description"><![CDATA[]]></item>
+			<item id="datatables"><![CDATA[]]></item>
+			<item id="directory"><![CDATA[ygclub_party/]]></item>
+			<item id="copyright"><![CDATA[阳光志愿者]]></item>
+			<item id="version"><![CDATA[1.0]]></item>
+			<item id="__modules">
+				<item id="0">
+					<item id="name"><![CDATA[mobileparty]]></item>
+					<item id="menu"><![CDATA[]]></item>
+					<item id="url"><![CDATA[]]></item>
+					<item id="type"><![CDATA[28]]></item>
+					<item id="adminid"><![CDATA[0]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+					<item id="navtitle"><![CDATA[]]></item>
+					<item id="navicon"><![CDATA[]]></item>
+					<item id="navsubname"><![CDATA[]]></item>
+					<item id="navsuburl"><![CDATA[]]></item>
+				</item>
+				<item id="1">
+					<item id="name"><![CDATA[party]]></item>
+					<item id="menu"><![CDATA[]]></item>
+					<item id="url"><![CDATA[]]></item>
+					<item id="type"><![CDATA[11]]></item>
+					<item id="adminid"><![CDATA[0]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+					<item id="navtitle"><![CDATA[]]></item>
+					<item id="navicon"><![CDATA[]]></item>
+					<item id="navsubname"><![CDATA[]]></item>
+					<item id="navsuburl"><![CDATA[]]></item>
+				</item>
+				<item id="2">
+					<item id="name"><![CDATA[thread]]></item>
+					<item id="menu"><![CDATA[]]></item>
+					<item id="url"><![CDATA[]]></item>
+					<item id="type"><![CDATA[12]]></item>
+					<item id="adminid"><![CDATA[0]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+					<item id="navtitle"><![CDATA[]]></item>
+					<item id="navicon"><![CDATA[]]></item>
+					<item id="navsubname"><![CDATA[]]></item>
+					<item id="navsuburl"><![CDATA[]]></item>
+				</item>
+				<item id="3">
+					<item id="name"><![CDATA[admincp]]></item>
+					<item id="menu"><![CDATA[版块设置]]></item>
+					<item id="url"><![CDATA[]]></item>
+					<item id="type"><![CDATA[3]]></item>
+					<item id="adminid"><![CDATA[1]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+					<item id="navtitle"><![CDATA[]]></item>
+					<item id="navicon"><![CDATA[]]></item>
+					<item id="navsubname"><![CDATA[]]></item>
+					<item id="navsuburl"><![CDATA[]]></item>
+				</item>
+			</item>
+		</item>
+		<item id="version"><![CDATA[X3]]></item>
+		<item id="var">
+			<item id="0">
+				<item id="displayorder"><![CDATA[0]]></item>
+				<item id="title"><![CDATA[插件]]></item>
+				<item id="description"><![CDATA[]]></item>
+				<item id="variable"><![CDATA[forum_group]]></item>
+				<item id="type"><![CDATA[forum_textarea]]></item>
+				<item id="value"><![CDATA[]]></item>
+				<item id="extra"><![CDATA[]]></item>
+			</item>
+		</item>
+		<item id="language">
+			<item id="scriptlang">
+				<item id="plugin_name"><![CDATA[阳光活动]]></item>
+				<item id="plugin_buttontext"><![CDATA[召集阳光活动]]></item>
+				<item id="unlimited"><![CDATA[不限]]></item>
+				<item id="unlimited_gender"><![CDATA[不限性别]]></item>
+				<item id="partyapplies_succeed"><![CDATA[已申请成功，请等待确认]]></item>
+				<item id="add"><![CDATA[添加]]></item>
+				<item id="title"><![CDATA[标题]]></item>
+				<item id="content"><![CDATA[内容]]></item>
+				<item id="submit"><![CDATA[提交]]></item>
+				<item id="party_add"><![CDATA[添加]]></item>
+				<item id="party_config"><![CDATA[版块召集设置]]></item>
+				<item id="party_manage"><![CDATA[活动管理]]></item>
+				<item id="party_list"><![CDATA[活动列表]]></item>
+				<item id="success"><![CDATA[添加成功]]></item>
+				<item id="publish_time"><![CDATA[发布时间]]></item>
+				<item id="status"><![CDATA[状态]]></item>
+				<item id="publish"><![CDATA[点击发布]]></item>
+				<item id="in_publish"><![CDATA[发布中]]></item>
+				<item id="edit_success"><![CDATA[消息已更换]]></item>
+				<item id="consummate_party_data"><![CDATA[完善活动资料]]></item>
+				<item id="already_applied"><![CDATA[已经报名此次活动]]></item>
+				<item id="error_phone_empty"><![CDATA[请输入联系电话]]></item>
+				<item id="error_message_empty"><![CDATA[请输入个人说明]]></item>
+				<item id="error_empty_usertask"><![CDATA[请选择分工]]></item>
+				<item id="error_empty_marks"><![CDATA[请选择备注选项]]></item>
+				<item id="error_followed"><![CDATA[随行人员请输入数字]]></item>
+				<item id="error_SFDC_field"><![CDATA[{field_name}不能为空]]></item>
+				<item id="update_forum_condata_succeed"><![CDATA[设置成功]]></item>
+				<item id="update_succeed"><![CDATA[更新成功]]></item>
+			</item>
+			<item id="templatelang">
+				<item id="name"><![CDATA[yes]]></item>
+				<item id="showtime"><![CDATA[活动时间]]></item>
+				<item id="starttime"><![CDATA[报名时间]]></item>
+				<item id="class"><![CDATA[活动分类]]></item>
+				<item id="gender"><![CDATA[性别]]></item>
+				<item id="unlimited"><![CDATA[不限]]></item>
+				<item id="unlimited_gender"><![CDATA[不限性别]]></item>
+				<item id="male"><![CDATA[男]]></item>
+				<item id="female"><![CDATA[女]]></item>
+				<item id="number_limited"><![CDATA[限制人数]]></item>
+				<item id="number_spec"><![CDATA[0为不限]]></item>
+				<item id="followed"><![CDATA[随行人员]]></item>
+				<item id="inviter_isjoin"><![CDATA[召集人参与]]></item>
+				<item id="inviter_phone"><![CDATA[召集人电话]]></item>
+				<item id="doworker"><![CDATA[分工类型]]></item>
+				<item id="doworker_spec"><![CDATA[多个选项用<strong>英文逗号</strong>分割。如：类型1,类型2]]></item>
+				<item id="marks"><![CDATA[备注]]></item>
+				<item id="marks_spec"><![CDATA[多个选项请用竖线|分割，如：集合点|自行前往]]></item>
+				<item id="starttimefrom"><![CDATA[发起时间]]></item>
+				<item id="starttimeto"><![CDATA[报名截至时间]]></item>
+				<item id="already_confirmed"><![CDATA[已确认]]></item>
+				<item id="applied"><![CDATA[报名]]></item>
+				<item id="status"><![CDATA[状态]]></item>
+				<item id="approved_partyers"><![CDATA[通过人员]]></item>
+				<item id="marks_stat"><![CDATA[通过人员统计]]></item>
+				<item id="dateline"><![CDATA[申请时间]]></item>
+				<item id="message"><![CDATA[说明]]></item>
+				<item id="usertask"><![CDATA[分工]]></item>
+				<item id="i_join"><![CDATA[我要报名]]></item>
+				<item id="party_join_phone"><![CDATA[联系电话]]></item>
+				<item id="party_join_usrexplain"><![CDATA[个人说明]]></item>
+				<item id="party_join_usertask"><![CDATA[选择分工]]></item>
+				<item id="party_join_marks"><![CDATA[备注选项]]></item>
+				<item id="party_join_followed"><![CDATA[随行人员]]></item>
+				<item id="join_party"><![CDATA[同意以上声明并确认报名]]></item>
+				<item id="you_already_applied"><![CDATA[你已经报名了此次活动。]]></item>
+			</item>
+		</item>
+	</item>
+</root>

@@ -1,0 +1,43 @@
+{eval
+
+global $member_list_string, $tomorrow_member_list_string;
+function tpl_birth_member_list() {
+global $member_list_string, $tomorrow_member_list_string;
+
+}
+
+<!--{block return}-->
+<style type="text/css">
+    #party_info {font-size:14px}
+    #party_info tr th {text-align:center;width:200px;}
+</style>
+
+<div class="bm_h cl">
+    <span class="o">
+        <img id="birth_member_list_img" src="static/image/common/collapsed_no.gif" title="收起/展开" alt="收起/展开" onclick="toggle_collapse('birth_member_list');">
+    </span>
+    <h2>
+        <img src="source/plugin/ygclub_birth/image/cake.gif" weight="16" height="16" />
+        <a href="#" style="">今天过生日的小伙伴</a>
+    </h2>
+</div>
+<dl id="birth_member_list" class="bm_c">
+    <dd class="ptm pbm{if $tomorrow_member_list_string != ''} bbda{/if}">
+    $member_list_string
+    </dd>
+    <!--{if $tomorrow_member_list_string != ''}-->
+    <dd class="ptm pbm">
+    <ul class="cl">
+        明天将要过生日的小伙伴：
+        $tomorrow_member_list_string
+        </ul>
+    </dd>
+    <!--{/if}-->
+</dl>
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}

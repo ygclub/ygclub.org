@@ -1,0 +1,84 @@
+<!--{template common/header}-->
+<style type="text/css">
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:80%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+    .checkin0 {color:#aaa}
+    .checkin1 {color:green}
+    .checkin2 {color:red}
+</style>
+
+<div id="wrap" class="wrap s_clear">
+    <div id="content">
+        <h4>注：该活动统计数据来源为报名贴中通过的人员，与实际情况可能存在出入，仅供参考。</h4><br />
+        <form method="get">
+            <input type="text" name="starttime" id="starttime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$starttime_template" readonly="readonly" class="txt" />
+            ~
+            <input type="text" name="endtime" id="endtime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$endtime_template" readonly="readonly" class="txt" />
+            <input type="hidden" name="uid" value="$uid" />
+            <input type="submit" value="查询">
+        </form>
+        <br />
+        <br />
+        <!--{if $endtime > $today}-->
+        <h2>截止时间不得大于今天。<h2>
+        <!--{else}-->
+
+            <!--{if $total_count > 0}-->
+        <span>
+            <strong><a href="home.php?mod=space&uid=$uid&from=act_f" style="color:#690;">$user_name</a></strong> 从 $starttime_template 到 $endtime_template 共报名参加了 $total_count 次活动，已确认参加 $total_checkin_count 次。
+        </span>
+            <!--{loop $partyClass  $ck $cv}-->
+            <!--{if $party_class_count[$cv] > 0}-->
+        <table class="tableline">
+            <caption>
+                <h2>报名{$cv} {$party_class_count[$cv]} 次，已确认参加 {$party_class_checkin_count[$cv]} 次</h2>
+            </caption>
+            <tr>
+                <th style="width:35px">#</th>
+                <th width="50%">活动名称</th>
+                <th style="width:100px">实际参加</th>
+                <!--{if $cv == '阳光公益活动'}-->
+                <th style="width:150px">课程</th>
+                <!--{/if}-->
+                <th style="width:250px">活动时间</th>
+            </tr>
+            <!--{eval $size=0;}-->
+            <!--{loop $act_user_list[$cv]['tlist'] $k $v}-->
+            <!--{eval $size++;}-->
+            <tr class='t1'>
+                <th>$size</th>
+                <td>
+                    <!--{if $v['showtime'] >= time() }-->
+                    <a href="forum.php?mod=viewthread&tid=$k&from=act_f" style="font-weight: bold;color: #2B65B7">$v['subject']</a>
+                    <!--{else}-->
+                    <a href="forum.php?mod=viewthread&tid=$k&from=act_f" >$v['subject']</a>
+                    <!--{/if}-->
+                    <!--{if $v['ctid'] > 0 }--><a href="forum.php?mod=viewthread&tid=$v[ctid]" style="color:green">[相关总结帖]</a><!--{/if}-->
+                </td>
+                <td>
+                    <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>
+                </td>
+                <!--{if $cv == '阳光公益活动'}-->
+                <td><!--{loop $v['config']['课程'] $config}-->
+                    $config  
+                    <!--{/loop}-->
+                </td>
+                <!--{/if}-->
+                 <td>$v['showtime_gm']</td>
+            </tr>
+            <!--{/loop}-->
+        </table>
+                <!--{/if}-->
+            <!--{/loop}-->
+            <!--{else}-->
+            <h2> 您设置查询条件无活动数据。</h2>
+            <!--{/if}-->
+        <!--{/if}-->
+    </div>
+</div>
+
+<script type="text/javascript" src="{$_G[setting][jspath]}calendar.js?{VERHASH}"></script>
+<!--{template common/footer}-->

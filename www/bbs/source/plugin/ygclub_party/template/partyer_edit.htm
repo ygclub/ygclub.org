@@ -1,0 +1,79 @@
+<!--{template common/header}-->
+<div id="partyeredit">
+    <h2>{$partyer['username']}的报名信息</h2>
+    <form name="partyer_edit" id="partyer_edit" method="post" action="plugin.php?id=ygclub_party&act=editp" onsubmit="ajaxpost('partyer_edit', 'return_partyeredit', 'return_partyeredit', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="partyer_edit" />
+        <input type="hidden" name="partyereditsubmit" value="partyereditsubmit" />
+        <input type="hidden" name="action" value="partyer_edit" />
+        <input type="hidden" name="tid" value="{$party[tid]}" />
+        <input type="hidden" name="pid" value="{$partyer[pid]}" />
+        <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" class="dt">
+            <tr>
+                <th style="width:120px">{lang ygclub_party:dateline}</th>
+                <td>
+                    <span>$partyer[_dateline]</span>
+                </td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:status}</th>
+                <td>
+                    <span>$partyer['_status']</span>
+                </td>
+            </tr>
+
+            <tr>
+                <th>{lang ygclub_party:party_join_phone}</th>
+                <td>
+                    <input type="text" class="px" name="phone" size="20" maxlength="20" value="{$partyer[phone]}" onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> (仅限数字)
+                </td>
+            </tr>
+            <tr>
+                <th>{lang ygclub_party:party_join_usrexplain}</th>
+                <td>
+                    <textarea name="message" maxlength="200" cols="38" rows="2" class="pt">$partyer['message']</textarea>
+                </td>
+            </tr>
+
+            <!--{if !empty($party['_doworker_list'])}-->
+            <tr>
+                <th>{lang ygclub_party:party_join_usertask}<span class="rq y">*</span></th>
+                <td>
+                    <!--{loop $party['_doworker_list'] $k $v}-->
+                    <label for="usertask_{$k}"><input class="pr" type="radio" value="$v" name="usertask" id="usertask_{$k}" {if $partyer[usertask] == $v}checked="checked"{/if}/>$v</label>
+                    <!--{/loop}-->
+                </td>
+            </tr>
+            <!--{/if}-->
+
+            <!--{if !empty($party['_marks_list'])}-->
+            <tr>
+                <th>{lang ygclub_party:party_join_marks}<span class="rq y">*</span></th>
+                <td>
+                    <!--{loop $party['_marks_list'] $k $v}-->
+                    <label for="marks_{$k}"><input class="pr" type="radio" name="marks" id="marks_{$k}" value="$k" {if $partyer[marks] == $k}checked="checked"{/if}/>$v</label>
+                    <!--{/loop}-->
+                </td>
+            </tr>
+            <!--{/if}-->
+
+            <!--{if $party['followed']}-->
+            <tr>
+                <th>{lang ygclub_party:party_join_followed}<span class="rq y">*</span></th>
+                <td>
+                    <input type='text' name='followed' class='ps' onkeyup="value=value.replace(/[^0123456789]/g,'')" value='{$party[followed]}' maxlength='4' size='4'>
+                </td>
+            </tr>
+            <!--{/if}-->
+
+            <tr>
+                <td  style="border-bottom:0"></td>
+                <td  style="border-bottom:0">
+                    <button type="submit" id="partyereditsubmit" name="partyereditsubmit" value="true" class="pn pnc"><span>保存</span></button>
+                    <button type="reset" class="pn "><span>恢复</span></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<!--{template common/footer}-->

@@ -1,0 +1,65 @@
+<!--{template common/header}-->
+<style type="text/css">
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:70%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+</style>
+
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+    <div id="content">
+    <!--{if $discuz_uid > 0 }-->
+    <h4>注：该活动统计数据来源为报名贴中通过的人员，与实际情况可能存在出入，仅供参考。</h4><br />
+        <form method="get">
+            <input type="text" name="starttime" id="starttime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$starttime_template" readonly="readonly" class="txt"/>
+            ~
+            <input type="text" name="endtime" id="endtime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$endtime_template" readonly="readonly"  class="txt"/>
+            输入用户名查找 <input type="text" name="username" id="username" value="$username" class="txt" />
+            <input type="submit" value="查询">
+        </form>
+        <br />
+        <br />
+        <!--{if $endtime > $today}-->
+        <h2>截止时间不得大于今天。<h2>
+        <!--{else}-->
+            <!--{if $party_total_count > 0}-->
+        从 $starttime_template 到 $endtime_template 共有 $party_uniq_user_count 人报名参加了活动，报名活动人次总计 $party_total_count 次。<!--{loop $partyClass $ck $cv}-->$cv $party_class_count[$cv] 次。 <!--{/loop}-->
+        <table class="tableline">
+            <tr>
+                <th style="width:35px">#</th>
+                <th>用户名</th>
+                <!--{loop $partyClass $ck $cv}-->
+                <th>$cv</th>
+                <!--{/loop}-->
+                <th>总计</th>
+            </tr>
+            <!--{eval $size=0;}-->
+            <!--{loop $act_user_total_count $k $v}-->
+            <!--{eval $size++;}-->
+            <tr class='t1'>
+                <th>$size</th>
+                <td><a href="act.php?uid=$k&starttime=$starttime_template&endtime=$endtime_template">$act_user_list[$k]['username']</a></td>
+                <!--{loop $partyClass $ck $cv}-->
+                <td>$act_user_list[$k][$cv]</td>
+                <!--{/loop}-->
+                <td>$act_user_list[$k]['total']</td>
+            </tr>
+            <!--{/loop}-->
+        </table>
+            <!--{else}-->
+            <h2> 您设置查询条件无活动数据。</h2>
+            <!--{/if}-->
+        <!--{/if}-->
+
+    <!--{else}-->
+        <center>
+            请先<a href="member.php?mod=logging&action=login">登录</a>
+        </center>
+    <!--{/if}-->
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{$_G[setting][jspath]}calendar.js?{VERHASH}"></script>
+<!--{template common/footer}-->

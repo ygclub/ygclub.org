@@ -1,0 +1,103 @@
+<!--{template common/header}-->
+<script type="text/javascript">
+function check_all(form, prefix) {
+    count = 0;
+    for(var i = 0; i < form.elements.length; i++) {
+        var e = form.elements[i];
+        if(e.id && e.name != checkall && (!prefix || (prefix && e.id.match(prefix)))) {
+            e.checked = "checked";
+            if(e.checked) {
+                count++;
+            }
+        }
+    }
+}
+</script>
+<style type="text/css">
+    #content {padding: 8px; clear: both; width:95%;  margin: auto; margin-top: 10px;}
+    #content a {color:#690; font-family: Tahoma,sans-serif; }
+    #content a:hover { color: #3C9D40;}
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:90%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:#ccc;}
+    table.tableline tr.odd td{background-color:#eee}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+    .checkin0 {color:#aaa}
+    .checkin1 {color:green}
+    .checkin2 {color:red}
+</style>
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+        <div class="content">
+<!--{if $notshow}-->
+活动尚未开始，不能查看/编辑签到信息。
+<!--{else}-->
+<!--{if $mPerm && $_GET[step] == 'list'}-->
+<a href="plugin.php?id=ygclub_party&tid=$tid&act=checkin" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
+<!--{/if}-->
+<table cellspacing="0" cellpadding="0" class="tableline" style="width:70%">
+    <caption>
+        课程活动总结
+    </caption>
+    <thead>
+        <th width="16%">课程</th>
+        <th width="28%">主讲人</th>
+        <th width="28%">助教</th>
+        <th width="28%">旁听</th>
+    </thead>
+    <tbody>
+        <!--{loop $sum_list $k $v}-->
+        <!--{if $k != '其他分工'}-->
+        <tr>
+        <td>$k</td>
+        <td>{$v['主讲人']['sum']}</td>
+        <td>{$v['助教']['sum']}</td>
+        <td>{$v['旁听']['sum']}</td>
+        </tr>
+        <!--{else}-->
+         <tr>
+        <td>$k</td>
+        <td colspan="3">$v['其他分工']['sum']</td>
+        </tr>
+       <!--{/if}-->
+        <!--{/loop}-->
+    </tbody>
+</table>
+<br />
+<table cellspacing="0" cellpadding="0" class="tableline">
+    <caption>
+        共有{$total_count}人成功报名了活动，其中：&nbsp; {$checkin_count_list[1]}人实际参加了活动<!--{if $checkin_count_list[2]>0}-->，{$checkin_count_list[2]}人未参加活动<!--{/if}--><!--{if $checkin_count_list[0]>0}-->，还有{$checkin_count_list[0]}人等待确认<!--{/if}-->
+    </caption>
+	<thead>
+		<tr>
+			<th width="120">用户名</th>
+			<th width="120" class="state">是否实际参加</th>
+			<!--{if $party['doworker']}--><th width='100'>分工</th><!--{/if}-->
+			<th>个人说明</th>
+		</tr>
+	</thead>
+    <tbody>
+        <!--{loop $result_list $k $v}-->
+        <tr<!--{if $k%2 == 1}--> class="odd"<!--{/if}-->>
+            <td class="author1">
+<a href="space.php?uid=$v[uid]" target="_blank">$v[username]</a>
+            </td>
+			<td class="state">
+                    <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>
+            </td>
+			<!--{if $party['doworker']}--><td width='100'>$v[usertask]</td><!--{/if}-->
+			<td><div id="user_say_$v[uid]" ><!--{if $v['phone']=='召集人邀请'}--><font color='green'>$v[message]</font><!--{else}-->$v[message]<!--{/if}-->
+			<!--{if $v['reply']}--><br /><font color='green'>$v[reply]</font><!--{/if}--></div></td>
+		</tr>
+<!--{/loop}-->
+	<tbody>
+           </table>
+           <br />
+            <!--{/if}-->
+        </div>
+    </div>
+</div>
+
+
+<!--{template common/footer}-->

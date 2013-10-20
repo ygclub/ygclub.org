@@ -1,0 +1,187 @@
+<script type="text/javascript">
+    function show_perms(id){
+        for (i=1; i<=4 ; i++ ){
+            if (id==i){
+                document.getElementById('perms'+id).style.display = 'block';
+            }else{
+                document.getElementById('perms'+i).style.display = 'none';
+            }
+        }
+    }
+function add_option_field(v){
+    var obj = document.getElementById('option_field_num');
+    var str = "";
+    if (v > 0){
+        for (i=1; i<=v ; i++ ){
+            str = str + "<br /><br /><input type='text' name='party[optionfield][field][]' class='txt' style='width:50px;'/> - <input type='text' name='party[optionfield][name][]' class='txt' style='width:50px;'/> - <select name='party[optionfield][type][]'><option value='text'>单行文本</option><option value='textarea'>多行文本</option><option value='radio'>单选</option><option value='checkbox'>多选</option></select> - <input type='text' name='party[optionfield][default][]' class='txt' style='width:150px;'/> - <input type='checkbox' name='party[optionfield][bold][]' />加粗 - <input type='text' name='party[optionfield][color][]' class='txt' style='width:50px;'/> - <input type='checkbox' name='party[optionfield][must][]' />必填 - <input type='text' name='party[optionfield][order][]' class='txt' style='width:20px;'/>";
+        }
+    }
+    obj.innerHTML = str;
+}
+function add_sign_field(v){
+    var obj = document.getElementById('sign_field_num');
+    var str = "";
+    if (v > 0){
+        for (i=1; i<=v ; i++ ){
+            str = str + "<br /><br /><input type='text' name='party[signfield][field][]' class='txt' style='width:50px;'/> - <input type='text' name='party[signfield][name][]' class='txt' style='width:50px;'/> - <select name='party[signfield][type][]'><option value='text'>单行文本</option><option value='textarea'>多行文本</option><option value='radio'>单选</option><option value='checkbox'>多选</option></select> - <input type='text' name='party[signfield][default][]' class='txt' style='width:150px;'/> - <input type='checkbox' name='party[signfield][bold][]' />加粗 - <input type='text' name='party[signfield][color][]' class='txt' style='width:50px;'/> - <input type='checkbox' name='party[signfield][must][]' />必填 - <input type='text' name='party[signfield][order][]' class='txt' style='width:20px;'/>";
+        }
+    }
+    obj.innerHTML = str;
+}
+</script>
+
+
+<form method="post" autocomplete="off" action="">
+    <table class="tb tb2">
+        <tbody id="party_body">
+            <tr>
+                <th colspan="2" class="partition">
+                    $_G['cache']['forums'][$fid]['name']
+                </th>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">报名权限</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    {eval $j=0;}
+                    <!--{loop $_G['cache']['usergroups'] $k $v}-->
+                        {eval $j++}
+                        <input type="checkbox" name="party[bgroup][]" id="party_bgroup_$k" value="$k" {if $condata[bgroup] && in_array($k,$condata[bgroup])}checked{/if}/><label for="party_bgroup_$k">$v[grouptitle]</label> &nbsp;
+                        <!--{if $j%4 == 0}--><br /><!--{/if}-->
+                    <!--{/loop}-->
+                </td>
+                <td class="vtop tips2">
+                    不选为全体会员可参加
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">退出时间</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="text" name="party[limittime]" value="{if $condata}$condata[limittime]{else}30{/if}" class="txt" style="width:30px" />分钟
+                </td>
+                <td class="vtop tips2">
+                    允许召集结束前?分钟内可以自由退出活动。只针对已通过报名的会员，为“0”则可以随时退出活动
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">随行人员</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="radio" name="party[follower]" value='1' {if $condata[follower]==1}checked{/if}/> 开启 <input type="radio" name="party[follower]" value='0' {if $condata[follower]==0 || empty($condata)}checked{/if}/> 关闭
+                </td>
+                <td class="vtop tips2">
+                    关闭该选项后前台发起活动时不会有随行人员选项
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">活动类型</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="text" name="party[classes]" value='$condata[classes]' class='txt'/> 
+                </td>
+                <td class="vtop tips2">
+                    多个设置请用英文状态下的逗号隔开。如：活动类型1,活动类型2,活动类型3
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">分工类型</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="text" name="party[doworker]" value='$condata[doworker]' class='txt'/> 
+                </td>
+                <td class="vtop tips2">
+                    多个设置请用英文状态下的逗号隔开。如：分工1,分工2,分工3
+                </td>
+            </tr>
+
+	    <tr>
+                <td class="td27" colspan="2">默认备注</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="text" name="party[marks]" value='$condata[marks]' class='txt'/> 
+                </td>
+                <td class="vtop tips2">
+                    多个设置请用竖线|隔开。如：备注1|备注2|备注3
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td27" colspan="2">报名表单</td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform">
+                    <input type="radio" name="party[signform]" value='1' onclick="document.getElementById('signform').style.display='block';" value='1' {if $condata[signform]==1}checked{/if}/> 开启 <input type="radio" name="party[signform]" value='0' onclick="document.getElementById('signform').style.display='none';" value='0' {if $condata[signform]==0 || empty($condata)}checked{/if}/> 关闭
+                </td>
+                <td class="vtop tips2">
+                    报名表单
+                </td>
+            </tr>
+            <tr class="noborder">
+                <td class="vtop rowform" colspan="2">
+                    <span id="signform" style="display:{if $condata[signform]==1}block{else}none{/if};"><br />格式：字段(<font color="red">*</font>) - 名称(<font color="red">*</font>) - 类型 - 默认值 - 加粗 - 颜色 - 必填 - 排序(<font color="red">*</font>)&nbsp;&nbsp;// 加 <select onchange="add_sign_field(this.value);"><option value='0'>--</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option><option value='6'>6</option><option value='7'>7</option><option value='8'>8</option><option value='9'>9</option><option value='10'>10</option></select> 个字段&nbsp;&nbsp;(注：排序的数字不能重复。)<br /><br />
+                        <!--{if $condata['signfield']}-->
+                        <!--{loop $condata['signfield'] $k $v}-->
+                        <input type="text" name="party[signfield][field][$k]" value="$v[field]" class="txt" style="width:50px;"/> - <input type="text" name="party[signfield][name][$k]" value="$v[name]" class="txt" style="width:50px;"/> - <select name="party[signfield][type][$k]"><option value="text" {if $v[type]=='text'}selected{/if}>单行文本</option><option value="textarea" {if $v[type]=='textarea'}selected{/if}>多行文本</option><option value="radio" {if $v[type]=='radio'}selected{/if}>单选</option><option value="checkbox" {if $v[type]=='checkbox'}selected{/if}>多选</option></select> - <input type="text" name="party[signfield][default][$k]" value="$v[default]" class="txt" style="width:150px;"/> - <input type="checkbox" name="party[signfield][bold][$k]" {if $v[bold]=='on'}checked{/if}/>加粗 - <input type="text" name="party[signfield][color][$k]" value="$v[color]" class="txt" style="width:50px;"/> - <input type="checkbox" name="party[signfield][must][$k]" {if $v[must]=='on'}checked{/if}/>必填 - <input type="text" name="party[signfield][order][$k]" value="$v[order]" class="txt" style="width:20px;"/><br /><br />
+                        <!--{/loop}-->
+                        <!--{/if}-->
+                    <input type="text" name="party[signfield][field][]" value="" class="txt" style="width:50px;"/> - <input type="text" name="party[signfield][name][]" value="" class="txt" style="width:50px;"/> - <select name="party[signfield][type][]"><option value="text">单行文本</option><option value="textarea">多行文本</option><option value="radio">单选</option><option value="checkbox">多选</option></select> - <input type="text" name="party[signfield][default][]" value="" class="txt" style="width:150px;"/> - <input type="checkbox" name="party[signfield][bold][]" />加粗 - <input type="text" name="party[signfield][color][]" value="" class="txt" style="width:50px;"/> - <input type="checkbox" name="party[signfield][must][]" />必填 - <input type="text" name="party[signfield][order][]" value="{echo count($condata[signfield])+1;}" class="txt" style="width:20px;"/><div id="sign_field_num" style="display:inline;"></div></span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value='提交' name='partysubmit' class="btn"/>
+                </td>
+            </tr>                
+        <!-- 
+        <tr>
+            <td class="td27" s="1" colspan="2">启用站内短信</td>
+        </tr>
+        <tr class="noborder">
+            <td class="vtop rowform">
+            </td>
+            <td class="vtop" s="1">
+            </td>
+        </tr>
+
+        <tr>
+            <td><b>启用短信</b></th>
+            <td><input type="radio" name="party[sms]" value='1' {if $condata[sms]==1}checked{/if}/> 开启 <input type="radio" name="party[sms]" value='0' {if $condata[sms]==0 || empty($condata)}checked{/if}/> 关闭</td>
+        </tr>
+        <tr>
+            <td valign="top"><b>所用币值</b></th>
+            <td>对应着的论坛币种，通过召集报名后将扣除或奖励以下设置的值，为0则不扣除或奖励。<br />
+                <!--{loop $_DCACHE['settings']['extcredits'] $k $v}-->$v[title] <input type="text" name="party[coins][$k]" value="{if $condata}$condata[coins][$k]{else}0{/if}" class="txt" style="width:30px;"/> <!--{/loop}--></td>
+        </tr>
+        <tr>
+            <td valign="top"><b>选项表单</b></th>
+            <td><input type="radio" name="party[optionform]" onclick="document.getElementById('optionform').style.display='block';" value='1' {if $condata[optionform]==1}checked{/if}/> 开启 <input type="radio" name="party[optionform]" onclick="document.getElementById('optionform').style.display='none';" value='0' {if $condata[optionform]==0 || empty($condata)}checked{/if}/> 关闭
+                <span id="optionform" style="display:{if $condata[optionform]==1}block{else}none{/if};"><br />格式：字段(<font color="red">*</font>) - 名称(<font color="red">*</font>) - 类型 - 默认值 - 加粗 - 颜色 - 必填 - 排序(<font color="red">*</font>)&nbsp;&nbsp;// 加 <select onchange="add_option_field(this.value);"><option value='0'>--</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option><option value='6'>6</option><option value='7'>7</option><option value='8'>8</option><option value='9'>9</option><option value='10'>10</option></select> 个字段&nbsp;&nbsp;(注：排序的数字不能重复。)<br /><br />
+                    <!--{if $condata['optionfield']}-->
+                    <!--{loop $condata['optionfield'] $k $v}-->
+                    <input type="text" name="party[optionfield][field][$k]" value="$v[field]" class="txt" style="width:50px;"/> - <input type="text" name="party[optionfield][name][$k]" value="$v[name]" class="txt" style="width:50px;"/> - <select name="party[optionfield][type][$k]"><option value="text" {if $v[type]=='text'}selected{/if}>单行文本</option><option value="textarea" {if $v[type]=='textarea'}selected{/if}>多行文本</option><option value="radio" {if $v[type]=='radio'}selected{/if}>单选</option><option value="checkbox" {if $v[type]=='checkbox'}selected{/if}>多选</option></select> - <input type="text" name="party[optionfield][default][$k]" value="$v[default]" class="txt" style="width:150px;"/> - <input type="checkbox" name="party[optionfield][bold][$k]" {if $v[bold]=='on'}checked{/if}/>加粗 - <input type="text" name="party[optionfield][color][$k]" value="$v[color]" class="txt" style="width:50px;"/> - <input type="checkbox" name="party[optionfield][must][$k]" {if $v[must]=='on'}checked{/if}/>必填 - <input type="text" name="party[optionfield][order][$k]" value="$v[order]" class="txt" style="width:20px;"/><br /><br />
+                    <!--{/loop}-->
+                    <!--{/if}-->
+                    <input type="text" name="party[optionfield][field][]" value="" class="txt" style="width:50px;"/> - <input type="text" name="party[optionfield][name][]" value="" class="txt" style="width:50px;"/> - <select name="party[optionfield][type][]"><option value="text">单行文本</option><option value="textarea">多行文本</option><option value="radio">单选</option><option value="checkbox">多选</option></select> - <input type="text" name="party[optionfield][default][]" value="" class="txt" style="width:150px;"/> - <input type="checkbox" name="party[optionfield][bold][]" />加粗 - <input type="text" name="party[optionfield][color][]" value="" class="txt" style="width:50px;"/> - <input type="checkbox" name="party[optionfield][must][]" />必填 - <input type="text" name="party[optionfield][order][]" value="{echo count($condata[optionfield])+1;}" class="txt" style="width:20px;"/><div id="option_field_num" style="display:inline;"></div></span></td>
+        </tr>
+        -->
+        </tbody>
+    </table>
+</form>
+
+
+<script type="text/javascript">
+    document.getElementById('party_body').style.display='$party_body_display';
+</script>
+

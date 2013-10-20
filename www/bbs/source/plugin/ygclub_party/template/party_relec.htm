@@ -1,0 +1,56 @@
+<!--{template common/header}-->
+<div id="partyrelec">
+    <form name="party_relec" id="party_relec" method="post" action="plugin.php?id=ygclub_party&act=party_relec" onsubmit="ajaxpost('party_relec', 'return_partyrelec', 'return_partyrelec', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="party_relec" />
+        <input type="hidden" name="partyrelecsubmit" value="partyrelecsubmit" />
+        <input type="hidden" name="action" value="party_relec" />
+        <input type="hidden" name="tid" value="{$party[tid]}" />
+			<table cellspacing="0" cellpadding="0" class="formtable">
+                <tr>
+                    <td>
+                        <h1>
+                        <!--{if $party[ctid] > 0}-->已关联至总结帖: <a href="forum.php?mod=viewthread&tid=$party[ctid]">$ctinfo[subject]</a>
+                        <!--{else}-->尚未关联总结帖<!--{/if}-->
+                        </h1>
+        <br />
+                    </td>
+				</tr>
+				<tr>
+                    <td>输入要关联的总结贴ID:
+                      <!--{if $party[ctid] > 0}-->
+                      <input type="text" value="$party[ctid]"class="px" name="ctid" size="20" maxlength="20"  onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> (仅限数字)
+                      <!--{elseif $rcinfo[tid] > 0}-->
+                      <input type="text" value="$rcinfo[tid]" class="px" name="ctid" size="20" maxlength="20"  onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> (仅限数字)
+                      <!--{else}-->
+                      <input type="text" value="" class="px" name="ctid" size="20" maxlength="20"  onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> (仅限数字)
+                      <!--{/if}-->
+                  </td>
+				</tr>				
+                <tr>
+                    <td>
+        <br />
+                    <button type="submit" id="partyrelecsubmit" name="partyrelecsubmit" value="true" class="pn pnc"><span>保存</span></button>
+                    <button type="reset" class="pn "><span>恢复</span></button>
+                    </td>
+				</tr>				
+                <!--{if $party[ctid] == 0}-->
+                <tr>
+                    <td>
+                        <!--{if $rcinfo[tid]>0}-->
+                        系统推荐您关联至总结帖：[{$rcinfo['tid']}] <a href="forum.php?mod=viewthread&tid=$rcinfo[tid]">$rcinfo[subject]</a>
+                        <!--{else}-->
+                        系统没有找到可推荐的总结帖进行关联，请尝试检查是否有相关总结帖或手工输入ID进行关联。
+                        <!--{/if}-->
+                    </td>
+                </tr>				
+                <!--{/if}-->
+            </table>
+        </form>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+<!--{template common/footer}-->

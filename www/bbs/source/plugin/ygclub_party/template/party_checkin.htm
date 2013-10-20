@@ -1,0 +1,113 @@
+<!--{template common/header}-->
+<script type="text/javascript">
+function check_all(form, prefix) {
+    count = 0;
+    for(var i = 0; i < form.elements.length; i++) {
+        var e = form.elements[i];
+        if(e.id && e.name != checkall && (!prefix || (prefix && e.id.match(prefix)))) {
+            e.checked = "checked";
+            if(e.checked) {
+                count++;
+            }
+        }
+    }
+}
+</script>
+<style type="text/css">
+    #content {padding: 8px; clear: both; width:95%;  margin: auto; margin-top: 10px;}
+    #content a {color:#690; font-family: Tahoma,sans-serif; }
+    #content a:hover { color: #3C9D40;}
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:90%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:#ccc;}
+    table.tableline tr.odd td{background-color:#eee}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+    .checkin0 {color:#aaa}
+    .checkin1 {color:green}
+    .checkin2 {color:red}
+</style>
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+        <div class="content">
+<!--{if $notshow}-->
+活动尚未开始，不能查看/编辑签到信息。
+<!--{else}-->
+<!--{if $mPerm && $step == 'list'}-->
+<a href="plugin.php?id=ygclub_party&tid=$tid&act=checkin" style="font-weight:normal;font-size:12px;">[编辑签到信息]</a>  
+<!--{/if}-->
+<!--{if $mPerm && $step != 'list'}-->
+<a href="plugin.php?id=ygclub_party&tid=$tid&act=checkin&step=list" style="font-weight:normal;font-size:12px;">[查看签到信息]</a>  
+<!--{/if}-->
+<form name="party_checkin" id="party_checkin" method="post" action="plugin.php?id=ygclub_party&act=checkin" onsubmit="ajaxpost('party_checkin', 'return_partycheckin', 'return_partycheckin', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="party_checkin" />
+        <input type="hidden" name="partycheckinsubmit" value="partycheckinsubmit" />
+        <input type="hidden" name="action" value="party_checkin" />
+        <input type="hidden" name="tid" value="{$party[tid]}" />
+
+<table cellspacing="0" cellpadding="0" class="tableline">
+    <caption>
+        共有{$total_count}人成功报名了活动，其中：&nbsp; {$checkin_count_list[1]}人实际参加了活动<!--{if $checkin_count_list[2]>0}-->，{$checkin_count_list[2]}人未参加活动<!--{/if}--><!--{if $checkin_count_list[0]>0}-->，还有{$checkin_count_list[0]}人等待确认<!--{/if}-->
+    </caption>
+	<thead>
+		<tr>
+			<th width="120">用户名</th>
+<!--{if $mPerm && $step != 'list'}-->
+<th class="state" style="width:280px">是否实际参加<br />
+<input id="checkall_0" name="checkall" type="radio" onclick="check_all(this.form, 'checkin0_');" /><label for="checkall_0">全部稍后确认
+<input id="checkall_1" name="checkall" type="radio" onclick="check_all(this.form, 'checkin1_');" /><label for="checkall_1">全部参加
+<input id="checkall_2" name="checkall" type="radio" onclick="check_all(this.form, 'checkin2_');" /><label for="checkall_2">全部未参加
+<!--{else}-->
+			<th class="state" style="width:160px">是否实际参加
+<!--{/if}-->
+</th>
+			<!--{if $party['doworker']}--><th width='100'>分工</th><!--{/if}-->
+			<th>个人说明</th>
+		</tr>
+	</thead>
+    <tbody>
+        <!--{loop $result_list $k $v}-->
+        <tr<!--{if $k%2 == 1}--> class="odd"<!--{/if}-->>
+            <td class="author1">
+                <a href="home.php?mod=space&uid=v[uid]" target="_blank">$v[username]</a>
+            </td>
+			<td class="state">
+                <!--{if $mPerm && $step != 'list'}-->
+                <input type="radio" name="checkin[{$v[uid]}]" value="0" id="checkin0_{$v[uid]}" <!--{if $v['checkin'] == 0}-->checked="checked"<!--{/if}-->/> <label for="checkin0_{$v[uid]}">稍后确认</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <input type="radio" name="checkin[{$v[uid]}]" value="1" id="checkin1_{$v[uid]}" <!--{if $v['checkin'] == 1}-->checked="checked"<!--{/if}-->/> <label for="checkin1_{$v[uid]}">已参加</label>&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="checkin[{$v[uid]}]" value="2" id="checkin2_{$v[uid]}" <!--{if $v['checkin'] == 2}-->checked="checked"<!--{/if}-->/> <label for="checkin2_{$v[uid]}">未参加</label>
+                <!--{else}-->
+                    <span class="checkin{$v['checkin']}">$v['checkin_txt']</span>
+            <!--{/if}-->
+            </td>
+            <!--{if $party['doworker']}-->
+                <!--{if $mPerm && $step != 'list'}-->
+                <td width='100' align="center">
+                    <select name="usertask_list[{$v[uid]}]">
+                    <!--{loop $ex_workers $ut}-->
+                    <option value="$ut" <!--{if $ut == $v[usertask]}-->selected="selected"<!--{/if}-->>$ut</option>
+                    <!--{/loop}-->
+                </select></td>
+                <!--{else}-->
+            <td width='100' align="center">$v[usertask]</td>
+                <!--{/if}-->
+            <!--{/if}-->
+			<td><div id="user_say_$v[uid]" ><!--{if $v['phone']=='召集人邀请'}--><font color='green'>$v[message]</font><!--{else}-->$v[message]<!--{/if}-->
+			<!--{if $v['reply']}--><br /><font color='green'>$v[reply]</font><!--{/if}--></div></td>
+		</tr>
+       <!--{/loop}-->
+	   </tbody>
+           </table>
+           <br />
+           <!--{if $mPerm && $step != 'list'}-->
+           <button type="submit" id="partycheckinsubmit" name="partycheckinsubmit" value="true" class="pn pnc"><span>更新签到数据</span></button>
+           <button type="reset" class="pn "><span>取消更改</span></button>
+            <!--{/if}-->
+            <!--{/if}-->
+        </div>
+    </div>
+</div>
+</form>
+
+<!--{template common/footer}-->

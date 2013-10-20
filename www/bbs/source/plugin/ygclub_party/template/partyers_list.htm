@@ -1,0 +1,103 @@
+<h2>$hdr (共{$count}人)</h2>
+<!--{if $count > 0}-->
+<table class="dt">
+    <tr>
+        <th width="120">&nbsp;</th>
+        <!--{if $mPerm==1}-->
+        <th width="40">电话</th>
+        <!--{/if}-->
+        <th width="100">{lang ygclub_party:dateline}</th>
+        <th>{lang ygclub_party:message}</th>
+        <th width="70">{lang ygclub_party:status}</th>
+
+        <!--{if $party['doworker']}-->
+        <th width="70">{lang ygclub_party:usertask}</th>
+        <!--{/if}-->
+
+        <!--{if !empty($party['marks'])}-->
+        <th width="70">{lang ygclub_party:marks}</th>
+        <!--{/if}-->
+        
+        <!--{if $mPerm==1}-->
+        <th width='160'>操作</th>
+        <!--{/if}-->
+    </tr>
+    <!--{loop $apply_list $partyer}-->
+    <tr>
+        <td>
+		<a target="_blank" href="home.php?mod=space&uid=$partyer[uid]" class="ratl vm" >{$partyer[_avatar]}</a>
+            <a target="_blank" href="home.php?mod=space&uid=$partyer[uid]" >{$partyer[username]}</a>
+        </td>
+        <!--{if $mPerm==1}-->
+        <td><img src="source/plugin/ygclub_party/images/mobile.gif" title="{$partyer[phone]}" /></td>
+        <!--{/if}-->
+        <td>{$partyer[_dateline]}</td>
+        <td>{$partyer[message]}<!--{if $partyer[reply] != ''}--><br /><font color="green">{$partyer[reply]}</font><!--{/if}--></td>
+        <td>{$partyer[_status]}</td>
+
+        <!--{if $party['doworker']}-->
+        <td>{$partyer[usertask]}</td>
+        <!--{/if}-->
+
+        <!--{if !empty($party['marks'])}-->
+        <td>{$partyer[_marks]}</td>
+        <!--{/if}-->
+        
+        <!--{if $mPerm==1}-->
+        <td>
+            <!--{if $partyer[verified] == 4}-->
+            <button onclick="showDialog($('partyer_operate').innerHTML,'info','取消 $partyer[username] 参加此次活动',null,1);$('operate_pid').value='{$partyer[pid]}';$('operate_for').value='wait';return false;" class="pn"><span>取消</span></button>
+	    <button onclick="showDialog($('partyer_operate').innerHTML,'info','回复 $partyer[username]',null,1);$('operate_pid').value='{$partyer[pid]}';$('operate_for').value='reply';return false;" class="pn"><span>回复</span></button>
+	    <!--{else}-->
+	    <!--
+	    <button onclick="showDialog($('partyer_operate').innerHTML,'info','接受 $partyer[username] 参加此次活动',null,1);$('operate_pid').value='{$partyer[pid]}';$('operate_for').value='accept';return false;" class="pn"><span>接受</span></button> -->
+	    <button onclick="$('operate_pid').value='{$partyer[pid]}';$('operate_for').value='accept';ajaxpost('partyer_operate_form', 'return_partyer_operate', 'return_partyer_operate', 'onerror');return false;" class="pn"><span>接受</span></button>
+            <button onclick="showDialog($('partyer_operate').innerHTML,'info','回复 $partyer[username]',null,1);$('operate_pid').value='{$partyer[pid]}';$('operate_for').value='reply';return false;" class="pn"><span>回复</span></button>
+            <!--{/if}-->
+            <a href="plugin.php?id=ygclub_party&act=editp&pid={$partyer[pid]}" class="pn pnc">编辑</a>
+        </td>
+        <!--{/if}-->
+
+    </tr>
+    <!--{/loop}-->
+</table>
+<br \>
+<div class="pgs mbm cl">
+    <div class="pg">{$multipage}</div>
+</div>
+        <div class="pbm ptm">
+            <em class="xi1" id="return_operateapplies"></em>
+        </div>
+<script type="text/javascript">
+function succeedhandle_partyer_operate(url, message)
+{
+	//showDialog(message,'right',null, null, 1, null, null, null, null, 1, null);
+    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=PassUsers','ygclub_party_passed_partyers');
+    ajaxget('plugin.php?id=ygclub_party&tid={$tid}&act=list&step=noPassUsers','ygclub_party_nopassed_partyers');
+    hideMenu('fwin_dialog', 'dialog');
+}
+</script>
+<div id="partyer_operate" style="display:none">
+    <form name="partyer_operate_form" id="partyer_operate_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$tid}&act=operate" onsubmit="ajaxpost(this.id, 'return_partyer_operate', 'return_partyer_operate', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="partyer_operate" />
+        <input type="hidden" name="operate_for" id="operate_for" value="" />
+        <input type="hidden" name="operate_pid" id="operate_pid" value="" />
+        <div class="c">
+            <div class="actfm">
+                <table cellpadding="0" cellspacing="0" class="actl">
+                    <tr>
+                        <th>留言</th>
+                        <td><textarea name="reply_message" maxlength="200" cols="38" rows="2" class="pt"></textarea></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="o pns">
+            <input type="hidden" name="partyer_operate_submit" value="true">
+            <em class="xi1" id="return_partyer_operate"></em>
+            <button type="submit" class="pn pnc"><span>提交</span></button>
+        </div>
+    </form>
+</div>
+<!--{/if}-->

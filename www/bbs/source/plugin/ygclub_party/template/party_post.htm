@@ -1,0 +1,157 @@
+<!--{eval global $condata;}-->
+{eval
+
+function tpl_ygclub_party_post($party = array()) {
+global $condata;
+
+}
+<!--{block return}-->
+<div class="exfm cl">
+    <div class="sinf sppoll z">
+        <dl>
+            <dt><span class="rq">*</span>{lang ygclub_party:showtime}:</dt>
+            <dd>
+                <input type="text" name="showtime" id="showtime" class="px" onclick="showcalendar(event, this, true)" autocomplete="off" value="$party[_showtime]" />
+            </dd>
+
+            <dt><span class="rq">*</span>{lang ygclub_party:starttime}:</dt>
+            <dd>
+                <input type="text" name="starttimefrom" id="starttimefrom" class="px" onclick="showcalendar(event, this, true)" autocomplete="off" value="$party[_starttimefrom]" /><span> ~ </span><input onclick="showcalendar(event, this, true)" type="text" autocomplete="off" id="starttimeto" name="starttimeto" class="px" value="{if $party['_starttimeto']}$party[_starttimeto]{/if}"/>
+            </dd>
+
+            <dt><span class="rq">*</span>{lang ygclub_party:class}:<dt>
+            <dd>
+                <span class="ftid">
+                    <select name="class" id="party_class" class="px">
+                        <option value=""></option>
+                        <!--{loop $condata[_classes_list] $k $v}-->
+                        <option value="$v"{if $party['class'] == $v} selected="selected"{/if}>$v</option>
+                        <!--{/loop}-->
+                    </select>
+                </span>
+            </dd>
+
+            <dt><span class="rq">*</span>{lang ygclub_party:gender}:</dt>
+            <dd>
+                <span class="ftid">
+                    <select name="gender" id="gender" class="ps">
+                        <option value="0" {if !$party['gender']}selected="selected"{/if}>{lang ygclub_party:unlimited_gender}</option>
+                        <option value="1" {if $party['gender'] == 1}selected="selected"{/if}>{lang ygclub_party:male}</option>
+                        <option value="2" {if $party['gender'] == 2}selected="selected"{/if}>{lang ygclub_party:female}</option>
+                    </select>
+                </span>
+            </dd>
+
+            <dt><span class="rq">*</span>{lang ygclub_party:number_limited}:</dt>
+            <dd>
+            <input type="text" name="number" id="party_number" class="px z" style="width:55px;" onkeyup="checkvalue(this.value, 'activitynumbermessage')" value="{if $party[number]+0 <= 0}0{else}$party[number]{/if}" />
+                <span class="xg1">{lang ygclub_party:number_spec}</span>
+                <span id="activitynumbermessage"></span>
+            </dd>
+
+            <!--{if $condata['follower'] == 1}--> 
+            <dt><span class="rq">*</span>{lang ygclub_party:followed}:</dt>
+            <dd>
+               <label for="followed_0"><input type="radio" name="followed" id="followed_0" class="pc" value="0" {if $party[followed] == '' || $party[followed] == '0'}checked="checked"{/if} />No</label>
+               <label for="followed_1"><input type="radio" name="followed" id="followed_1" class="pc" value="1" {if $party[followed] == '1'}checked="checked"{/if} />Yes</label>
+            </dd>
+            <!--{/if}-->
+       
+        </dl>
+    </div>
+    <div class="sadd z">
+        <dl>
+            <dt><span class="rq">*</span>{lang ygclub_party:inviter_isjoin}:</dt>
+            <dd>
+                <label for="isjoin_1"><input type="radio" name="isjoin" id="isjoin_1" class="pc" value="1" {if $party[isjoin] == '' || $party[isjoin] == '1'}checked="checked"{/if} />Yes</label>
+                <label for="isjoin_0"><input type="radio" name="isjoin" id="isjoin_0" class="pc" value="0" {if $party[isjoin] == '0'}checked="checked"{/if} />No</label>
+            </dd>
+
+            <dt><span class="rq">*</span>{lang ygclub_party:inviter_phone}:<dt>
+            <dd>
+                <input type="text" name="phone" id="phone" class="px z" value="$party[phone]" />
+            </dd>
+
+
+            <dt><span class="rq">*</span>{lang ygclub_party:doworker}:</dt>
+            <dd>
+            <input type="text" name="doworker" id="doworker" class="px oinf" value="{if $party[doworker] == ''}$condata[doworker]{else}$party[doworker]{/if}" />
+                <p class="xg1">{lang ygclub_party:doworker_spec}</p>
+            </dd>
+
+            <dt>{lang ygclub_party:marks}:</dt>
+            <dd>
+	    <input type="text" name="marks" id="marks" class="px oinf" value="{if $party[marks] == ''}$condata[marks]{else}$party[marks]{/if}" />
+		<p class="xg1">{lang ygclub_party:marks_spec}</p>
+            </dd>
+
+        </dl>
+    </div>
+</div>
+<script type="text/javascript" reload="1">
+function checkvalue(value, message){
+    if(!value.search(/^\d+$/)) {
+        $(message).innerHTML = '';
+    } else {
+        $(message).innerHTML = '<b>{lang ygclub_party:digit_input_invalid}</b>';
+    }
+}
+
+EXTRAFUNC['validator']['special'] = 'validateextra';
+function validateextra() {
+    if($('postform').showtime.value == '') {
+        showDialog('{lang ygclub_party:post_error_message_showtime}', 'alert', '', function () { $('postform').showtime.focus() });
+        return false;
+    }
+    if($('postform').starttimefrom.value == '') {
+        showDialog('{lang ygclub_party:post_error_message_starttimefrom}', 'alert', '', function () { $('postform').starttimefrom.focus() });
+        return false;
+    }
+    if($('postform').starttimeto.value == '') {
+        showDialog('{lang ygclub_party:post_error_message_starttimeto}', 'alert', '', function () { $('postform').starttimeto.focus() });
+        return false;
+    }
+    var showtime = new Date($('postform').showtime.value).getTime();
+    var starttimefrom = new Date($('postform').starttimefrom.value).getTime();
+    var starttimeto = new Date($('postform').starttimeto.value).getTime();
+    if( starttimefrom > starttimeto )
+    {
+        showDialog('{lang ygclub_party:post_error_message_starttimefrom_more_than_starttimeto}', 'alert', '', function () { $('postform').starttimefrom.focus() });
+        return false;
+    }
+    if( showtime < starttimeto)
+    {
+        showDialog('{lang ygclub_party:post_error_message_starttimeto_more_than_showtime}', 'alert', '', function () { $('postform').showtime.focus() });
+        return false;
+    }
+    if($('postform').party_class.value == '') {
+        showDialog('{lang ygclub_party:post_error_message_class}', 'alert', '', function () { $('postform').party_class.focus() });
+        return false;
+    }
+    if($('postform').party_number.value == '' || $('postform').party_number.value.search(/^\d+$/)) {
+        showDialog('{lang ygclub_party:post_error_message_number}', 'alert', '', function () { $('postform').party_number.focus() });
+        return false;
+    }
+    if($('postform').phone.value == '') {
+        showDialog('{lang ygclub_party:post_error_phone}', 'alert', '', function () { $('postform').phone.focus() });
+        return false;
+    }
+    if($('postform').doworker.value == '') {
+        showDialog('{lang ygclub_party:post_error_doworker}', 'alert', '', function () { $('postform').doworker.focus() });
+        return false;
+    }
+    //else{
+    //    showDialog('{lang ygclub_party:post_error_message_number}', 'alert', '', function () { $('postform').party_number.focus() });
+    //    return false;
+    //}
+    return true;
+}
+
+</script>
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}

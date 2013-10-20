@@ -1,0 +1,100 @@
+{eval
+
+global $party;
+function tpl_ygclub_party_info () {
+global $party, $partyer;
+
+}
+
+<!--{block return}-->
+<style type="text/css">
+    #party_info {font-size:14px}
+    #party_info tr th {text-align:center;width:200px;}
+</style>
+
+<div class="pbm cl">
+    <table id="party_info" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>{lang ygclub_party:inviter_phone}</td>
+                <td>{$party[phone]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:class}</td>
+                <td>{$party[class]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:showtime}</td>
+                <td>{$party[_showtime]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:starttimefrom}</td>
+                <td>{$party[_starttimefrom]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:starttimeto}</td>
+                <td>{$party[_starttimeto]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:number_limited}</td>
+                <td>{$party[_number]}({$party[_gender]})</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:already_confirmed}/{lang ygclub_party:applied}</td>
+                <td><strong class="rq">{$party[_verified][4]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][4]['followed']}<!--{/if}--></strong> / {$party[_verified][all]['count']}<!--{if $party[followed] == 1}-->+{$party[_verified][all]['followed']}<!--{/if}--></td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:approved_partyers}</td>
+                <td>{$party[_approved_username_list_html]}</td>
+            </tr>
+            <tr>
+                <td>{lang ygclub_party:marks_stat}</td>
+                <td>
+                    <!--{loop $party[_marks_list] $k $v}-->
+                    $v(<font color="red">{$party[_marks_count][$k]}</font>);&nbsp;
+                    <!--{/loop}-->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+   <!--{if $partyer[verified] == 4}-->
+    <div id="single_partyer_operate">
+    <form name="partyer_operate_form" id="partyer_operate_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$partyer[tid]}&act=operate" onsubmit="ajaxpost('partyer_operate_form', 'return_partyer_operate', 'return_partyer_operate', 'onerror');return false;">
+        <input type="hidden" name="formhash" value="{FORMHASH}" />
+        <input type="hidden" name="handlekey" value="partyer_operate" />
+        <input type="hidden" name="operate_for" id="operate_for" value="nexttime" />
+        <input type="hidden" name="operate_pid" value="{$partyer[pid]}" />
+        <div class="c">
+            <div class="actfm">
+                        我要退出此次活动，因为：
+                        <input type="text" name="reply_message" maxlength="200" class="pt" />
+            <input type="hidden" name="partyer_operate_submit" value="true">
+            <em class="xi1" id="return_partyer_operate"></em>
+            <button type="submit" class="pn pnc"><span>退出</span></button>
+        </div>
+    </form>
+    </div>
+    <!--{/if}-->
+
+<!--{if $party[_mPerm] == '1'}-->
+<div class="pbm cl">
+    <center>
+    <dl>
+        <dt></dt>
+        <dd>
+        </dd>
+    </dl>
+    </center>
+</div>
+
+<!--{/if}-->
+
+<!--{/block}-->
+<!--{eval return $return;}-->
+{eval
+
+}
+
+}
+
