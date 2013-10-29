@@ -6,6 +6,7 @@ bbs/config/config_global.php
 bbs/uc_client/data/cache/*
 bbs/data/backup*
 bbs/data/*.lock
+bbs/data/threadcache/*
 
 uc/data/config.inc.php
 uc/data/install.lock
