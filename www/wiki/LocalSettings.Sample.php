@@ -25,7 +25,7 @@ $wgSitename = "阳光百科";
 ## For more information on customizing the URLs
 ## (like /w/index.php/Page_title to /wiki/Page_title) please see:
 ## http://www.mediawiki.org/wiki/Manual:Short_URL
-$wgScriptPath = "/mediawiki";
+$wgScriptPath = "/wiki";
 $wgScriptExtension = ".php";
 
 ## The protocol and server name to use in fully-qualified URLs
@@ -36,7 +36,7 @@ $wgStylePath = "$wgScriptPath/skins";
 
 ## The relative URL path to the logo.  Make sure you change this from the default,
 ## or else you'll overwrite your logo when you upgrade!
-$wgLogo             = "http://www.ygclub.org/wiki/style/default/logo.gif";
+$wgLogo             = "http://www.ygclub.org/wiki/images/c/c6/LEAD_logo_132x50.png";
 
 ## UPO means: this is also a user preference option
 
@@ -112,9 +112,9 @@ $wgDefaultSkin = "vector";
 ## appropriate copyright notice / icon. GNU Free Documentation
 ## License and Creative Commons licenses are supported so far.
 $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
-$wgRightsUrl = "http://creativecommons.org/licenses/by-sa/3.0/";
-$wgRightsText = "知识共享署名-相同方式分享";
-$wgRightsIcon = "{$wgStylePath}/common/images/cc-by-sa.png";
+$wgRightsUrl = "http://creativecommons.org/licenses/by-nc-sa/3.0/";
+$wgRightsText = "知识共享署名-非商业使用-相同方式分享";
+$wgRightsIcon = "{$wgStylePath}/common/images/cc-by-nc-sa.png";
 
 # Path to the GNU diff3 utility. Used for conflict resolution.
 $wgDiff3 = "/usr/bin/diff3";
@@ -131,21 +131,21 @@ $wgResourceLoaderMaxQueryLength = 512;
 # Add more configuration options below.
 
 #basic plugins
-require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
 require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" );
 require_once( "$IP/extensions/Gadgets/Gadgets.php" );
 require_once( "$IP/extensions/Nuke/Nuke.php" );
 require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
+$wgPFEnableStringFunctions = true;
 require_once( "$IP/extensions/Renameuser/Renameuser.php" );
 
-require_once( "$IP/extensions/WikiEditor/WikiEditor.php" );
-# Enables use of WikiEditor by default but still allow users to disable it in preferences
-$wgDefaultUserOptions['usebetatoolbar'] = 1;
-$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
-# Displays the Preview and Changes tabs
-$wgDefaultUserOptions['wikieditor-preview'] = 1;
-# Displays the Publish and Cancel buttons on the top right side
-$wgDefaultUserOptions['wikieditor-publish'] = 0;
+#require_once( "$IP/extensions/WikiEditor/WikiEditor.php" );
+## Enables use of WikiEditor by default but still allow users to disable it in preferences
+#$wgDefaultUserOptions['usebetatoolbar'] = 1;
+#$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+## Displays the Preview and Changes tabs
+#$wgDefaultUserOptions['wikieditor-preview'] = 1;
+## Displays the Publish and Cancel buttons on the top right side
+#$wgDefaultUserOptions['wikieditor-publish'] = 0;
 
 require_once( "$IP/extensions/ConfirmEdit/Asirra.php" );
 $wgCaptchaClass = 'Asirra';
@@ -166,15 +166,18 @@ $wgAllowExternalImages = true;
 
 $wgUsePathInfo = false;
 
+require_once("$IP/extensions/Cite/Cite.php");
 require_once("$IP/extensions/MobileFrontend/MobileFrontend.php");
 
 require_once("$IP/extensions/videoflash.php");
-$wgFileExtensions = array('png', 'gif', 'jpg', 'jpeg' ,'rar','zip','pdf','xls','xlsx','docx','ppt','pptx');
+$wgFileExtensions = array('sb', 'png', 'gif', 'jpg', 'jpeg' ,'rar','zip','pdf','xls','xlsx','doc','docx','ppt','pptx');
+$wgAllowJavaUploads = true;
 
 #advance plugins
 require_once( "$IP/extensions/MultiBoilerplate/MultiBoilerplate.php");
 $wgMultiBoilerplateDiplaySpecialPage = true;
 $wgMultiBoilerplateOptions = false;
+#$wgMultiBoilerplateOverwrite = true;
 
 require_once( "$IP/extensions/DataValues/DataValues.php" );
 require_once( "$IP/extensions/Validator/Validator.php" );
@@ -197,6 +200,104 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 // OPTIONAL: Enable VisualEditor's experimental code features
 //$wgVisualEditorEnableExperimentalCode = true;
 
-$wgVisualEditorParsoidURL = 'http://localhost:8000';
+$wgVisualEditorParsoidURL = 'http://localhost:8002';
 
+$wgExternalLinkTarget = '_blank';
 
+require_once "$IP/extensions/Scribunto/Scribunto.php";
+$wgScribuntoDefaultEngine = 'luastandalone';
+
+require_once ( "$IP/extensions/ClientsideDrafts/ClientsideDrafts.php" );
+
+#Dynamic Page List
+require_once("$IP/extensions/intersection/DynamicPageList.php");
+
+$wgGroupPermissions['*']['upload_by_url'] = true;
+$wgAllowCopyUploads = true;
+$wgCopyUploadsFromSpecialUpload = true;
+
+$wgDefaultUserOptions['timecorrection'] = '08:00';
+
+require_once "$IP/extensions/Interwiki/Interwiki.php";
+// To grant sysops permissions to edit interwiki data
+$wgGroupPermissions['sysop']['interwiki'] = true;
+
+##Start --------------------------------------- MsUpload
+$wgMSU_ShowAutoKat = false;    #autocategorisation
+$wgMSU_CheckedAutoKat = false;  #checkbox: checked = true/false
+$wgMSU_debug = false;
+$wgMSU_ImgParams = '800px'; //default max-size for image insert
+require_once("$IP/extensions/MsUpload/msupload.php");
+###End  --------------------------------------- MsUpload
+
+##Start --------------------------------------- MsLinks
+require_once("$IP/extensions/MsLinks/mslinks.php");
+$wgMSL_FileTypes = array(
+"no" => "no_icon.png",
+"jpg" => "image_icon.png", 
+"gif" => "image_icon.png", 
+"bmp" => "image_icon.png", 
+"png" => "image_icon.png", 
+"tiff" => "image_icon.png", 
+"tif" => "image_icon.png", 
+"ai" => "image_ai_icon.png",
+"psd" => "image_ps_icon.png", 
+"pdf" => "pdf_icon.png", 
+"pps" => "pps_icon.png", 
+"ppt" => "pps_icon.png", 
+"pptx" => "pps_icon.png", 
+"xls" => "xls_icon.png",
+"xlsx" => "xls_icon.png", 
+"doc" => "doc_icon.png", 
+"docx" => "doc_icon.png",
+"dot" => "doc_icon.png",
+"dotx" => "doc_icon.png",
+"rtf" => "doc_icon.png",
+"txt" => "txt_icon.png",
+"html" => "code_icon.png",
+"php" => "code_icon.png",
+"exe" => "exe_icon.gif",
+"asc" => "txt_icon.png",
+"dwg" => "dwg_icon.gif",
+"zip" => "zip_icon.png",
+"mov"  => "movie_icon.png",
+"mpeg"  => "movie_icon.png",
+"mpg"  => "movie_icon.png",
+"wmv"  => "movie_icon.png",
+"avi"  => "movie_icon.png",
+"mp4"  => "movie_icon.png",
+"flv"  => "movie_flash_icon.png",
+"wma"  => "music_icon.png",
+"mp3"  => "music_icon.png",
+"wav"  => "music_icon.png",
+"mid"  => "music_icon.png"
+);
+##End  --------------------------------------- MsLinks
+
+require_once( "$IP/extensions/WikiEditor/WikiEditor.php" );
+require_once("$IP/extensions/WYSIWYG/WYSIWYG.php");//Activation some for all extensions
+$wgGroupPermissions['*']['wysiwyg'] = true;//Everyone can use (if can edit)...
+$wgDefaultUserOptions['riched_start_disabled'] = false;//Important!!! else bug...
+$wgDefaultUserOptions['cke_show'] = 'richeditor';//Enable CKEditor
+$wgDefaultUserOptions['riched_use_toggle'] = true;//Editor can toggle between CKEditor/WikiTextBox
+$wgDefaultUserOptions['riched_start_disabled'] = false;//Important!!! else bug...
+$wgDefaultUserOptions['riched_toggle_remember_state'] = true;//working/bug?)
+$wgDefaultUserOptions['riched_use_popup'] = false;//Deprecated
+
+$wgFCKEditorExcludedNamespaces[] = NS_MEDIAWIKI;
+$wgFCKEditorExcludedNamespaces[] = NS_TEMPLATE;
+
+$wgUploadSizeWarning = 10485760;
+$wgMaxUploadSize = 10485760;
+$wgVerifyMimeType = false;
+
+require_once("$IP/extensions/Duoshuo/Duoshuo.php");
+$wgDuoshuoShortName = 'ygwiki';
+$wgDuoshuoSecret = '9d19f04122e26bddb9cca306197d7a04';
+
+require_once("extensions/AccessControl/AccessControl.php");
+$wgAccessControlMessages = true; // if set to true, show a line on top of each secured page, which says, which groups are allowed to see this page.
+$wgUseMediaWikiGroups = false; // use the groups from MediaWiki instead of own Usergroup pages
+$wgAdminCanReadAll = true; // sysop users can read all restricted pages
+
+$wgRawHtml=true;
