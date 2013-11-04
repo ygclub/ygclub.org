@@ -105,6 +105,7 @@ function uc_login_hook() {
 	$row = mysql_fetch_row($result);
 
 	$ygclub_username= $row[0];
+  $ygclub_username=str_replace("/","~",$ygclub_username);
 
 //		   echo "<script>alert('ygclub_username=".$ygclub_username."');</script>";
 
@@ -164,7 +165,7 @@ function uc_login_hook() {
 		// Authenticate user data will automatically create new users.
 		$loginForm = new LoginForm( $params );
 		$result = $loginForm->authenticateUserData();
-//		echo "<script>alert('wpName=".urlencode($wgAuth->getCanonicalName($ygclub_username))."auth complete:".$result."');</script>";
+		//echo "<script>alert('wpName=".urlencode($wgAuth->getCanonicalName($ygclub_username))."auth complete:".$result."');</script>";
 
 		switch ( $result ) {
 			case LoginForm :: SUCCESS :
