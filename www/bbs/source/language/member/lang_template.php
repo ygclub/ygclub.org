@@ -48,7 +48,7 @@ $lang = array (
   'register_password_length_tips2' => '个字符',
   'register_password_tips' => '请填写密码',
   'register_repassword_tips' => '请再次输入密码',
-  'register_username_tips' => '用户名是阳光er对你的称呼,请尽量简单好记，也可用真名比如：立文。请不要用wcjiw1991这样无法念出的名字。',
+  'register_username_tips' => '用户名是在阳光大家对你的称呼，请尽量简单好记。可用真名，比如：立文。请不要用wcjiw1991这样无法念出的名字。',
   'register_validate_email_tips' => '注册需要验证邮箱，请务必填写正确的邮箱，提交后请及时查收邮件。<br />您可能需要等待几分钟才能收到邮件，如果收件箱没有，请检查一下垃圾邮件箱。',
   'rulemessage' => '网站服务条款',
 );
