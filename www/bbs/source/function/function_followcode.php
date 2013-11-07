@@ -345,8 +345,7 @@ function fparsetable($width, $bgcolor, $message) {
 	if(strpos($message, '[/tr]') === FALSE && strpos($message, '[/td]') === FALSE) {
 		$rows = explode("\n", $message);
 		$html = '<table cellspacing="0" class="t_table" '.
-			($width == '' ? NULL : 'style="width:'.$width.'"').
-			($bgcolor ? ' bgcolor="'.$bgcolor.'">' : '>');
+			($width == '' ? NULL : 'style="width:'.$width.'"');
 		foreach($rows as $row) {
 			$html .= '<tr><td>'.str_replace(array('\|', '|', '\n'), array('&#124;', '</td><td>', "\n"), $row).'</td></tr>';
 		}
@@ -363,7 +362,6 @@ function fparsetable($width, $bgcolor, $message) {
 		}
 		$html = '<table cellspacing="0" class="t_table" '.
 			($width == '' ? NULL : 'style="width:'.$width.'"').
-			($bgcolor ? ' bgcolor="'.$bgcolor.'">' : '>').
 			str_replace('\\"', '"', preg_replace(array(
 					"/\[tr(?:=([\(\)\s%,#\w]+))?\]\s*\[td(?:=(\d{1,4}%?))?\]/ie",
 					"/\[\/td\]\s*\[td(?:=(\d{1,4}%?))?\]/ie",
