@@ -350,8 +350,7 @@ function parsetable($width, $bgcolor, $message) {
 	if(strpos($message, '[/tr]') === FALSE && strpos($message, '[/td]') === FALSE) {
 		$rows = explode("\n", $message);
 		$s = !defined('IN_MOBILE') ? '<table cellspacing="0" class="t_table" '.
-			($width == '' ? NULL : 'style="width:'.$width.'"').
-			($bgcolor ? ' bgcolor="'.$bgcolor.'">' : '>') : '<table>';
+			($width == '' ? NULL : 'style="width:'.$width.'"') : '<table>';
 		foreach($rows as $row) {
 			$s .= '<tr><td>'.str_replace(array('\|', '|', '\n'), array('&#124;', '</td><td>', "\n"), $row).'</td></tr>';
 		}
@@ -368,8 +367,7 @@ function parsetable($width, $bgcolor, $message) {
 			$width = $width ? ($width <= 560 ? $width.'px' : '98%') : '';
 		}
 		return (!defined('IN_MOBILE') ? '<table cellspacing="0" class="t_table" '.
-			($width == '' ? NULL : 'style="width:'.$width.'"').
-			($bgcolor ? ' bgcolor="'.$bgcolor.'">' : '>') : '<table>').
+			($width == '' ? NULL : 'style="width:'.$width.'"') : '<table>').
 			str_replace('\\"', '"', preg_replace(array(
 					"/\[tr(?:=([\(\)\s%,#\w]+))?\]\s*\[td(?:=(\d{1,4}%?))?\]/ie",
 					"/\[\/td\]\s*\[td(?:=(\d{1,4}%?))?\]/ie",
