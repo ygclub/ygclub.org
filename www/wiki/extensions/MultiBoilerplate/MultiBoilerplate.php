@@ -73,7 +73,7 @@ function efBoilerplateDisplaySpecialPage( &$aSpecialPages ) {
 function efMultiBoilerplate( $form ) {
 
 	// Get various variables needed for this extension.
-	global $wgMultiBoilerplateOptions, $wgMultiBoilerplateOverwrite, $wgTitle, $wgRequest;
+	global $wgMultiBoilerplateOptions, $wgMultiBoilerplateOverwrite, $wgMultiBoilerplateSelectByTitle, $wgTitle, $wgRequest;
 
 	// If $wgMultiBoilerplateOverwrite is true then detect whether
 	// the current page exists or not and if it does return true
@@ -92,19 +92,41 @@ function efMultiBoilerplate( $form ) {
 		}
 	} else {
 		$things = wfMsgForContent( 'multiboilerplate' );
-		$options = '';
+    $options = '';
 		$things = explode( "\n", str_replace( "\r", "\n", str_replace( "\r\n", "\n", $things ) ) ); // Ensure line-endings are \n
 		foreach( $things as $row ) {
 			if ( substr( ltrim( $row ), 0, 1)==="*" ) {
 				$row = ltrim( $row, '* ' ); // Remove the asterix (and a space if found) from the start of the line.
-				$row = explode( '|', $row );
+        $row = explode( '|', $row );
 				if( !isset( $row[ 1 ] ) ) return true; // Invalid syntax, abort.
-				$selected = false;
-				if( $wgRequest->getVal( 'boilerplate' ) == $row[ 1 ] ) $selected = true;
+        array_push($biolerplate_titles, $row[0]);   
+        $selected = false;
+        if( $wgRequest->getVal( 'boilerplate' ) == $row[ 1 ] ) {
+          $selected = true;  
+        } else {
+          // boilerplate pre-select based on page title
+          if ( $wgMultiBoilerplateSelectByTitle ) {
+            if (!$boilerplateTitle) {
+
+              $title = trim($wgTitle->getText());
+              $type = trim($row[0]);
+              if (strpos($title,$type)) {
+                $boilerplateTitle = $row[1];
+                $selected = true;  
+              }
+            }
+          }
+
+        }
 				$options .= Xml::option( $row[ 0 ], $row[ 1 ], $selected );
 			}
 		}
 	}
+
+  // boilerplate pre-select based on page title
+  if ( $wgRequest->getText( 'boilerplate', false ) ) {
+    $boilerplateTitle = $wgRequest->getVal( 'boilerplate' ); 
+  } 
 
 	// No options found in either configuration file, abort.
 	if( $options == '' ) return true;
@@ -128,8 +150,8 @@ function efMultiBoilerplate( $form ) {
 		Xml::closeElement( 'form' );
 
 	// If the Load button has been pushed replace the article text with the boilerplate.
-	if( $wgRequest->getText( 'boilerplate', false ) ) {
-		$plate = new Article( Title::newFromURL( $wgRequest->getVal( 'boilerplate' ) ) );
+	if( $boilerplateTitle ) {
+		$plate = new Article( Title::newFromURL( $boilerplateTitle ) );
 		$content = $plate->fetchContent();
 		/* Strip out noinclude tags and contained data, and strip includeonly
 		 * tags (but retain contained data). If a function exists in the
