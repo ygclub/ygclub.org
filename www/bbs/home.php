@@ -35,7 +35,7 @@ if($mod == 'space' && ((empty($_GET['do']) || $_GET['do'] == 'index') && ($_G['i
 	$_GET['do'] = 'profile';
 }
 
-if ($mod == 'space') {
+if (($mod == 'space') && empty($_GET['do'])) {
 	$_GET['do'] = 'profile';
 }
 
