@@ -35,7 +35,9 @@ if($mod == 'space' && ((empty($_GET['do']) || $_GET['do'] == 'index') && ($_G['i
 	$_GET['do'] = 'profile';
 }
 
-$_GET['do'] = 'profile';
+if ($mod == 'space') {
+	$_GET['do'] = 'profile';
+}
 
 $curmod = !empty($_G['setting']['followstatus']) && (empty($_GET['diy']) && empty($_GET['do']) && $mod == 'space' || $_GET['do'] == 'follow') ? 'follow' : $mod;
 define('CURMODULE', $curmod);
