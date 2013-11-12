@@ -73,7 +73,6 @@ class RunJobs extends Maintenance {
 		$startTime = time();
 		$type = $this->getOption( 'type', false );
 		$wgTitle = Title::newFromText( 'RunJobs.php' );
-		$dbw = wfGetDB( DB_MASTER );
 		$jobsRun = 0; // counter
 
 		$group = JobQueueGroup::singleton();
@@ -93,19 +92,23 @@ class RunJobs extends Maintenance {
 				++$jobsRun;
 				$this->runJobsLog( $job->toString() . " STARTING" );
 
+				// Set timer to stop the job if too much CPU time is used
+				set_time_limit( $maxTime ?: 0 );
 				// Run the job...
-				$t = microtime( true );
 				wfProfileIn( __METHOD__ . '-' . get_class( $job ) );
+				$t = microtime( true );
 				try {
 					$status = $job->run();
 					$error = $job->getLastError();
 				} catch ( MWException $e ) {
 					$status = false;
 					$error = get_class( $e ) . ': ' . $e->getMessage();
-					wfDebugLog( 'exception', $e->getLogMessage() );
+					$e->report(); // write error to STDERR and the log
 				}
-				wfProfileOut( __METHOD__ . '-' . get_class( $job ) );
 				$timeMs = intval( ( microtime( true ) - $t ) * 1000 );
+				wfProfileOut( __METHOD__ . '-' . get_class( $job ) );
+				// Disable the timer
+				set_time_limit( 0 );
 
 				// Mark the job as done on success or when the job cannot be retried
 				if ( $status !== false || !$job->allowRetries() ) {
@@ -135,8 +138,33 @@ class RunJobs extends Maintenance {
 				if ( $jobsRun > 0 && ( $jobsRun % 100 ) == 0 ) {
 					$group->waitForBackups();
 				}
+
+				// Bail if near-OOM instead of in a job
+				$this->assertMemoryOK();
 			}
 		} while ( $job ); // stop when there are no jobs
+	}
+
+	/**
+	 * Make sure that this script is not too close to the memory usage limit
+	 * @throws MWException
+	 */
+	private function assertMemoryOK() {
+		static $maxBytes = null;
+		if ( $maxBytes === null ) {
+			$m = array();
+			if ( preg_match( '!^(\d+)(k|m|g|)$!i', ini_get( 'memory_limit' ), $m ) ) {
+				list( , $num, $unit ) = $m;
+				$conv = array( 'g' => 1024 * 1024 * 1024, 'm' => 1024 * 1024, 'k' => 1024, '' => 1 );
+				$maxBytes = $num * $conv[strtolower( $unit )];
+			} else {
+				$maxBytes = 0;
+			}
+		}
+		$usedBytes = memory_get_usage();
+		if ( $maxBytes && $usedBytes >= 0.95 * $maxBytes ) {
+			throw new MWException( "Detected excessive memory usage ($usedBytes/$maxBytes)." );
+		}
 	}
 
 	/**

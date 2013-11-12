@@ -6,27 +6,27 @@
  */
 
 /**
- * ContentEditable relocatable node.
+ * ContentEditable protected node.
  *
  * @class
  * @abstract
  *
  * @constructor
+ * @param {jQuery} [$phantomable=this.$element] Element to show a phantom for
  */
-ve.ce.ProtectedNode = function VeCeProtectedNode() {
+ve.ce.ProtectedNode = function VeCeProtectedNode( $phantomable ) {
 	// Properties
-	this.$phantoms = $( [] );
-	this.$shields = $( [] );
+	this.$phantoms = this.$( [] );
+	this.$shields = this.$( [] );
+	this.$phantomable = $phantomable || this.$element;
 	this.isSetup = false;
 
 	// Events
 	this.connect( this, {
 		'setup': 'onProtectedSetup',
-		'teardown': 'onProtectedTeardown'
+		'teardown': 'onProtectedTeardown',
+		'resizeStart': 'onProtectedResizeStart'
 	} );
-
-	// Initialization
-	this.$.addClass( 've-ce-protectedNode' );
 };
 
 /* Static Properties */
@@ -44,7 +44,7 @@ ve.ce.ProtectedNode.static = {};
  */
 ve.ce.ProtectedNode.static.$shieldTemplate = $( '<img>' )
 	.addClass( 've-ce-protectedNode-shield' )
-	.attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' );
+	.attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' );
 
 /**
  * Phantom element template.
@@ -75,23 +75,28 @@ ve.ce.ProtectedNode.prototype.onProtectedSetup = function () {
 	}
 
 	// Events
-	this.$.on( 'mouseenter.ve-ce-protectedNode', ve.bind( this.onProtectedMouseEnter, this ) );
-	this.getRoot().getSurface().getModel()
-		.connect( this, { 'change': 'onSurfaceModelChange' } );
+	this.$element.on( 'mouseenter.ve-ce-protectedNode', ve.bind( this.onProtectedMouseEnter, this ) );
 	this.getRoot().getSurface().getSurface()
-		.connect( this, { 'toolbarPosition': 'positionPhantoms' } );
+		.connect( this, { 'position': 'positionPhantoms' } );
+
+	// DOM changes
+	this.$element
+		.addClass( 've-ce-protectedNode' )
+		.prop( 'contentEditable', 'false' );
 
 	// Shields
-	this.$.add( this.$.find( '*' ) ).each( function () {
-		var $this = $( this );
+	this.$element.add( this.$element.find( '*' ) ).each( function () {
+		var $this = node.$( this );
 		if ( this.nodeType === Node.ELEMENT_NODE ) {
 			if (
 				( $this.css( 'float' ) === 'none' || $this.css( 'float' ) === '' ) &&
-				!$this.hasClass( 've-ce-protectedNode' )
+				!$this.hasClass( 've-ce-protectedNode' ) &&
+				// Phantoms are built off shields, so make sure $phantomable has a shield
+				!$this.is( node.$phantomable )
 			) {
 				return;
 			}
-			$shield = $shieldTemplate.clone().appendTo( $this );
+			$shield = node.$( node.$.context.importNode( $shieldTemplate[0], true ) ).appendTo( $this );
 			node.$shields = node.$shields.add( $shield );
 		}
 	} );
@@ -111,18 +116,21 @@ ve.ce.ProtectedNode.prototype.onProtectedTeardown = function () {
 	}
 
 	// Events
-	this.$.off( '.ve-ce-protectedNode' );
-	this.root.getSurface().getModel()
-		.disconnect( this, { 'change': 'onSurfaceModelChange' } );
+	this.$element.off( '.ve-ce-protectedNode' );
 	this.getRoot().getSurface().getSurface()
-		.disconnect( this, { 'toolbarPosition': 'positionPhantoms' } );
+		.disconnect( this, { 'position': 'positionPhantoms' } );
 
 	// Shields
 	this.$shields.remove();
-	this.$shields = $( [] );
+	this.$shields = this.$( [] );
 
 	// Phantoms
 	this.clearPhantoms();
+
+	// DOM changes
+	this.$element
+		.removeClass( 've-ce-protectedNode' )
+		.removeProp( 'contentEditable' );
 
 	this.isSetup = false;
 };
@@ -155,7 +163,7 @@ ve.ce.ProtectedNode.prototype.onPhantomMouseDown = function ( e ) {
  * @method
  */
 ve.ce.ProtectedNode.prototype.onProtectedMouseEnter = function () {
-	if ( !this.root.getSurface().dragging ) {
+	if ( !this.root.getSurface().dragging && !this.resizing ) {
 		this.createPhantoms();
 	}
 };
@@ -167,7 +175,7 @@ ve.ce.ProtectedNode.prototype.onProtectedMouseEnter = function () {
  * @param {jQuery.Event} e Mouse move event
  */
 ve.ce.ProtectedNode.prototype.onSurfaceMouseMove = function ( e ) {
-	var $target = $( e.target );
+	var $target = this.$( e.target );
 	if (
 		!$target.hasClass( 've-ce-protectedNode-phantom' ) &&
 		$target.closest( '.ve-ce-protectedNode' ).length === 0
@@ -189,14 +197,12 @@ ve.ce.ProtectedNode.prototype.onSurfaceMouseOut = function ( e ) {
 };
 
 /**
- * Handle surface model change events
+ * Handle resize start events.
  *
  * @method
  */
-ve.ce.ProtectedNode.prototype.onSurfaceModelChange = function () {
-	if ( this.$phantoms.length ) {
-		this.positionPhantoms();
-	}
+ve.ce.ProtectedNode.prototype.onProtectedResizeStart = function () {
+	this.clearPhantoms();
 };
 
 /**
@@ -208,20 +214,22 @@ ve.ce.ProtectedNode.prototype.createPhantoms = function () {
 	var $phantomTemplate = this.constructor.static.$phantomTemplate,
 		surface = this.root.getSurface();
 
-	this.$.find( '.ve-ce-protectedNode-shield' ).each(
+	this.$phantomable.find( '.ve-ce-protectedNode-shield' ).each(
 		ve.bind( function () {
 			this.$phantoms = this.$phantoms.add(
-				$phantomTemplate.clone().on( 'mousedown', ve.bind( this.onPhantomMouseDown, this ) )
+				this.$( this.$.context.importNode( $phantomTemplate[0], true ) )
+					.on( 'mousedown', ve.bind( this.onPhantomMouseDown, this ) )
 			);
 		}, this )
 	);
 	this.positionPhantoms();
 	surface.replacePhantoms( this.$phantoms );
 
-	surface.$.on( {
+	surface.$element.on( {
 		'mousemove.ve-ce-protectedNode': ve.bind( this.onSurfaceMouseMove, this ),
 		'mouseout.ve-ce-protectedNode': ve.bind( this.onSurfaceMouseOut, this )
 	} );
+	surface.getModel().getDocument().connect( this, { 'transact': 'positionPhantoms' } );
 };
 
 /**
@@ -230,11 +238,11 @@ ve.ce.ProtectedNode.prototype.createPhantoms = function () {
  * @method
  */
 ve.ce.ProtectedNode.prototype.positionPhantoms = function () {
-	this.$.find( '.ve-ce-protectedNode-shield' ).each(
+	this.$phantomable.find( '.ve-ce-protectedNode-shield' ).each(
 		ve.bind( function ( i, element ) {
-			var $shield = $( element ),
-				offset = ve.Element.getRelativePosition(
-					$shield, this.getRoot().getSurface().getSurface().$
+			var $shield = this.$( element ),
+				offset = OO.ui.Element.getRelativePosition(
+					$shield, this.getRoot().getSurface().getSurface().$element
 				);
 			this.$phantoms.eq( i ).css( {
 				'top': offset.top,
@@ -255,6 +263,7 @@ ve.ce.ProtectedNode.prototype.positionPhantoms = function () {
 ve.ce.ProtectedNode.prototype.clearPhantoms = function () {
 	var surface = this.root.getSurface();
 	surface.replacePhantoms( null );
-	surface.$.unbind( '.ve-ce-protectedNode' );
-	this.$phantoms = $( [] );
+	surface.$element.unbind( '.ve-ce-protectedNode' );
+	surface.getModel().getDocument().disconnect( this, { 'transact': 'positionPhantoms' } );
+	this.$phantoms = this.$( [] );
 };

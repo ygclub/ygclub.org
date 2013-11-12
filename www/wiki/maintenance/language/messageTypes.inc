@@ -141,6 +141,7 @@ $wgIgnoredMessages = array(
 	'statistics-footer',
 	'talkpagetext',
 	'uploadfooter',
+	'upload-default-description',
 	'listgrouprights-link',
 	'search-interwiki-custom',
 	'allpages-summary',
@@ -243,6 +244,7 @@ $wgIgnoredMessages = array(
 	'version-summary',
 	'tags-summary',
 	'comparepages-summary',
+	'resettokens-summary',
 	'version-entrypoints-index-php',
 	'version-entrypoints-api-php',
 	'version-entrypoints-load-php',
@@ -258,12 +260,13 @@ $wgIgnoredMessages = array(
 	'today-at',
 	'redirect-text',
 	'edithelppage',
+	'autocomment-prefix',
+	'move-redirect-text',
 );
 
 /** Optional messages, which may be translated only if changed in the target language. */
 $wgOptionalMessages = array(
 	'linkprefix',
-	'editsection-brackets',
 	'feed-atom',
 	'feed-rss',
 	'unit-pixel',
@@ -454,7 +457,6 @@ $wgOptionalMessages = array(
 	'percent',
 	'parentheses',
 	'brackets',
-	'autocomment-prefix',
 	'listgrouprights-right-display',
 	'listgrouprights-right-revoked',
 	'timezone-utc',
@@ -479,6 +481,11 @@ $wgOptionalMessages = array(
 	'pageinfo-redirects-value',
 	'created', // @deprecated. Remove in MediaWiki 1.23.
 	'changed', // @deprecated. Remove in MediaWiki 1.23.
+	'limitreport-ppvisitednodes-value',
+	'limitreport-ppgeneratednodes-value',
+	'limitreport-expansiondepth-value',
+	'limitreport-expensivefunctioncount-value',
+	'tooltip-iwiki',
 );
 
 /** Exif messages, which may be set as optional in several checks, but are generally mandatory */

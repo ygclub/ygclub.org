@@ -21,7 +21,7 @@ ve.dm.Node = function VeDmNode( length, element ) {
 	ve.dm.Model.call( this, element );
 	// Mixin constructor
 	ve.Node.call( this );
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.length = length || 0;
@@ -40,11 +40,11 @@ ve.dm.Node = function VeDmNode( length, element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.Node, ve.dm.Model );
+OO.inheritClass( ve.dm.Node, ve.dm.Model );
 
-ve.mixinClass( ve.dm.Node, ve.Node );
+OO.mixinClass( ve.dm.Node, ve.Node );
 
-ve.mixinClass( ve.dm.Node, ve.EventEmitter );
+OO.mixinClass( ve.dm.Node, OO.EventEmitter );
 
 /* Static Properties */
 
@@ -63,7 +63,7 @@ ve.mixinClass( ve.dm.Node, ve.EventEmitter );
  * If .static.childNodeTypes is set to [], this property is ignored and will be assumed to be true.
  *
  * @static
- * @type {boolean} static.handlesOwnChildren
+ * @property {boolean} static.handlesOwnChildren
  * @inheritable
  */
 ve.dm.Node.static.handlesOwnChildren = false;
@@ -159,6 +159,15 @@ ve.dm.Node.static.parentNodeTypes = null;
 ve.dm.Node.static.suggestedParentNodeTypes = null;
 
 /**
+ * Array of annotation types which can't be applied to this node
+ *
+ * @static
+ * @property {string[]} static.blacklistedAnnotationTypes
+ * @inheritable
+ */
+ve.dm.Node.static.blacklistedAnnotationTypes = [];
+
+/**
  * Default attributes to set for newly created linear model elements. These defaults will be used
  * when creating a new element in ve.dm.NodeFactory#getDataElement when there is no DOM node or
  * existing linear model element to base the attributes on.
@@ -200,20 +209,6 @@ ve.dm.Node.static.remapStoreIndexes = function ( /*dataElement, mapping*/ ) {
  * @param {Object} mapping Object mapping old internal list indexes to new internal list indexes
  */
 ve.dm.Node.static.remapInternalListIndexes = function ( /*dataElement, mapping*/ ) {
-};
-
-/**
- * Get hash object of a linear model data element
- *
- * @static
- * @param {Object} dataElement Data element
- * @returns {Object} Hash object
- */
-ve.dm.Node.static.getHashObject = function ( dataElement ) {
-	return {
-		type: dataElement.type,
-		attributes: dataElement.attributes
-	};
 };
 
 /**
@@ -268,7 +263,7 @@ ve.dm.Node.prototype.isInspectable = function () {
  * @returns {Object} Cloned element object
  */
 ve.dm.Node.prototype.getClonedElement = function () {
-	var clone = ve.copyObject( this.element );
+	var clone = ve.copy( this.element );
 	if ( clone.internal ) {
 		delete clone.internal.generated;
 		if ( ve.isEmptyObject( clone.internal ) ) {
@@ -452,8 +447,8 @@ ve.dm.Node.prototype.getOuterRange = function () {
  *
  * @method
  * @param {number} length Length of content
- * @emits lengthChange
- * @emits update
+ * @fires lengthChange
+ * @fires update
  * @throws {Error} Invalid content length error if length is less than 0
  */
 ve.dm.Node.prototype.setLength = function ( length ) {
@@ -481,8 +476,8 @@ ve.dm.Node.prototype.setLength = function ( length ) {
  *
  * @method
  * @param {number} adjustment Amount to adjust length by
- * @emits lengthChange
- * @emits update
+ * @fires lengthChange
+ * @fires update
  * @throws {Error} Invalid adjustment error if resulting length is less than 0
  */
 ve.dm.Node.prototype.adjustLength = function ( adjustment ) {
@@ -560,19 +555,4 @@ ve.dm.Node.prototype.canBeMergedWith = function ( node ) {
 		n2 = n2.getParent();
 	}
 	return true;
-};
-
-/**
- * Get the hash object of the node.
- *
- * The actual logic is in a static function as this needs
- * to be accessible from ve.dm.Converter
- *
- * This is a custom hash function for ve#getHash.
- *
- * @method
- * @returns {Object} Hash object
- */
-ve.dm.Node.prototype.getHashObject = function () {
-	return this.constructor.static.getHashObject( this.element );
 };

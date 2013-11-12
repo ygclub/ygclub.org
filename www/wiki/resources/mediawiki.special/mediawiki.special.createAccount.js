@@ -5,17 +5,36 @@
 
 	// When sending password by email, hide the password input fields.
 	// This function doesn't need to be loaded early by ResourceLoader, but is tiny.
-	function hidePasswordOnEmail( $ ) {
-		$( '#wpCreateaccountMail' )
-			.on( 'change', function() {
-				$( '.mw-row-password' ).toggle( !$( this ).attr( 'checked' ) );
-			} )
-			.trigger( 'change' );
+	function hidePasswordOnEmail() {
+		// Always required if checked, otherwise it depends, so we use the original
+		var $emailLabel = $( 'label[for="wpEmail"]' ),
+			originalText = $emailLabel.text(),
+			requiredText = mw.message( 'createacct-emailrequired' ).text(),
+			$createByMailCheckbox = $( '#wpCreateaccountMail' ),
+			$beforePwds = $( '.mw-row-password:first' ).prev(),
+			$pwds;
+
+		function updateForCheckbox() {
+			var checked = $createByMailCheckbox.prop( 'checked' );
+			if ( checked ) {
+				$pwds = $( '.mw-row-password' ).detach();
+				$emailLabel.text( requiredText );
+			} else {
+				if ( $pwds ) {
+					$beforePwds.after( $pwds );
+					$pwds = null;
+				}
+				$emailLabel.text( originalText );
+			}
+		}
+
+		$createByMailCheckbox.on( 'change', updateForCheckbox );
+		updateForCheckbox();
 	}
 
 	// Move the FancyCaptcha image into a more attractive container.
 	// This function does need to be run early by ResourceLoader.
-	function adjustFancyCaptcha( $, mw ) {
+	function adjustFancyCaptcha() {
 		var $content = $( '#mw-content-text' ),
 			$submit = $content.find( '#wpCreateaccount' ),
 			tabIndex,
@@ -85,9 +104,9 @@
 		}
 	}
 
-	$( document ).ready( function( $ ) {
-		adjustFancyCaptcha( $, mw);
-		hidePasswordOnEmail( $ );
+	$( function () {
+		adjustFancyCaptcha();
+		hidePasswordOnEmail();
 	} );
 
 }( mediaWiki, jQuery ) );

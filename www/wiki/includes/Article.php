@@ -1121,6 +1121,13 @@ class Article implements Page {
 			return false;
 		}
 
+		if ( $rc->getPerformer()->getName() == $user->getName() ) {
+			// Don't show a patrol link for own creations. If the user could
+			// patrol them, they already would be patrolled
+			wfProfileOut( __METHOD__ );
+			return false;
+		}
+
 		$rcid = $rc->getAttribute( 'rc_id' );
 
 		$token = $user->getEditToken( $rcid );
@@ -1546,13 +1553,7 @@ class Article implements Page {
 
 			$this->doDelete( $reason, $suppress );
 
-			if ( $user->isLoggedIn() && $request->getCheck( 'wpWatch' ) != $user->isWatched( $title ) ) {
-				if ( $request->getCheck( 'wpWatch' ) ) {
-					WatchAction::doWatch( $title, $user );
-				} else {
-					WatchAction::doUnwatch( $title, $user );
-				}
-			}
+			WatchAction::doWatchOrUnwatch( $request->getCheck( 'wpWatch' ), $title, $user );
 
 			return;
 		}

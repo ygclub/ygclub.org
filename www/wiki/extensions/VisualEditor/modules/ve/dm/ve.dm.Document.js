@@ -10,36 +10,30 @@
  *
  * WARNING: The data parameter is passed by reference. Do not modify a data array after passing
  * it to this constructor, and do not construct multiple Documents with the same data array. If you
- * need to do these things, make a deep copy (ve.copyArray()) of the data array and operate on the
+ * need to do these things, make a deep copy (ve#copy) of the data array and operate on the
  * copy.
  *
  * @class
  * @extends ve.Document
  * @constructor
- * @param {HTMLDocument|Array|ve.dm.LinearData} documentOrData HTML document, raw linear model data or LinearData to start with
+ * @param {HTMLDocument|Array|ve.dm.ElementLinearData|ve.dm.FlatLinearData} data HTML document,
+ *  raw linear model data, ElementLinearData or FlatLinearData to be split
+ * @param {HTMLDocument} [htmlDocument] HTML document the data was converted from, if any.
+ *  If omitted, a new document will be created. If data is an HTMLDocument, this parameter is
+ *  ignored.
  * @param {ve.dm.Document} [parentDocument] Document to use as root for created nodes
  * @param {ve.dm.InternalList} [internalList] Internal list to clone; passed when creating a document slice
  */
-ve.dm.Document = function VeDmDocument( documentOrData, parentDocument, internalList ) {
+ve.dm.Document = function VeDmDocument( data, htmlDocument, parentDocument, internalList ) {
 	// Parent constructor
 	ve.Document.call( this, new ve.dm.DocumentNode() );
 
 	// Initialization
-	/*
-	 * Build a tree of nodes and nodes that will be added to them after a full scan is complete,
-	 * then from the bottom up add nodes to their potential parents. This avoids massive length
-	 * updates being broadcast upstream constantly while building is underway.
-	 */
-	var i, node, children, meta,
+	var fullData, result,
+		split = true,
 		doc = parentDocument || this,
-		root = this.getDocumentNode(),
-		textLength = 0,
-		inTextNode = false,
-		// Stack of stacks, each containing a
-		stack = [[this.documentNode], []],
-		currentStack = stack[1],
-		parentStack = stack[0],
-		currentNode = this.documentNode;
+		root = this.getDocumentNode();
+
 	this.documentNode.setRoot( root );
 	this.documentNode.setDocument( doc );
 	this.internalList = internalList ? internalList.clone( this ) : new ve.dm.InternalList( this );
@@ -48,143 +42,211 @@ ve.dm.Document = function VeDmDocument( documentOrData, parentDocument, internal
 	this.parentDocument = parentDocument;
 	this.completeHistory = [];
 
-	if ( documentOrData instanceof ve.dm.LinearData ) {
-		this.data = documentOrData;
-	} else if ( !ve.isArray( documentOrData ) && typeof documentOrData === 'object' ) {
-		this.data = ve.dm.converter.getDataFromDom( documentOrData, new ve.dm.IndexValueStore(), this.getInternalList() );
+	if ( data instanceof ve.dm.ElementLinearData ) {
+		// Pre-split ElementLinearData
+		split = false;
+		fullData = data;
+	} else if ( data instanceof ve.dm.FlatLinearData ) {
+		// Element + Meta linear data
+		fullData = data;
+	} else if ( !ve.isArray( data ) && typeof data === 'object' ) {
+		// HTMLDocument
+		fullData = ve.dm.converter.getDataFromDom( data, new ve.dm.IndexValueStore(), this.getInternalList() );
+		htmlDocument = data;
 	} else {
-		this.data = new ve.dm.ElementLinearData(
+		// Raw linear model data
+		fullData = new ve.dm.FlatLinearData(
 			new ve.dm.IndexValueStore(),
-			ve.isArray( documentOrData ) ? documentOrData : []
+			ve.isArray( data ) ? data : []
 		);
 	}
-	this.store = this.data.getStore();
+	this.store = fullData.getStore();
+	this.htmlDocument = htmlDocument || ve.createDocumentFromHtml( '' );
 
-	// Sparse array containing the metadata for each offset
-	// Each element is either undefined, or an array of metadata elements
-	// Because the indexes in the metadata array represent offsets in the data array, the
-	// metadata array has one element more than the data array.
-	this.metadata = new ve.dm.MetaLinearData( this.getStore(), [] );
-
-	// extract metadata and build node tree
-	// NB: this.data.getLength() will change as data is spliced out
-	for ( i = 0; i < this.data.getLength(); i++ ) {
-		// Infer that if an item in the linear model has a type attribute than it must be an element
-		if ( !this.data.isElementData( i ) ) {
-			// Text node opening
-			if ( !inTextNode ) {
-				// Create a lengthless text node
-				node = new ve.dm.TextNode();
-				node.setDocument( doc );
-				// Put the node on the current inner stack
-				currentStack.push( node );
-				currentNode = node;
-				// Set a flag saying we're inside a text node
-				inTextNode = true;
-			}
-			// Track the length
-			textLength++;
-		} else {
-			// Element data
-			if ( !this.data.isCloseElementData( i ) &&
-				ve.dm.metaItemFactory.lookup( this.data.getData( i ).type )
-			) {
-				// Metadata
-				// Splice the meta element and its closing out of the linmod
-				meta = this.data.getData( i );
-				this.data.splice( i, 2 );
-				// Put the metadata in the meta-linmod
-				if ( !this.metadata.getData( i ) ) {
-					this.metadata.setData( i, [] );
-				}
-				this.metadata.getData( i ).push( meta );
-				// Make sure the loop doesn't skip the next element
-				i--;
-				continue;
-			}
-
-			// Text node closing
-			if ( inTextNode ) {
-				// Finish the text node by setting the length
-				currentNode.setLength( textLength );
-				// Put the state variables back as they were
-				currentNode = parentStack[parentStack.length - 1];
-				inTextNode = false;
-				textLength = 0;
-			}
-			// Element open/close
-			if ( !this.data.isCloseElementData( i ) ) {
-				// Branch or leaf node opening
-				// Create a childless node
-				node = ve.dm.nodeFactory.create(
-					this.data.getData( i ).type, [], this.data.getData( i )
-				);
-				node.setDocument( doc );
-				// Put the childless node on the current inner stack
-				currentStack.push( node );
-				if ( ve.dm.nodeFactory.canNodeHaveChildren( node.getType() ) ) {
-					// Create a new inner stack for this node
-					parentStack = currentStack;
-					currentStack = [];
-					stack.push( currentStack );
-				}
-				currentNode = node;
-			} else {
-				// Branch or leaf node closing
-				if ( ve.dm.nodeFactory.canNodeHaveChildren( currentNode.getType() ) ) {
-					// Pop this node's inner stack from the outer stack. It'll have all of the
-					// node's child nodes fully constructed
-					children = stack.pop();
-					currentStack = parentStack;
-					parentStack = stack[stack.length - 2];
-					if ( !parentStack ) {
-						// This can only happen if we got unbalanced data
-						throw new Error( 'Unbalanced input passed to document' );
-					}
-					// Attach the children to the node
-					ve.batchSplice( currentNode, 0, 0, children );
-				}
-				currentNode = parentStack[parentStack.length - 1];
-			}
-		}
-	}
-	// pad out the metadata array
-	if ( this.metadata.getLength() < this.data.getLength() + 1 ) {
-		this.metadata.data = this.metadata.data.concat(
-			new Array( 1 + this.data.getLength() - this.metadata.getLength() )
-		);
-	}
-
-	if ( inTextNode ) {
-		// Text node ended by end-of-input rather than by an element
-		currentNode.setLength( textLength );
-		// Don't bother updating currentNode et al, we don't use them below
-	}
-
-	// State variable that allows nodes to know that they are being
-	// appended in order. Used by ve.dm.InternalList.
-	this.buildingNodeTree = true;
-
-	// The end state is stack = [ [this.documentNode] [ array, of, its, children ] ]
-	// so attach all nodes in stack[1] to the root node
-	ve.batchSplice( this.documentNode, 0, 0, stack[1] );
-
-	this.buildingNodeTree = false;
+	result = this.constructor.static.splitData( fullData, split, true, this.documentNode );
+	this.data = result.elementData;
+	this.metadata = result.metaData || new ve.dm.MetaLinearData( this.data.getStore(), new Array( 1 + this.data.getLength() ) );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.Document, ve.Document );
+OO.inheritClass( ve.dm.Document, ve.Document );
 
 /* Events */
 
 /**
  * @event transact
  * @param {ve.dm.Transaction} tx Transaction that was just processed
- * @param {boolean} reversed Whether the transaction was processed in reverse
  */
 
 /* Static methods */
+
+ve.dm.Document.static = {};
+
+/**
+ * Split data into element data and meta data. Also build a node tree if requried.
+ *
+ * @param {ve.dm.FlatLinearData} fullData Full data from converter
+ * @param {boolean} [split=false] Split out meta and element data, otherwise return fullData by reference
+ * @param {boolean} [keepMeta=false] Process and return metadata
+ * @param {ve.dm.Node} [parentNode] Parent node
+ * @returns {Object} Object containing element linear data and meta linear data (if processed)
+ */
+ve.dm.Document.static.splitData = function( fullData, split, keepMeta, parentNode ) {
+	var i, len, offset, node, children, meta, elementData, metaData,
+		currentStack, parentStack, nodeStack, currentNode, doc,
+		textLength = 0,
+		inTextNode = false;
+
+	if ( split ) {
+		elementData = new ve.dm.ElementLinearData( fullData.getStore() );
+		if ( keepMeta ) {
+			// Sparse array containing the metadata for each offset
+			// Each element is either undefined, or an array of metadata elements
+			// Because the indexes in the metadata array represent offsets in the data array, the
+			// metadata array has one element more than the data array.
+			metaData = new ve.dm.MetaLinearData( fullData.getStore() );
+		}
+	} else {
+	// If metadata is not being split out, just return fullData as elementData
+		elementData = fullData;
+	}
+
+	if ( parentNode ) {
+		// Build a tree of nodes and nodes that will be added to them after a full scan is complete,
+		// then from the bottom up add nodes to their potential parents. This avoids massive length
+		// updates being broadcast upstream constantly while building is underway.
+		currentStack = [];
+		parentStack = [parentNode];
+		// Stack of stacks
+		nodeStack = [parentStack, currentStack];
+		currentNode = parentNode;
+		doc = parentNode.getDocument();
+	}
+
+	// Separate element data and metadata and build node tree
+	for ( i = 0, len = fullData.getLength(); i < len; i++ ) {
+		if ( !fullData.isElementData( i ) ) {
+			if ( split ) {
+				// Add to element linear data
+				elementData.push( fullData.getData( i ) );
+			}
+			if ( parentNode ) {
+				// Text node opening
+				if ( !inTextNode ) {
+					// Create a lengthless text node
+					node = new ve.dm.TextNode();
+					node.setDocument( doc );
+					// Put the node on the current inner stack
+					currentStack.push( node );
+					currentNode = node;
+					// Set a flag saying we're inside a text node
+					inTextNode = true;
+				}
+				// Track the length
+				textLength++;
+			}
+		} else {
+			if ( split ) {
+				// Element data
+				if ( fullData.isOpenElementData( i ) &&
+					ve.dm.metaItemFactory.lookup( fullData.getType( i ) )
+				) {
+					if ( keepMeta ) {
+						// Metadata
+						meta = fullData.getData( i );
+						offset = elementData.getLength();
+						// Put the meta data in the meta-linmod
+						if ( !metaData.getData( offset ) ) {
+							metaData.setData( offset, [] );
+						}
+						metaData.getData( offset ).push( meta );
+					}
+					// Skip close element
+					i++;
+					continue;
+				}
+				// Add to element linear data
+				elementData.push( fullData.getData( i ) );
+			}
+
+			if ( parentNode ) {
+				// Text node closing
+				if ( inTextNode ) {
+					// Finish the text node by setting the length
+					currentNode.setLength( textLength );
+					// Put the state variables back as they were
+					currentNode = parentStack[parentStack.length - 1];
+					inTextNode = false;
+					textLength = 0;
+				}
+				// Element open/close
+				if ( fullData.isOpenElementData( i ) ) {
+					// Branch or leaf node opening
+					// Create a childless node
+					node = ve.dm.nodeFactory.create(
+						fullData.getType( i ), [], fullData.getData( i )
+					);
+					node.setDocument( doc );
+					// Put the childless node on the current inner stack
+					currentStack.push( node );
+					if ( ve.dm.nodeFactory.canNodeHaveChildren( node.getType() ) ) {
+						// Create a new inner stack for this node
+						parentStack = currentStack;
+						currentStack = [];
+						nodeStack.push( currentStack );
+					}
+					currentNode = node;
+				} else {
+					// Branch or leaf node closing
+					if ( ve.dm.nodeFactory.canNodeHaveChildren( currentNode.getType() ) ) {
+						// Pop this node's inner stack from the outer stack. It'll have all of the
+						// node's child nodes fully constructed
+						children = nodeStack.pop();
+						currentStack = parentStack;
+						parentStack = nodeStack[nodeStack.length - 2];
+						if ( !parentStack ) {
+							// This can only happen if we got unbalanced data
+							throw new Error( 'Unbalanced input passed to document' );
+						}
+						// Attach the children to the node
+						ve.batchSplice( currentNode, 0, 0, children );
+					}
+					currentNode = parentStack[parentStack.length - 1];
+				}
+			}
+		}
+	}
+	// Pad out the metadata length to element data length + 1
+	if ( split && keepMeta && metaData.getLength() < elementData.getLength() + 1 ) {
+		metaData.data = metaData.data.concat(
+			new Array( 1 + elementData.getLength() - metaData.getLength() )
+		);
+	}
+
+	if ( parentNode ) {
+		if ( inTextNode ) {
+			// Text node ended by end-of-input rather than by an element
+			currentNode.setLength( textLength );
+			// Don't bother updating currentNode et al, we don't use them below
+		}
+
+		// State variable that allows nodes to know that they are being
+		// appended in order. Used by ve.dm.InternalList.
+		doc.buildingNodeTree = true;
+
+		// The end state is stack = [ [this.documentNode] [ array, of, its, children ] ]
+		// so attach all nodes in stack[1] to the root node
+		ve.batchSplice( parentNode, 0, 0, currentStack );
+
+		doc.buildingNodeTree = false;
+	}
+
+	return {
+		'elementData': elementData,
+		'metaData': metaData
+	};
+};
 
 /**
  * Apply annotations to content data.
@@ -195,7 +257,7 @@ ve.inheritClass( ve.dm.Document, ve.Document );
  * @param {Array} data Data to apply annotations to
  * @param {ve.dm.AnnotationSet} annotationSet Annotations to apply
  */
-ve.dm.Document.addAnnotationsToData = function ( data, annotationSet ) {
+ve.dm.Document.static.addAnnotationsToData = function ( data, annotationSet ) {
 	var i, length, newAnnotationSet, store = annotationSet.getStore();
 	if ( annotationSet.isEmpty() ) {
 		// Nothing to do
@@ -222,43 +284,20 @@ ve.dm.Document.addAnnotationsToData = function ( data, annotationSet ) {
 /* Methods */
 
 /**
- * Reverse a transaction's effects on the content data.
- *
- * @method
- * @param {ve.dm.Transaction} transaction Transaction to roll back
- * @emits transact
- * @throws {Error} Cannot roll back a transaction that has not been committed
- */
-ve.dm.Document.prototype.rollback = function ( transaction ) {
-	if ( !transaction.hasBeenApplied() ) {
-		throw new Error( 'Cannot roll back a transaction that has not been committed' );
-	}
-	new ve.dm.TransactionProcessor( this, transaction, true ).process();
-	this.completeHistory.push( {
-		'undo': true,
-		'transaction': transaction
-	} );
-	this.emit( 'transact', transaction, true );
-};
-
-/**
  * Apply a transaction's effects on the content data.
  *
  * @method
  * @param {ve.dm.Transaction} transaction Transaction to apply
- * @emits transact
+ * @fires transact
  * @throws {Error} Cannot commit a transaction that has already been committed
  */
 ve.dm.Document.prototype.commit = function ( transaction ) {
 	if ( transaction.hasBeenApplied() ) {
 		throw new Error( 'Cannot commit a transaction that has already been committed' );
 	}
-	new ve.dm.TransactionProcessor( this, transaction, false ).process();
-	this.completeHistory.push( {
-		'undo': false,
-		'transaction': transaction
-	} );
-	this.emit( 'transact', transaction, false );
+	new ve.dm.TransactionProcessor( this, transaction ).process();
+	this.completeHistory.push( transaction );
+	this.emit( 'transact', transaction );
 };
 
 /**
@@ -286,6 +325,16 @@ ve.dm.Document.prototype.getMetadata = function ( range, deep ) {
 };
 
 /**
+ * Get the HTMLDocument associated with this document.
+ *
+ * @method
+ * @returns {HTMLDocument} Associated document
+ */
+ve.dm.Document.prototype.getHtmlDocument = function () {
+	return this.htmlDocument;
+};
+
+/**
  * Get the document's index-value store
  *
  * @method
@@ -304,64 +353,31 @@ ve.dm.Document.prototype.getInternalList = function () {
 };
 
 /**
- * Get a document from a slice of this document. The new document's store and internal list will be
+ * Clone a sub-document from a range in this document. The new document's store and internal list will be
  * clones of the ones in this document.
  *
- * @param {ve.Range|ve.dm.Node} rangeOrNode Range of data to clone, or node whose contents should be cloned
+ * @param {ve.Range} range Range of data to clone
  * @returns {ve.dm.Document} New document
- * @throws {Error} rangeOrNode must be a ve.Range or a ve.dm.Node
  */
-ve.dm.Document.prototype.getDocumentSlice = function ( rangeOrNode ) {
-	var data, range,
+ve.dm.Document.prototype.cloneFromRange = function ( range ) {
+	var data, newDoc,
 		store = this.store.clone(),
 		listRange = this.internalList.getListNode().getOuterRange();
-	if ( rangeOrNode instanceof ve.dm.Node ) {
-		range = rangeOrNode.getRange();
-	} else if ( rangeOrNode instanceof ve.Range ) {
-		range = rangeOrNode;
-	} else {
-		throw new Error( 'rangeOrNode must be a ve.Range or a ve.dm.Node' );
-	}
-	data = ve.copyArray( this.getFullData( range, true ) );
+
+	data = ve.copy( this.getFullData( range, true ) );
 	if ( range.start > listRange.start || range.end < listRange.end ) {
 		// The range does not include the entire internal list, so add it
 		data = data.concat( this.getFullData( listRange ) );
 	}
-	return new this.constructor(
-		new ve.dm.ElementLinearData( store, data ),
-		undefined, this.internalList
+	newDoc = new this.constructor(
+		new ve.dm.FlatLinearData( store, data ),
+		this.htmlDocument, undefined, this.internalList
 	);
-};
-
-/**
- * Get the metadata replace operation required to keep data & metadata in sync after a splice
- *
- * @method
- * @param {number} offset Data offset to start at
- * @param {number} remove Number of elements being removed
- * @param {Array} insert Element data being inserted
- * @returns {Object} Metadata replace operation to keep data & metadata in sync
- */
-ve.dm.Document.prototype.getMetadataReplace = function ( offset, remove, insert ) {
-	var removeMetadata, insertMetadata, replace = {};
-	if ( remove > insert.length ) {
-		// if we are removing more than we are inserting we need to collapse the excess metadata
-		removeMetadata = this.getMetadata( new ve.Range( offset + insert.length, offset + remove + 1 ) );
-		// check removeMetadata is non-empty
-		if ( !ve.compare( removeMetadata, new Array( removeMetadata.length ) ) ) {
-			insertMetadata = ve.dm.MetaLinearData.static.merge( removeMetadata );
-			replace.retain = insert.length;
-			replace.remove = removeMetadata;
-			replace.insert = insertMetadata;
-		}
-	}
-	// if insert.length === remove metadata can just stay where it is
-	if ( insert.length > remove ) {
-		// if we are inserting more than we are removing then we need to pad out with undefineds
-		replace.retain = remove;
-		replace.insert = new Array( insert.length - remove );
-	}
-	return replace;
+	// Record the length of the internal list at the time the slice was created so we can
+	// reconcile additions properly
+	newDoc.origDoc = this;
+	newDoc.origInternalListLength = this.internalList.getItemNodeCount();
+	return newDoc;
 };
 
 /**
@@ -490,20 +506,24 @@ ve.dm.Document.prototype.getText = function ( range ) {
  * top level. The tree is updated during this operation.
  *
  * Process:
+ *
  *  1. Nodes between {index} and {index} + {numNodes} in {parent} will be removed
  *  2. Data will be retrieved from this.data using {offset} and {newLength}
  *  3. A document fragment will be generated from the retrieved data
  *  4. The document fragment's nodes will be inserted into {parent} at {index}
  *
  * Use cases:
+ *
  *  1. Rebuild old nodes and offset data after a change to the linear model.
  *  2. Insert new nodes and offset data after a insertion in the linear model.
  *
  * @param {ve.dm.Node} parent Parent of the node(s) being rebuilt
  * @param {number} index Index within parent to rebuild or insert nodes
+ *
  *  - If {numNodes} == 0: Index to insert nodes at
  *  - If {numNodes} >= 1: Index of first node to rebuild
  * @param {number} numNodes Total number of nodes to rebuild
+ *
  *  - If {numNodes} == 0: Nothing will be rebuilt, but the node(s) built from data will be
  *    inserted before {index}. To insert nodes at the end, use number of children in 'parent'
  *  - If {numNodes} == 1: Only the node at {index} will be rebuilt
@@ -516,7 +536,7 @@ ve.dm.Document.prototype.rebuildNodes = function ( parent, index, numNodes, offs
 	var // Get a slice of the document where it's been changed
 		data = this.data.sliceObject( offset, offset + newLength ),
 		// Build document fragment from data
-		fragment = new ve.dm.Document( data, this ),
+		fragment = new this.constructor( data, this.htmlDocument, this ),
 		// Get generated child nodes from the document fragment
 		nodes = fragment.getDocumentNode().getChildren();
 	// Replace nodes in the model tree
@@ -745,7 +765,7 @@ ve.dm.Document.prototype.fixupInsertion = function ( data, offset ) {
 					if ( openingStack.length > 0 ) {
 						popped = openingStack.pop();
 						parentType = popped.type;
-						reopenElements.push( ve.copyObject( popped ) );
+						reopenElements.push( ve.copy( popped ) );
 						// The opening was on openingStack, so we're closing a node that was opened
 						// within data. Don't track that on closingStack
 					} else {
@@ -853,24 +873,24 @@ ve.dm.Document.prototype.fixupInsertion = function ( data, offset ) {
 /**
  * Get the document data for a range.
  *
- * Data will be fixed up so that unopened closings and unclosed openings in the document data slice
- * are balanced.
+ * Data will be fixed up so that unopened closings and unclosed openings in the
+ * linear data slice are balanced.
  *
  * @param {ve.Range} range Range to get contents of
- * @returns {ve.dm.DocumentSlice} Balanced slice of linear model data
+ * @returns {ve.dm.ElementLinearDataSlice} Balanced slice of linear model data
  */
-ve.dm.Document.prototype.getSlice = function ( range ) {
+ve.dm.Document.prototype.getSlicedLinearData = function ( range ) {
 	var first, last, firstNode, lastNode,
 		node = this.getNodeFromOffset( range.start ),
 		selection = this.selectNodes( range, 'siblings' ),
 		addOpenings = [],
 		addClosings = [];
 	if ( selection.length === 0 ) {
-		return new ve.dm.DocumentSlice( [] );
+		return new ve.dm.ElementLinearDataSlice( this.getStore(), [] );
 	}
-	if ( selection.length === 1 && selection[0].range.equals( range ) ) {
+	if ( selection.length === 1 && selection[0].range && selection[0].range.equalsSelection( range ) ) {
 		// Nothing to fix up
-		return new ve.dm.DocumentSlice( this.data.slice( range.start, range.end ) );
+		return new ve.dm.ElementLinearDataSlice( this.getStore(), this.data.slice( range.start, range.end ) );
 	}
 
 	first = selection[0];
@@ -911,7 +931,8 @@ ve.dm.Document.prototype.getSlice = function ( range ) {
 		}
 	}
 
-	return new ve.dm.DocumentSlice(
+	return new ve.dm.ElementLinearDataSlice(
+		this.getStore(),
 		addOpenings.reverse()
 			.concat( this.data.slice( range.start, range.end ) )
 			.concat( addClosings ),

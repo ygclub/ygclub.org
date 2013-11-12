@@ -90,7 +90,10 @@ class RequestContext implements IContextSource {
 	 *
 	 * @param Title $t
 	 */
-	public function setTitle( Title $t ) {
+	public function setTitle( $t ) {
+		if ( $t !== null && !$t instanceof Title ) {
+			throw new MWException( __METHOD__ . " expects an instance of Title" );
+		}
 		$this->title = $t;
 		// Erase the WikiPage so a new one with the new title gets created.
 		$this->wikipage = null;
@@ -417,7 +420,9 @@ class RequestContext implements IContextSource {
 	 * This will setup the session from the given ID. This is useful when
 	 * background scripts inherit context when acting on behalf of a user.
 	 *
-	 * $param array $params Result of RequestContext::exportSession()
+	 * @note suhosin.session.encrypt may interfere with this method.
+	 *
+	 * @param array $params Result of RequestContext::exportSession()
 	 * @return ScopedCallback
 	 * @throws MWException
 	 * @since 1.21

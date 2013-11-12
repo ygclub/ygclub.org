@@ -103,13 +103,6 @@ class GlobalTest extends MediaWikiTestCase {
 			UserMailer::quotedPrintable( "\xc4\x88u legebla?", "UTF-8" ) );
 	}
 
-	function testTime() {
-		$start = wfTime();
-		$this->assertInternalType( 'float', $start );
-		$end = wfTime();
-		$this->assertTrue( $end > $start, "Time is running backwards!" );
-	}
-
 	public static function provideArrayToCGI() {
 		return array(
 			array( array(), '' ), // empty
@@ -273,8 +266,8 @@ class GlobalTest extends MediaWikiTestCase {
 			array_unshift( $param_set, $sampleUTF );
 
 			$this->assertEquals(
-				MWFunction::callArray( 'mb_substr', $param_set ),
-				MWFunction::callArray( 'Fallback::mb_substr', $param_set ),
+				call_user_func_array( 'mb_substr', $param_set ),
+				call_user_func_array( 'Fallback::mb_substr', $param_set ),
 				'Fallback mb_substr with params ' . implode( ', ', $old_param_set )
 			);
 		}
@@ -301,14 +294,14 @@ class GlobalTest extends MediaWikiTestCase {
 			array_unshift( $param_set, $sampleUTF );
 
 			$this->assertEquals(
-				MWFunction::callArray( 'mb_strpos', $param_set ),
-				MWFunction::callArray( 'Fallback::mb_strpos', $param_set ),
+				call_user_func_array( 'mb_strpos', $param_set ),
+				call_user_func_array( 'Fallback::mb_strpos', $param_set ),
 				'Fallback mb_strpos with params ' . implode( ', ', $old_param_set )
 			);
 
 			$this->assertEquals(
-				MWFunction::callArray( 'mb_strrpos', $param_set ),
-				MWFunction::callArray( 'Fallback::mb_strrpos', $param_set ),
+				call_user_func_array( 'mb_strrpos', $param_set ),
+				call_user_func_array( 'Fallback::mb_strrpos', $param_set ),
 				'Fallback mb_strrpos with params ' . implode( ', ', $old_param_set )
 			);
 		}
@@ -431,7 +424,7 @@ class GlobalTest extends MediaWikiTestCase {
 	/** array( shorthand, expected integer ) */
 	public static function provideShorthand() {
 		return array(
-			# Null, empty ... 
+			# Null, empty ...
 			array( '', -1 ),
 			array( '  ', -1 ),
 			array( null, -1 ),
@@ -630,13 +623,20 @@ class GlobalTest extends MediaWikiTestCase {
 				array( "$p//www.example2.com", array( 'www.example.com', 'www.example2.com', 'www.example3.com' ), true, "Exact match with other domains in array, $pDesc URL" ),
 				array( "$p//www.example2.com", array( 'example.com', 'example2.com', 'example3,com' ), true, "Match without subdomain with other domains in array, $pDesc URL" ),
 				array( "$p//www.example4.com", array( 'example.com', 'example2.com', 'example3,com' ), false, "Domain not in array, $pDesc URL" ),
-
-				// FIXME: This is a bug in wfMatchesDomainList(). If and when this is fixed, update this test case
-				array( "$p//nds-nl.wikipedia.org", array( 'nl.wikipedia.org' ), true, "Substrings of domains match while they shouldn't, $pDesc URL" ),
+				array( "$p//nds-nl.wikipedia.org", array( 'nl.wikipedia.org' ), false, "Non-matching substring of domain, $pDesc URL" ),
 			) );
 		}
 
 		return $a;
+	}
+
+	function testWfMkdirParents() {
+		// Should not return true if file exists instead of directory
+		$fname = $this->getNewTempFile();
+		wfSuppressWarnings();
+		$ok = wfMkdirParents( $fname );
+		wfRestoreWarnings();
+		$this->assertFalse( $ok );
 	}
 
 	/**

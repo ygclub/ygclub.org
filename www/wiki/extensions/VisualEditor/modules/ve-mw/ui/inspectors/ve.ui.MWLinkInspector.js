@@ -14,19 +14,21 @@
  * @extends ve.ui.LinkInspector
  *
  * @constructor
- * @param {ve.ui.Surface} surface
- * @param {Object} [config] Config options
+ * @param {ve.ui.WindowSet} windowSet Window set this inspector is part of
+ * @param {Object} [config] Configuration options
  */
-ve.ui.MWLinkInspector = function VeUiMWLinkInspector( surface, config ) {
+ve.ui.MWLinkInspector = function VeUiMWLinkInspector( windowSet, config ) {
 	// Parent constructor
-	ve.ui.LinkInspector.call( this, surface, config );
+	ve.ui.LinkInspector.call( this, windowSet, config );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWLinkInspector, ve.ui.LinkInspector );
+OO.inheritClass( ve.ui.MWLinkInspector, ve.ui.LinkInspector );
 
 /* Static properties */
+
+ve.ui.MWLinkInspector.static.name = 'link';
 
 ve.ui.MWLinkInspector.static.modelClasses = [
 	ve.dm.MWExternalLinkAnnotation, ve.dm.MWInternalLinkAnnotation
@@ -43,10 +45,10 @@ ve.ui.MWLinkInspector.static.linkTargetInputWidget = ve.ui.MWLinkTargetInputWidg
  *
  * @method
  * @param {string} target Link target
- * @returns {ve.dm.MWInternalLinkAnnotation|ve.dm.MWExternalLinkAnnotation}
+ * @returns {ve.dm.MWInternalLinkAnnotation|ve.dm.MWExternalLinkAnnotation|null}
  */
-ve.ui.MWLinkInspector.prototype.getAnnotationFromTarget = function ( target ) {
-	var title;
+ve.ui.MWLinkInspector.prototype.getAnnotationFromText = function ( target ) {
+	var title = mw.Title.newFromText( target );
 
 	// Figure out if this is an internal or external link
 	if ( ve.init.platform.getExternalLinkUrlProtocolsRegExp().test( target ) ) {
@@ -57,19 +59,18 @@ ve.ui.MWLinkInspector.prototype.getAnnotationFromTarget = function ( target ) {
 				'href': target
 			}
 		} );
-	} else {
+	} else if ( title ) {
 		// Internal link
 		// TODO: In the longer term we'll want to have autocompletion and existence and validity
 		// checks using AJAX
-		try {
-			title = new mw.Title( target );
-			if ( title.getNamespaceId() === 6 || title.getNamespaceId() === 14 ) {
-				// File: or Category: link
-				// We have to prepend a colon so this is interpreted as a link
-				// rather than an image inclusion or categorization
-				target = ':' + target;
-			}
-		} catch ( e ) { }
+
+		if ( title.getNamespaceId() === 6 || title.getNamespaceId() === 14 ) {
+			// File: or Category: link
+			// We have to prepend a colon so this is interpreted as a link
+			// rather than an image inclusion or categorization
+			target = ':' + target;
+		}
+
 		return new ve.dm.MWInternalLinkAnnotation( {
 			'type': 'link/mwInternal',
 			'attributes': {
@@ -77,9 +78,13 @@ ve.ui.MWLinkInspector.prototype.getAnnotationFromTarget = function ( target ) {
 				'normalizedTitle': ve.dm.MWInternalLinkAnnotation.static.normalizeTitle( target )
 			}
 		} );
+	} else {
+		// Doesn't look like an external link and mw.Title considered it an illegal value,
+		// for an internal link.
+		return null;
 	}
 };
 
 /* Registration */
 
-ve.ui.inspectorFactory.register( 'mwLink', ve.ui.MWLinkInspector );
+ve.ui.inspectorFactory.register( ve.ui.MWLinkInspector );

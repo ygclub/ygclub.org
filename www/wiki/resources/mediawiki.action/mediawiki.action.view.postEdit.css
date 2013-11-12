@@ -5,6 +5,11 @@
 	height: 0;
 	left: 50%;
 	z-index: 1000;
+	font-size: 13px;
+}
+
+.postedit-container:hover {
+	cursor: pointer;
 }
 
 .postedit {
@@ -12,19 +17,13 @@
 	top: 0.6em;
 	left: -50%;
 	padding: .6em 3.6em .6em 1.1em;
-	font-size: 0.8em;
 	line-height: 1.5625em;
 	color: #626465;
 	background-color: #f4f4f4;
 	border: 1px solid #dcd9d9;
-	-webkit-text-shadow: 0 0.0625em 0 rgba(255, 255, 255, 0.5);
-	-moz-text-shadow: 0 0.0625em 0 rgba(255, 255, 255, 0.5);
 	text-shadow: 0 0.0625em 0 rgba(255, 255, 255, 0.5);
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 	-webkit-box-shadow: 0 2px 5px 0 #ccc;
-	-moz-box-shadow: 0 2px 5px 0 #ccc;
 	box-shadow: 0 2px 5px 0 #ccc;
 	-webkit-transition: all 0.25s ease-in-out;
 	-moz-transition: all 0.25s ease-in-out;
@@ -33,12 +32,8 @@
 	transition: all 0.25s ease-in-out;
 }
 
-.skin-vector .postedit {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
 .skin-monobook .postedit {
-	top: 3em !important;
+	top: 6em !important;
 }
 
 .postedit-faded {
@@ -77,7 +72,6 @@
 .postedit-close:hover {
 	color: black;
 	text-decoration: none;
-	cursor: pointer;
 	opacity: 0.4;
 	filter: alpha(opacity=40);
 }

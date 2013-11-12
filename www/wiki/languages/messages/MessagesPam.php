@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Geitost
  * @author Kaganer
  * @author Katimawan2005
  * @author Urhixidur
@@ -45,7 +46,6 @@ Pabusten ing pamanaliling dake kapamilatan [alilan] ning suglung',
 'tog-shownumberswatching' => 'Ipakit la reng bilang da reng magbanteng talagamit',
 'tog-oldsig' => 'I-preview ya ing salukuyan a pirma',
 'tog-fancysig' => 'Ituring yang wikitext ing pirma (alang automatic link o tambing a suglung)',
-'tog-showjumplinks' => 'Salangian la reng suglung a pampabilis (accessibility links) a "luksu king" (jump to)',
 'tog-uselivepreview' => 'Gumamit kang live preview (JavaScript) (Experimental)',
 'tog-forceeditsummary' => 'Pabaluan mu ku ustung magpalub a blankung edit',
 'tog-watchlisthideown' => 'Isalikut mo reng alili kareng babanten',
@@ -221,7 +221,7 @@ Pabusten ing pamanaliling dake kapamilatan [alilan] ning suglung',
 'jumptonavigation' => 'pamaglibut',
 'jumptosearch' => 'paintunan',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Tungkul {{SITENAME}}',
 'aboutpage' => 'Project:tungkul',
 'copyright' => 'Mipaintulutan ing laman na niti lalam ning $1.',
@@ -297,17 +297,6 @@ Ating tala da reng bulung a makabukud king [[Special:SpecialPages|{{int:specialp
 # General errors
 'error' => 'Mali',
 'databaseerror' => 'Pamagkamali king database (simpanan)',
-'dberrortext' => 'Ating migkamali king database query syntax.
-Mapaliaring ating bug king software.
-Ing tauling mesubuk a kutang king database (database query) yapin iti:
-<blockquote><tt>$1</tt></blockquote>
-from within function "<tt>$2</tt>".
-MySQL returned error "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'Mika pamagkamali king syntax ning pamangutang king database (database query).
-Ing tauling kutang king database yapin iti:
-"$1"
-manibat king kilub ning function "$2".
-Ini ing pamagkamaling linto king MySQL - "$3: $4"',
 'laggedslavemode' => 'Kapiadian: Mapaliaring ala lu king bulung deng pekatauling mibayu.',
 'readonly' => 'Makasara ya ing database',
 'enterlockreason' => 'Ibie me ing sangkan ning pamaniara, pati ing tantia nung kapilan ya milako iti',
@@ -352,7 +341,6 @@ Pakisubukan mung pasibayu kaibat ning mapilang minutu.',
 'viewsourcetext' => 'Malyari meng lon at kopian ing pikuanan (source) ning bulung a ini:',
 'protectedinterface' => 'Maki interface text ya para king software ing bulung a iti. Makasara ya ba yang e mayabusu.',
 'editinginterface' => "'''Babala:''' Babie yang interface text para king software ing bulung a i-edit mu. Makayapektu la king itsura ning user interface para kareng aliwang gagamit deng pamagbayu keti. Malyari lang munta king [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net] deng bisang sumaup king pamaglikas.",
-'sqlhidden' => '(makasalikut ya ing SQL query)',
 'cascadeprotected' => 'Makaprotekta ya king pamag-edit ing bulung a ini uling kayabe ya king makatuking {{PLURAL:$1|bulung, a|bulung, a}} a maki proteksiun uling makasalangi ya ing  "tuki-tuki" o "cascading" option:
 $2',
 'namespaceprotected' => "Ala kang paintulut a mag-edit bulung king pirinan lagyung (namespace a) '''$1'''.",
@@ -378,7 +366,7 @@ Apansingan mung mapalyaring makalto la pa murin deng aliwang bulung a bala mu ma
 'logout' => 'Mag-log out',
 'userlogout' => 'Mag logout',
 'notloggedin' => 'E maka login',
-'nologin' => "Ala kang login? '''$1'''.",
+'nologin' => 'Ala kang login? $1.',
 'nologinlink' => 'Maglalang kang account',
 'createaccount' => 'Maglalang kang account',
 'gotaccount' => "Atin na kang account? '''$1'''.",
@@ -450,7 +438,7 @@ Bang mayari ing kekang pamag-login, kailangan mung mangibiling bayung password k
 'newpassword' => 'Bayung password:',
 'retypenew' => 'Sulat meng pasibayu ing bayung password:',
 'resetpass_submit' => 'Mangibili kang password at maglogin ka',
-'resetpass_success' => 'Melaus ing pamanalili mung password! Ngeni mila-login naka...',
+'changepassword-success' => 'Melaus ing pamanalili mung password! Ngeni mila-login naka...',
 'resetpass_forbidden' => 'E la malyaring alilan deng password keng wiking ini',
 
 # Edit page toolbar
@@ -984,7 +972,6 @@ Nung ibie me, magamit ya bang kilalanan ing kekang ambag.',
 'recentchangeslinked-feed' => 'Miyalilan a makaugne',
 'recentchangeslinked-toolbox' => 'Miyalilan a makaugne',
 'recentchangeslinked-title' => 'Deng miyalilan a maki kaugnayan king "$1"',
-'recentchangeslinked-noresult' => 'Alang miyalilan kareng bulung a pakasuglung ketang mebanggit a panaun.',
 'recentchangeslinked-summary' => "↓Makalista la king bulung a iti deng tauling mengayalilan kareng 
 bulung a makasuglung ketang partikular a bulung. '''Makapal la pangasulat''' deng bulung
 king kekang watchlist (tala da reng babanten).",
@@ -1072,11 +1059,11 @@ Mamili ka sanang lagyung mas maglarawan keng kekang simpan.",
 'upload-proto-error-text' => 'Mangailangan yang URL a magumpisa king <code>http://</code> o <code>ftp://</code> ing pang-malaut a pamaglulan (remote upload).',
 'upload-file-error' => 'Pamagkamaling pangkilub (internal error)',
 'upload-file-error-text' => 'Mika pamagkamaling pangkilub aniang susubukan nang maglalang pansamantalang simpan king server.
-Pakiyaus me ing metung a talapanibala ning sistema (system administrator).',
+Pakiyaus me ing metung a talapanibala ([[Special:ListUsers/sysop|administrator]]).',
 'upload-misc-error' => 'E makikilalang pamagkamali king pamaglulan (unknown upload error)',
 'upload-misc-error-text' => 'Ating miliaring e makikilalang pamagkamali aniang maglulan.
 Pakilawe mu nung ustu ya at maliari yang luban ing URL, at subukan mung pasibayu.
-Nung atin pa muring prublema, maus kang talapanibala king sistema (system administrator).',
+Nung atin pa muring prublema, maus kang talapanibala ([[Special:ListUsers/sysop|administrator]]).',
 
 # Some likely curl errors. More could be added from <http://curl.haxx.se/libcurl/c/libcurl-errors.html>
 'upload-curl-error6' => 'E ne ayabut ing URL',
@@ -1184,13 +1171,6 @@ Isulat (input): contenttype/subtype, alimbawa <code>image/jpeg</code>.',
 'statistics' => 'Deng datos (Statistics)',
 'statistics-header-users' => 'Talagamit statistics',
 'statistics-mostpopular' => 'Bulung a pekamaralas dang linawe',
-
-'disambiguations' => 'Bulung a pamipalino',
-'disambiguationspage' => 'Template:pamipalino',
-'disambiguations-text' => "Makasuglung la king '''bulung pamipalino''' (disambiguation page) deng makatuking bulung.
-Ing dapat, keta lang makatud a paksa makasuglung.<br />
-Tuturing yang bulung pamipalino ing metung a bulung nung gagamit yang modelung (template)  makasuglung manibat king
-[[MediaWiki:Disambiguationspage]]",
 
 'doubleredirects' => 'Dobling pamanaliling direksiun',
 'doubleredirectstext' => 'Pakalista la king bulung a ini deng bulung a makayalis direksiun (redirect) kareng aliwang bulung pamanalis direksiun. Atin yang suglung ing balang dane (row) king mumuna ampong kaduang pamanalis direksiun, ampo king tuturu (target) ning kaduang pamanalis direksiun, a keraklan ya ing "tagana" o "tutung" bulung a tuturu, nung nu ya dapat tambing makaturu ing mumunang pamanalis direksiun.',
@@ -1360,7 +1340,6 @@ click me ing \"Tuknangan ing pamagbante\" (Unwatch) king gilid na ning bulung.",
 'unwatchthispage' => 'Tuknang kang magbante',
 'notanarticle' => 'E ya bulung ding kalamnan (content page)',
 'notvisiblerev' => 'Mebura ya itang mibayu (revision)',
-'watchnochange' => 'Alang me-edit kareng kekang babanten ketang panaun a makabili keti.',
 'watchlist-details' => "{{PLURAL:$1|$1 bulung|$1 bulung}} king kekang watchlist, e la kayabe deng ''talk pages''.",
 'wlheader-enotif' => 'Makasalangi (enabled) ing pamipabalu kapamilatan ning e-mail.',
 'wlheader-showupdated' => "'''Makapal''' la pangasulat deng bulung a miyalilan manibat aniang tauli mu lang pintalan.",

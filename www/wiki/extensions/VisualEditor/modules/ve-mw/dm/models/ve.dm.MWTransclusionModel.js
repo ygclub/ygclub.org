@@ -15,13 +15,13 @@ var hasOwn = Object.hasOwnProperty,
  * MediaWiki transclusion model.
  *
  * @class
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  */
 ve.dm.MWTransclusionModel = function VeDmMWTransclusionModel() {
 	// Mixin constructors
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.parts = [];
@@ -32,7 +32,7 @@ ve.dm.MWTransclusionModel = function VeDmMWTransclusionModel() {
 
 /* Inheritance */
 
-ve.mixinClass( ve.dm.MWTransclusionModel, ve.EventEmitter );
+OO.mixinClass( ve.dm.MWTransclusionModel, OO.EventEmitter );
 
 /* Events */
 
@@ -59,6 +59,7 @@ ve.dm.MWTransclusionModel.prototype.load = function ( data ) {
 	var i, len, part;
 
 	// Convert single part format to multi-part format
+	// Parsoid doesn't use this format any more, but we accept it for backwards compatibility
 	if ( data.params && data.target ) {
 		data = { 'parts': [ { 'template': data } ] };
 	}
@@ -85,8 +86,8 @@ ve.dm.MWTransclusionModel.prototype.load = function ( data ) {
  *
  * @method
  * @param {Object[]} queue List of objects containing parts to add and optionally indexes to add
- *   them at, if no index is given parts will be added at the end
- * @emits add For each item added
+ *  them at, if no index is given parts will be added at the end
+ * @fires add For each item added
  */
 ve.dm.MWTransclusionModel.prototype.process = function ( queue ) {
 	var i, len, item, title, index;
@@ -99,12 +100,24 @@ ve.dm.MWTransclusionModel.prototype.process = function ( queue ) {
 				item.part.getSpec().extend( specCache[title] );
 			}
 		}
+		// Auto-remove if already existing
+		index = ve.indexOf( item.part, this.parts );
+		if ( index !== -1 ) {
+			this.parts.splice( index, 1 );
+			this.emit( 'remove', item.part );
+		}
+		// Add at index, or end if none was given
 		index = item.index === undefined ? this.parts.length : item.index;
 		this.parts.splice( index, 0, item.part );
 		this.emit( 'add', item.part );
+		// Resolve promises
+		if ( item.deferred ) {
+			item.deferred.resolve();
+		}
 	}
 };
 
+/** */
 ve.dm.MWTransclusionModel.prototype.fetch = function () {
 	if ( !this.queue.length ) {
 		return;
@@ -151,7 +164,8 @@ ve.dm.MWTransclusionModel.prototype.fetch = function () {
 		'data': {
 			'format': 'json',
 			'action': 'templatedata',
-			'titles': titles.join( '|' )
+			'titles': titles.join( '|' ),
+			'lang': mw.config.get( 'wgUserLanguage' )
 		}
 	} )
 		.done( function ( data ) {
@@ -232,11 +246,6 @@ ve.dm.MWTransclusionModel.prototype.getPlainObject = function () {
 		return null;
 	}
 
-	// Use single-part format when possible
-	if ( obj.parts.length === 1 ) {
-		obj = obj.parts[0].template;
-	}
-
 	return obj;
 };
 
@@ -261,15 +270,20 @@ ve.dm.MWTransclusionModel.prototype.getUniquePartId = function () {
  * @param {ve.dm.MWTransclusionPartModel} part Part to add
  * @param {number} [index] Specific index to add content at, defaults to the end
  * @throws {Error} If part is not valid
+ * @returns {jQuery.Promise} Promise, resolved when part is added
  */
 ve.dm.MWTransclusionModel.prototype.addPart = function ( part, index ) {
+	var deferred = $.Deferred();
 	if ( !( part instanceof ve.dm.MWTransclusionPartModel ) ) {
 		throw new Error( 'Invalid transclusion part' );
 	}
-	this.queue.push( { 'part': part, 'index': index } );
+	this.queue.push( { 'part': part, 'index': index, 'deferred': deferred } );
+
 	// Fetch on next yield to process items in the queue together, subsequent calls to fetch will
 	// have no effect because the queue will be clear
 	setTimeout( ve.bind( this.fetch, this ) );
+
+	return deferred.promise();
 };
 
 /**
@@ -277,7 +291,7 @@ ve.dm.MWTransclusionModel.prototype.addPart = function ( part, index ) {
  *
  * @method
  * @param {ve.dm.MWTransclusionPartModel} part Part to remove
- * @emits remove
+ * @fires remove
  */
 ve.dm.MWTransclusionModel.prototype.removePart = function ( part ) {
 	var index = ve.indexOf( part, this.parts );

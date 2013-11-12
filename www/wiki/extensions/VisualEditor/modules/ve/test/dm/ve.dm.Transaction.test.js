@@ -47,6 +47,7 @@ QUnit.test( 'newFromInsertion', function ( assert ) {
 		doc = ve.dm.example.createExampleDocument(),
 		isolationDoc = ve.dm.example.createExampleDocument( 'isolationData' ),
 		complexTableDoc = ve.dm.example.createExampleDocument( 'complexTable' ),
+		listWithMetaDoc = ve.dm.example.createExampleDocument( 'listWithMeta' ),
 		doc2 = new ve.dm.Document(
 			ve.dm.example.preprocessAnnotations( [ { 'type': 'paragraph' }, { 'type': '/paragraph' } ] )
 		),
@@ -308,6 +309,19 @@ QUnit.test( 'newFromInsertion', function ( assert ) {
 					},
 					{ 'type': 'retain', 'length': 13 }
 				]
+			},
+			'preserving trailing metadata': {
+				'args': [ listWithMetaDoc, 4, [ 'b' ] ],
+				'ops': [
+					{ 'type': 'retain', 'length': 4 },
+					{
+						'type': 'replace',
+						'remove': [],
+						'insert': [ 'b' ]
+					},
+					{ 'type': 'retain', 'length': 8 },
+					{ 'type': 'retainMetadata', 'length': 1 }
+				]
 			}
 			// TODO test cases for unclosed openings
 			// TODO test cases for (currently failing) unopened closings use case
@@ -386,15 +400,7 @@ QUnit.test( 'newFromRemoval', function ( assert ) {
 						'type': 'replace',
 						'remove': [
 							'h',
-							{
-								'type': 'image',
-								'attributes': {
-									'src': ve.dm.example.imgSrc,
-									'width': null,
-									'height': null
-								},
-								'htmlAttributes': [ { 'values': { 'src': ve.dm.example.imgSrc } } ]
-							},
+							ve.dm.example.image.data,
 							{ 'type': '/image' },
 							'i'
 						],
@@ -577,9 +583,13 @@ QUnit.test( 'newFromRemoval', function ( assert ) {
 						'type': 'replace',
 						'remove': ['B', 'a'],
 						'insert': [],
-						'retainMetadata': 0,
-						'removeMetadata': metaDoc.getMetadata().slice( 7, 10 ),
-						'insertMetadata': ve.dm.MetaLinearData.static.merge( metaDoc.getMetadata().slice( 7, 10 ) )
+						'removeMetadata': metaDoc.getMetadata().slice( 7, 9 ),
+						'insertMetadata': []
+					},
+					{
+						'type': 'replaceMetadata',
+						'remove': [],
+						'insert': ve.dm.MetaLinearData.static.merge( metaDoc.getMetadata().slice( 7, 9 ) )[0]
 					},
 					{ 'type': 'retain', 'length': 4 }
 				]
@@ -658,38 +668,150 @@ QUnit.test( 'newFromRemoval', function ( assert ) {
 	runConstructorTests( assert, ve.dm.Transaction.newFromRemoval, cases );
 } );
 
-QUnit.test( 'newFromNodeReplacement', function ( assert ) {
-	var doc = ve.dm.example.createExampleDocument( 'internalData' ),
-		paragraph = [ { 'type': 'paragraph' }, 'H', 'e', 'l', 'l', 'o', { 'type': '/paragraph' } ],
-		secondNode = doc.internalList.getItemNode( 1 ),
-		cases = {
-			'replacing first internal node with paragraph': {
-				'args': [doc, new ve.Range( 7, 12 ), paragraph],
-				'ops': [
-					{ 'type': 'retain', 'length': 7 },
+QUnit.test( 'newFromDocumentReplace', function ( assert ) {
+	var i, j, doc2, tx, actualStoreItems, expectedStoreItems,
+		doc = ve.dm.example.createExampleDocument( 'internalData' ),
+		nextIndex = doc.store.valueStore.length,
+		whee = [ { 'type': 'paragraph' }, 'W', 'h', 'e', 'e', { 'type': '/paragraph' } ],
+		wheeItem = [ { 'type': 'internalItem' } ].concat( whee ).concat( [ { 'type': '/internalItem' } ] ),
+		cases = [
+			{
+				'msg': 'simple insertion',
+				'doc': 'internalData',
+				'range': new ve.Range( 7, 12 ),
+				'modify': function ( newDoc ) {
+					// Change "Bar" to "Bazaar"
+					newDoc.commit( ve.dm.Transaction.newFromInsertion(
+						newDoc, 3, [ 'z', 'a', 'a' ]
+					) );
+				},
+				'expectedOps': [
+					{ 'type': 'retain', 'length': 6 },
 					{
 						'type': 'replace',
-						'remove': doc.data.slice( 7, 12 ),
-						'insert': paragraph
+						'remove': doc.getData( new ve.Range( 6, 20 ) ),
+						'insert': doc.getData( new ve.Range( 6, 10 ) )
+							.concat( [ 'z', 'a', 'a' ] )
+							.concat( doc.getData( new ve.Range( 10, 20 ) ) )
 					},
-					{ 'type': 'retain', 'length': 15 }
+					{ 'type': 'retain', 'length': 7 }
 				]
 			},
-			'replacing second internal node with two paragraphs': {
-				'args': [doc, secondNode, paragraph.concat( paragraph )],
-				'ops': [
-					{ 'type': 'retain', 'length': 14 },
+			{
+				'msg': 'simple annotation',
+				'doc': 'internalData',
+				'range': doc.getInternalList().getItemNode( 1 ),
+				'modify': function ( newDoc ) {
+					// Bold the first two characters
+					newDoc.commit( ve.dm.Transaction.newFromAnnotation(
+						newDoc, new ve.Range( 1, 3 ), 'set', ve.dm.example.bold
+					) );
+				},
+				'expectedOps': [
+					{ 'type': 'retain', 'length': 6 },
 					{
 						'type': 'replace',
-						'remove': doc.data.getDataSlice( secondNode.getRange() ),
-						'insert': paragraph.concat( paragraph )
+						'remove': doc.getData( new ve.Range( 6, 20 ) ),
+						'insert': doc.getData( new ve.Range( 6, 15 ) )
+							.concat( [ [ doc.data.getData( 15 ), [ nextIndex ] ] ] )
+							.concat( [ [ doc.data.getData( 16 ), [ nextIndex ] ] ] )
+							.concat( doc.getData( new ve.Range( 17, 20 ) ) )
 					},
-					{ 'type': 'retain', 'length': 8 }
+					{ 'type': 'retain', 'length': 7 }
+				],
+				'expectedStoreItems': [
+					ve.dm.example.bold
+				]
+			},
+			{
+				'msg': 'insertion into internal list',
+				'doc': 'internalData',
+				'range': new ve.Range( 21, 27 ),
+				'modify': function ( newDoc ) {
+					var insertion = newDoc.internalList.getItemInsertion( 'test', 'whee', whee );
+					newDoc.commit( insertion.transaction );
+				},
+				'expectedOps': [
+					{ 'type': 'retain', 'length': 6 },
+					{
+						'type': 'replace',
+						'remove': doc.getData( new ve.Range( 6, 20 ) ),
+						'insert': doc.getData( new ve.Range( 6, 20 ) ).concat( wheeItem )
+					},
+					{ 'type': 'retain', 'length': 1 },
+					{
+						'type': 'replace',
+						'remove': doc.getData( new ve.Range( 21, 27 ) ),
+						'insert': doc.getData( new ve.Range( 21, 27 ) )
+					}
+				]
+			},
+			{
+				'msg': 'change in internal list',
+				'doc': 'internalData',
+				'range': new ve.Range( 21, 27 ),
+				'modify': function ( newDoc ) {
+					newDoc.commit( ve.dm.Transaction.newFromInsertion(
+						newDoc, 12, [ '!', '!', '!' ]
+					) );
+				},
+				'expectedOps': [
+					{ 'type': 'retain', 'length': 6 },
+					{
+						'type': 'replace',
+						'remove': doc.getData( new ve.Range( 6, 20 ) ),
+						'insert': doc.getData( new ve.Range( 6, 11 ) )
+							.concat( [ '!', '!', '!' ] )
+							.concat( doc.getData( new ve.Range( 11, 20 ) ) )
+					},
+					{ 'type': 'retain', 'length': 1 },
+					{
+						'type': 'replace',
+						'remove': doc.getData( new ve.Range( 21, 27 ) ),
+						'insert': doc.getData( new ve.Range( 21, 27 ) )
+					}
+				]
+			},
+			{
+				'msg': 'insertion into internal list from slice within internal list',
+				'doc': 'internalData',
+				'range': new ve.Range( 7, 12 ),
+				'modify': function ( newDoc ) {
+					var insertion = newDoc.internalList.getItemInsertion( 'test', 'whee', whee );
+					newDoc.commit( insertion.transaction );
+				},
+				'expectedOps': [
+					{ 'type': 'retain', 'length': 6 },
+					{
+						'type': 'replace',
+						'remove': doc.getData( new ve.Range( 6, 20 ) ),
+						'insert': doc.getData( new ve.Range( 6, 20 ) ).concat( wheeItem )
+					},
+					{ 'type': 'retain', 'length': 7 }
 				]
 			}
-		};
-	QUnit.expect( ve.getObjectKeys( cases ).length );
-	runConstructorTests( assert, ve.dm.Transaction.newFromNodeReplacement, cases );
+		];
+	QUnit.expect( 2 * cases.length );
+	for ( i = 0; i < cases.length; i++ ) {
+		doc = ve.dm.example.createExampleDocument( cases[i].doc );
+		if ( cases[i].newDocData ) {
+			doc2 = new ve.dm.Document( cases[i].newDocData );
+		} else {
+			doc2 = doc.cloneFromRange( cases[i].range instanceof ve.Range ? cases[i].range : cases[i].range.getRange() );
+			cases[i].modify( doc2 );
+		}
+		tx = ve.dm.Transaction.newFromDocumentReplace( doc, cases[i].range, doc2 );
+		assert.deepEqualWithDomElements( tx.getOperations(), cases[i].expectedOps, cases[i].msg + ': transaction' );
+
+		actualStoreItems = [];
+		expectedStoreItems = cases[i].expectedStoreItems || [];
+		for ( j = 0; j < expectedStoreItems.length; j++ ) {
+			actualStoreItems[j] = doc.store.value( doc.store.indexOfHash(
+				OO.getHash( expectedStoreItems[j] )
+			) );
+		}
+		assert.deepEqual( actualStoreItems, expectedStoreItems, cases[i].msg + ': store items' );
+	}
 } );
 QUnit.test( 'newFromAttributeChanges', function ( assert ) {
 	var doc = ve.dm.example.createExampleDocument(),
@@ -754,6 +876,7 @@ QUnit.test( 'newFromAttributeChanges', function ( assert ) {
 QUnit.test( 'newFromAnnotation', function ( assert ) {
 	var bold = ve.dm.example.createAnnotation( ve.dm.example.bold ),
 		doc = ve.dm.example.createExampleDocument(),
+		annotationDoc = ve.dm.example.createExampleDocument( 'annotationData' ),
 		cases = {
 			'over plain text': {
 				'args': [doc, new ve.Range( 1, 2 ), 'set', bold],
@@ -848,8 +971,63 @@ QUnit.test( 'newFromAnnotation', function ( assert ) {
 					},
 					{ 'type': 'retain', 'length': 52 }
 				]
+			},
+			'over content and content element (image)': {
+				'args': [doc, new ve.Range( 38, 42 ), 'set', bold],
+				'ops': [
+					{ 'type': 'retain', 'length': 38 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'start',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 4 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'stop',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 21 }
+				]
+			},
+			'over content and unannotatable content element (unboldable node)': {
+				'args': [annotationDoc, new ve.Range( 1, 9 ), 'set', bold],
+				'ops': [
+					{ 'type': 'retain', 'length': 1 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'start',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'stop',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 2 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'start',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{
+						'type': 'annotate',
+						'method': 'set',
+						'bias': 'stop',
+						'annotation': bold
+					},
+					{ 'type': 'retain', 'length': 3 }
+				]
 			}
 		};
+
 	QUnit.expect( ve.getObjectKeys( cases ).length );
 	runConstructorTests( assert, ve.dm.Transaction.newFromAnnotation, cases );
 } );
@@ -1025,6 +1203,9 @@ QUnit.test( 'newFromContentBranchConversion', function ( assert ) {
 QUnit.test( 'newFromWrap', function ( assert ) {
 	var i, key,
 		doc = ve.dm.example.createExampleDocument(),
+		metaDoc = ve.dm.example.createExampleDocument( 'withMeta' ),
+		listMetaDoc = ve.dm.example.createExampleDocument( 'listWithMeta' ),
+		listDoc = ve.dm.example.createExampleDocumentFromObject( 'listDoc', null, { 'listDoc': listMetaDoc.getData() } ),
 		cases = {
 			'changes a heading to a paragraph': {
 				'args': [doc, new ve.Range( 1, 4 ), [ { 'type': 'heading', 'attributes': { 'level': 1 } } ], [ { 'type': 'paragraph' } ], [], []],
@@ -1047,6 +1228,25 @@ QUnit.test( 'newFromWrap', function ( assert ) {
 					{ 'type': 'retain', 'length': 10 },
 					{ 'type': 'replace', 'remove': [ { 'type': '/listItem' }, { 'type': '/list' } ], 'insert': [] },
 					{ 'type': 'retain', 'length': 37 }
+				]
+			},
+			'unwraps a multiple-item list': {
+				'args': [listDoc, new ve.Range( 1, 11 ), [ { 'type': 'list' } ], [], [ { 'type': 'listItem', 'attributes': {'styles': ['bullet']} } ], [] ],
+				'ops': [
+					{ 'type': 'replace',
+					  'remove': [ { 'type': 'list' }, { 'type': 'listItem', 'attributes': { 'styles': ['bullet'] } } ],
+					  'insert': []
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{ 'type': 'replace',
+					  'remove': [ { 'type': '/listItem' }, { 'type': 'listItem', 'attributes': { 'styles': ['bullet'] } } ],
+					  'insert': []
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{ 'type': 'replace',
+					  'remove': [ { 'type': '/listItem' }, { 'type': '/list' } ],
+					  'insert': []
+					}
 				]
 			},
 			'replaces a table with a list': {
@@ -1093,6 +1293,61 @@ QUnit.test( 'newFromWrap', function ( assert ) {
 					{ 'type': 'retain', 'length': 3 },
 					{ 'type': 'replace', 'remove': [], 'insert': [ { 'type': '/definitionListItem' }, { 'type': '/definitionList' } ] },
 					{ 'type': 'retain', 'length': 2 }
+				]
+			},
+			'metadata is preserved on wrap': {
+				'args': [metaDoc, new ve.Range( 1, 10 ), [ { 'type': 'paragraph' } ], [ { 'type': 'heading', 'level': 1 } ], [], [] ],
+				'ops': [
+					{ 'type': 'replace',
+					  'remove': [ { 'type': 'paragraph' } ],
+					  'insert': [ { 'type': 'heading', 'level': 1 } ],
+					  'insertMetadata': metaDoc.getMetadata().slice(0, 1),
+					  'removeMetadata': metaDoc.getMetadata().slice(0, 1)
+					},
+					{ 'type': 'retain', 'length': 9 },
+					{ 'type': 'replace',
+					  'remove': [ { 'type': '/paragraph' } ],
+					  'insert': [ { 'type': '/heading' } ]
+					},
+					{ 'type': 'retain', 'length': 2 }
+				]
+			},
+			'metadata is preserved on unwrap': {
+				'args': [listMetaDoc, new ve.Range( 1, 11 ), [ { 'type': 'list' } ], [], [ { 'type': 'listItem', 'attributes': {'styles': ['bullet']} } ], [] ],
+				'ops': [
+					{ 'type': 'replace',
+					  'remove': [ { 'type': 'list' }, { 'type': 'listItem', 'attributes': { 'styles': ['bullet'] } } ],
+					  'insert': [],
+					  'insertMetadata': [],
+					  'removeMetadata': listMetaDoc.getMetadata().slice(0, 2)
+					},
+					{ 'type': 'replaceMetadata',
+					  'insert': ve.dm.MetaLinearData.static.merge( listMetaDoc.getMetadata().slice(0, 2) )[0],
+					  'remove': []
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{ 'type': 'replace',
+					  'remove': [ { 'type': '/listItem' }, { 'type': 'listItem', 'attributes': { 'styles': ['bullet'] } } ],
+					  'insert': [],
+					  'insertMetadata': [],
+					  'removeMetadata': listMetaDoc.getMetadata().slice(5, 7)
+					},
+					{ 'type': 'replaceMetadata',
+					  'insert': ve.dm.MetaLinearData.static.merge( listMetaDoc.getMetadata().slice(5, 7) )[0],
+					  'remove': []
+					},
+					{ 'type': 'retain', 'length': 3 },
+					{ 'type': 'replace',
+					  'remove': [ { 'type': '/listItem' }, { 'type': '/list' } ],
+					  'insert': [],
+					  'insertMetadata': [],
+					  'removeMetadata': listMetaDoc.getMetadata().slice(10, 12)
+					},
+					{ 'type': 'replaceMetadata',
+					  'insert': ve.dm.MetaLinearData.static.merge( listMetaDoc.getMetadata().slice(10, 12) )[0],
+					  'remove': []
+					},
+					{ 'type': 'retainMetadata', 'length': 1 }
 				]
 			},
 			'checks integrity of unwrapOuter parameter': {
@@ -1164,55 +1419,7 @@ QUnit.test( 'translateOffset', function ( assert ) {
 	for ( offset in mapping ) {
 		expected = ve.isArray( mapping[offset] ) ? mapping[offset] : [ mapping[offset], mapping[offset] ];
 		assert.strictEqual( tx.translateOffset( Number( offset ) ), expected[1], offset );
-		assert.strictEqual( tx.translateOffset( Number( offset ), false, true ), expected[0], offset + ' (excludeInsertion)' );
-	}
-} );
-
-QUnit.test( 'translateOffsetReversed', function ( assert ) {
-	var mapping, offset, expected,
-		doc = new ve.dm.Document( '-----defg---h--'.split( '' ) ),
-		tx = new ve.dm.Transaction();
-
-	tx.pushReplace( doc, 0, 0, ['a','b','c'] );
-	tx.pushRetain( 5 );
-	tx.pushReplace( doc, 5, 4, [] );
-	tx.pushRetain( 2 );
-	tx.pushStartAnnotating( 'set', { 'type': 'textStyle/bold' } );
-	tx.pushRetain( 1 );
-	tx.pushReplace( doc, 12, 1, ['i', 'j', 'k', 'l', 'm'] );
-	tx.pushRetain( 2 );
-	tx.pushReplace( doc, 15, 0, ['n', 'o', 'p'] );
-
-	mapping = {
-		0: 0,
-		1: 0,
-		2: 0,
-		3: 0,
-		4: 1,
-		5: 2,
-		6: 3,
-		7: 4,
-		8: [5, 9],
-		9: 10,
-		10: 11,
-		11: 12,
-		12: 13,
-		13: 13,
-		14: 13,
-		15: 13,
-		16: 13,
-		17: 14,
-		18: 15,
-		19: 15,
-		20: 15,
-		21: 15,
-		22: 16
-	};
-	QUnit.expect( 2*ve.getObjectKeys( mapping ).length );
-	for ( offset in mapping ) {
-		expected = ve.isArray( mapping[offset] ) ? mapping[offset] : [ mapping[offset], mapping[offset] ];
-		assert.strictEqual( tx.translateOffset( Number( offset ), true ), expected[1], offset );
-		assert.strictEqual( tx.translateOffset( Number( offset ), true, true ), expected[0], offset + ' (excludeInsertion)' );
+		assert.strictEqual( tx.translateOffset( Number( offset ), true ), expected[0], offset + ' (excludeInsertion)' );
 	}
 } );
 
@@ -1509,6 +1716,7 @@ QUnit.test( 'push*Annotating', function ( assert ) {
 
 QUnit.test( 'newFromMetadataInsertion', function ( assert ) {
 	var doc = ve.dm.example.createExampleDocument( 'withMeta' ),
+		listWithMetaDoc = ve.dm.example.createExampleDocument( 'listWithMeta' ),
 		element = {
 			'type': 'alienMeta',
 			'attributes': {
@@ -1528,7 +1736,7 @@ QUnit.test( 'newFromMetadataInsertion', function ( assert ) {
 						'insert': [ element ]
 					},
 					{ 'type': 'retainMetadata', 'length': 2 },
-					{ 'type': 'retain', 'length': 3 }
+					{ 'type': 'retain', 'length': 2 }
 				]
 			},
 			'inserting metadata element into empty list': {
@@ -1540,7 +1748,31 @@ QUnit.test( 'newFromMetadataInsertion', function ( assert ) {
 						'remove': [],
 						'insert': [ element ]
 					},
-					{ 'type': 'retain', 'length': 11 }
+					{ 'type': 'retain', 'length': 10 }
+				]
+			},
+			'inserting trailing metadata (1)': {
+				'args': [ listWithMetaDoc, 12, 0, [ element ] ],
+				'ops': [
+					{ 'type': 'retain', 'length': 12 },
+					{
+						'type': 'replaceMetadata',
+						'remove': [],
+						'insert': [ element ]
+					},
+					{ 'type': 'retainMetadata', 'length': 1 }
+				]
+			},
+			'inserting trailing metadata (2)': {
+				'args': [ listWithMetaDoc, 12, 1, [ element ] ],
+				'ops': [
+					{ 'type': 'retain', 'length': 12 },
+					{ 'type': 'retainMetadata', 'length': 1 },
+					{
+						'type': 'replaceMetadata',
+						'remove': [],
+						'insert': [ element ]
+					}
 				]
 			}
 		};
@@ -1550,6 +1782,7 @@ QUnit.test( 'newFromMetadataInsertion', function ( assert ) {
 
 QUnit.test( 'newFromMetadataRemoval', function ( assert ) {
 	var doc = ve.dm.example.createExampleDocument( 'withMeta' ),
+		listWithMetaDoc = ve.dm.example.createExampleDocument( 'listWithMeta' ),
 		allElements = ve.dm.example.withMetaMetaData[11],
 		someElements = allElements.slice( 1, 3 ),
 		cases = {
@@ -1562,7 +1795,7 @@ QUnit.test( 'newFromMetadataRemoval', function ( assert ) {
 						'remove': allElements,
 						'insert': []
 					},
-					{ 'type': 'retain', 'length': 3 }
+					{ 'type': 'retain', 'length': 2 }
 				]
 			},
 			'removing some metadata elements from metadata list': {
@@ -1576,7 +1809,25 @@ QUnit.test( 'newFromMetadataRemoval', function ( assert ) {
 						'insert': []
 					},
 					{ 'type': 'retainMetadata', 'length': 1 },
-					{ 'type': 'retain', 'length': 3 }
+					{ 'type': 'retain', 'length': 2 }
+				]
+			},
+			'removing trailing metadata': {
+				'args': [ listWithMetaDoc, 12, new ve.Range( 0, 1 ) ],
+				'ops': [
+					{ 'type': 'retain', 'length': 12 },
+					{
+						'type': 'replaceMetadata',
+						'remove': [
+							{
+								'type': 'alienMeta',
+								'attributes': {
+									'domElements': $( '<meta property="thirteen" />' ).toArray()
+								}
+							}
+						],
+						'insert': []
+					}
 				]
 			},
 			'checks metadata at offset is non-empty': {
@@ -1594,6 +1845,7 @@ QUnit.test( 'newFromMetadataRemoval', function ( assert ) {
 
 QUnit.test( 'newFromMetadataElementReplacement', function ( assert ) {
 	var doc = ve.dm.example.createExampleDocument( 'withMeta' ),
+		listWithMetaDoc = ve.dm.example.createExampleDocument( 'listWithMeta' ),
 		newElement = {
 			'type': 'alienMeta',
 			'attributes': {
@@ -1613,7 +1865,18 @@ QUnit.test( 'newFromMetadataElementReplacement', function ( assert ) {
 						'remove': [ oldElement ],
 						'insert': [ newElement ]
 					},
-					{ 'type': 'retain', 'length': 3 }
+					{ 'type': 'retain', 'length': 2 }
+				]
+			},
+			'replacing trailing metadata': {
+				'args': [ listWithMetaDoc, 12, 0, newElement ],
+				'ops': [
+					{ 'type': 'retain', 'length': 12 },
+					{
+						'type': 'replaceMetadata',
+						'remove': [ listWithMetaDoc.metadata.getData( 12 )[0] ],
+						'insert': [ newElement ]
+					}
 				]
 			},
 			'checks offset is in bounds': {

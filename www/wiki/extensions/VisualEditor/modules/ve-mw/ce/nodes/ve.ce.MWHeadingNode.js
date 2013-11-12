@@ -12,7 +12,7 @@
  * @extends ve.ce.HeadingNode
  * @constructor
  * @param {ve.dm.MWHeadingNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWHeadingNode = function VeCeMWHeadingNode( model, config ) {
 	// Parent constructor
@@ -21,7 +21,7 @@ ve.ce.MWHeadingNode = function VeCeMWHeadingNode( model, config ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWHeadingNode, ve.ce.HeadingNode );
+OO.inheritClass( ve.ce.MWHeadingNode, ve.ce.HeadingNode );
 
 /* Static Properties */
 

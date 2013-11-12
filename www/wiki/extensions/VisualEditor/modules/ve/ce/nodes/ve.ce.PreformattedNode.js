@@ -12,7 +12,7 @@
  * @extends ve.ce.BranchNode
  * @constructor
  * @param {ve.dm.PreformattedNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.PreformattedNode = function VeCePreformattedNode( model, config ) {
 	// Parent constructor
@@ -21,7 +21,7 @@ ve.ce.PreformattedNode = function VeCePreformattedNode( model, config ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.PreformattedNode, ve.ce.ContentBranchNode );
+OO.inheritClass( ve.ce.PreformattedNode, ve.ce.ContentBranchNode );
 
 /* Static Properties */
 

@@ -49,7 +49,7 @@ abstract class Collation {
 				return new IcuCollation( 'root' );
 			default:
 				$match = array();
-				if ( preg_match( '/^uca-([a-z-]+)$/', $collationName, $match ) ) {
+				if ( preg_match( '/^uca-([a-z@=-]+)$/', $collationName, $match ) ) {
 					return new IcuCollation( $match[1] );
 				}
 
@@ -214,6 +214,7 @@ class IcuCollation extends Collation {
 		'pt' => array(),
 		'ru' => array(),
 		'sv' => array( "Å", "Ä", "Ö" ),
+		'sv@collation=standard' => array( "Å", "Ä", "Ö" ),
 		'uk' => array( "Ґ", "Ь" ),
 		'vi' => array( "Ă", "Â", "Đ", "Ê", "Ô", "Ơ", "Ư" ),
 		// Not verified, but likely correct
@@ -235,6 +236,7 @@ class IcuCollation extends Collation {
 		'es' => array( "Ñ" ),
 		'et' => array( "Š", "Ž", "Õ", "Ä", "Ö", "Ü" ),
 		'eu' => array( "Ñ" ),
+		'fa' => array( "آ", "ء", "ه" ),
 		'fo' => array( "Á", "Ð", "Í", "Ó", "Ú", "Ý", "Æ", "Ø", "Å" ),
 		'fr' => array(),
 		'fur' => array( "À", "Á", "Â", "È", "Ì", "Ò", "Ù" ),

@@ -93,6 +93,18 @@ if ( !function_exists( 'mb_strrpos' ) ) {
 		return Fallback::mb_strrpos( $haystack, $needle, $offset, $encoding );
 	}
 }
+
+// gzdecode function only exists in PHP >= 5.4.0
+// http://php.net/gzdecode
+if ( !function_exists( 'gzdecode' ) ) {
+	/**
+	 * @codeCoverageIgnore
+	 * @return string
+	 */
+	function gzdecode( $data ) {
+		return gzinflate( substr( $data, 10, -8 ) );
+	}
+}
 /// @endcond
 
 /**
@@ -106,12 +118,12 @@ function wfArrayDiff2( $a, $b ) {
 }
 
 /**
- * @param $a
- * @param $b
+ * @param $a array|string
+ * @param $b array|string
  * @return int
  */
 function wfArrayDiff2_cmp( $a, $b ) {
-	if ( !is_array( $a ) ) {
+	if ( is_string( $a ) && is_string( $b ) ) {
 		return strcmp( $a, $b );
 	} elseif ( count( $a ) !== count( $b ) ) {
 		return count( $a ) < count( $b ) ? -1 : 1;
@@ -130,14 +142,16 @@ function wfArrayDiff2_cmp( $a, $b ) {
 
 /**
  * Array lookup
- * Returns an array where the values in the first array are replaced by the
- * values in the second array with the corresponding keys
+ * Returns an array where the values in array $b are replaced by the
+ * values in array $a with the corresponding keys
  *
+ * @deprecated since 1.22; use array_intersect_key()
  * @param $a Array
  * @param $b Array
  * @return array
  */
 function wfArrayLookup( $a, $b ) {
+	wfDeprecated( __FUNCTION__, '1.22' );
 	return array_flip( array_intersect( array_flip( $a ), array_keys( $b ) ) );
 }
 
@@ -163,11 +177,13 @@ function wfAppendToArrayIfNotDefault( $key, $value, $default, &$changed ) {
  * Backwards array plus for people who haven't bothered to read the PHP manual
  * XXX: will not darn your socks for you.
  *
+ * @deprecated since 1.22; use array_replace()
  * @param $array1 Array
  * @param [$array2, [...]] Arrays
  * @return Array
  */
 function wfArrayMerge( $array1/* ... */ ) {
+	wfDeprecated( __FUNCTION__, '1.22' );
 	$args = func_get_args();
 	$args = array_reverse( $args, true );
 	$out = array();
@@ -875,10 +891,10 @@ function wfMakeUrlIndexes( $url ) {
 function wfMatchesDomainList( $url, $domains ) {
 	$bits = wfParseUrl( $url );
 	if ( is_array( $bits ) && isset( $bits['host'] ) ) {
+		$host = '.' . $bits['host'];
 		foreach ( (array)$domains as $domain ) {
-			// FIXME: This gives false positives. http://nds-nl.wikipedia.org will match nl.wikipedia.org
-			// We should use something that interprets dots instead
-			if ( substr( $bits['host'], -strlen( $domain ) ) === $domain ) {
+			$domain = '.' . $domain;
+			if ( substr( $host, -strlen( $domain ) ) === $domain ) {
 				return true;
 			}
 		}
@@ -1221,36 +1237,31 @@ function wfIncrStats( $key, $count = 1 ) {
 }
 
 /**
- * Check if the wiki read-only lock file is present. This can be used to lock
- * off editing functions, but doesn't guarantee that the database will not be
- * modified.
+ * Check whether the wiki is in read-only mode.
  *
  * @return bool
  */
 function wfReadOnly() {
-	global $wgReadOnlyFile, $wgReadOnly;
-
-	if ( !is_null( $wgReadOnly ) ) {
-		return (bool)$wgReadOnly;
-	}
-	if ( $wgReadOnlyFile == '' ) {
-		return false;
-	}
-	// Set $wgReadOnly for faster access next time
-	if ( is_file( $wgReadOnlyFile ) ) {
-		$wgReadOnly = file_get_contents( $wgReadOnlyFile );
-	} else {
-		$wgReadOnly = false;
-	}
-	return (bool)$wgReadOnly;
+	return wfReadOnlyReason() !== false;
 }
 
 /**
- * @return bool
+ * Get the value of $wgReadOnly or the contents of $wgReadOnlyFile.
+ *
+ * @return string|bool: String when in read-only mode; false otherwise
  */
 function wfReadOnlyReason() {
-	global $wgReadOnly;
-	wfReadOnly();
+	global $wgReadOnly, $wgReadOnlyFile;
+
+	if ( $wgReadOnly === null ) {
+		// Set $wgReadOnly for faster access next time
+		if ( is_file( $wgReadOnlyFile ) && filesize( $wgReadOnlyFile ) > 0 ) {
+			$wgReadOnly = file_get_contents( $wgReadOnlyFile );
+		} else {
+			$wgReadOnly = false;
+		}
+	}
+
 	return $wgReadOnly;
 }
 
@@ -1347,7 +1358,7 @@ function wfMessage( $key /*...*/) {
  */
 function wfMessageFallback( /*...*/ ) {
 	$args = func_get_args();
-	return MWFunction::callArray( 'Message::newFallbackSequence', $args );
+	return call_user_func_array( 'Message::newFallbackSequence', $args );
 }
 
 /**
@@ -1692,10 +1703,12 @@ function wfEmptyMsg( $key ) {
  * Throw a debugging exception. This function previously once exited the process,
  * but now throws an exception instead, with similar results.
  *
+ * @deprecated since 1.22; just throw an MWException yourself
  * @param string $msg message shown when dying.
  * @throws MWException
  */
 function wfDebugDieBacktrace( $msg = '' ) {
+	wfDeprecated( __FUNCTION__, '1.22' );
 	throw new MWException( $msg );
 }
 
@@ -1939,23 +1952,6 @@ function wfViewPrevNext( $offset, $limit, $link, $query = '', $atend = false ) {
 }
 
 /**
- * Make a list item, used by various special pages
- *
- * @param string $page Page link
- * @param string $details Text between brackets
- * @param $oppositedm Boolean	Add the direction mark opposite to your
- *								language, to display text properly
- * @return String
- * @deprecated since 1.19; use Language::specialList() instead
- */
-function wfSpecialList( $page, $details, $oppositedm = true ) {
-	wfDeprecated( __METHOD__, '1.19' );
-
-	global $wgLang;
-	return $wgLang->specialList( $page, $details, $oppositedm );
-}
-
-/**
  * @todo document
  * @todo FIXME: We may want to blacklist some broken browsers
  *
@@ -2011,22 +2007,54 @@ function wfCheckLimits( $deflimit = 50, $optionname = 'rclimit' ) {
  * @return String
  */
 function wfEscapeWikiText( $text ) {
-	$text = strtr( "\n$text", array(
-		'"' => '&#34;', '&' => '&#38;', "'" => '&#39;', '<' => '&#60;',
-		'=' => '&#61;', '>' => '&#62;', '[' => '&#91;', ']' => '&#93;',
-		'{' => '&#123;', '|' => '&#124;', '}' => '&#125;',
-		"\n#" => "\n&#35;", "\n*" => "\n&#42;",
-		"\n:" => "\n&#58;", "\n;" => "\n&#59;",
-		'://' => '&#58;//', 'ISBN ' => 'ISBN&#32;', 'RFC ' => 'RFC&#32;',
-	) );
-	return substr( $text, 1 );
+	static $repl = null, $repl2 = null;
+	if ( $repl === null ) {
+		$repl = array(
+			'"' => '&#34;', '&' => '&#38;', "'" => '&#39;', '<' => '&#60;',
+			'=' => '&#61;', '>' => '&#62;', '[' => '&#91;', ']' => '&#93;',
+			'{' => '&#123;', '|' => '&#124;', '}' => '&#125;', ';' => '&#59;',
+			"\n#" => "\n&#35;", "\r#" => "\r&#35;",
+			"\n*" => "\n&#42;", "\r*" => "\r&#42;",
+			"\n:" => "\n&#58;", "\r:" => "\r&#58;",
+			"\n " => "\n&#32;", "\r " => "\r&#32;",
+			"\n\n" => "\n&#10;", "\r\n" => "&#13;\n",
+			"\n\r" => "\n&#13;", "\r\r" => "\r&#13;",
+			"\n\t" => "\n&#9;", "\r\t" => "\r&#9;", // "\n\t\n" is treated like "\n\n"
+			"\n----" => "\n&#45;---", "\r----" => "\r&#45;---",
+			'__' => '_&#95;', '://' => '&#58;//',
+		);
+
+		// We have to catch everything "\s" matches in PCRE
+		foreach ( array( 'ISBN', 'RFC', 'PMID' ) as $magic ) {
+			$repl["$magic "] = "$magic&#32;";
+			$repl["$magic\t"] = "$magic&#9;";
+			$repl["$magic\r"] = "$magic&#13;";
+			$repl["$magic\n"] = "$magic&#10;";
+			$repl["$magic\f"] = "$magic&#12;";
+		}
+
+		// And handle protocols that don't use "://"
+		global $wgUrlProtocols;
+		$repl2 = array();
+		foreach ( $wgUrlProtocols as $prot ) {
+			if ( substr( $prot, -1 ) === ':' ) {
+				$repl2[] = preg_quote( substr( $prot, 0, -1 ), '/' );
+			}
+		}
+		$repl2 = $repl2 ? '/\b(' . join( '|', $repl2 ) . '):/i' : '/^(?!)/';
+	}
+	$text = substr( strtr( "\n$text", $repl ), 1 );
+	$text = preg_replace( $repl2, '$1&#58;', $text );
+	return $text;
 }
 
 /**
  * Get the current unix timestamp with microseconds.  Useful for profiling
+ * @deprecated since 1.22; call microtime() directly
  * @return Float
  */
 function wfTime() {
+	wfDeprecated( __FUNCTION__, '1.22' );
 	return microtime( true );
 }
 
@@ -2431,7 +2459,7 @@ function wfIsWindows() {
  * @return Bool
  */
 function wfIsHipHop() {
-	return function_exists( 'hphp_thread_set_warmup_enabled' );
+	return defined( 'HPHP_VERSION' );
 }
 
 /**
@@ -2494,7 +2522,7 @@ function wfMkdirParents( $dir, $mode = null, $caller = null ) {
 		wfDebug( "$caller: called wfMkdirParents($dir)\n" );
 	}
 
-	if ( strval( $dir ) === '' || file_exists( $dir ) ) {
+	if ( strval( $dir ) === '' || ( file_exists( $dir ) && is_dir( $dir ) ) ) {
 		return true;
 	}
 
@@ -2510,6 +2538,11 @@ function wfMkdirParents( $dir, $mode = null, $caller = null ) {
 	wfRestoreWarnings();
 
 	if ( !$ok ) {
+		//directory may have been created on another request since we last checked
+		if ( is_dir( $dir ) ) {
+			return true;
+		}
+
 		// PHP doesn't report the path in its warning message, so add our own to aid in diagnosis.
 		wfLogWarning( sprintf( "failed to mkdir \"%s\" mode 0%o", $dir, $mode ) );
 	}
@@ -2599,38 +2632,6 @@ function wfIniGetBool( $setting ) {
 		|| $val == 'true'
 		|| $val == 'yes'
 		|| preg_match( "/^\s*[+-]?0*[1-9]/", $val ); // approx C atoi() function
-}
-
-/**
- * Wrapper function for PHP's dl(). This doesn't work in most situations from
- * PHP 5.3 onward, and is usually disabled in shared environments anyway.
- *
- * @param string $extension A PHP extension. The file suffix (.so or .dll)
- *                          should be omitted
- * @param string $fileName Name of the library, if not $extension.suffix
- * @return Bool - Whether or not the extension is loaded
- */
-function wfDl( $extension, $fileName = null ) {
-	if ( extension_loaded( $extension ) ) {
-		return true;
-	}
-
-	$canDl = false;
-	if ( PHP_SAPI == 'cli' || PHP_SAPI == 'cgi' || PHP_SAPI == 'embed' ) {
-		$canDl = ( function_exists( 'dl' ) && is_callable( 'dl' )
-		&& wfIniGetBool( 'enable_dl' ) && !wfIniGetBool( 'safe_mode' ) );
-	}
-
-	if ( $canDl ) {
-		$fileName = $fileName ? $fileName : $extension;
-		if ( wfIsWindows() ) {
-			$fileName = 'php_' . $fileName;
-		}
-		wfSuppressWarnings();
-		dl( $fileName . '.' . PHP_SHLIB_SUFFIX );
-		wfRestoreWarnings();
-	}
-	return extension_loaded( $extension );
 }
 
 /**
@@ -2732,9 +2733,11 @@ function wfShellExecDisabled() {
  *                 added to the executed command environment.
  * @param array $limits optional array with limits(filesize, memory, time, walltime)
  *                 this overwrites the global wgShellMax* limits.
- * @return string collected stdout as a string (trailing newlines stripped)
+ * @param array $options Array of options. Only one is "duplicateStderr" => true, which
+ *                 Which duplicates stderr to stdout, including errors from limit.sh
+ * @return string collected stdout as a string
  */
-function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array() ) {
+function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array(), $options = array() ) {
 	global $IP, $wgMaxShellMemory, $wgMaxShellFileSize, $wgMaxShellTime,
 		$wgMaxShellWallClockTime, $wgShellCgroup;
 
@@ -2745,6 +2748,8 @@ function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array
 			'Unable to run external programs in safe mode.' :
 			'Unable to run external programs, passthru() is disabled.';
 	}
+
+	$includeStderr = isset( $options['duplicateStderr'] ) && $options['duplicateStderr'];
 
 	wfInitShellLocale();
 
@@ -2768,6 +2773,10 @@ function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array
 	$cmd = $envcmd . $cmd;
 
 	if ( php_uname( 's' ) == 'Linux' ) {
+		$stderrDuplication = '';
+		if ( $includeStderr ) {
+			$stderrDuplication = 'exec 2>&1; ';
+		}
 		$time = intval ( isset( $limits['time'] ) ? $limits['time'] : $wgMaxShellTime );
 		if ( isset( $limits['walltime'] ) ) {
 			$wallTime = intval( $limits['walltime'] );
@@ -2783,17 +2792,25 @@ function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array
 			$cmd = '/bin/bash ' . escapeshellarg( "$IP/includes/limit.sh" ) . ' ' .
 				escapeshellarg( $cmd ) . ' ' .
 				escapeshellarg(
+					$stderrDuplication .
 					"MW_CPU_LIMIT=$time; " .
 					'MW_CGROUP=' . escapeshellarg( $wgShellCgroup ) . '; ' .
 					"MW_MEM_LIMIT=$mem; " .
 					"MW_FILE_SIZE_LIMIT=$filesize; " .
 					"MW_WALL_CLOCK_LIMIT=$wallTime"
 				);
+		} else {
+			$cmd .= ' 2>&1';
 		}
+	} elseif ( $includeStderr ) {
+		$cmd .= ' 2>&1';
 	}
 	wfDebug( "wfShellExec: $cmd\n" );
 
-	$retval = 1; // error by default?
+	// Default to an unusual value that shouldn't happen naturally,
+	// so in the unlikely event of a weird php bug, it would be
+	// more obvious what happened.
+	$retval = 200;
 	ob_start();
 	passthru( $cmd, $retval );
 	$output = ob_get_contents();
@@ -2803,6 +2820,24 @@ function wfShellExec( $cmd, &$retval = null, $environ = array(), $limits = array
 		wfDebugLog( 'exec', "Possibly missing executable file: $cmd\n" );
 	}
 	return $output;
+}
+
+/**
+ * Execute a shell command, returning both stdout and stderr. Convenience
+ * function, as all the arguments to wfShellExec can become unwieldy.
+ *
+ * @note This also includes errors from limit.sh, e.g. if $wgMaxShellFileSize is exceeded.
+ * @param string $cmd Command line, properly escaped for shell.
+ * @param &$retval null|Mixed optional, will receive the program's exit code.
+ *                 (non-zero is usually failure)
+ * @param array $environ optional environment variables which should be
+ *                 added to the executed command environment.
+ * @param array $limits optional array with limits(filesize, memory, time, walltime)
+ *                 this overwrites the global wgShellMax* limits.
+ * @return string collected stdout and stderr as a string
+ */
+function wfShellExecWithStderr( $cmd, &$retval = null, $environ = array(), $limits = array() ) {
+	return wfShellExec( $cmd, $retval, $environ, $limits, array( 'duplicateStderr' => true ) );
 }
 
 /**
@@ -3155,9 +3190,9 @@ function wfBaseConvert( $input, $sourceBase, $destBase, $pad = 1, $lowercase = t
 		$sourceBase > 36 ||
 		$destBase < 2 ||
 		$destBase > 36 ||
-		$sourceBase != (int) $sourceBase ||
-		$destBase != (int) $destBase ||
-		$pad != (int) $pad ||
+		$sourceBase != (int)$sourceBase ||
+		$destBase != (int)$destBase ||
+		$pad != (int)$pad ||
 		!preg_match( "/^[" . substr( '0123456789abcdefghijklmnopqrstuvwxyz', 0, $sourceBase ) . "]+$/i", $input )
 	) {
 		return false;
@@ -3211,7 +3246,7 @@ function wfBaseConvert( $input, $sourceBase, $destBase, $pad = 1, $lowercase = t
 				$work += $digit;
 
 				if ( $workDigits || $work >= $destBase ) {
-					$workDigits[] = (int) ( $work / $destBase );
+					$workDigits[] = (int)( $work / $destBase );
 				}
 				$work %= $destBase;
 			}
@@ -3300,6 +3335,27 @@ function wfFixSessionID() {
 }
 
 /**
+ * Reset the session_id
+ * @since 1.22
+ */
+function wfResetSessionID() {
+	global $wgCookieSecure;
+	$oldSessionId = session_id();
+	$cookieParams = session_get_cookie_params();
+	if ( wfCheckEntropy() && $wgCookieSecure == $cookieParams['secure'] ) {
+		session_regenerate_id( false );
+	} else {
+		$tmp = $_SESSION;
+		session_destroy();
+		wfSetupSession( MWCryptRand::generateHex( 32 ) );
+		$_SESSION = $tmp;
+	}
+	$newSessionId = session_id();
+	wfRunHooks( 'ResetSessionID', array( $oldSessionId, $newSessionId ) );
+}
+
+
+/**
  * Initialise php session
  *
  * @param $sessionId Bool
@@ -3384,7 +3440,7 @@ function wfForeignMemcKey( $db, $prefix /*, ... */ ) {
 	} else {
 		$key = $db . ':' . implode( ':', $args );
 	}
-	return $key;
+	return str_replace( ' ', '_', $key );
 }
 
 /**
@@ -3750,22 +3806,17 @@ function wfBCP47( $code ) {
 	$codeSegment = explode( '-', $code );
 	$codeBCP = array();
 	foreach ( $codeSegment as $segNo => $seg ) {
-		if ( count( $codeSegment ) > 0 ) {
-			// when previous segment is x, it is a private segment and should be lc
-			if ( $segNo > 0 && strtolower( $codeSegment[( $segNo - 1 )] ) == 'x' ) {
-				$codeBCP[$segNo] = strtolower( $seg );
-			// ISO 3166 country code
-			} elseif ( ( strlen( $seg ) == 2 ) && ( $segNo > 0 ) ) {
-				$codeBCP[$segNo] = strtoupper( $seg );
-			// ISO 15924 script code
-			} elseif ( ( strlen( $seg ) == 4 ) && ( $segNo > 0 ) ) {
-				$codeBCP[$segNo] = ucfirst( strtolower( $seg ) );
-			// Use lowercase for other cases
-			} else {
-				$codeBCP[$segNo] = strtolower( $seg );
-			}
+		// when previous segment is x, it is a private segment and should be lc
+		if ( $segNo > 0 && strtolower( $codeSegment[( $segNo - 1 )] ) == 'x' ) {
+			$codeBCP[$segNo] = strtolower( $seg );
+		// ISO 3166 country code
+		} elseif ( ( strlen( $seg ) == 2 ) && ( $segNo > 0 ) ) {
+			$codeBCP[$segNo] = strtoupper( $seg );
+		// ISO 15924 script code
+		} elseif ( ( strlen( $seg ) == 4 ) && ( $segNo > 0 ) ) {
+			$codeBCP[$segNo] = ucfirst( strtolower( $seg ) );
+		// Use lowercase for other cases
 		} else {
-		// Use lowercase for single segment
 			$codeBCP[$segNo] = strtolower( $seg );
 		}
 	}
@@ -3949,4 +4000,17 @@ function wfIsBadImage( $name, $contextTitle = false, $blacklist = null ) {
 	$bad = isset( $badImages[$name] ) && !isset( $badImages[$name][$contextKey] );
 	wfProfileOut( __METHOD__ );
 	return $bad;
+}
+
+/**
+ * Determine whether the client at a given source IP is likely to be able to
+ * access the wiki via HTTPS.
+ *
+ * @param string $ip The IPv4/6 address in the normal human-readable form
+ * @return boolean
+ */
+function wfCanIPUseHTTPS( $ip ) {
+	$canDo = true;
+	wfRunHooks( 'CanIPUseHTTPS', array( $ip, &$canDo ) );
+	return !!$canDo;
 }

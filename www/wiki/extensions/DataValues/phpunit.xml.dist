@@ -1,0 +1,27 @@
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="bootstrap.php"
+         cacheTokens="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         strict="true"
+         verbose="true">
+    <testsuites>
+        <testsuite name="DataValues">
+            <directory>DataValues/tests</directory>
+        </testsuite>
+        <testsuite name="DataValuesInterfaces">
+            <directory>DataValuesInterfaces/tests</directory>
+        </testsuite>
+        <testsuite name="DataValuesCommon">
+            <directory>DataValuesCommon/tests</directory>
+            <exclude>DataValuesCommon/tests/ValueParsers/api</exclude>
+        </testsuite>
+    </testsuites>
+</phpunit>

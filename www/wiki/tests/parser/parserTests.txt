@@ -27,6 +27,10 @@
 # comment       run through Linker::formatComment() instead of main parser
 # local         format section links in edit comment text as local links
 #
+# You can also set the following parser properties via test options:
+#  wgEnableUploads, wgAllowExternalImages, wgMaxTocLevel,
+#  wgLinkHolderBatchSize, wgRawHtml
+#
 # For testing purposes, temporary articles can created:
 # !!article / NAMESPACE:TITLE / !!text / ARTICLE TEXT / !!endarticle
 # where '/' denotes a newline.
@@ -117,10 +121,29 @@ Template:table_attribs
 !! endarticle
 
 !! article
+Template:table_cells
+!! text
+{{table_attribs}} || Bar || Baz
+!! endarticle
+
+!! article
+Template:image_attribs
+!! text
+<noinclude>
+[[File:foobar.jpg|</noinclude>right|Caption text<noinclude>]]</noinclude>
+!! endarticle
+
+!! article
 A?b
 !! text
 Weirdo titles!
 !! endarticle
+
+!!article
+Template:Bullet
+!!text
+* Bar
+!!endarticle
 
 ###
 ### Basic tests
@@ -173,7 +196,11 @@ a
 b
 ----
 a
-<!--foo--><!--More than 1 comment disables stripping of this line!-->
+<!--foo--><!--More than 1 comment, still stripped-->
+b
+----
+a
+ <!--foo--> <!----> <!-- bar --> 
 b
 ----
 a
@@ -205,7 +232,11 @@ b
 </p>
 <hr />
 <p>a
-</p><p>b
+b
+</p>
+<hr />
+<p>a
+b
 </p>
 <hr />
 <p>a
@@ -265,7 +296,7 @@ a
 b
 ----
 a
- <!--foo--><!--More than 1 comment disables stripping of this line!-->
+ <!--foo--><!--More than 1 comment doesn't disable stripping of this line!-->
 b
 ----
 a
@@ -288,7 +319,7 @@ b
 </p>
 <hr />
 <p>a
-</p><p>b
+b
 </p>
 <hr />
 <p>a
@@ -334,11 +365,11 @@ a
 <p>a
 </p><p><br />
 </p>
-<h1><span class="mw-headline" id="b">b</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: b">edit</a>]</span></h1>
+<h1><span class="mw-headline" id="b">b</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: b">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 <p><a href="/index.php?title=A&amp;action=edit&amp;redlink=1" class="new" title="A (page does not exist)">a</a>
 </p><p><br />
 </p>
-<h1><span class="mw-headline" id="b_2">b</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: b">edit</a>]</span></h1>
+<h1><span class="mw-headline" id="b_2">b</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: b">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 
 !! end
 
@@ -351,7 +382,7 @@ Extra newlines between heading and content are swallowed
 
 [[a]]
 !! result
-<h1><span class="mw-headline" id="b">b</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: b">edit</a>]</span></h1>
+<h1><span class="mw-headline" id="b">b</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: b">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 <p><a href="/index.php?title=A&amp;action=edit&amp;redlink=1" class="new" title="A (page does not exist)">a</a>
 </p>
 !! end
@@ -416,15 +447,36 @@ Italics and bold
 
 !! end
 
-# this example taken from the simple/Moon article
+# this example taken from the [[simple:Moon]] article (bug 47326)
 !! test
-Italics and possessives
+Italics and possessives (1)
 !! input
 obtained by ''[[Lunar Prospector]]'''s gamma-ray spectrometer
 !! result
 <p>obtained by <i><a href="/index.php?title=Lunar_Prospector&amp;action=edit&amp;redlink=1" class="new" title="Lunar Prospector (page does not exist)">Lunar Prospector</a>'</i>s gamma-ray spectrometer
 </p>
 !! end
+
+# this example taken from [[en:Flaming Pie]] (bug 49926)
+!! test
+Italics and possessives (2)
+!! input
+'''''Flaming Pie''''' is ... released in 1997. In ''Flaming Pie'''s liner notes
+!! result
+<p><i><b>Flaming Pie</b></i> is ... released in 1997. In <i>Flaming Pie'</i>s liner notes
+</p>
+!! end
+
+# this example taken from [[en:Dictionary]] (bug 49926)
+!! test
+Italics and possessives (3)
+!! input
+The first monolingual dictionary written in a Romance language was ''Sebastián Covarrubias''' ''Tesoro de la lengua castellana o española'', published in 1611 in Madrid. In 1612 the first edition of the ''Vocabolario dell'[[Accademia della Crusca]]'', for Italian, was published. In 1690 in Rotterdam was published, posthumously, the ''Dictionnaire Universel''.
+!! result
+<p>The first monolingual dictionary written in a Romance language was <i>Sebastián Covarrubias'</i> <i>Tesoro de la lengua castellana o española</i>, published in 1611 in Madrid. In 1612 the first edition of the <i>Vocabolario dell'<a href="/index.php?title=Accademia_della_Crusca&amp;action=edit&amp;redlink=1" class="new" title="Accademia della Crusca (page does not exist)">Accademia della Crusca</a></i>, for Italian, was published. In 1690 in Rotterdam was published, posthumously, the <i>Dictionnaire Universel</i>.
+</p>
+!! end
+
 
 ###
 ### 2-quote opening sequence tests
@@ -534,7 +586,7 @@ parsoid
 !! input
 '''foo'''''
 !! result
-<p><b>foo<i></i></b>
+<p><b>foo</b><i></i>
 </p>
 !!end
 
@@ -591,7 +643,7 @@ parsoid
 !! input
 ''''foo'''''
 !! result
-<p>'<b>foo<i></i></b>
+<p>'<b>foo</b><i></i>
 </p>
 !!end
 
@@ -601,24 +653,12 @@ parsoid
 ###
 
 !! test
-Italics and bold: 5-quote opening sequence: (5,2) (php)
+Italics and bold: 5-quote opening sequence: (5,2)
 !! options
-php
 !! input
 '''''foo''
 !! result
 <p><b><i>foo</i></b>
-</p>
-!!end
-# Parsoid reverses the nesting order, compared to the PHP parser
-!! test
-Italics and bold: 5-quote opening sequence: (5,2) (parsoid)
-!! options
-parsoid
-!! input
-'''''foo''
-!! result
-<p><i><b>foo</b></i>
 </p>
 !!end
 
@@ -763,30 +803,13 @@ Italics and bold: other quote tests: (3,2,3,2)
 !!end
 
 
-# The Parsoid team believes the PHP parser's output on this test is wrong.
-# It only checks for convert-to-bold-on-single-character-word when the word
-# matches with a bold tag ("'''") that is *odd* in the list of quote tokens.
-# This means that the bold token in position 2 (0-indexed) gets converted by
-# parsoid, but doesn't get changed by the PHP parser.
 !! test
-Italics and bold: other quote tests: (3,2,3,3) (php)
+Italics and bold: other quote tests: (3,2,3,3)
 !! options
-php
 !! input
 '''this is about ''foo'''s family'''
 !! result
 <p>'<i>this is about </i>foo<b>s family</b>
-</p>
-!!end
-# This is the output the Parsoid team believes to be correct.
-!! test
-Italics and bold: other quote tests: (3,2,3,3) (parsoid)
-!! options
-parsoid
-!! input
-'''this is about ''foo'''s family'''
-!! result
-<p><b>this is about <i>foo'</i>s family</b>
 </p>
 !!end
 
@@ -810,6 +833,23 @@ The ''[[Main Page]]'''s talk page.
 </p>
 !! end
 
+!! test
+Parsoid only: Quote balancing context should be restricted to td/th cells on the same wikitext line
+(Requires tidy for PHP parser output to be fixed up)
+!! options
+parsoid=wt2html,wt2wt
+!! input
+{|
+!''a!!''b
+|''a||''b
+|}
+!! result
+<table>
+<tbody><tr><th><i>a</i></th><th><i>b</i></th>
+<td><i>a</i></td><td><i>b</i></td></tr>
+</tbody></table>
+!! end
+
 ###
 ### Non-html5 tags
 ###
@@ -828,6 +868,74 @@ Non-html5 tags should be accepted
 <font><i>foo</i></font>
 <strike><i>foo</i></strike>
 <tt><i>foo</i></tt>
+</p>
+!! end
+
+!! test
+<wbr> is valid wikitext (bug 52468)
+!! input
+<wbr>
+!! result
+<p><wbr />
+</p>
+!! end
+
+# <strike> is HTML4, <s> is HTML4/5.
+!! test
+<s> or <strike> for strikethrough
+!! input
+<strike>strike</strike>
+
+<s>s</s>
+!! result
+<p><strike>strike</strike>
+</p><p><s>s</s>
+</p>
+!! end
+
+!! test
+Non-word characters don't terminate tag names (bug 17663, 40670, 52022)
+!! input
+<b→> doesn't work! </b>
+
+<bä> doesn't work! </b>
+
+<boo> works fine </b>
+
+<s.foo>foo</s>
+
+<s.foo>s.foo</s.foo>
+
+<sub-ID#1>
+!! result
+<p>&lt;b→&gt; doesn't work! &lt;/b&gt;
+</p><p>&lt;bä&gt; doesn't work! &lt;/b&gt;
+</p><p>&lt;boo&gt; works fine &lt;/b&gt;
+</p><p>&lt;s.foo&gt;foo&lt;/s&gt;
+</p><p>&lt;s.foo&gt;s.foo&lt;/s.foo&gt;
+</p><p>&lt;sub-ID#1&gt;
+</p>
+!! end
+
+###
+### Special characters
+###
+
+!! test
+Bare pipe character (bug 52363)
+!! input
+|
+!! result
+<p>|
+</p>
+!! end
+
+!! test
+Bare pipe character from a template (bug 52363)
+!! input
+{{pipe}}
+!! result
+<p>|
 </p>
 !! end
 
@@ -898,6 +1006,16 @@ Entities inside <nowiki>
 </p>
 !! end
 
+!! test
+Entities inside template parameters
+!! options
+parsoid
+!! input
+{{echo|&ndash;}}
+!! result
+<p><span typeof="mw:Transclusion mw:Entity" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"&amp;ndash;"}},"i":0}}]}'>&ndash;</span>
+</p>
+!! end
 
 ###
 ### Comments
@@ -1079,7 +1197,7 @@ b
 !! end
 
 ###
-### paragraph wraping tests
+### paragraph wrapping tests
 ###
 !! test
 No block tags
@@ -1092,8 +1210,9 @@ b
 </p><p>b
 </p>
 !! end
+
 !! test
-Block tag on one line
+Block tag on one line (<div>)
 !! input
 a <div>foo</div>
 
@@ -1105,7 +1224,19 @@ a <div>foo</div>
 !! end
 
 !! test
-Block tag on both lines
+Block tag on one line (<blockquote>)
+!! input
+a <blockquote>foo</blockquote>
+
+b
+!! result
+a <blockquote>foo</blockquote>
+<p>b
+</p>
+!! end
+
+!! test
+Block tag on both lines (<div>)
 !! input
 a <div>foo</div>
 
@@ -1113,6 +1244,18 @@ b <div>foo</div>
 !! result
 a <div>foo</div>
 b <div>foo</div>
+
+!! end
+
+!! test
+Block tag on both lines (<blockquote>)
+!! input
+a <blockquote>foo</blockquote>
+
+b <blockquote>foo</blockquote>
+!! result
+a <blockquote>foo</blockquote>
+b <blockquote>foo</blockquote>
 
 !! end
 
@@ -1185,6 +1328,22 @@ And a <a href="/wiki/Main_Page" title="Main Page">link</a>
 !! end
 
 !! test
+Tabs don't trigger preformatted text
+!! input
+	This is not
+	 preformatted text.
+ This is preformatted text.
+ 	So is this.
+!! result
+<p>	This is not
+	 preformatted text.
+</p>
+<pre>This is preformatted text.
+	So is this.
+</pre>
+!! end
+
+!! test
 Ident preformatting with inline content
 !! input
  a
@@ -1226,17 +1385,61 @@ Regression with preformatted in <center>
 
 !! end
 
-# Expected output in the following test is not really expected (there should be
-# <pre> in the output) -- it's only testing for well-formedness.
 !! test
-Bug 6200: Preformatted in <blockquote>
+Bug 52763: Preformatted in <blockquote>
 !! input
 <blockquote>
  Blah
 </blockquote>
 !! result
 <blockquote>
- Blah
+<p> Blah
+</p>
+</blockquote>
+
+!! end
+
+!! test
+Bug 51086: Double newlines in blockquotes should be turned into paragraphs
+!! input
+<blockquote>
+Foo
+
+Bar
+</blockquote>
+!! result
+<blockquote>
+<p>Foo
+</p><p>Bar
+</p>
+</blockquote>
+
+!! end
+
+!! test
+Bug 15491: <ins>/<del> in blockquote
+!! input
+<blockquote>
+Foo <del>bar</del> <ins>baz</ins> quux
+</blockquote>
+!! result
+<blockquote>
+<p>Foo <del>bar</del> <ins>baz</ins> quux
+</p>
+</blockquote>
+
+!! end
+
+# Note that the p-wrapping is newline sensitive, which could be
+# considered a bug: tidy will wrap only the 'Foo' in the example
+# below in a <p> tag. (see comment 23-25 of bug #6200)
+!! test
+Bug 15491: <ins>/<del> in blockquote (2)
+!! input
+<blockquote>Foo <del>bar</del> <ins>baz</ins> quux
+</blockquote>
+!! result
+<blockquote>Foo <del>bar</del> <ins>baz</ins> quux
 </blockquote>
 
 !! end
@@ -1466,53 +1669,220 @@ Templates: Indent-Pre: 1f: Wrapping should be based on expanded content
 </pre>
 !!end
 
+# TODO / maybe: fix wt2wt for this
 !! test
-Templates: Single-line variant of parameter whitespace stripping test
+Parsoid: Don't paragraph-wrap fosterable content
+!! options
+parsoid=wt2html
 !! input
-{{echo| a}}
+{|
+<td></td>
+<td></td>
 
-{{echo|1= a}}
 
-{{echo|{{echo| a}}}}
 
-{{echo|1={{echo| a}}}}
+|}
 !! result
-<pre>a
-</pre>
-<p>a
-</p>
-<pre>a
-</pre>
-<p>a
-</p>
+<table>
+
+<tbody>
+<tr>
+<td></td>
+
+<td></td></tr>
+
+
+
+</tbody></table>
 !! end
 
 !! test
-Templates: Strip whitespace from named parameters, but not positional ones
+Parsoid: Don't paragraph-wrap fosterable content even if table syntax is unbalanced
+!! options
+parsoid=wt2html
 !! input
-{{echo|
- foo}}
+{|
+<td>
+<td>
+</td>
 
-{{echo|
-* foo}}
 
-{{echo| 1 =
- foo}}
 
-{{echo| 1 =
-* foo}}
+|}
 !! result
-<pre>foo
+<table>
+
+<tbody>
+<tr>
+<td></td>
+
+<td>
+</td></tr>
+
+
+
+</tbody></table>
+!! end
+
+
+#--------------------------------------------------------------------
+# Transclusion parameter whitespace stripping tests
+# Behavior is different for positional and named parameters
+#--------------------------------------------------------------------
+!! test
+Templates: Strip leading and trailing whitespace from named-param values
+!! input
+{{echo|1= a }}
+
+{{echo|1= {{echo|b}} }}
+
+{{echo| 1 =
+ c }}
+
+{{echo| 1 =
+* d
+}}
+!! result
+<p>a
+</p><p>b
+</p><p>c
+</p>
+<ul><li> d
+</li></ul>
+
+!! end
+
+!! test
+Templates: Don't strip whitespace from positional-param values
+!! input
+{{echo|a }}
+
+{{echo|{{echo|b}} }}
+
+{{echo| c 
+}}
+
+{{echo| {{echo|d}}
+}}
+
+{{echo|
+ e}}
+
+{{echo|
+* f}}
+
+{{echo|
+ }}g
+!! result
+<p>a 
+</p><p>b 
+</p>
+<pre>c 
 </pre>
 <p><br />
 </p>
-<ul><li> foo
-</li></ul>
-<p>foo
+<pre>d
+</pre>
+<p><br />
 </p>
-<ul><li> foo
+<pre>e
+</pre>
+<p><br />
+</p>
+<ul><li> f
 </li></ul>
+<p><br />
+</p>
+<pre>g
+</pre>
+!! end
 
+!! test
+Templates: Handle empty comment-and-ws-only lines correctly
+!! input
+{{echo|foo
+<!--should be ignored-->
+ <!--should be ignored as well-->
+bar}}
+!! result
+<p>foo
+bar
+</p>
+!! end
+
+#--------------------------------------------------------------------
+# Transclusion parameter escaping tests
+#--------------------------------------------------------------------
+!! test
+Templates: Parsoid parameter escaping test 1
+!! options
+parsoid
+!! input
+{{echo|[foo]|{{echo|[bar]}}}}
+!! result
+<p about="#mwt1" typeof="mw:Transclusion"
+data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"[foo]"},"2":{"wt":"{{echo|[bar]}}"}},"i":0}}]}'>[foo]</p>
+!! end
+
+!! test
+Parsoid: Pipes in external links in template parameter
+!! options
+parsoid
+!! input
+{{echo|[{{echo|http://example.com}} link]}}
+!! result
+<p><a rel="mw:ExtLink" href="http://example.com" about="#mwt31" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"[{{echo|http://example.com}} link]"}},"i":0}}]}'>link</a></p>
+!! end
+
+!! test
+Parsoid: pipe in transclusion parameter
+!! options
+parsoid
+!! input
+{{echo|http://foo.com/a&#124;b}}
+!! result
+<p><a rel="mw:ExtLink" href="http://foo.com/a|b" about="#mwt1"
+typeof="mw:Transclusion"
+data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"http://foo.com/a&amp;#124;b"}},"i":0}}]}'>http://foo.com/a|b</a></p>
+!! end
+
+!! test
+Parsoid: Pipe in external link target and content in template parameter
+!! options
+parsoid=html2wt,wt2wt
+!! input
+{{echo|[http://foo.com/a&#124;b a&#124;b]}}
+!! result
+<p><a rel="mw:ExtLink" href="http://foo.com/a|b" about="#mwt1"
+typeof="mw:Transclusion"
+data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},
+"params":{"1":{"wt":"[http://foo.com/a|b a|b]"}},"i":0}}]}'>a|b</a></p>
+!! end
+
+!! test
+Templates: Dont escape already nowiki-escaped text in template parameters
+!! options
+parsoid=html2wt,wt2wt
+!! input
+{{echo|foo<nowiki>|</nowiki>bar}}
+{{echo|<nowiki>&lt;div&gt;</nowiki>}}
+{{echo|<nowiki></nowiki>}}
+!! result
+<p><span about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"foo<nowiki>|</nowiki>bar"}},"i":0}}]}'}'>foo</span><span typeof="mw:Nowiki" about="#mwt1">|</span><span about="#mwt1">bar</span>
+<span typeof="mw:Transclusion mw:Nowiki" about="#mwt2" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<nowiki>&amp;lt;div&amp;gt;</nowiki>"}},"i":0}}]}'><span typeof="mw:Entity">&lt;</span>div<span typeof="mw:Entity">&gt;</span></span>
+<span typeof="mw:Transclusion mw:Nowiki" about="#mwt3" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<nowiki></nowiki>"}},"i":0}}]}'></span>
+</p>
+!! end
+
+## Bug 52824
+!! test
+Templates: '=' char in nested transclusions should not trigger nowiki escapes or conversion to named param
+!! options
+parsoid=html2wt,wt2wt
+!! input
+{{echo|{{echo|1=bar}}}}
+!! result
+<p about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"{{echo|1=bar}}"}},"i":0}}]}'>bar</p>
 !! end
 
 ###
@@ -1555,6 +1925,20 @@ c
 <pre> a
 </pre>
 <pre> a
+</pre>
+!!end
+
+!!test
+1d. Indent-Pre and Comments
+(Pre-handler currently cannot distinguish between comment/ws order and normalizes them to [comment,ws] order)
+!!input
+<!--a--> a
+
+ <!--b-->b
+!!result
+<pre>a
+</pre>
+<pre>b
 </pre>
 !!end
 
@@ -1617,10 +2001,12 @@ c
 !!input
  <p> foo </p>
  <div> foo </div>
+ <blockquote> foo </blockquote>
  <span> foo </span>
 !!result
  <p> foo </p>
  <div> foo </div>
+ <blockquote> foo </blockquote>
 <pre><span> foo </span>
 </pre>
 !!end
@@ -1644,6 +2030,12 @@ c
  foo
 </blockquote>
 
+<blockquote>
+<pre>
+foo
+</pre>
+</blockquote>
+
 <table><tr><td>
  foo
 </td></tr></table>
@@ -1665,7 +2057,13 @@ c
 </pre>
 </center>
 <blockquote>
- foo
+<p> foo
+</p>
+</blockquote>
+<blockquote>
+<pre>
+foo
+</pre>
 </blockquote>
 <table><tr><td>
 <pre>foo
@@ -1708,6 +2106,56 @@ NOTE: the white-space char on 2nd line is significant
 
 b
 </pre>
+!! end
+
+!! test
+6. Pre-blocks should extend across lines with leading WS even when there is no wrappable content
+!! input
+ a
+ 
+ <!-- continue -->
+ b
+
+ c
+ 
+d
+!! result
+<pre>a
+
+b
+</pre>
+<pre>c
+
+</pre>
+<p>d
+</p>
+!! end
+
+!! test
+7a. Indent-pre and category links
+!! options
+parsoid=wt2html,wt2wt
+!! input
+ [[Category:foo]] <!-- No pre-wrapping -->
+{{echo| [[Category:foo]]}} <!-- No pre-wrapping -->
+!! result
+ <link rel="mw:WikiLink/Category" href="./Category:Foo"> <!-- No pre-wrapping -->
+<span about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":" [[Category:foo]]"}},"i":0}}]}'> </span>
+<link rel="mw:WikiLink/Category" href="./Category:Foo" about="#mwt1"> <!-- No pre-wrapping -->
+!! end
+
+!! test
+7b. Indent-pre and category links
+!! options
+parsoid=wt2html,wt2wt
+!! input
+ [[Category:foo]] a
+ [[Category:foo]] {{echo|b}}
+!! result
+<pre>
+<link rel="mw:WikiLink/Category" href="./Category:Foo"> a
+
+<link rel="mw:WikiLink/Category" href="./Category:Foo"> <span about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"b"}},"i":0}}]}'>b</span></pre>
 !! end
 
 ###
@@ -2041,6 +2489,19 @@ should be left alone
 <p>this text
 should be left alone
 </p>
+!! end
+
+# Bug 52473
+!! test
+Definition Lists: Hacky use to indent tables (WS-insensitive)
+!! options
+parsoid
+!! input
+: {|
+|a
+|} 
+!! result
+<dl><dd> <table><tr><td>a</td></tr></table> </dd></dl>
 !! end
 ## The PHP parser treats : items (dd) without a corresponding ; item (dt)
 ## as an empty dt item.  It also ignores all but the last ";" when followed
@@ -2658,6 +3119,17 @@ External image from https: https://meta.wikimedia.org/upload/f/f1/Ncwikicol.png
 !! end
 
 !! test
+External image (when not allowed)
+!! options
+wgAllowExternalImages=0
+!! input
+External image: http://meta.wikimedia.org/upload/f/f1/Ncwikicol.png
+!! result
+<p>External image: <a rel="nofollow" class="external free" href="http://meta.wikimedia.org/upload/f/f1/Ncwikicol.png">http://meta.wikimedia.org/upload/f/f1/Ncwikicol.png</a>
+</p>
+!! end
+
+!! test
 Link to non-http image, no img tag
 !! input
 Link to non-http image, no img tag: ftp://example.com/test.jpg
@@ -3080,6 +3552,15 @@ External link containing double-single-quotes with no space separating the url f
 !! end
 
 !! test
+External link with comments in link text
+!! input
+[http://www.google.com Google <!-- comment -->]
+!! result
+<p><a rel="nofollow" class="external text" href="http://www.google.com">Google </a>
+</p>
+!! end
+
+!! test
 URL-encoding in URL functions (single parameter)
 !! input
 {{localurl:Some page|amp=&}}
@@ -3151,6 +3632,28 @@ Non-extlinks in brackets
 </p>
 !! end
 
+!! test
+Parsoid: Percent encoding in external links
+!! options
+parsoid
+!! input
+[https://github.com/search?l=&q=ResourceLoader+%40wikimedia Search]
+!! result
+<p><a rel="mw:ExtLink"
+href="https://github.com/search?l=&amp;q=ResourceLoader+%40wikimedia">Search</a></p>
+!! end
+
+!! test
+Parsoid: use url link syntax for links where the content is equal the link
+target
+!! options
+parsoid
+!! input
+http://example.com
+!! result
+<p><a rel="mw:ExtLink" href="http://example.com">http://example.com</a></p>
+!! end
+
 ###
 ### Quotes
 ###
@@ -3208,8 +3711,7 @@ Plain ''italic'''s plain
 !! end
 # Parsoid inserts an empty bold tag pair at the end of the line, that the PHP
 # parser strips. The wikitext contains just the first half of the bold
-# quote pair. (There's also a case where Parsoid nests <b> and <i>
-# differently than the PHP parser.)
+# quote pair.
 !! test
 Unclosed and unmatched quotes (parsoid)
 !! options
@@ -3237,7 +3739,7 @@ Normal text.
 Plain ''italic'''s plain
 !! result
 <p><i><b>Bold italic text </b>with bold deactivated<b> in between.</b></i>
-</p><p><i><b>Bold italic text </b></i><b>with italic deactivated<i> in between.</i></b>
+</p><p><b><i>Bold italic text </i>with italic deactivated<i> in between.</i></b>
 </p><p><b>Bold text..</b>
 </p><p>..spanning two paragraphs (should not work).<b></b>
 </p><p><b>Bold tag left open</b>
@@ -3256,7 +3758,7 @@ Plain ''italic'''s plain
 ###
 
 # This should not produce <table></table> as <table><tr><td></td></tr></table>
-# is the bare minimun required by the spec, see:
+# is the bare minimum required by the spec, see:
 # http://www.w3.org/TR/xhtml-modularization/dtd_module_defs.html#a_module_Basic_Tables
 !! test
 A table with no data. (php)
@@ -3701,11 +4203,44 @@ Template-generated table cell attributes and cell content
 !! input
 {|
 |{{table_attribs}}
+| {{table_attribs}}
 |}
 !! result
 <table>
 <tr>
 <td style="color: red"> Foo
+</td>
+<td style="color: red"> Foo
+</td></tr></table>
+
+!! end
+
+!! test
+Template-generated table cell attributes and cell content (2)
+!! input
+{|
+|align=center {{table_attribs}}
+|}
+!! result
+<table>
+<tr>
+<td align="center" style="color: red"> Foo
+</td></tr></table>
+
+!! end
+
+!! test
+Template-generated table cell attributes and cell content (3)
+!! input
+{|
+|align=center {{table_cells}}
+|}
+!! result
+<table>
+<tr>
+<td align="center" style="color: red"> Foo </td>
+<td> Bar </td>
+<td> Baz
 </td></tr></table>
 
 !! end
@@ -3841,6 +4376,104 @@ parsoid
 <td>foo</td></tr></tbody></table>
 !! end
 
+!! test
+Implicit <td> after a |-
+(PHP parser relies on Tidy to add the missing <td> tags)
+!! options
+parsoid=wt2html,wt2wt
+!! input
+{|
+|-
+a
+|}
+!! result
+<table>
+<tr><td>a</td></tr>
+</table>
+!! end
+
+!! test
+Pres should be recognized in an explicit <td> context, but not in an implicit <td> context
+(PHP parser relies on Tidy to add the missing <td> tags)
+!! options
+parsoid=wt2html,wt2wt
+!! input
+{|
+|-
+|
+ a
+|-
+ b
+|}
+!! result
+<table>
+<tbody>
+<tr><td><pre>a</pre></td></tr>
+<tr><td> b</td></tr>
+</tbody>
+</table>
+!! end
+
+!! test
+Lists should be recognized in an implicit <td> context
+(PHP parser relies on Tidy to add the missing <td> tags)
+!! options
+parsoid=wt2html,wt2wt
+!! input
+{|
+|-
+*a
+|}
+!! result
+<table>
+<tr>
+<td><ul><li>a</li></ul></td>
+</tr>
+</table>
+!! end
+
+!! test
+Parsoid: Round-trip tables directly followed by content (bug 51219)
+!! options
+parsoid=wt2html,wt2wt
+!! input
+{|
+|foo
+|} bar
+
+{|
+|baz
+|}<b>quux</b>
+!! result
+<table><tbody>
+<tr>
+<td>foo</td></tr></tbody></table> bar
+<table>
+<tbody>
+<tr>
+<td>baz</td></tr></tbody></table><b>quux</b>
+!! end
+
+!! test
+Parsoid: Default to a newline after tables in new content (bug 51219)
+!! options
+parsoid=html2wt
+!! input
+{|
+|foo
+|}
+<nowiki> </nowiki>bar
+{|
+|baz
+|}
+'''quux'''
+!! result
+<table><tbody>
+<tr><td>foo</td></tr></tbody></table> bar
+<table><tbody>
+<tr><td>baz</td></tr></tbody></table><b>quux</b>
+!! end
+
 ###
 ### Internal links
 ###
@@ -3866,6 +4499,15 @@ Plain link, uncapitalized
 Piped link
 !! input
 [[Main Page|The Main Page]]
+!! result
+<p><a href="/wiki/Main_Page" title="Main Page">The Main Page</a>
+</p>
+!! end
+
+!! test
+Piped link with comment in link text
+!! input
+[[Main Page|The Main<!--front--> Page]]
 !! result
 <p><a href="/wiki/Main_Page" title="Main Page">The Main Page</a>
 </p>
@@ -3989,6 +4631,22 @@ Link to namespaces
 [[Talk:Parser testing]], [[Meta:Disclaimers]]
 !! result
 <p><a href="/index.php?title=Talk:Parser_testing&amp;action=edit&amp;redlink=1" class="new" title="Talk:Parser testing (page does not exist)">Talk:Parser testing</a>, <a href="/index.php?title=Meta:Disclaimers&amp;action=edit&amp;redlink=1" class="new" title="Meta:Disclaimers (page does not exist)">Meta:Disclaimers</a>
+</p>
+!! end
+
+!! article
+MemoryAlpha:AlphaTest
+!! text
+This is an article in the MemoryAlpha namespace
+(which shadows the memoryalpha interwiki link).
+!! endarticle
+
+!! test
+Namespace takes precedence over interwiki link (bug 51680)
+!! input
+[[MemoryAlpha:AlphaTest]]
+!! result
+<p><a href="/wiki/MemoryAlpha:AlphaTest" title="MemoryAlpha:AlphaTest">MemoryAlpha:AlphaTest</a>
 </p>
 !! end
 
@@ -4468,6 +5126,12 @@ Interwiki link with fragment (bug 2130)
 </p>
 !! end
 
+
+###
+### Interlanguage links
+### Language links (so that searching for '### language' matches..)
+###
+
 !! test
 Interlanguage link
 !! input
@@ -4525,6 +5189,189 @@ language=ln
 </p>
 !! end
 
+!! test
+Parsoid bug 53221: Wikilinks should be properly entity-escaped
+!! options
+parsoid=html2wt
+!! input
+He&amp;nbsp;llo [[Foo|He&amp;nbsp;llo]]
+
+He&amp;nbsp;llo [[He&amp;nbsp;llo]]
+!!result
+<p>He&amp;nbsp;llo <a href="Foo" rel="mw:WikiLink">He&amp;nbsp;llo</a></p>
+<p>He&amp;nbsp;llo <a href="He&amp;nbsp;llo" rel="mw:WikiLink">He&amp;nbsp;llo</a></p>
+!! end
+
+!! test
+Parsoid: handle constructor well
+!! options
+parsoid
+!! input
+[[constructor]]
+
+[[constructor:foo]]
+!! result
+<p data-parsoid="{&quot;dsr&quot;:[0,15,0,0]}"><a rel="mw:WikiLink" href="./Constructor" data-parsoid="{&quot;stx&quot;:&quot;simple&quot;,&quot;a&quot;:{&quot;href&quot;:&quot;./Constructor&quot;},&quot;sa&quot;:{&quot;href&quot;:&quot;constructor&quot;},&quot;dsr&quot;:[0,15,2,2]}">constructor</a></p>
+
+
+<p data-parsoid="{&quot;dsr&quot;:[17,36,0,0]}"><a rel="mw:WikiLink" href="./Foo" data-parsoid="{&quot;stx&quot;:&quot;simple&quot;,&quot;a&quot;:{&quot;href&quot;:&quot;./Foo&quot;},&quot;sa&quot;:{&quot;href&quot;:&quot;constructor:foo&quot;},&quot;dsr&quot;:[17,36,2,2]}">constructor:foo</a></p>
+!! end
+
+!! test
+Parsoid: recognize interlanguage links without a target page
+!! options
+parsoid
+!! input
+[[ko:]]
+!! result
+<p>
+<link rel="mw:WikiLink/Language" href="http://ko.wikipedia.org/wiki/"></p>
+!! end
+
+!! test
+Parsoid: recognize interwiki links without a target page
+!! options
+parsoid
+!! input
+[[:ko:]]
+!! result
+<p><a rel="mw:WikiLink/Interwiki" href="http://ko.wikipedia.org/wiki/">ko:</a></p>
+!! end
+
+###
+### Redirects, Parsoid-only
+###
+!! test
+Simple redirect to page
+!! options
+parsoid
+!! input
+#REDIRECT [[Main Page]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Main_Page">
+!! end
+
+!! test
+Optional colon in #REDIRECT
+!! options
+# the colon is archaic syntax.  we support it for wt2html, but we
+# don't care that it roundtrips back to the modern syntax.
+parsoid=wt2html,html2html
+!! input
+#REDIRECT:[[Main Page]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Main_Page">
+!! end
+
+!! test
+Whitespace in #REDIRECT with optional colon
+!! options
+# the colon and gratuitous whitespace is archaic syntax.  we support
+# it for wt2html, but we don't care that it roundtrips back to the
+# modern syntax (without extra whitespace)
+parsoid=wt2html,html2html
+!! input
+ 
+ #REDIRECT 
+: 
+[[Main Page]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Main_Page">
+!! end
+
+!! test
+Piped link in #REDIRECT
+!! options
+# content after piped link is ignored.  we support this syntax,
+# but don't care that the piped link is lost when we roundtrip this.
+parsoid=wt2html
+!! input
+#REDIRECT [[Main Page|bar]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Main_Page">
+!! end
+
+!! test
+Redirect to category
+!! options
+parsoid=wt2html
+!! input
+#REDIRECT [[Category:Foo]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Category:Foo"><link rel="mw:WikiLink/Category" href="./Category:Foo">
+!! end
+
+!! test
+Redirect to category with URL encoding
+!! options
+parsoid=wt2html
+!! input
+#REDIRECT [[Category%3AFoo]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Category:Foo"><link rel="mw:WikiLink/Category" href="./Category:Foo">
+!! end
+
+!! test
+Redirect to category page
+!! options
+parsoid=wt2html,html2html
+!! input
+#REDIRECT [[:Category:Foo]]
+!! result
+<p><a rel="mw:WikiLink" href="Category:Foo">Category:Foo</a></p>
+!! end
+
+!! test
+Redirect to image page (1)
+!! options
+parsoid
+!! input
+#REDIRECT [[File:Wiki.png]]
+!! result
+<link rel="mw:PageProp/redirect" href="./File:Wiki.png">
+!! end
+
+!! test
+Redirect to image page (2)
+!! options
+parsoid
+!! input
+#REDIRECT [[Image:Wiki.png]]
+!! result
+<link rel="mw:PageProp/redirect" href="./File:Wiki.png">
+!! end
+
+!! test
+Redirect to language
+!! options
+parsoid
+!! input
+#REDIRECT [[en:File:Wiki.png]]
+!! result
+<link rel="mw:PageProp/redirect" href="File:Wiki.png">
+!! end
+
+!! test
+Redirect to interwiki
+!! options
+parsoid
+!! input
+#REDIRECT [[meatball:File:Wiki.png]]
+!! result
+<link rel="mw:PageProp/redirect" href="File:Wiki.png">
+!! end
+
+!! test
+Non-English #REDIRECT
+!! options
+parsoid
+language=is
+!! input
+#TILVÍSUN [[Main Page]]
+!! result
+<link rel="mw:PageProp/redirect" href="./Main_Page">
+!! end
+
 ##
 ## XHTML tidiness
 ###
@@ -4540,11 +5387,24 @@ language=ln
 
 !! test
 Broken br tag sanitization
+!! options
+php
 !! input
 </br>
 !! result
 <p>&lt;/br&gt;
 </p>
+!! end
+
+# TODO: Fix html2html mode (bug 51055)!
+!! test
+Parsoid: Broken br tag recognition
+!! options
+parsoid=wt2html
+!! input
+</br>
+!! result
+<p><br></p>
 !! end
 
 !! test
@@ -4888,6 +5748,183 @@ Nested lists 8 (multiple nesting transitions)
 !! end
 
 !! test
+List items are not parsed correctly following a <pre> block (bug 785)
+!! input
+* <pre>foo</pre>
+* <pre>bar</pre>
+* zar
+!! result
+<ul><li> <pre>foo</pre>
+</li><li> <pre>bar</pre>
+</li><li> zar
+</li></ul>
+
+!! end
+
+!! test
+List items from template
+!! input
+
+{{inner list}}
+* item 2
+
+* item 0
+{{inner list}}
+* item 2
+
+* item 0
+* notSOL{{inner list}}
+* item 2
+!! result
+<ul><li> item 1
+</li><li> item 2
+</li></ul>
+<ul><li> item 0
+</li><li> item 1
+</li><li> item 2
+</li></ul>
+<ul><li> item 0
+</li><li> notSOL
+</li><li> item 1
+</li><li> item 2
+</li></ul>
+
+!! end
+
+!! test
+List interrupted by empty line or heading
+!! input
+* foo
+
+** bar
+== A heading ==
+* Another list item
+!! result
+<ul><li> foo
+</li></ul>
+<ul><li><ul><li> bar
+</li></ul>
+</li></ul>
+<h2><span class="mw-headline" id="A_heading">A heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: A heading">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<ul><li> Another list item
+</li></ul>
+
+!!end
+
+!!test
+Multiple list tags generated by templates
+!!input
+{{echo|<li>}}a
+{{echo|<li>}}b
+{{echo|<li>}}c
+!!result
+<li>a
+<li>b
+<li>c</li>
+</li>
+</li>
+
+!!end
+
+!!test
+Single-comment whitespace lines dont break lists, and neither do multi-comment whitespace lines
+!!input
+*a
+<!--This line will NOT split the list-->
+*b
+ <!--This line will NOT split the list either-->
+*c
+ <!--foo--> <!----> <!--This line NOT split the list either--> 
+*d
+!!result
+<ul><li>a
+</li><li>b
+</li><li>c
+</li><li>d
+</li></ul>
+
+!!end
+
+!!test
+Replacing whitespace with tabs still doesn't break the list (gerrit 78327)
+!!input
+*a
+<!--This line will NOT split the list-->	
+*b
+	<!--This line will NOT split the list either--> 	
+*c
+	<!--foo--> <!---->	<!--This line NOT split the list
+        either-->	 
+*d
+!!result
+<ul><li>a
+</li><li>b
+</li><li>c
+</li><li>d
+</li></ul>
+
+!!end
+
+!!test
+Test the li-hack
+(Cannot test this with PHP parser since it relies on Tidy for the hack)
+!!options
+parsoid=wt2html,wt2wt
+!!input
+* foo
+* <li>li-hack
+* {{echo|<li>templated li-hack}}
+* <!--foo--> <li> unsupported li-hack with preceding comments
+
+<ul>
+<li><li>not a li-hack
+</li>
+</ul>
+!!result
+<ul><li> foo</li>
+<li>li-hack</li>
+<li about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<li>templated li-hack"}}}}]}'>templated li-hack</li>
+<li> <!--foo--> </li><li> li-hack with preceding comments</li></ul>
+
+<ul>
+<li></li><li>not a li-hack
+</li>
+</ul>
+!!end
+
+!! test
+Parsoid: Make sure nested lists are serialized on their own line even if HTML contains no newlines
+!! options
+parsoid
+!! input
+# foo
+## bar
+* foo
+** bar
+: foo
+:: bar
+!! result
+<ol><li> foo<ol><li> bar</li></ol></li></ol><ul><li> foo<ul><li> bar</li></ul></li></ul><dl><dd> foo<dl><dd> bar</dd></dl></dd></dl>
+!! end
+
+!! test
+Parsoid: Test of whitespace serialization with Templated bullets
+!! options
+parsoid
+!! input
+* {{bullet}}
+!! result
+<ul>
+<li> </li><li about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"bullet","href":"./Template:Bullet"},"params":{},"i":0}}]}'> Bar</li>
+</ul>
+!! end
+
+# ------------------------------------------------------------------------
+# The next set of tests are about Parsoid's ability to handle badly nested
+# tags (parse, minimize scope of fixup, and roundtrip back)
+# ------------------------------------------------------------------------
+
+!! test
 Unbalanced closing block tags break a list
 (Parsoid-only since php parser generates broken html -- relies on Tidy to fix up)
 !! options
@@ -4955,107 +5992,30 @@ parsoid
 !!end
 
 !! test
-List items are not parsed correctly following a <pre> block (bug 785)
+Table with missing opening <tr> tag
+!! options
+parsoid=wt2html,wt2wt
 !! input
-* <pre>foo</pre>
-* <pre>bar</pre>
-* zar
+<table>
+<td>foo</td>
+</tr>
+</table>
 !! result
-<ul><li> <pre>foo</pre>
-</li><li> <pre>bar</pre>
-</li><li> zar
-</li></ul>
-
+<table>
+<tr>
+<td>foo</td>
+</tr>
+</table>
 !! end
-
-!! test
-List items from template
-!! input
-
-{{inner list}}
-* item 2
-
-* item 0
-{{inner list}}
-* item 2
-
-* item 0
-* notSOL{{inner list}}
-* item 2
-!! result
-<ul><li> item 1
-</li><li> item 2
-</li></ul>
-<ul><li> item 0
-</li><li> item 1
-</li><li> item 2
-</li></ul>
-<ul><li> item 0
-</li><li> notSOL
-</li><li> item 1
-</li><li> item 2
-</li></ul>
-
-!! end
-
-!! test
-List interrupted by empty line or heading
-!! input
-* foo
-
-** bar
-== A heading ==
-* Another list item
-!! result
-<ul><li> foo
-</li></ul>
-<ul><li><ul><li> bar
-</li></ul>
-</li></ul>
-<h2><span class="mw-headline" id="A_heading">A heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: A heading">edit</a>]</span></h2>
-<ul><li> Another list item
-</li></ul>
-
-!!end
-
-!!test
-Multiple list tags generated by templates
-!!input
-{{echo|<li>}}a
-{{echo|<li>}}b
-{{echo|<li>}}c
-!!result
-<li>a
-<li>b
-<li>c</li>
-</li>
-</li>
-
-!!end
-
-!!test
-Single-comment whitespace lines dont break lists, but multi-comment whitespace lines do
-!!input
-*a
-<!--This line will NOT split the list-->
-*b
- <!--This line will NOT split the list either-->
-*c
- <!--foo--> <!--This line with more than 1 comment will split the list-->
-*d
-!!result
-<ul><li>a
-</li><li>b
-</li><li>c
-</li></ul>
-<ul><li>d
-</li></ul>
-
-!!end
 
 ###
 ### Magic Words
 ###
+
+# Note that the current date is hard-coded as
+#   1970-01-01T00:02:03Z (a Thursday)
+# when running parser tests.  The timezone is also fixed to GMT, so
+# local date will be identical to current date.
 
 !! test
 Magic Word: {{CURRENTDAY}}
@@ -5103,6 +6063,15 @@ Magic Word: {{CURRENTMONTH}}
 !! end
 
 !! test
+Magic Word: {{CURRENTMONTH1}}
+!! input
+{{CURRENTMONTH1}}
+!! result
+<p>1
+</p>
+!! end
+
+!! test
 Magic Word: {{CURRENTMONTHABBREV}}
 !! input
 {{CURRENTMONTHABBREV}}
@@ -5139,6 +6108,15 @@ Magic Word: {{CURRENTTIME}}
 !! end
 
 !! test
+Magic Word: {{CURRENTHOUR}}
+!! input
+{{CURRENTHOUR}}
+!! result
+<p>00
+</p>
+!! end
+
+!! test
 Magic Word: {{CURRENTWEEK}} (@bug 4594)
 !! input
 {{CURRENTWEEK}}
@@ -5154,6 +6132,51 @@ Magic Word: {{CURRENTYEAR}}
 !! result
 <p>1970
 </p>
+!! end
+
+!! test
+Magic Word: {{CURRENTTIMESTAMP}}
+!! input
+{{CURRENTTIMESTAMP}}
+!! result
+<p>19700101000203
+</p>
+!! end
+
+!! test
+Magic Words LOCAL (UTC)
+!! input
+* {{LOCALMONTH}}
+* {{LOCALMONTH1}}
+* {{LOCALMONTHNAME}}
+* {{LOCALMONTHNAMEGEN}}
+* {{LOCALMONTHABBREV}}
+* {{LOCALDAY}}
+* {{LOCALDAY2}}
+* {{LOCALDAYNAME}}
+* {{LOCALYEAR}}
+* {{LOCALTIME}}
+* {{LOCALHOUR}}
+* {{LOCALWEEK}}
+* {{LOCALDOW}}
+* {{LOCALTIMESTAMP}}
+!! result
+<ul><li> 01
+</li><li> 1
+</li><li> January
+</li><li> January
+</li><li> Jan
+</li><li> 1
+</li><li> 01
+</li><li> Thursday
+</li><li> 1970
+</li><li> 00:02
+</li><li> 00
+</li><li> 1
+</li><li> 4
+</li><li> 19700101000203
+</li></ul>
+
 !! end
 
 !! test
@@ -5175,6 +6198,93 @@ title=[[User:Ævar Arnfjörð Bjarmason]]
 {{FULLPAGENAMEE}}
 !! result
 <p>User:%C3%86var_Arnfj%C3%B6r%C3%B0_Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKSPACE}}
+!! options
+title=[[User:Ævar Arnfjörð Bjarmason]]
+!! input
+{{TALKSPACE}}
+!! result
+<p>User talk
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKSPACE}}, same namespace
+!! options
+title=[[User talk:Ævar Arnfjörð Bjarmason]]
+!! input
+{{TALKSPACE}}
+!! result
+<p>User talk
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKSPACE}}, main namespace
+!! options
+title=[[Parser Test]]
+!! input
+{{TALKSPACE}}
+!! result
+<p>Talk
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKSPACEE}}
+!! options
+title=[[User:Ævar Arnfjörð Bjarmason]]
+!! input
+{{TALKSPACEE}}
+!! result
+<p>User_talk
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBJECTSPACE}}
+!! options
+title=[[User talk:Ævar Arnfjörð Bjarmason]]
+!! input
+{{SUBJECTSPACE}}
+!! result
+<p>User
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBJECTSPACE}}, same namespace
+!! options
+title=[[User:Ævar Arnfjörð Bjarmason]]
+!! input
+{{SUBJECTSPACE}}
+!! result
+<p>User
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBJECTSPACE}}, main namespace
+!! options
+title=[[Parser Test]]
+!! input
+{{SUBJECTSPACE}}
+!! result
+
+!! end
+
+!! test
+Magic Word: {{SUBJECTSPACEE}}
+!! options
+title=[[User talk:Ævar Arnfjörð Bjarmason]]
+!! input
+{{SUBJECTSPACEE}}
+!! result
+<p>User
 </p>
 !! end
 
@@ -5208,6 +6318,116 @@ title=[[User:Ævar Arnfjörð Bjarmason]]
 {{NAMESPACENUMBER}}
 !! result
 <p>2
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBPAGENAME}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub ö]] subpage
+!! input
+{{SUBPAGENAME}}
+!! result
+<p>sub ö
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBPAGENAMEE}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub ö]] subpage
+!! input
+{{SUBPAGENAMEE}}
+!! result
+<p>sub_%C3%B6
+</p>
+!! end
+
+!! test
+Magic Word: {{ROOTPAGENAME}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub/sub2]] subpage
+!! input
+{{ROOTPAGENAME}}
+!! result
+<p>Ævar Arnfjörð Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{ROOTPAGENAMEE}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub/sub2]] subpage
+!! input
+{{ROOTPAGENAMEE}}
+!! result
+<p>%C3%86var_Arnfj%C3%B6r%C3%B0_Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{BASEPAGENAME}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub]] subpage
+!! input
+{{BASEPAGENAME}}
+!! result
+<p>Ævar Arnfjörð Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{BASEPAGENAMEE}}
+!! options
+title=[[Ævar Arnfjörð Bjarmason/sub]] subpage
+!! input
+{{BASEPAGENAMEE}}
+!! result
+<p>%C3%86var_Arnfj%C3%B6r%C3%B0_Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKPAGENAME}}
+!! options
+title=[[User:Ævar Arnfjörð Bjarmason]]
+!! input
+{{TALKPAGENAME}}
+!! result
+<p>User talk:Ævar Arnfjörð Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{TALKPAGENAMEE}}
+!! options
+title=[[User:Ævar Arnfjörð Bjarmason]]
+!! input
+{{TALKPAGENAMEE}}
+!! result
+<p>User_talk:%C3%86var_Arnfj%C3%B6r%C3%B0_Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBJECTPAGENAME}}
+!! options
+title=[[User talk:Ævar Arnfjörð Bjarmason]]
+!! input
+{{SUBJECTPAGENAME}}
+!! result
+<p>User:Ævar Arnfjörð Bjarmason
+</p>
+!! end
+
+!! test
+Magic Word: {{SUBJECTPAGENAMEE}}
+!! options
+title=[[User talk:Ævar Arnfjörð Bjarmason]]
+!! input
+{{SUBJECTPAGENAMEE}}
+!! result
+<p>User:%C3%86var_Arnfj%C3%B6r%C3%B0_Bjarmason
 </p>
 !! end
 
@@ -5290,6 +6510,15 @@ Magic Word: {{SCRIPTPATH}}
 {{SCRIPTPATH}}
 !! result
 <p>/
+</p>
+!! end
+
+!! test
+Magic Word: {{STYLEPATH}}
+!! input
+{{STYLEPATH}}
+!! result
+<p>/skins
 </p>
 !! end
 
@@ -6092,8 +7321,8 @@ Bug 6563: Edit link generation for section shown by <includeonly>
 !! input
 {{includeonly section}}
 !! result
-<h2><span class="mw-headline" id="Includeonly_section">Includeonly section</span><span class="mw-editsection">[<a href="/index.php?title=Template:Includeonly_section&amp;action=edit&amp;section=T-1" title="Template:Includeonly section">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Section_T-1">Section T-1</span><span class="mw-editsection">[<a href="/index.php?title=Template:Includeonly_section&amp;action=edit&amp;section=T-2" title="Template:Includeonly section">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Includeonly_section">Includeonly section</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Template:Includeonly_section&amp;action=edit&amp;section=T-1" title="Template:Includeonly section">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Section_T-1">Section T-1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Template:Includeonly_section&amp;action=edit&amp;section=T-2" title="Template:Includeonly section">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -6119,7 +7348,7 @@ Bug 6563: Edit link generation for section suppressed by <includeonly>
 </includeonly>
 ==Section 1==
 !! result
-<h2><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 1">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -6141,6 +7370,77 @@ Un-closed <includeonly>
 !! input
 <includeonly>
 !! result
+!! end
+
+# TODO: test with DOM fragment reuse!
+!! test
+Parsoid: DOM fragment reuse
+!! options
+parsoid=wt2wt,wt2html
+!! input
+a{{echo|b<table></table>c}}d
+
+a{{echo|b
+<table></table>
+c}}d
+
+{{echo|a
+
+<table></table>
+
+b}}
+!! result
+a<span about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"b
+<table></table>c"}},"i":0}}]}'>b</span>
+<table about="#mwt1"></table><span about="#mwt1">c</span>d
+
+
+<p about="#mwt2" typeof="mw:Transclusion" data-mw='{"parts":["a",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"b\n<table></table>\nc"}},"i":0}},"d"]}'>ab</p><span about="#mwt2">
+</span>
+<table about="#mwt2"></table><span about="#mwt2">
+</span>
+<p about="#mwt2">cd</p>
+
+
+<p about="#mwt3" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"a\n\n<table></table>\n\nb"}},"i":0}}]}'>a</p><span about="#mwt3">
+
+</span>
+<table about="#mwt3"></table><span about="#mwt3">
+
+</span>
+<p about="#mwt3">b</p>
+!! end
+
+!! test
+Parsoid: Merge double tds (bug 50603)
+!! options
+parsoid
+!! input
+{|
+|{{echo|{{!}} foo}}
+|}
+!! result
+<table><tbody>
+<tr><td about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":["|",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"{{!}} foo"}},"i":0}}]}'> foo</td></tr>
+</tbody></table>
+!! end
+
+!! test
+Parsoid: Merge double tds in nested transclusion content (bug 50603)
+!! options
+parsoid
+!! input
+{{echo|<div>}}
+{|
+|{{echo|{{!}} foo}}
+|}
+{{echo|</div>}}
+!! result
+<div about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<div>"}},"i":0}},"\n{|\n|",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"{{!}} foo"}},"i":1}},"\n|}\n",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"</div>"}},"i":2}}]}'>
+<table><tbody>
+<tr><td data-mw='{"parts":["|"]}'> foo</td></tr>
+</tbody></table>
+</div>
 !! end
 
 ###
@@ -6239,8 +7539,10 @@ Templates: 1. Simple use
 Templates: 2. Inside a block tag
 !!input
 <div>{{echo|Foo}}</div>
+<blockquote>{{echo|Foo}}</blockquote>
 !!result
 <div>Foo</div>
+<blockquote>Foo</blockquote>
 
 !!end
 
@@ -6284,14 +7586,14 @@ bar <div>baz</div>
 !!test
 Templates: P-wrapping: 1d. Template preceded by comment-only line
 !!options
-parsoid=wt2html,wt2wt
+parsoid
 !!input
 <!-- foo -->
 {{echo|Bar}}
 !!result
 <!-- foo -->
-<p typeof="mw:Transclusion">Bar
-</p>
+
+<p about="#mwt223" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"Bar"}},"i":0}}]}'>Bar</p>
 !!end
 
 !!test
@@ -6553,6 +7855,20 @@ Templates: HTML Tables: 4f. Generating a single tag of a HTML table
 !!end
 
 !!test
+Templates: HTML Tables: 5. Proper fostering of categories from inside
+!!options
+parsoid=wt2html,wt2wt
+!!input
+<table>[[Category:foo1]]<tr><td>foo</td></tr></table>
+<!--Two categories (Bug 50330)-->
+<table>[[Category:bar1]][[Category:bar2]]<tr><td>foo</td></tr></table>
+!!result
+<link rel="mw:WikiLink/Category" href="./Category:Foo1"><table><tbody><tr><td>foo</td></tr></tbody></table>
+<!--Two categories (Bug 50330)-->
+<link rel="mw:WikiLink/Category" href="./Category:Bar1"><link rel="mw:WikiLink/Category" href="./Category:Bar2"><table><tbody><tr><td>foo</td></tr></tbody></table>
+!!end
+
+!!test
 Templates: Wiki Tables: 1a. Fostering of entire template content
 !!input
 {|
@@ -6678,24 +7994,24 @@ Templates: Ugly nesting: 1. Quotes opened/closed across templates (echo)
 Templates: Ugly nesting: 2. Quotes opened/closed across templates (echo_with_span)
 (PHP parser generates misnested html)
 !! options
-parsoid=wt2html,wt2wt
+parsoid
 !!input
 {{echo_with_span|''a}}{{echo_with_span|b''c''d}}{{echo_with_span|''e}}
 !!result
-<p><span typeof="mw:Transclusion"><i>a</i></span><i typeof="mw:Transclusion"><span>b</span></i><span>c</span><i>d</i><span>e</span></p>
+<p><span about="#mwt1" typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_span&quot;,&quot;href&quot;:&quot;./Template:Echo_with_span&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;''a&quot;}},&quot;i&quot;:0}}]}"><i>a</i></span><i about="#mwt2" typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_span&quot;,&quot;href&quot;:&quot;./Template:Echo_with_span&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;b''c''d&quot;}},&quot;i&quot;:0}},{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_span&quot;,&quot;href&quot;:&quot;./Template:Echo_with_span&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;''e&quot;}},&quot;i&quot;:1}}]}"><span>b</span></i><span about="#mwt2">c</span><i about="#mwt2">d<span></span></i><span about="#mwt2">e</span></p>
 !!end
 
 !!test
 Templates: Ugly nesting: 3. Quotes opened/closed across templates (echo_with_div)
-(PHP parser generates misnested html)
+(PHP parser generates misnested html; Parsoid html2wt mode adds newlines between {{echo}}s)
 !! options
 parsoid=wt2html,wt2wt
 !!input
 {{echo_with_div|''a}}{{echo_with_div|b''c''d}}{{echo_with_div|''e}}
 !!result
-<div typeof="mw:Transclusion"><i>a</i></div>
-<div typeof="mw:Transclusion"><i>b</i>c<i>d</i></div>
-<div typeof="mw:Transclusion">e</div>
+<div about="#mwt1" typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_div&quot;,&quot;href&quot;:&quot;./Template:Echo_with_div&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;''a&quot;}},&quot;i&quot;:0}}]}"><i>a</i></div>
+<div about="#mwt2" typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_div&quot;,&quot;href&quot;:&quot;./Template:Echo_with_div&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;b''c''d&quot;}},&quot;i&quot;:0}}]}"><i>b</i>c<i>d</i></div>
+<div about="#mwt3" typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo_with_div&quot;,&quot;href&quot;:&quot;./Template:Echo_with_div&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;''e&quot;}},&quot;i&quot;:0}}]}">e</div>
 !!end
 
 !!test
@@ -6718,10 +8034,13 @@ parsoid
 |bar
 |}
 !!result
-<table typeof="mw:Transclusion">
+<table about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":["{|\n|",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"foo</table>"}},"i":0}},"\n|bar\n|}"]}'>
+
 <tbody>
 <tr>
-<td>foo</td></tr></tbody></table><span>bar</span>
+<td>foo</td></tr></tbody></table><span about="#mwt1">
+</span><span about="#mwt1">bar</span><span about="#mwt1">
+</span>
 !!end
 
 !!test
@@ -6750,24 +8069,24 @@ parsoid
   </tr>
 </table>
 !!result
-<table  about="#mwt1" typeof="mw:Transclusion">
-  <tbody><tr >
-    <td >
-    <table >
-      <tbody><tr >
-        <td >1. foo </td></tr></tbody></table></td>
-        <td > bar </td>
-        <td >2. baz </td></tr></tbody></table><span about="#mwt1">
-      </span><span about="#mwt1">
-      
-        abc</span><span about="#mwt1">
-      </span><span about="#mwt1">
-    </span><span about="#mwt1">
-    </span><span about="#mwt1">
-  </span><span about="#mwt1">
-  
-    xyz</span><span about="#mwt1">
-  </span><span about="#mwt1">
+<table about="#mwt2" typeof="mw:Transclusion" data-mw='{"parts":["<table>\n  <tr>\n    <td>\n    <table>\n      <tr>\n        <td>1. ",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"foo </table>"}},"i":0}},"</td>\n        <td> bar </td>\n        <td>2. ",{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"baz </table>"}},"i":1}},"</td>\n      </tr>\n      <tr>\n        <td>abc</td>\n      </tr>\n    </table>\n    </td>\n  </tr>\n  <tr>\n    <td>xyz</td>\n  </tr>\n</table>"]}'>
+  <tbody><tr>
+    <td>
+    <table>
+      <tbody><tr>
+        <td>1. foo </td></tr></tbody></table></td>
+        <td> bar </td>
+        <td>2. baz </td></tr></tbody></table><span about="#mwt2">
+      </span><span about="#mwt2">
+      </span><span about="#mwt2">
+        </span><span about="#mwt2">abc</span><span about="#mwt2">
+      </span><span about="#mwt2">
+    </span><span about="#mwt2">
+    </span><span about="#mwt2">
+  </span><span about="#mwt2">
+  </span><span about="#mwt2">
+    </span><span about="#mwt2">xyz</span><span about="#mwt2">
+  </span><span about="#mwt2">
 </span>
 !!end
 
@@ -7332,6 +8651,62 @@ But not inside includeonly
 <includeonly>{{subst:Foo}}</includeonly>
 !! end
 
+!! test
+Parsoid: Recognize nowiki with trailing space in tags
+!! options
+parsoid=wt2html
+!! input
+<nowiki ><div>[[foo]]</nowiki >
+
+a<nowiki / >b
+
+c<nowiki />d
+
+e<nowiki/ >f
+!! result
+<p><span typeof="mw:Nowiki">&lt;div&gt;[[foo]]</span></p>
+<p>ab</p>
+<p>cd</p>
+<p>ef</p>
+!! end
+
+!! test
+Parsoid: Recognize nowiki with odd capitalization
+!! options
+parsoid=wt2html
+!! input
+<noWikI ><div>[[foo]]</Nowiki >
+!! result
+<p><span typeof="mw:Nowiki">&lt;div&gt;[[foo]]</span></p>
+!! end
+
+
+!! test
+Parsoid: Escape nowiki with trailing space in tags
+!! options
+parsoid=html2wt
+!! input
+&lt;nowiki &gt; foo &lt;/nowiki &gt;
+
+a&lt;nowiki /&gt;b
+
+c&lt;nowiki/ &gt;d
+!! result
+<p>&lt;nowiki &gt; foo &lt/nowiki ></p>
+<p>a&lt;nowiki /&gt;b</p>
+<p>c&lt;nowiki/ &gt;d</p>
+!! end
+
+!! test
+Parsoid: Escape weird noWikI capitalizations
+!! options
+parsoid=html2wt
+!! input
+&lt;noWikI &gt; foo &lt;/NoWikI &gt;
+!! result
+<p>&lt;noWikI &gt; foo &lt/NoWikI ></p>
+!! end
+
 ###
 ### Message transform tests
 ###
@@ -7438,8 +8813,13 @@ Special:Foobar_nonexistent
 ###
 ### Images
 ###
+### For Parsoid-specific tests, see
+#### http://www.mediawiki.org/wiki/Parsoid/MediaWiki_DOM_spec#Images
+
 !! test
-Simple image
+Simple image (php)
+!! options
+php
 !! input
 [[Image:foobar.jpg]]
 !! result
@@ -7448,16 +8828,20 @@ Simple image
 !! end
 
 !! test
-Right-aligned image
+Simple image (parsoid)
+!! options
+parsoid=wt2html
 !! input
-[[Image:foobar.jpg|right]]
+[[Image:foobar.jpg]]
 !! result
-<div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
-
+<p><span class="mw-default-size" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span>
+</p>
 !! end
 
 !! test
-Simple image (using File: namespace, now canonical)
+Simple image (using File: namespace, now canonical) (php)
+!! options
+php
 !! input
 [[File:foobar.jpg]]
 !! result
@@ -7466,29 +8850,108 @@ Simple image (using File: namespace, now canonical)
 !! end
 
 !! test
-Image with caption
+Simple image (using File: namespace, now canonical) (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|right|Caption text]]
+[[File:Foobar.jpg]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span>
+</p>
+!! end
+
+!! test
+Right-aligned image (php)
+!! options
+php
+!! input
+[[Image:foobar.jpg|right]]
+!! result
+<div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
+
+!! end
+
+!! test
+Right-aligned image (parsoid)
+!! options
+parsoid
+!! input
+[[File:Foobar.jpg|right]]
+!! result
+<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></figure>
+!! end
+
+!! test
+Image with caption (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|right|Caption text]]
 !! result
 <div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption text"><img alt="Caption text" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
 
 !! end
 
 !! test
-Image with empty attribute
+Image with caption (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|right||Caption text]]
+[[File:Foobar.jpg|right|Caption text]]
+!! result
+<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a><figcaption>Caption text</figcaption></figure>
+!! end
+
+!! test
+Image with empty attribute (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|right||Caption text]]
 !! result
 <div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption text"><img alt="Caption text" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
 
 !! end
 
 !! test
-Image with link tails
+Image with empty attribute (parsoid)
+!! options
+parsoid=wt2html
 !! input
-123[[Image:foobar.jpg]]456
-123[[Image:foobar.jpg|right]]456
-123[[Image:foobar.jpg|thumb]]456
+[[File:Foobar.jpg|right||Caption text]]
+!! result
+<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a><figcaption>Caption text</figcaption></figure>
+!! end
+
+!! test
+Image with attributes from template (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|{{image_attribs}}]]
+!! result
+<div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption text"><img alt="Caption text" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
+
+!! end
+
+!! test
+Image with attributes from template (parsoid)
+!! options
+parsoid
+!! input
+[[File:Foobar.jpg|{{image_attribs}}]]
+!! result
+<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a><figcaption>Caption text</figcaption></figure>
+!! end
+
+!! test
+Image with link tails (php)
+!! options
+php
+!! input
+123[[File:Foobar.jpg]]456
+123[[File:Foobar.jpg|right]]456
+123[[File:Foobar.jpg|thumb]]456
 !! result
 <p>123<a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>456
 </p>
@@ -7498,20 +8961,48 @@ Image with link tails
 !! end
 
 !! test
-Image with multiple captions -- only last one is accepted
+Image with link tails (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|right|Caption1 - ignored|[[Caption2]] - ignored|Caption3 - accepted]]
+123[[File:Foobar.jpg]]456
+123[[File:Foobar.jpg|right]]456
+123[[File:Foobar.jpg|thumb]]456
+!! result
+<p>123<span class="mw-default-size" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span>456</p>
+123<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></figure>456
+123<figure class="mw-default-size" typeof="mw:Image/Thumb"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/180px-Foobar.jpg" height="20" width="180"></a></figure>456
+!! end
+
+!! test
+Image with multiple captions -- only last one is accepted (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|right|Caption1 - ignored|[[Caption2]] - ignored|Caption3 - accepted]]
 !! result
 <div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption3 - accepted"><img alt="Caption3 - accepted" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></div>
 
 !! end
 
 !! test
-Image with width attribute at different positions
+Image with multiple captions -- only last one is accepted (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|200px|right|Caption]]
-[[Image:foobar.jpg|right|200px|Caption]]
-[[Image:foobar.jpg|right|Caption|200px]]
+[[File:Foobar.jpg|right|Caption1 - ignored|[[Caption2]] - ignored|Caption3 - accepted]]
+!! result
+<figure class="mw-default-size mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a><figcaption>Caption3 - accepted</figcaption></figure>
+!! end
+
+!! test
+Image with width attribute at different positions (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|200px|right|Caption]]
+[[File:Foobar.jpg|right|200px|Caption]]
+[[File:Foobar.jpg|right|Caption|200px]]
 !! result
 <div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption"><img alt="Caption" src="http://example.com/images/thumb/3/3a/Foobar.jpg/200px-Foobar.jpg" width="200" height="23" srcset="http://example.com/images/thumb/3/3a/Foobar.jpg/300px-Foobar.jpg 1.5x, http://example.com/images/thumb/3/3a/Foobar.jpg/400px-Foobar.jpg 2x" /></a></div>
 <div class="floatright"><a href="/wiki/File:Foobar.jpg" class="image" title="Caption"><img alt="Caption" src="http://example.com/images/thumb/3/3a/Foobar.jpg/200px-Foobar.jpg" width="200" height="23" srcset="http://example.com/images/thumb/3/3a/Foobar.jpg/300px-Foobar.jpg 1.5x, http://example.com/images/thumb/3/3a/Foobar.jpg/400px-Foobar.jpg 2x" /></a></div>
@@ -7520,21 +9011,82 @@ Image with width attribute at different positions
 !! end
 
 !! test
-Image with link parameter, wiki target
+Image with width attribute at different positions (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|link=Target page]]
+[[File:Foobar.jpg|200px|right|Caption]]
+[[File:Foobar.jpg|right|200px|Caption]]
+[[File:Foobar.jpg|right|Caption|200px]]
 !! result
-<p><a href="/wiki/Target_page" title="Target page"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
+<figure class="mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/200px-Foobar.jpg" height="23" width="200"></a><figcaption>Caption</figcaption></figure>
+<figure class="mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/200px-Foobar.jpg" height="23" width="200"></a><figcaption>Caption</figcaption></figure>
+<figure class="mw-halign-right" typeof="mw:Image"><a href="File:Foobar.jpg"><img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/200px-Foobar.jpg" height="23" width="200"></a><figcaption>Caption</figcaption></figure>
+!! end
+
+!! test
+Image with link parameter, wiki target (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|link=Main Page]]
+!! result
+<p><a href="/wiki/Main_Page" title="Main Page"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
 </p>
 !! end
 
 !! test
-Image with link parameter, URL target
+Image with link parameter, wiki target (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|link=http://example.com/]]
+[[File:Foobar.jpg|link=Main Page]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image"><a href="Main_Page"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span></p>
+!! end
+
+!! test
+Image with link parameter, URL target (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|link=http://example.com/]]
 !! result
 <p><a href="http://example.com/" rel="nofollow"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
 </p>
+!! end
+
+# parsoid bug 49293 (part 1)
+!! test
+Image with link parameter, URL target (parsoid)
+!! options
+parsoid
+!! input
+[[File:Foobar.jpg|link=http://example.com/]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image"><a href="http://example.com/"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span></p>
+!! end
+
+!! test
+Image with link parameter, protocol-less URL target (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|link=//example.com/]]
+!! result
+<p><a href="//example.com/" rel="nofollow"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
+</p>
+!! end
+
+# parsoid bug 49293 (part 2)
+!! test
+Image with link parameter, protocol-less URL target (parsoid)
+!! options
+parsoid
+!! input
+[[File:Foobar.jpg|link=//example.com/]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image"><a href="//example.com/"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span></p>
 !! end
 
 !! test
@@ -7582,30 +9134,66 @@ wgExternalLinkTarget='foobar'
 !! end
 
 !! test
-Image with empty link parameter
+Image with empty link parameter (php)
+!! options
+php
 !! input
-[[Image:foobar.jpg|link=]]
+[[File:Foobar.jpg|link=]]
 !! result
 <p><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" />
 </p>
 !! end
 
 !! test
-Image with link parameter (wiki target) and unnamed parameter
+Image with empty link parameter (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|link=Target page|Title]]
+[[File:Foobar.jpg|link=]]
 !! result
-<p><a href="/wiki/Target_page" title="Title"><img alt="Title" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
+<p><span class="mw-default-size" typeof="mw:Image"><span><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></span></span></p>
+!! end
+
+!! test
+Image with link parameter (wiki target) and unnamed parameter (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|link=Main Page|Title]]
+!! result
+<p><a href="/wiki/Main_Page" title="Title"><img alt="Title" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
 </p>
 !! end
 
 !! test
-Image with link parameter (URL target) and unnamed parameter
+Image with link parameter (wiki target) and unnamed parameter (parsoid)
+!! options
+parsoid
 !! input
-[[Image:foobar.jpg|link=http://example.com/|Title]]
+[[File:Foobar.jpg|link=Main Page|Title]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image" data-mw='{"caption":"Title"}'><a href="Main_Page"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span></p>
+!! end
+
+!! test
+Image with link parameter (URL target) and unnamed parameter (php)
+!! options
+php
+!! input
+[[File:Foobar.jpg|link=http://example.com/|Title]]
 !! result
 <p><a href="http://example.com/" title="Title" rel="nofollow"><img alt="Title" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a>
 </p>
+!! end
+
+!! test
+Image with link parameter (URL target) and unnamed parameter (parsoid)
+!! options
+parsoid
+!! input
+[[File:Foobar.jpg|link=http://example.com/|Title]]
+!! result
+<p><span class="mw-default-size" typeof="mw:Image" data-mw='{"caption":"Title"}'><a href="http://example.com/"><img resource="./File:Foobar.jpg" src="//example.com/images/3/3a/Foobar.jpg" height="220" width="1941"></a></span></p>
 !! end
 
 !! test
@@ -7756,7 +9344,6 @@ Thumbnail image caption with a free URL and explicit alt
 <div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Alteration" src="http://example.com/images/thumb/3/3a/Foobar.jpg/180px-Foobar.jpg" width="180" height="20" class="thumbimage" srcset="http://example.com/images/thumb/3/3a/Foobar.jpg/270px-Foobar.jpg 1.5x, http://example.com/images/thumb/3/3a/Foobar.jpg/360px-Foobar.jpg 2x" /></a>  <div class="thumbcaption"><div class="magnify"><a href="/wiki/File:Foobar.jpg" class="internal" title="Enlarge"><img src="/skins/common/images/magnify-clip.png" width="15" height="11" alt="" /></a></div><a rel="nofollow" class="external free" href="http://example.com">http://example.com</a></div></div></div>
 
 !! end
-
 
 !! test
 SVG thumbnails with no language set
@@ -7987,54 +9574,8 @@ wgEnableUploads=0
 # http://www.mediawiki.org/wiki/Parsoid/MediaWiki_DOM_spec#Images
 # Currently imperfect due to a flaw in the Parsoid testrunner
 # Work in progress
-
-!! test
-Parsoid-specific image handling - simple image
-!! options
-parsoid
-!! input
-[[Image:Foobar.jpg]]
-!! result
-<p>
-<span class="mw-default-size" typeof="mw:Image">
-<a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg" height="220" width="1941">
-</a>
-</span>
-</p>
-!! end
-
-!! test
-Parsoid-specific image handling - simple image without link
-!! options
-parsoid
-!! input
-[[Image:Foobar.jpg|link=]]
-!! result
-<p>
-<span class="mw-default-size" typeof="mw:Image">
-<span>
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg" height="220" width="1941">
-</span>
-</span>
-</p>
-!! end
-
-!! test
-Parsoid-specific image handling - simple image with specific link
-!! options
-parsoid
-!! input
-[[Image:Foobar.jpg|link=Main Page]]
-!! result
-<p>
-<span class="mw-default-size" typeof="mw:Image">
-<a href="Main_Page">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg" height="220" width="1941">
-</a>
-</span>
-</p>
-!! end
+# THESE TESTS SHOULD BE MOVED UP and merged with the php-specific
+# image tests.
 
 !! test
 Parsoid-specific image handling - simple image with size and middle alignment
@@ -8046,7 +9587,7 @@ parsoid
 <p>
 <span class="mw-valign-middle" typeof="mw:Image">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50">
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50">
 </a>
 </span>
 </p>
@@ -8062,7 +9603,7 @@ parsoid
 <p>
 <span class="mw-valign-baseline" typeof="mw:Image" data-mw="{&quot;caption&quot;:&quot;caption&quot;}">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/89px-Foobar.jpg" height="10" width="89">
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/89px-Foobar.jpg" height="10" width="89">
 </a>
 </span>
 </p>
@@ -8078,7 +9619,7 @@ parsoid
 <p>
 <span class="mw-image-border" typeof="mw:Image" data-mw="{&quot;caption&quot;:&quot;caption&quot;}">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50">
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50">
 </a>
 </span>
 </p>
@@ -8093,9 +9634,9 @@ parsoid
 !! result
 <figure class="mw-default-size mw-halign-left mw-valign-baseline" typeof="mw:Image/Thumb">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/180px-Foobar.jpg" height="21" width="180" />
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/180px-Foobar.jpg" height="21" width="180" />
 </a>
-<figcaption class="mw-figcaption">caption content</figcaption>
+<figcaption>caption content</figcaption>
 </figure>
 !! end
 
@@ -8108,9 +9649,9 @@ parsoid
 !! result
 <figure class="mw-halign-right mw-valign-middle" typeof="mw:Image/Thumb">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50" />
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/50px-Foobar.jpg" height="6" width="50" />
 </a>
-<figcaption class="mw-figcaption">caption</figcaption>
+<figcaption>caption</figcaption>
 </figure>
 !! end
 
@@ -8123,9 +9664,9 @@ parsoid
 !! result
 <figure typeof="mw:Image/Frame">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
 </a>
-<figcaption class="mw-figcaption">caption</figcaption>
+<figcaption>caption</figcaption>
 </figure>
 !! end
 
@@ -8138,9 +9679,9 @@ parsoid
 !! result
 <figure class="mw-halign-left mw-valign-baseline" typeof="mw:Image/Frame">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
 </a>
-<figcaption class="mw-figcaption">caption</figcaption>
+<figcaption>caption</figcaption>
 </figure>
 !! end
 
@@ -8154,7 +9695,7 @@ parsoid
 <p>
 <span class="mw-image-border" typeof="mw:Image/Frameless" data-mw="{&quot;caption&quot;:&quot;caption&quot;}">
 <a href="File:Foobar.jpg">
-<img resource="./File:Foobar.jpg" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
+<img resource="./File:Foobar.jpg" src="//example.com/images/thumb/3/3a/Foobar.jpg/442px-Foobar.jpg" height="50" width="442" />
 </a>
 </p>
 !! end
@@ -8169,7 +9710,7 @@ parsoid
 #<p>
 #<span typeof="mw:Image">
 #<a class="mw-default-size" href="Image:Foobar.jpg">
-#<img alt="Foobar.jpg" class="mw-default-size" src="http://upload.wikimedia.org/wikipedia/commons/3/3a/Foobar.jpg" height="220" width="1941">
+#<img alt="Foobar.jpg" class="mw-default-size" src="http://example.com/images/3/3a/Foobar.jpg" height="220" width="1941">
 #</a>
 #<span>abc</span>
 #</span>
@@ -8205,6 +9746,38 @@ subpage title=[[Subpage test]]
 !! result
 <p><a href="/wiki/Subpage_test/subpage" title="Subpage test/subpage">subpage</a>
 </p>
+!! end
+
+# TODO: make this PHP-parser compatible!
+!! test
+Relative subpage noslash link
+!! options
+parsoid=wt2wt,wt2html,html2html
+subpage title=[[Subpage test/1/2/3/4]]
+!!input
+[[../../subpage/]]
+
+[[../../subpage]]
+!! result
+<p><a rel="mw:WikiLink" href="Subpage_test/1/2/subpage/">subpage</a></p>
+<p><a rel="mw:WikiLink" href="Subpage_test/1/2/subpage">Subpage_test/1/2/subpage</a></p>
+!! end
+
+# TODO: make this PHP-parser compatible!
+!! test
+Parsoid: dot-slash prefixed wikilinks
+!! options
+parsoid=wt2wt,wt2html,html2html
+!!input
+[[./foo]]
+
+[[././bar]]
+
+[[././baz/]]
+!! result
+<p><a rel="mw:WikiLink" href="./Foo">foo</a></p>
+<p><a rel="mw:WikiLink" href="./Bar">bar</a></p>
+<p><a rel="mw:WikiLink" href="./Baz/">baz/</a></p>
 !! end
 
 !! test
@@ -8390,6 +9963,59 @@ Bar
 </p>
 !! end
 
+!! test
+Parsoid: Serialize link to category page with colon escape
+!! options
+parsoid
+!! input
+
+[[:Category:Foo]]
+[[:Category:Foo|Bar]]
+!! result
+<p>
+<a rel="mw:WikiLink" href="Category:Foo">Category:Foo</a>
+<a rel="mw:WikiLink" href="Category:Foo">Bar</a>
+</p>
+!! end
+
+!! test
+Parsoid: Link prefix/suffixes aren't applied to category links
+!! options
+parsoid=wt2html,wt2wt,html2html
+language=is
+!! input
+x[[Category:Foo]]y
+!! result
+<p>x<link rel="mw:WikiLink/Category" href="Category:Foo">y</p>
+!! end
+
+!! test
+Parsoid: Serialize link to file page with colon escape
+!! options
+parsoid
+!! input
+
+[[:File:Foo.png]]
+[[:File:Foo.png|Bar]]
+!! result
+<p>
+<a rel="mw:WikiLink" href="File:Foo.png">File:Foo.png</a>
+<a rel="mw:WikiLink" href="File:Foo.png">Bar</a>
+</p>
+!! end
+
+!! test
+Parsoid: Serialize a genuine category link without colon escape
+!! options
+parsoid
+!! input
+[[Category:Foo]]
+[[Category:Foo|Bar]]
+!! result
+<link rel="mw:WikiLink/Category" href="Category:Foo">
+<link rel="mw:WikiLink/Category" href="Category:Foo#Bar">
+!! end
+
 ###
 ### Inter-language links
 ###
@@ -8432,13 +10058,13 @@ More
 ===Smaller headline===
 Blah blah
 !! result
-<h2><span class="mw-headline" id="Headline_1">Headline 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Headline 1">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Headline_1">Headline 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Headline 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>Some text
 </p>
-<h2><span class="mw-headline" id="Headline_2">Headline 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Headline 2">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Headline_2">Headline 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Headline 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>More
 </p>
-<h3><span class="mw-headline" id="Smaller_headline">Smaller headline</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Smaller headline">edit</a>]</span></h3>
+<h3><span class="mw-headline" id="Smaller_headline">Smaller headline</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Smaller headline">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
 <p>Blah blah
 </p>
 !! end
@@ -8455,7 +10081,7 @@ Section headings with TOC
 Some text
 ===Another headline===
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Headline_1"><span class="tocnumber">1</span> <span class="toctext">Headline 1</span></a>
 <ul>
@@ -8476,15 +10102,15 @@ Some text
 </ul>
 </li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Headline_1">Headline 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Headline 1">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="Subheadline_1">Subheadline 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Subheadline 1">edit</a>]</span></h3>
-<h5><span class="mw-headline" id="Skipping_a_level">Skipping a level</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Skipping a level">edit</a>]</span></h5>
-<h6><span class="mw-headline" id="Skipping_a_level_2">Skipping a level</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Skipping a level">edit</a>]</span></h6>
-<h2><span class="mw-headline" id="Headline_2">Headline 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Headline 2">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Headline_1">Headline 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Headline 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="Subheadline_1">Subheadline 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Subheadline 1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h5><span class="mw-headline" id="Skipping_a_level">Skipping a level</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Skipping a level">edit</a><span class="mw-editsection-bracket">]</span></span></h5>
+<h6><span class="mw-headline" id="Skipping_a_level_2">Skipping a level</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Skipping a level">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h2><span class="mw-headline" id="Headline_2">Headline 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Headline 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>Some text
 </p>
-<h3><span class="mw-headline" id="Another_headline">Another headline</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: Another headline">edit</a>]</span></h3>
+<h3><span class="mw-headline" id="Another_headline">Another headline</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: Another headline">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
 
 !! end
 
@@ -8503,7 +10129,7 @@ Handling of sections up to level 6 and beyond
 ========= Level 9 Heading=========
 ========== Level 10 Heading==========
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Level_1_Heading"><span class="tocnumber">1</span> <span class="toctext">Level 1 Heading</span></a>
 <ul>
@@ -8531,17 +10157,17 @@ Handling of sections up to level 6 and beyond
 </ul>
 </li>
 </ul>
-</td></tr></table>
-<h1><span class="mw-headline" id="Level_1_Heading">Level 1 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Level 1 Heading">edit</a>]</span></h1>
-<h2><span class="mw-headline" id="Level_2_Heading">Level 2 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Level 2 Heading">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="Level_3_Heading">Level 3 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Level 3 Heading">edit</a>]</span></h3>
-<h4><span class="mw-headline" id="Level_4_Heading">Level 4 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Level 4 Heading">edit</a>]</span></h4>
-<h5><span class="mw-headline" id="Level_5_Heading">Level 5 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Level 5 Heading">edit</a>]</span></h5>
-<h6><span class="mw-headline" id="Level_6_Heading">Level 6 Heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: Level 6 Heading">edit</a>]</span></h6>
-<h6><span class="mw-headline" id=".3D_Level_7_Heading.3D">= Level 7 Heading=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=7" title="Edit section: = Level 7 Heading=">edit</a>]</span></h6>
-<h6><span class="mw-headline" id=".3D.3D_Level_8_Heading.3D.3D">== Level 8 Heading==</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=8" title="Edit section: == Level 8 Heading==">edit</a>]</span></h6>
-<h6><span class="mw-headline" id=".3D.3D.3D_Level_9_Heading.3D.3D.3D">=== Level 9 Heading===</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=9" title="Edit section: === Level 9 Heading===">edit</a>]</span></h6>
-<h6><span class="mw-headline" id=".3D.3D.3D.3D_Level_10_Heading.3D.3D.3D.3D">==== Level 10 Heading====</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=10" title="Edit section: ==== Level 10 Heading====">edit</a>]</span></h6>
+</div>
+<h1><span class="mw-headline" id="Level_1_Heading">Level 1 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Level 1 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h2><span class="mw-headline" id="Level_2_Heading">Level 2 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Level 2 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="Level_3_Heading">Level 3 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Level 3 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id="Level_4_Heading">Level 4 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Level 4 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h4>
+<h5><span class="mw-headline" id="Level_5_Heading">Level 5 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Level 5 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h5>
+<h6><span class="mw-headline" id="Level_6_Heading">Level 6 Heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: Level 6 Heading">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h6><span class="mw-headline" id=".3D_Level_7_Heading.3D">= Level 7 Heading=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=7" title="Edit section: = Level 7 Heading=">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h6><span class="mw-headline" id=".3D.3D_Level_8_Heading.3D.3D">== Level 8 Heading==</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=8" title="Edit section: == Level 8 Heading==">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h6><span class="mw-headline" id=".3D.3D.3D_Level_9_Heading.3D.3D.3D">=== Level 9 Heading===</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=9" title="Edit section: === Level 9 Heading===">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h6><span class="mw-headline" id=".3D.3D.3D.3D_Level_10_Heading.3D.3D.3D.3D">==== Level 10 Heading====</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=10" title="Edit section: ==== Level 10 Heading====">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
 
 !! end
 
@@ -8555,7 +10181,7 @@ TOC regression (bug 9764)
 == title 2 ==
 === title 2.1 ===
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#title_1"><span class="tocnumber">1</span> <span class="toctext">title 1</span></a>
 <ul>
@@ -8573,13 +10199,13 @@ TOC regression (bug 9764)
 </ul>
 </li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a>]</span></h3>
-<h4><span class="mw-headline" id="title_1.1.1">title 1.1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 1.1.1">edit</a>]</span></h4>
-<h3><span class="mw-headline" id="title_1.2">title 1.2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: title 1.2">edit</a>]</span></h3>
-<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: title 2">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="title_2.1">title 2.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: title 2.1">edit</a>]</span></h3>
+</div>
+<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id="title_1.1.1">title 1.1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 1.1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h4>
+<h3><span class="mw-headline" id="title_1.2">title 1.2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: title 1.2">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: title 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="title_2.1">title 2.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: title 2.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
 
 !! end
 
@@ -8595,7 +10221,7 @@ wgMaxTocLevel=3
 == title 2 ==
 === title 2.1 ===
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#title_1"><span class="tocnumber">1</span> <span class="toctext">title 1</span></a>
 <ul>
@@ -8609,13 +10235,13 @@ wgMaxTocLevel=3
 </ul>
 </li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a>]</span></h3>
-<h4><span class="mw-headline" id="title_1.1.1">title 1.1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 1.1.1">edit</a>]</span></h4>
-<h3><span class="mw-headline" id="title_1.2">title 1.2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: title 1.2">edit</a>]</span></h3>
-<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: title 2">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="title_2.1">title 2.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: title 2.1">edit</a>]</span></h3>
+</div>
+<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id="title_1.1.1">title 1.1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 1.1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h4>
+<h3><span class="mw-headline" id="title_1.2">title 1.2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: title 1.2">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: title 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="title_2.1">title 2.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: title 2.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
 
 !! end
 
@@ -8630,7 +10256,7 @@ wgMaxTocLevel=3
 ====Section 1.1.1.1====
 ==Section 2==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Section_1"><span class="tocnumber">1</span> <span class="toctext">Section 1</span></a>
 <ul>
@@ -8639,12 +10265,12 @@ wgMaxTocLevel=3
 </li>
 <li class="toclevel-1 tocsection-5"><a href="#Section_2"><span class="tocnumber">2</span> <span class="toctext">Section 2</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 1">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="Section_1.1">Section 1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Section 1.1">edit</a>]</span></h3>
-<h4><span class="mw-headline" id="Section_1.1.1">Section 1.1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Section 1.1.1">edit</a>]</span></h4>
-<h4><span class="mw-headline" id="Section_1.1.1.1">Section 1.1.1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Section 1.1.1.1">edit</a>]</span></h4>
-<h2><span class="mw-headline" id="Section_2">Section 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Section 2">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="Section_1.1">Section 1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Section 1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id="Section_1.1.1">Section 1.1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: Section 1.1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h4>
+<h4><span class="mw-headline" id="Section_1.1.1.1">Section 1.1.1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Section 1.1.1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h4>
+<h2><span class="mw-headline" id="Section_2">Section 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Section 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8655,8 +10281,8 @@ Resolving duplicate section names
 == Foo bar ==
 == Foo bar ==
 !! result
-<h2><span class="mw-headline" id="Foo_bar">Foo bar</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo bar">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Foo_bar_2">Foo bar</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo bar">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Foo_bar">Foo bar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Foo_bar_2">Foo bar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8666,8 +10292,8 @@ Resolving duplicate section names with differing case (bug 10721)
 == Foo bar ==
 == Foo Bar ==
 !! result
-<h2><span class="mw-headline" id="Foo_bar">Foo bar</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo bar">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Foo_Bar_2">Foo Bar</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo Bar">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Foo_bar">Foo bar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Foo_Bar_2">Foo Bar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo Bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8686,10 +10312,10 @@ __NOTOC__
 {{sections}}
 ==Section 4==
 !! result
-<h2><span class="mw-headline" id="Section_0">Section 0</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 0">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection">[<a href="/index.php?title=Template:Sections&amp;action=edit&amp;section=T-1" title="Template:Sections">edit</a>]</span></h3>
-<h2><span class="mw-headline" id="Section_2">Section 2</span><span class="mw-editsection">[<a href="/index.php?title=Template:Sections&amp;action=edit&amp;section=T-2" title="Template:Sections">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Section_4">Section 4</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Section 4">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Section_0">Section 0</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section 0">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="Section_1">Section 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Template:Sections&amp;action=edit&amp;section=T-1" title="Template:Sections">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h2><span class="mw-headline" id="Section_2">Section 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Template:Sections&amp;action=edit&amp;section=T-2" title="Template:Sections">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Section_4">Section 4</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Section 4">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8710,7 +10336,7 @@ Link inside a section heading
 !! input
 ==Section with a [[Main Page|link]] in it==
 !! result
-<h2><span class="mw-headline" id="Section_with_a_link_in_it">Section with a <a href="/wiki/Main_Page" title="Main Page">link</a> in it</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section with a link in it">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Section_with_a_link_in_it">Section with a <a href="/wiki/Main_Page" title="Main Page">link</a> in it</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Section with a link in it">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8722,7 +10348,7 @@ __TOC__
 === title 1.1 ===
 == title 2 ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#title_1"><span class="tocnumber">1</span> <span class="toctext">title 1</span></a>
 <ul>
@@ -8731,10 +10357,10 @@ __TOC__
 </li>
 <li class="toclevel-1 tocsection-3"><a href="#title_2"><span class="tocnumber">2</span> <span class="toctext">title 2</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a>]</span></h2>
-<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a>]</span></h3>
-<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 2">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="title_1">title 1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: title 1">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id="title_1.1">title 1.1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: title 1.1">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h2><span class="mw-headline" id="title_2">title 2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: title 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -8756,10 +10382,10 @@ The line above must have a trailing space!
 --> <!-- -->
 But just in case it doesn't...
 !! result
-<h1><span class="mw-headline" id=".3D">=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: =">edit</a>]</span></h1>
+<h1><span class="mw-headline" id=".3D">=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: =">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 <p>The line above must have a trailing space!
 </p>
-<h1><span class="mw-headline" id=".3D_2">=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: =">edit</a>]</span></h1>
+<h1><span class="mw-headline" id=".3D_2">=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: =">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 <p>But just in case it doesn't...
 </p>
 !! end
@@ -8786,7 +10412,7 @@ section 5
 !! result
 <p>The tooltips shall not show entities to the user (ie. be double escaped)
 </p>
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#text_.3E_text"><span class="tocnumber">1</span> <span class="toctext">text &gt; text</span></a></li>
 <li class="toclevel-1 tocsection-2"><a href="#text_.3C_text"><span class="tocnumber">2</span> <span class="toctext">text &lt; text</span></a></li>
@@ -8794,20 +10420,20 @@ section 5
 <li class="toclevel-1 tocsection-4"><a href="#text_.27_text"><span class="tocnumber">4</span> <span class="toctext">text ' text</span></a></li>
 <li class="toclevel-1 tocsection-5"><a href="#text_.22_text"><span class="tocnumber">5</span> <span class="toctext">text " text</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="text_.3E_text">text &gt; text</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: text > text">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="text_.3E_text">text &gt; text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: text > text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>section 1
 </p>
-<h2><span class="mw-headline" id="text_.3C_text">text &lt; text</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: text &lt; text">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="text_.3C_text">text &lt; text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: text &lt; text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>section 2
 </p>
-<h2><span class="mw-headline" id="text_.26_text">text &amp; text</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: text &amp; text">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="text_.26_text">text &amp; text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: text &amp; text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>section 3
 </p>
-<h2><span class="mw-headline" id="text_.27_text">text ' text</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: text ' text">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="text_.27_text">text ' text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: text ' text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>section 4
 </p>
-<h2><span class="mw-headline" id="text_.22_text">text " text</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: text &quot; text">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="text_.22_text">text " text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: text &quot; text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p>section 5
 </p>
 !! end
@@ -8821,18 +10447,18 @@ Headers with excess '=' characters
 =''italic'' heading==
 ==''italic'' heading=
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#foo.3D"><span class="tocnumber">1</span> <span class="toctext">foo=</span></a></li>
 <li class="toclevel-1 tocsection-2"><a href="#.3Dfoo"><span class="tocnumber">2</span> <span class="toctext">=foo</span></a></li>
 <li class="toclevel-1 tocsection-3"><a href="#italic_heading.3D"><span class="tocnumber">3</span> <span class="toctext"><i>italic</i> heading=</span></a></li>
 <li class="toclevel-1 tocsection-4"><a href="#.3Ditalic_heading"><span class="tocnumber">4</span> <span class="toctext">=<i>italic</i> heading</span></a></li>
 </ul>
-</td></tr></table>
-<h1><span class="mw-headline" id="foo.3D">foo=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: foo=">edit</a>]</span></h1>
-<h1><span class="mw-headline" id=".3Dfoo">=foo</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: =foo">edit</a>]</span></h1>
-<h1><span class="mw-headline" id="italic_heading.3D"><i>italic</i> heading=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: italic heading=">edit</a>]</span></h1>
-<h1><span class="mw-headline" id=".3Ditalic_heading">=<i>italic</i> heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: =italic heading">edit</a>]</span></h1>
+</div>
+<h1><span class="mw-headline" id="foo.3D">foo=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: foo=">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h1><span class="mw-headline" id=".3Dfoo">=foo</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: =foo">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h1><span class="mw-headline" id="italic_heading.3D"><i>italic</i> heading=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: italic heading=">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h1><span class="mw-headline" id=".3Ditalic_heading">=<i>italic</i> heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: =italic heading">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
 
 !! end
 
@@ -8850,7 +10476,7 @@ HTML headers vs TOC (bug 23393)
 == Header 2.2 ==
 __NOEDITSECTION__
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1"><a href="#Header_1"><span class="tocnumber">1</span> <span class="toctext">Header 1</span></a>
 <ul>
@@ -8865,7 +10491,7 @@ __NOEDITSECTION__
 </ul>
 </li>
 </ul>
-</td></tr></table>
+</div>
 <h1><span class="mw-headline" id="Header_1">Header 1</span></h1>
 <h2><span class="mw-headline" id="Header_1.1">Header 1.1</span></h2>
 <h2><span class="mw-headline" id="Header_1.2">Header 1.2</span></h2>
@@ -9088,6 +10714,81 @@ text with undefined character entity: xacute
 I always thought &xacute; was a cute letter.
 !! result
 <p>I always thought &amp;xacute; was a cute letter.
+</p>
+!! end
+
+
+###
+### Nesting tests (see bug 41545, 50604, 51081)
+###
+
+# This test case is fixed in Parsoid by domino 1.0.12. (bug 50604)
+# Note that html2wt is considerably more difficult if we use <b> in
+# the test case, instead of <big>
+!! test
+Ensure that HTML adoption agency algorithm is properly implemented.
+!! input
+<big>X<big>Y</big>Z</big>
+!! result
+<p><big>X<big>Y</big>Z</big>
+</p>
+!! end
+
+# This was bug 41545 in the PHP parser.
+!! test
+Nesting of <kbd>
+!! input
+<kbd>X<kbd>Y</kbd>Z</kbd>
+!! result
+<p><kbd>X<kbd>Y</kbd>Z</kbd>
+</p>
+!! end
+
+# The following cases were bug 51081 in the PHP parser.
+# Note that there are some other nestable tags (b, i, etc) which are
+# not covered; see bug 51081 for discussion.
+!! test
+Nesting of <em>
+!! input
+<em>X<em>Y</em>Z</em>
+!! result
+<p><em>X<em>Y</em>Z</em>
+</p>
+!! end
+
+!! test
+Nesting of <strong>
+!! input
+<strong>X<strong>Y</strong>Z</strong>
+!! result
+<p><strong>X<strong>Y</strong>Z</strong>
+</p>
+!! end
+
+!! test
+Nesting of <q>
+!! input
+<q>X<q>Y</q>Z</q>
+!! result
+<p><q>X<q>Y</q>Z</q>
+</p>
+!! end
+
+!! test
+Nesting of <ruby>
+!! input
+<ruby>X<ruby>Y</ruby>Z</ruby>
+!! result
+<p><ruby>X<ruby>Y</ruby>Z</ruby>
+</p>
+!! end
+
+!! test
+Nesting of <bdo>
+!! input
+<bdo>X<bdo>Y</bdo>Z</bdo>
+!! result
+<p><bdo>X<bdo>Y</bdo>Z</bdo>
 </p>
 !! end
 
@@ -9567,7 +11268,7 @@ Expansion of multi-line templates in attribute values (bug 6255 sanity check 2)
 !! end
 
 ###
-### Parser hooks (see maintenance/parserTestsParserHook.php for the <tag> extension)
+### Parser hooks (see tests/parser/parserTestsParserHook.php for the <tag> extension)
 ###
 !! test
 Parser hook: empty input
@@ -9732,7 +11433,7 @@ array (
 !! end
 
 ###
-### (see maintenance/parserTestsStaticParserHook.php for the <statictag> extension)
+### (see tests/parser/parserTestsParserHook.php for the <statictag> extension)
 ###
 
 !! test
@@ -10158,12 +11859,12 @@ Fuzz testing: Parser14
 == onmouseover= ==
 http://__TOC__
 !! result
-<h2><span class="mw-headline" id="onmouseover.3D">onmouseover=</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: onmouseover=">edit</a>]</span></h2>
-http://<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<h2><span class="mw-headline" id="onmouseover.3D">onmouseover=</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: onmouseover=">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+http://<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#onmouseover.3D"><span class="tocnumber">1</span> <span class="toctext">onmouseover=</span></a></li>
 </ul>
-</td></tr></table>
+</div>
 
 !! end
 
@@ -10173,7 +11874,7 @@ Fuzz testing: Parser14-table
 ==a==
 {| STYLE=__TOC__
 !! result
-<h2><span class="mw-headline" id="a">a</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: a">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="a">a</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: a">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <table style="&#95;_TOC&#95;_">
 <tr><td></td></tr>
 </table>
@@ -11352,7 +13053,7 @@ parsoid
 !! input
 '''''
 !! result
-<p><i><b></b></i></p>
+<p><b><i></i></b></p>
 !! end
 
 !! test
@@ -11366,21 +13067,26 @@ Special:Search page linking.
 
 !! test
 Say the magic word
+!! options
+title=[[Parser test]]
 !! input
 * {{PAGENAME}}
+* {{PAGENAMEE}}
+* {{FULLPAGENAME}}
+* {{FULLPAGENAMEE}}
 * {{BASEPAGENAME}}
+* {{BASEPAGENAMEE}}
 * {{SUBPAGENAME}}
 * {{SUBPAGENAMEE}}
 * {{ROOTPAGENAME}}
 * {{ROOTPAGENAMEE}}
-* {{BASEPAGENAME}}
-* {{BASEPAGENAMEE}}
 * {{TALKPAGENAME}}
 * {{TALKPAGENAMEE}}
 * {{SUBJECTPAGENAME}}
 * {{SUBJECTPAGENAMEE}}
 * {{NAMESPACEE}}
 * {{NAMESPACE}}
+* {{NAMESPACENUMBER}}
 * {{TALKSPACE}}
 * {{TALKSPACEE}}
 * {{SUBJECTSPACE}}
@@ -11388,7 +13094,9 @@ Say the magic word
 * {{Dynamic|{{NUMBEROFUSERS}}|{{NUMBEROFPAGES}}|{{CURRENTVERSION}}|{{CONTENTLANGUAGE}}|{{DIRECTIONMARK}}|{{CURRENTTIMESTAMP}}|{{NUMBEROFARTICLES}}}}
 !! result
 <ul><li> Parser test
+</li><li> Parser_test
 </li><li> Parser test
+</li><li> Parser_test
 </li><li> Parser test
 </li><li> Parser_test
 </li><li> Parser test
@@ -11401,6 +13109,7 @@ Say the magic word
 </li><li> Parser_test
 </li><li> 
 </li><li> 
+</li><li> 0
 </li><li> Talk
 </li><li> Talk
 </li><li> 
@@ -11425,40 +13134,40 @@ image4    |300px| centre
 * image6
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Image1.png</div>
+			<div class="thumb" style="height: 150px;">Image1.png</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Image2.gif</div>
+			<div class="thumb" style="height: 150px;">Image2.gif</div>
 			<div class="gallerytext">
 <p>||||
 </p>
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Image3</div>
+			<div class="thumb" style="height: 150px;">Image3</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Image4</div>
+			<div class="thumb" style="height: 150px;">Image4</div>
 			<div class="gallerytext">
 <p>300px| centre
 </p>
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Image5.svg</div>
+			<div class="thumb" style="height: 150px;">Image5.svg</div>
 			<div class="gallerytext">
 <p><a rel="nofollow" class="external free" href="http://///////">http://///////</a>
 </p>
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">* image6</div>
+			<div class="thumb" style="height: 150px;">* image6</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
@@ -11477,17 +13186,17 @@ image:foobar.jpg
 image:foobar.jpg|Blabla|alt=This is a foo-bar.|blabla.
 </gallery>
 !! result
-<ul class="gallery" style="max-width: 226px;_width: 226px;">
+<ul class="gallery mw-gallery-traditional" style="max-width: 226px;_width: 226px;">
 	<li class='gallerycaption'>Foo <a href="/wiki/Main_Page" title="Main Page">Main Page</a></li>
 		<li class="gallerybox" style="width: 105px"><div style="width: 105px">
-			<div style="height: 70px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 70px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 <p>caption
 </p>
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 105px"><div style="width: 105px">
-			<div style="height: 70px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 70px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
@@ -11522,7 +13231,7 @@ File:foobar.jpg|[[File:foobar.jpg|20px|desc|alt=inneralt]]|alt=galleryalt
 File:foobar.jpg|{{Test|unamedParam|alt=param}}|alt=galleryalt
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="galleryalt" src="http://example.com/images/thumb/3/3a/Foobar.jpg/120px-Foobar.jpg" width="120" height="14" /></a></div></div>
 			<div class="gallerytext">
@@ -11551,9 +13260,9 @@ image:foobar.jpg|some '''caption''' [[Main Page]]
 File:Foobar.jpg
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 150px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 <p><a href="/wiki/File:Nonexistant.jpg" title="File:Nonexistant.jpg">Nonexistant.jpg</a><br />
 caption
@@ -11561,7 +13270,7 @@ caption
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 150px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 <p><a href="/wiki/File:Nonexistant.jpg" title="File:Nonexistant.jpg">Nonexistant.jpg</a><br />
 </p>
@@ -11596,14 +13305,14 @@ image:foobar.jpg
 foobar.jpg
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 150px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
-			<div style="height: 150px;">Nonexistant.jpg</div>
+			<div class="thumb" style="height: 150px;">Nonexistant.jpg</div>
 			<div class="gallerytext">
 			</div>
 		</div></li>
@@ -11827,7 +13536,7 @@ Images with the "|" character in the comment
 !! test
 HTML with raw HTML ($wgRawHtml==true)
 !! options
-rawhtml
+wgRawHtml=1
 !! input
 <html><script>alert(1);</script></html>
 !! result
@@ -11893,6 +13602,45 @@ subpage title=[[Subpage test/L1/L2/L3]]
 [[../../////]]
 !! result
 <p><a href="/index.php?title=Subpage_test/L1////&amp;action=edit&amp;redlink=1" class="new" title="Subpage test/L1//// (page does not exist)">///</a>
+</p>
+!! end
+
+!! article
+Subpage test/L1/L2/L3Sibling
+!! text
+Sibling article
+!! endarticle
+
+!! test
+Transclusion of a sibling page (one level up)
+!! options
+subpage title=[[Subpage test/L1/L2/L3]]
+!! input
+{{../L3Sibling}}
+!! result
+<p>Sibling article
+</p>
+!! end
+
+!! test
+Transclusion of a child page
+!! options
+subpage title=[[Subpage test/L1/L2]]
+!! input
+{{/L3Sibling}}
+!! result
+<p>Sibling article
+</p>
+!! end
+
+!! test
+Non-transclusion because of too many up levels
+!! options
+subpage title=[[Subpage test/L1/L2/L3]]
+!! input
+{{../../../../More than parent}}
+!! result
+<p>{{../../../../More than parent}}
 </p>
 !! end
 
@@ -11970,7 +13718,7 @@ Inclusion of !userCanEdit() content
 !! input
 {{MediaWiki:Fake}}
 !! result
-<h2><span class="mw-headline" id="header">header</span><span class="mw-editsection">[<a href="/index.php?title=MediaWiki:Fake&amp;action=edit&amp;section=T-1" title="MediaWiki:Fake">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="header">header</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=MediaWiki:Fake&amp;action=edit&amp;section=T-1" title="MediaWiki:Fake">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -11985,7 +13733,7 @@ Out-of-order TOC heading levels
 =====5=====
 ==2==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#2"><span class="tocnumber">1</span> <span class="toctext">2</span></a>
 <ul>
@@ -12000,13 +13748,13 @@ Out-of-order TOC heading levels
 </ul>
 </li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="2">2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: 2">edit</a>]</span></h2>
-<h6><span class="mw-headline" id="6">6</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: 6">edit</a>]</span></h6>
-<h3><span class="mw-headline" id="3">3</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: 3">edit</a>]</span></h3>
-<h1><span class="mw-headline" id="1">1</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: 1">edit</a>]</span></h1>
-<h5><span class="mw-headline" id="5">5</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: 5">edit</a>]</span></h5>
-<h2><span class="mw-headline" id="2_2">2</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: 2">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="2">2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h6><span class="mw-headline" id="6">6</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: 6">edit</a><span class="mw-editsection-bracket">]</span></span></h6>
+<h3><span class="mw-headline" id="3">3</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: 3">edit</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h1><span class="mw-headline" id="1">1</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: 1">edit</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h5><span class="mw-headline" id="5">5</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: 5">edit</a><span class="mw-editsection-bracket">]</span></span></h5>
+<h2><span class="mw-headline" id="2_2">2</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=6" title="Edit section: 2">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -12118,9 +13866,6 @@ __NOEDITSECTION__
 </p>
 !! end
 
-# Expected output in the following test is not necessarily expected (there
-# should probably be <p> tags inside the <blockquote> in the output) -- it's
-# only testing for well-formedness.
 !! test
 Bug 6200: blockquotes and paragraph formatting
 !! input
@@ -12133,7 +13878,8 @@ bar
  baz
 !! result
 <blockquote>
-foo
+<p>foo
+</p>
 </blockquote>
 <p>bar
 </p>
@@ -12364,7 +14110,7 @@ language=sr variant=sr-ec
 !! input
 == -{Naslov}- ==
 !! result
-<h2><span class="mw-headline" id="-.7BNaslov.7D-">Naslov</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Уредите одељак „Naslov“">уреди</a>]</span></h2>
+<h2><span class="mw-headline" id="-.7BNaslov.7D-">Naslov</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Уредите одељак „Naslov“">уреди</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -12579,12 +14325,6 @@ language=sr
 </p>
 !!end
 
-!!article
-Template:Bullet
-!!text
-* Bar
-!!endarticle
-
 !! test
 Bug 529: Uncovered bullet
 !! input
@@ -12705,7 +14445,7 @@ Morwen/13: Unclosed link followed by heading
 !! result
 <p>[[link
 </p>
-<h2><span class="mw-headline" id="heading">heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: heading">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="heading">heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: heading">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -12729,7 +14469,7 @@ HHP2.2: Heuristics for headings in preprocessor parenthetical structures
 !! result
 <p>{{foo|
 </p>
-<h2><span class="mw-headline" id="heading">heading</span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: heading">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="heading">heading</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: heading">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -12819,8 +14559,6 @@ B</strong>
 # Bug 6200: <blockquote> should behave like <div> with respect to line breaks
 !! test
 Bug 6200: paragraphs inside blockquotes (no extra line breaks)
-!! options
-disabled
 !! input
 <blockquote>Line one
 
@@ -12833,8 +14571,6 @@ Line two</blockquote>
 
 !! test
 Bug 6200: paragraphs inside blockquotes (extra line break on open)
-!! options
-disabled
 !! input
 <blockquote>
 Line one
@@ -12850,8 +14586,6 @@ Line two</blockquote>
 
 !! test
 Bug 6200: paragraphs inside blockquotes (extra line break on close)
-!! options
-disabled
 !! input
 <blockquote>Line one
 
@@ -12867,8 +14601,6 @@ Line two
 
 !! test
 Bug 6200: paragraphs inside blockquotes (extra line break on open and close)
-!! options
-disabled
 !! input
 <blockquote>
 Line one
@@ -13089,7 +14821,7 @@ comment title=[[Main Page]]
 !! input
 pre-comment text /* External links */ removed bogus entries
 !! result
-pre-comment text - <a href="/wiki/Main_Page#External_links" title="Main Page">→</a>‎<span dir="auto"><span class="autocomment">External links: </span> removed bogus entries</span>
+pre-comment text <a href="/wiki/Main_Page#External_links" title="Main Page">→</a>‎<span dir="auto"><span class="autocomment">External links: </span> removed bogus entries</span>
 !!end
 
 !! test
@@ -13578,12 +15310,12 @@ title=[[Main Page]]
 __TOC__
 == ''Lost'' episodes ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Lost_episodes"><span class="tocnumber">1</span> <span class="toctext"><i>Lost</i> episodes</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Lost_episodes"><i>Lost</i> episodes</span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Lost episodes">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Lost_episodes"><i>Lost</i> episodes</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Lost episodes">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13595,12 +15327,12 @@ title=[[Main Page]]
 __TOC__
 == '''should be bold''' then normal text ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#should_be_bold_then_normal_text"><span class="tocnumber">1</span> <span class="toctext"><b>should be bold</b> then normal text</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="should_be_bold_then_normal_text"><b>should be bold</b> then normal text</span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: should be bold then normal text">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="should_be_bold_then_normal_text"><b>should be bold</b> then normal text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: should be bold then normal text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13612,12 +15344,12 @@ title=[[Main Page]]
 __TOC__
 == Image [[Image:foobar.jpg]] ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Image"><span class="tocnumber">1</span> <span class="toctext">Image</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Image">Image <a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Image">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Image">Image <a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Image">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13629,12 +15361,12 @@ title=[[Main Page]]
 __TOC__
 == <blockquote>Quote</blockquote> ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Quote"><span class="tocnumber">1</span> <span class="toctext">Quote</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Quote"><blockquote>Quote</blockquote></span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Quote">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Quote"><blockquote>Quote</blockquote></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Quote">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13648,12 +15380,12 @@ __TOC__
 <small>Hanc marginis exiguitas non caperet.</small>
 QED
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Proof:_2_.3C_3"><span class="tocnumber">1</span> <span class="toctext">Proof: 2 &lt; 3</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Proof:_2_.3C_3">Proof: 2 &lt; 3</span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Proof: 2 &lt; 3">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Proof:_2_.3C_3">Proof: 2 &lt; 3</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Proof: 2 &lt; 3">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 <p><small>Hanc marginis exiguitas non caperet.</small>
 QED
 </p>
@@ -13667,14 +15399,14 @@ __TOC__
 
 == <i>Foo</i> <blockquote>Bar</blockquote> ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Foo_Bar"><span class="tocnumber">1</span> <span class="toctext"><i>Foo</i> <b>Bar</b></span></a></li>
 <li class="toclevel-1 tocsection-2"><a href="#Foo_Bar_2"><span class="tocnumber">2</span> <span class="toctext"><i>Foo</i> Bar</span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Foo_Bar"><i>Foo</i> <b>Bar</b></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo Bar">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Foo_Bar_2"><i>Foo</i> <blockquote>Bar</blockquote></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo Bar">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Foo_Bar"><i>Foo</i> <b>Bar</b></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo Bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Foo_Bar_2"><i>Foo</i> <blockquote>Bar</blockquote></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo Bar">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13686,14 +15418,14 @@ __TOC__
 
 == <sup class="a > b">Evilbye</sup> ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Hello"><span class="tocnumber">1</span> <span class="toctext"><sup>Hello</sup></span></a></li>
 <li class="toclevel-1 tocsection-2"><a href="#b.22.3EEvilbye"><span class="tocnumber">2</span> <span class="toctext"><sup> b"&gt;Evilbye</sup></span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="Hello"><sup class="in-h2">Hello</sup></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Hello">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="b.22.3EEvilbye"><sup> b"&gt;Evilbye</sup></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: b&quot;>Evilbye">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="Hello"><sup class="in-h2">Hello</sup></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Hello">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="b.22.3EEvilbye"><sup> b"&gt;Evilbye</sup></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: b&quot;>Evilbye">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13711,7 +15443,7 @@ __TOC__
 
 == <span dir="ltr" style="font-style: italic">Attributes after dir on these span tags must be deleted from the TOC</span> ==
 !! result
-<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#C.2B.2B"><span class="tocnumber">1</span> <span class="toctext"><span dir="ltr">C++</span></span></a></li>
 <li class="toclevel-1 tocsection-2"><a href="#.D7.96.D7.91.D7.A0.D7.92.21"><span class="tocnumber">2</span> <span class="toctext"><span dir="rtl">זבנג!</span></span></a></li>
@@ -13719,12 +15451,12 @@ __TOC__
 <li class="toclevel-1 tocsection-4"><a href="#All_attributes_on_these_span_tags_must_be_deleted_from_the_TOC"><span class="tocnumber">4</span> <span class="toctext"><span>All attributes on these span tags must be deleted from the TOC</span></span></a></li>
 <li class="toclevel-1 tocsection-5"><a href="#Attributes_after_dir_on_these_span_tags_must_be_deleted_from_the_TOC"><span class="tocnumber">5</span> <span class="toctext"><span dir="ltr">Attributes after dir on these span tags must be deleted from the TOC</span></span></a></li>
 </ul>
-</td></tr></table>
-<h2><span class="mw-headline" id="C.2B.2B"><span dir="ltr">C++</span></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: C++">edit</a>]</span></h2>
-<h2><span class="mw-headline" id=".D7.96.D7.91.D7.A0.D7.92.21"><span dir="rtl">זבנג!</span></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: זבנג!">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="The_attributes_on_these_span_tags_must_be_deleted_from_the_TOC"><span style="font-style: italic">The attributes on these span tags must be deleted from the TOC</span></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: The attributes on these span tags must be deleted from the TOC">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="All_attributes_on_these_span_tags_must_be_deleted_from_the_TOC"><span style="font-style: italic" dir="ltr">All attributes on these span tags must be deleted from the TOC</span></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: All attributes on these span tags must be deleted from the TOC">edit</a>]</span></h2>
-<h2><span class="mw-headline" id="Attributes_after_dir_on_these_span_tags_must_be_deleted_from_the_TOC"><span dir="ltr" style="font-style: italic">Attributes after dir on these span tags must be deleted from the TOC</span></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Attributes after dir on these span tags must be deleted from the TOC">edit</a>]</span></h2>
+</div>
+<h2><span class="mw-headline" id="C.2B.2B"><span dir="ltr">C++</span></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: C++">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id=".D7.96.D7.91.D7.A0.D7.92.21"><span dir="rtl">זבנג!</span></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: זבנג!">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="The_attributes_on_these_span_tags_must_be_deleted_from_the_TOC"><span style="font-style: italic">The attributes on these span tags must be deleted from the TOC</span></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=3" title="Edit section: The attributes on these span tags must be deleted from the TOC">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="All_attributes_on_these_span_tags_must_be_deleted_from_the_TOC"><span style="font-style: italic" dir="ltr">All attributes on these span tags must be deleted from the TOC</span></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: All attributes on these span tags must be deleted from the TOC">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h2><span class="mw-headline" id="Attributes_after_dir_on_these_span_tags_must_be_deleted_from_the_TOC"><span dir="ltr" style="font-style: italic">Attributes after dir on these span tags must be deleted from the TOC</span></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Attributes after dir on these span tags must be deleted from the TOC">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13741,7 +15473,7 @@ title=[[Main Page]]
 !! input
 {{int:Bug32057}}
 !! result
-<h2><span class="mw-headline" id="Headline_text">Headline text</span><span class="mw-editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Headline text">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="Headline_text">Headline text</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Headline text">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13843,7 +15575,7 @@ nowiki inside link inside heading (bug 18295)
 !! input
 ==[[foo|x<nowiki>y</nowiki>z]]==
 !! result
-<h2><span class="mw-headline" id="xyz"><a href="/index.php?title=Foo&amp;action=edit&amp;redlink=1" class="new" title="Foo (page does not exist)">xyz</a></span><span class="mw-editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: xyz">edit</a>]</span></h2>
+<h2><span class="mw-headline" id="xyz"><a href="/index.php?title=Foo&amp;action=edit&amp;redlink=1" class="new" title="Foo (page does not exist)">xyz</a></span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: xyz">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
 
 !! end
 
@@ -13882,7 +15614,7 @@ Gallery override link with WikiLink (bug 34852)
 File:foobar.jpg|caption|alt=galleryalt|link=InterWikiLink
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="/wiki/InterWikiLink"><img alt="galleryalt" src="http://example.com/images/thumb/3/3a/Foobar.jpg/120px-Foobar.jpg" width="120" height="14" /></a></div></div>
 			<div class="gallerytext">
@@ -13901,7 +15633,7 @@ Gallery override link with absolute external link (bug 34852)
 File:foobar.jpg|caption|alt=galleryalt|link=http://www.example.org
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="http://www.example.org"><img alt="galleryalt" src="http://example.com/images/thumb/3/3a/Foobar.jpg/120px-Foobar.jpg" width="120" height="14" /></a></div></div>
 			<div class="gallerytext">
@@ -13920,7 +15652,7 @@ Gallery override link with malicious javascript (bug 34852)
 File:foobar.jpg|caption|alt=galleryalt|link=" onclick="alert('malicious javascript code!');
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="/wiki/%22_onclick%3D%22alert(%27malicious_javascript_code!%27);"><img alt="galleryalt" src="http://example.com/images/thumb/3/3a/Foobar.jpg/120px-Foobar.jpg" width="120" height="14" /></a></div></div>
 			<div class="gallerytext">
@@ -13939,7 +15671,7 @@ Gallery with invalid title as link (bug 43964)
 File:foobar.jpg|link=<
 </gallery>
 !! result
-<ul class="gallery">
+<ul class="gallery mw-gallery-traditional">
 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/thumb/3/3a/Foobar.jpg/120px-Foobar.jpg" width="120" height="14" /></a></div></div>
 			<div class="gallerytext">
@@ -14099,10 +15831,10 @@ A <ref>
 
 <references />
 !!result
-<p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"This is a <b data-parsoid=\"{&amp;quot;dsr&amp;quot;:[19,40,3,3]}\"><a rel=\"mw:WikiLink\" href=\"./Bolded_link\" data-parsoid=\"{&amp;quot;a&amp;quot;:{&amp;quot;href&amp;quot;:&amp;quot;./Bolded_link&amp;quot;},&amp;quot;sa&amp;quot;:{&amp;quot;href&amp;quot;:&amp;quot;bolded link&amp;quot;},&amp;quot;stx&amp;quot;:&amp;quot;simple&amp;quot;,&amp;quot;dsr&amp;quot;:[22,37,2,2]}\">bolded link</a></b> and this is a <span about=\"#mwt3\" typeof=\"mw:Transclusion\" data-mw=\"{&amp;quot;target&amp;quot;:{&amp;quot;wt&amp;quot;:&amp;quot;echo&amp;quot;,&amp;quot;href&amp;quot;:&amp;quot;./Template:Echo&amp;quot;},&amp;quot;params&amp;quot;:{&amp;quot;1&amp;quot;:{&amp;quot;wt&amp;quot;:&amp;quot;transclusion&amp;quot;}}}\" data-parsoid=\"{&amp;quot;src&amp;quot;:&amp;quot;{{echo|transclusion}}&amp;quot;,&amp;quot;dsr&amp;quot;:[55,76,null,null]}\">transclusion</span>\n"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
+<p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"This is a <b data-parsoid=\"{&amp;quot;dsr&amp;quot;:[19,40,3,3]}\"><a rel=\"mw:WikiLink\" href=\"./Bolded_link\" data-parsoid=\"{&amp;quot;stx&amp;quot;:&amp;quot;simple&amp;quot;,&amp;quot;a&amp;quot;:{&amp;quot;href&amp;quot;:&amp;quot;./Bolded_link&amp;quot;},&amp;quot;sa&amp;quot;:{&amp;quot;href&amp;quot;:&amp;quot;bolded link&amp;quot;},&amp;quot;dsr&amp;quot;:[22,37,2,2]}\">bolded link</a></b> and this is a <span about=\"#mwt5\" typeof=\"mw:Transclusion\" data-mw=\"{&amp;quot;parts&amp;quot;:[{&amp;quot;template&amp;quot;:{&amp;quot;target&amp;quot;:{&amp;quot;wt&amp;quot;:&amp;quot;echo&amp;quot;,&amp;quot;href&amp;quot;:&amp;quot;./Template:Echo&amp;quot;},&amp;quot;params&amp;quot;:{&amp;quot;1&amp;quot;:{&amp;quot;wt&amp;quot;:&amp;quot;transclusion&amp;quot;}},&amp;quot;i&amp;quot;:0}}]}\" data-parsoid=\"{&amp;quot;dsr&amp;quot;:[55,76,null,null],&amp;quot;pi&amp;quot;:[[{&amp;quot;k&amp;quot;:&amp;quot;1&amp;quot;,&amp;quot;spc&amp;quot;:[&amp;quot;&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;&amp;quot;]}]]}\">transclusion</span>\n"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
-<li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> This is a <b><a rel="mw:WikiLink" href="./Bolded_link">bolded link</a></b> and this is a <span about="#mwt3" typeof="mw:Transclusion" data-mw='{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"transclusion"}}}'>transclusion</span>
+<ol class="references" typeof="mw:Extension/references" about="#mwt2" data-mw='{"name":"references","attrs":{}}'>
+<li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> This is a <b><a rel="mw:WikiLink" href="./Bolded_link">bolded link</a></b> and this is a <span about="#mwt3" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"transclusion"}},"i":0}}]}'>transclusion</span>
 </li></ol>
 !!end
 
@@ -14121,7 +15853,7 @@ A <ref>
 !!result
 <p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo\n bar\n baz\n"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
+<ol class="references" typeof="mw:Extension/references" about="#mwt3" data-mw='{"name":"references","attrs":{}}'>
 <li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo
  bar
  baz
@@ -14129,7 +15861,7 @@ A <ref>
 !!end
 
 !!test
-Ref: 6. No p-wrapping in ref-body
+Ref: 7. No p-wrapping in ref-body
 !!options
 parsoid
 !!input
@@ -14150,7 +15882,7 @@ booz
 !!result
 <p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo\n\nbar\n\n\nbaz\n\n\n\nbooz\n"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
+<ol about="#mwt2" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'>
 <li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo
 
 bar
@@ -14173,9 +15905,9 @@ A <ref> foo {{echo|</ref> B C}}
 
 <references />
 !!result
-<p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo <span typeof=\"mw:Nowiki\" data-parsoid=\"{&amp;quot;src&amp;quot;:&amp;quot;{{&amp;quot;,&amp;quot;dsr&amp;quot;:[12,14,2,null]}\">{{</span>echo|"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span> B C<span typeof="mw:Nowiki">}}</span></p>
+<p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo <span typeof=\"mw:Nowiki\" data-parsoid=\"{&amp;quot;src&amp;quot;:&amp;quot;{{&amp;quot;,&amp;quot;dsr&amp;quot;:[12,14,0,0]}\">{{</span>echo|"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span> B C<span typeof="mw:Nowiki">}}</span></p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
+<ol about="#mwt2" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'>
 <li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo <span typeof="mw:Nowiki">{{</span>echo|</li></ol>
 !!end
 
@@ -14190,7 +15922,7 @@ A <ref> foo <!--</ref> B C
 !!result
 <p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo <!---->"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span> B C</p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
+<ol about="#mwt2" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'>
 <li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo <!----></li></ol>
 !!end
 
@@ -14205,7 +15937,7 @@ A <ref> <b> foo </ref> B C
 !!result
 <p>A <span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"<b data-parsoid=\"{&amp;quot;stx&amp;quot;:&amp;quot;html&amp;quot;,&amp;quot;autoInsertedEnd&amp;quot;:true,&amp;quot;dsr&amp;quot;:[8,16,3,0]}\"> foo </b>"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span> B C</p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references">
+<ol about="#mwt2" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'>
 <li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> <b> foo </b></li></ol>
 !!end
 
@@ -14265,9 +15997,10 @@ parsoid
 
 <references />
 !!result
-<p><span about="#mwt1" class="reference" data-mw='{"name":"ref","body":{"html":"foo &amp;lt;ref&amp;gt;bar"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span> baz&lt;/ref&gt;</p>
+<p><span about="#mwt1" class="reference" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;body&quot;:{&quot;html&quot;:&quot;foo &amp;lt;ref&amp;gt;bar&amp;lt;/ref&amp;gt; baz&quot;},&quot;attrs&quot;:{}}" id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo &lt;ref&gt;bar</li></ol>
+<ol class="references" typeof="mw:Extension/references" about="#mwt2" data-mw="{&quot;name&quot;:&quot;references&quot;,&quot;attrs&quot;:{}}">
+<li about="#cite_note-1" id="cite_note-1" data-parsoid="{}"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo &lt;ref&gt;bar&lt;/ref&gt; baz</li></ol>
 !!end
 
 !!test
@@ -14283,7 +16016,7 @@ B1 <ref name="b" /> B2 <ref name="b">bar</ref>
 <p>A1 <span about="#mwt3" class="reference" data-mw='{"name":"ref","body":{"html":"foo"},"attrs":{"name":"a"}}' id="cite_ref-a-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-a-1">[1]</a></span> A2 <span about="#mwt4" class="reference" data-mw='{"name":"ref","attrs":{"name":"a"}}' id="cite_ref-a-1-1" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-a-1">[1]</a></span>
 B1 <span about="#mwt7" class="reference" data-mw='{"name":"ref","attrs":{"name":"b"}}' id="cite_ref-b-2-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-b-2">[2]</a></span> B2 <span about="#mwt8" class="reference" data-mw='{"name":"ref","body":{"html":"bar"},"attrs":{"name":"b"}}' id="cite_ref-b-2-1" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-b-2">[2]</a></span></p>
 
-<ol about="#mwt10" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-a-1" id="cite_note-a-1"><span rel="mw:referencedBy">↑ <a href="#cite_ref-a-1-0">1.0</a> <a href="#cite_ref-a-1-1">1.1</a></span> foo</li><li about="#cite_note-b-2" id="cite_note-b-2"><span rel="mw:referencedBy">↑ <a href="#cite_ref-b-2-0">2.0</a> <a href="#cite_ref-b-2-1">2.1</a></span> bar</li></ol>
+<ol about="#mwt10" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'><li about="#cite_note-a-1" id="cite_note-a-1"><span rel="mw:referencedBy">↑ <a href="#cite_ref-a-1-0">1.0</a> <a href="#cite_ref-a-1-1">1.1</a></span> foo</li><li about="#cite_note-b-2" id="cite_note-b-2"><span rel="mw:referencedBy">↑ <a href="#cite_ref-b-2-0">2.0</a> <a href="#cite_ref-b-2-1">2.1</a></span> bar</li></ol>
 !!end
 
 !!test
@@ -14293,7 +16026,7 @@ parsoid
 !!input
 <references />
 !!result
-<ol about="#mwt2" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"></ol>
+<ol about="#mwt2" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'></ol>
 !!end
 
 !!test
@@ -14309,7 +16042,7 @@ B <ref group="b">bar</ref>
 <p>A <span about="#mwt2" class="reference" data-mw='{"name":"ref","body":{"html":"foo"},"attrs":{"group":"a"}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[a 1]</a></span>
 B <span about="#mwt4" class="reference" data-mw='{"name":"ref","body":{"html":"bar"},"attrs":{"group":"b"}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[b 1]</a></span></p>
 
-<ol about="#mwt6" class="references" data-mw='{"name":"references","attrs":{"group":"a"}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo</li></ol>
+<ol about="#mwt6" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{"group":"a"}}'><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo</li></ol>
 !!end
 
 !!test
@@ -14327,11 +16060,11 @@ B <ref>bar</ref>
 !!result
 <p>A <span about="#mwt2" class="reference" data-mw='{"name":"ref","body":{"html":"foo"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt4" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo</li></ol>
+<ol about="#mwt4" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo</li></ol>
 
 <p>B <span about="#mwt6" class="reference" data-mw='{"name":"ref","body":{"html":"bar"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt8" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> bar</li></ol>
+<ol about="#mwt8" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> bar</li></ol>
 !!end
 
 !!test
@@ -14351,11 +16084,11 @@ C <ref>cfoo</ref>
 <p>A <span about="#mwt2" class="reference" data-mw='{"name":"ref","body":{"html":"afoo"},"attrs":{"group":"a"}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[a 1]</a></span>
 B <span about="#mwt4" class="reference" data-mw='{"name":"ref","body":{"html":"bfoo"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref" data-parsoid='{"src":"<ref>bfoo</ref>","dsr":[30,45,5,6]}'><a href="#cite_note-1">[1]</a></span></p>
 
-<ol about="#mwt6" class="references" data-mw='{"name":"references","attrs":{"group":"a"}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> afoo</li></ol>
+<ol about="#mwt6" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{"group":"a"}}'><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> afoo</li></ol>
 
 <p>C <span about="#mwt8" class="reference" data-mw='{"name":"ref","body":{"html":"cfoo"},"attrs":{}}' id="cite_ref-2-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-2">[2]</a></span></p>
 
-<ol about="#mwt10" class="references" data-mw='{"name":"references","attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> bfoo</li><li about="#cite_note-2" id="cite_note-2"><span rel="mw:referencedBy"><a href="#cite_ref-2-0">↑</a></span> cfoo</li></ol>
+<ol about="#mwt10" class="references" typeof="mw:Extension/references" data-mw='{"name":"references","attrs":{}}'><li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> bfoo</li><li about="#cite_note-2" id="cite_note-2"><span rel="mw:referencedBy"><a href="#cite_ref-2-0">↑</a></span> cfoo</li></ol>
 !!end
 
 !!test
@@ -14374,8 +16107,43 @@ This should just get lost.
 <p>A <span about="#mwt2" class="reference" data-mw='{"name":"ref","attrs":{"name":"a"}}' id="cite_ref-a-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-a-1">[1]</a></span>
 B <span about="#mwt4" class="reference" data-mw='{"name":"ref","body":{"html":"bar"},"attrs":{"name":"b"}}' id="cite_ref-b-2-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-b-2">[2]</a></span></p>
 
-<ol about="#mwt7" class="references" data-mw='{"name":"references","body":{"extsrc":"<ref name=\"a\">foo</ref>\nThis should just get lost."},"attrs":{}}' typeof="mw:Extension/references"><li about="#cite_note-a-1" id="cite_note-a-1"><span rel="mw:referencedBy"><a href="#cite_ref-a-1-0">↑</a></span> foo</li><li about="#cite_note-b-2" id="cite_note-b-2"><span rel="mw:referencedBy"><a href="#cite_ref-b-2-0">↑</a></span> bar</li></ol>
+<ol class="references" typeof="mw:Extension/references" about="#mwt6" data-mw='{"name":"references","body":{"extsrc":"<ref name=\"a\">foo</ref>\nThis should just get lost.","html":"\n<span about=\"#mwt8\" class=\"reference\" data-mw=\"{&amp;quot;name&amp;quot;:&amp;quot;ref&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;html&amp;quot;:&amp;quot;foo&amp;quot;},&amp;quot;attrs&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;a&amp;quot;}}\" rel=\"dc:references\" typeof=\"mw:Extension/ref\"><a href=\"#cite_note-a-1\">[1]</a></span>\n"},"attrs":{}}'><li about="#cite_note-a-1" id="cite_note-a-1"><span rel="mw:referencedBy"><a href="#cite_ref-a-1-0">↑</a></span> foo</li><li about="#cite_note-b-2" id="cite_note-b-2"><span rel="mw:referencedBy"><a href="#cite_ref-b-2-0">↑</a></span> bar</li></ol>
 !!end
+
+!!test
+References: 6. <references /> from a transclusion
+!!options
+parsoid
+!!input
+{{echo|<references />}}
+!!result
+<ol class="references" about="#mwt2" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<references />"}},"i":0}}]}'></ol>
+!!end
+
+!! test
+References: 7. Multiple references tags (one without and one with nested refs) should be correctly handled
+!! options
+parsoid
+!! input
+A <ref>foo bar for a</ref>
+B <ref name="b" />
+
+<references />
+
+<references>
+<ref name="b">foo</ref>
+</references>
+!! result
+<p>A <span about="#mwt2" class="reference" data-mw='{"name":"ref","body":{"html":"foo bar for a"},"attrs":{}}' id="cite_ref-1-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-1">[1]</a></span>
+B <span about="#mwt4" class="reference" data-mw='{"name":"ref","attrs":{"name":"b"}}' id="cite_ref-b-2-0" rel="dc:references" typeof="mw:Extension/ref"><a href="#cite_note-b-2">[2]</a></span></p>
+
+<ol class="references" typeof="mw:Extension/references" about="#mwt6" data-mw='{"name":"references","attrs":{}}'>
+<li about="#cite_note-1" id="cite_note-1"><span rel="mw:referencedBy"><a href="#cite_ref-1-0">↑</a></span> foo bar for a</li>
+<li about="#cite_note-b-2" id="cite_note-b-2"><span rel="mw:referencedBy"><a href="#cite_ref-b-2-0">↑</a></span> </li></ol>
+
+<ol class="references" typeof="mw:Extension/references" about="#mwt8" data-mw='{"name":"references","body":{"extsrc":"<ref name=\"b\">foo</ref>","html":"\n<span about=\"#mwt10\" class=\"reference\" data-mw=\"{&amp;quot;name&amp;quot;:&amp;quot;ref&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;html&amp;quot;:&amp;quot;foo&amp;quot;},&amp;quot;attrs&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;b&amp;quot;}}\" rel=\"dc:references\" typeof=\"mw:Extension/ref\"><a href=\"#cite_note-b-1\">[1]</a></span>\n"},"attrs":{}}'>
+<li about="#cite_note-b-1" id="cite_note-b-1"><span rel="mw:referencedBy">↑</span> foo</li></ol>
+!! end
 
 #### ----------------------------------------------------------------
 #### The following section of tests are primarily to test
@@ -14427,10 +16195,15 @@ Headings: 1. Nested inside html
 parsoid
 !! input
 =<nowiki>=foo=</nowiki>=
+
 ==<nowiki>=foo=</nowiki>==
+
 ===<nowiki>=foo=</nowiki>===
+
 ====<nowiki>=foo=</nowiki>====
+
 =====<nowiki>=foo=</nowiki>=====
+
 ======<nowiki>=foo=</nowiki>======
 !! result
 <h1><span typeof="mw:Nowiki">=foo=</span></h1>
@@ -14447,9 +16220,11 @@ Headings: 2. Outside heading nest on a single line <h1>foo</h1>*bar
 parsoid
 !! input
 =foo=
-<nowiki>*bar</nowiki>
+<nowiki>*</nowiki>bar
+
 =foo=
 =bar
+
 =foo=
 <nowiki>=bar=</nowiki>
 !! result
@@ -14474,12 +16249,19 @@ Headings: 4a. No escaping needed (testing just h1 and h2)
 parsoid
 !! input
 ==foo=
+
 =foo==
+
 = =foo= =
+
 ==foo= bar=
+
 ===foo==
+
 ==foo===
+
 =''=''foo==
+
 =<nowiki>=</nowiki>=
 !! result
 <h1>=foo</h1>
@@ -14513,10 +16295,15 @@ Headings: 5. Empty headings
 parsoid
 !! input
 =<nowiki/>=
+
 ==<nowiki/>==
+
 ===<nowiki/>===
+
 ====<nowiki/>====
+
 =====<nowiki/>=====
+
 ======<nowiki/>======
 !! result
 <h1></h1>
@@ -14528,15 +16315,85 @@ parsoid
 !!end
 
 !! test
-Headings: 6. Heading chars in SOL context
+Headings: 6a. Heading chars in SOL context (with trailing spaces)
 !! options
 parsoid
 !! input
-<!--cmt--><nowiki>=h1=</nowiki>
-<!--cmt--><nowiki> =h1= </nowiki>
+<nowiki>=a=</nowiki>
+
+<nowiki>=a=</nowiki> 
+
+<nowiki>=a=</nowiki>	
+
+<nowiki>=a=</nowiki> 	
 !! result
-<p><!--cmt--><span typeof="mw:Nowiki">=h1=</span>
-<!--cmt--><span typeof="mw:Nowiki"> =h1= </span></p>
+<p>=a=</p>
+<p>=a= </p>
+<p>=a=	</p>
+<p>=a= 	</p>
+!!end
+
+!! test
+Headings: 6b. Heading chars in SOL context (with trailing newlines)
+!! options
+parsoid
+!! input
+<nowiki>=a=
+b</nowiki>
+
+<nowiki>=a= 
+b</nowiki>
+
+<nowiki>=a=	
+b</nowiki>
+
+<nowiki>=a=	 
+b</nowiki>
+!! result
+<p>=a=
+b</p>
+<p>=a= 
+b</p>
+<p>=a=	
+b</p>
+<p>=a=	 
+b</p>
+</p>
+!!end
+
+!! test
+Headings: 6c. Heading chars in SOL context (leading newline break)
+!! options
+parsoid
+!! input
+a
+<nowiki>=b=</nowiki>
+!! result
+<p>a
+=b=</p>
+!!end
+
+!! test
+Headings: 6d. Heading chars in SOL context (with interspersed comments)
+!! options
+parsoid
+!! input
+<!--c0--><nowiki>=a=</nowiki>
+<!--c1-->
+<nowiki>=a=</nowiki> <!--c2-->	 <!--c3-->
+!! result
+<p><!--c0-->=a=</p>
+<p><!--c1-->=a= <!--c2-->	 <!--c3--></p>
+!!end
+
+!! test
+Headings: 6d. Heading chars in SOL context (No escaping needed)
+!! options
+parsoid=html2wt
+!! input
+=a=<div>b</div>
+!! result
+=a=<div>b</div>
 !!end
 
 #### --------------- Lists ---------------
@@ -14553,9 +16410,9 @@ parsoid
 !! test
 Lists: 0. Outside nests
 !! input
-<nowiki>*foo</nowiki>
+<nowiki>*</nowiki>foo
 
-<nowiki>#foo</nowiki>
+<nowiki>#</nowiki>foo
 !! result
 <p>*foo
 </p><p>#foo
@@ -14700,8 +16557,8 @@ parsoid
 !! test
 Lists: 7. Escape bullets in a multi-line context
 !! input
-<nowiki>a
-*b</nowiki>
+a
+<nowiki>*</nowiki>b
 !! result
 <p>a
 *b
@@ -14872,7 +16729,6 @@ Tables: 4a. Escape -
 parsoid
 !! input
 {|
-|-
 !-bar
 |-
 |<nowiki>-bar</nowiki>
@@ -14890,7 +16746,6 @@ Tables: 4b. Escape +
 parsoid
 !! input
 {|
-|-
 !+bar
 |-
 |<nowiki>+bar</nowiki>
@@ -14908,17 +16763,25 @@ Tables: 4c. No escaping needed
 parsoid
 !! input
 {|
-|-
 |foo-bar
 |foo+bar
 |-
 |''foo''-bar
 |''foo''+bar
+|-
+|foo
+bar|baz
++bar
+-bar
 |}
 !! result
 <table><tbody>
 <tr><td>foo-bar</td><td>foo+bar</td></tr>
 <tr><td><i>foo</i>-bar</td><td><i>foo</i>+bar</td></tr>
+<tr><td>foo
+<p>bar|baz
++bar
+-bar</p></td></tr>
 </tbody></table>
 !! end
 
@@ -14947,7 +16810,7 @@ disabled
 
 !! end
 
-#### --------------- Links ---------------
+#### --------------- Links ----------------
 #### 1. Quote marks in link text
 #### 2. Wikilinks: Escapes needed
 #### 3. Wikilinks: No escapes needed
@@ -14959,7 +16822,7 @@ Links 1. Quote marks in link text
 !! options
 parsoid
 !! input
-[[Foo|<nowiki>Foo''boo''</nowiki>]]
+[[Foo|Foo<nowiki>''boo''</nowiki>]]
 !! result
 <a rel="mw:WikiLink" href="Foo">Foo''boo''</a>
 !! end
@@ -15030,26 +16893,44 @@ parsoid
 #### 1. Quotes inside <b> and <i>
 #### 2. Link fragments separated by <i> and <b> tags
 #### 3. Link fragments inside <i> and <b>
+#### 4. No escaping needed
 #### --------------------------------------
 !! test
 1. Quotes inside <b> and <i>
+!! options
+parsoid=html2wt,wt2wt
 !! input
 ''<nowiki>'foo'</nowiki>''
 ''<nowiki>''foo''</nowiki>''
 ''<nowiki>'''foo'''</nowiki>''
+''foo''<nowiki/>'s
 '''<nowiki>'foo'</nowiki>'''
 '''<nowiki>''foo''</nowiki>'''
 '''<nowiki>'''foo'''</nowiki>'''
 '''<nowiki>foo'</nowiki>''<nowiki>bar'</nowiki>''baz'''
+'''foo'''<nowiki/>'s
+'''foo''
+''foo''<nowiki/>'
+'<nowiki/>''foo''<nowiki/>'
+''''foo'''
+'''foo'''<nowiki/>'
+'<nowiki/>'''foo'''<nowiki/>'
 !! result
 <p><i>'foo'</i>
 <i>''foo''</i>
 <i>'''foo'''</i>
+<i>foo</i>'s
 <b>'foo'</b>
 <b>''foo''</b>
 <b>'''foo'''</b>
 <b>foo'<i>bar'</i>baz</b>
-</p>
+<b>foo</b>'s
+'<i>foo</i>
+<i>foo</i>'
+'<i>foo</i>'
+'<b>foo</b>
+<b>foo</b>'
+'<b>foo</b>'</p>
 !! end
 
 !! test
@@ -15065,7 +16946,7 @@ parsoid
 !! end
 
 !! test
-2. Link fragments inside <i> and <b>
+3. Link fragments inside <i> and <b>
 (FIXME: Escaping one or both of [[ and ]] is also acceptable --
  this is one of the shortcomings of this format)
 !! input
@@ -15078,7 +16959,18 @@ parsoid
 </p>
 !! end
 
-#### --------------- Paragraphs ---------------
+!! test
+4. No escaping needed
+!! input
+'<span>''bar''</span>'
+'<span>'''bar'''</span>'
+!! result
+<p>'<span><i>bar</i></span>'
+'<span><b>bar</b></span>'
+</p>
+!! end
+
+#### ----------- Paragraphs ---------------
 #### 1. No unnecessary escapes
 #### --------------------------------------
 
@@ -15103,27 +16995,74 @@ bar <span><nowiki>[[foo]]</nowiki></span>
 </p>
 !!end
 
-#### --------------- PRE ------------------
-#### 1. Leading space in SOL context should be escaped
-#### --------------------------------------
+#### ----------------------- PRE --------------------------
+#### 1. Leading whitespace in SOL context should be escaped
+#### ------------------------------------------------------
 !! test
-1. Leading space in SOL context should be escaped
+1. Leading whitespace in SOL context should be escaped
 !! options
 parsoid
 !! input
-<nowiki> foo</nowiki>
-<!--cmt--><nowiki> foo</nowiki>
+<nowiki> </nowiki>a
+
+<nowiki> </nowiki> a
+
+<nowiki>	</nowiki>a(tab)
+
+<nowiki> </nowiki>	a
+<!--cmt-->
+<nowiki> </nowiki> a
+
+a
+<nowiki> </nowiki>b
+
+a
+<nowiki>	</nowiki>b
+
+a
+<nowiki>	</nowiki> b
 !! result
-<p> foo
-<!--cmt--> foo
-</p>
+<p> a</p>
+<p>  a</p>
+<p>	a(tab)</p>
+<p> 	a</p>
+<p><!--cmt-->  a</p>
+<p>a
+ b</p>
+<p>a
+	b</p>
+<p>a
+	 b</p>
+!! end
+
+#### --------------- Behavior Switches --------------------
+!! test
+1. Valid behavior switches should be escaped
+!! options
+parsoid=html2wt
+!! input
+<nowiki>__TOC__</nowiki>
+!! result
+__TOC__
+!! end
+
+!! test
+2. Invalid behavior switches should not be escaped
+!! options
+parsoid=html2wt
+!! input
+__TOO__
+__|__
+!! result
+__TOO__
+__|__
 !! end
 
 #### --------------- HTML tags ---------------
 #### 1. a tags
 #### 2. other tags
 #### 3. multi-line html tag
-#### --------------------------------------
+#### -----------------------------------------
 !! test
 1. a tags
 !! options
@@ -15158,6 +17097,15 @@ parsoid
 </p>
 !! end
 
+!! test
+4. extension tags
+!! input
+<nowiki><ref>foo</ref></nowiki>
+!! result
+<p>&lt;ref&gt;foo&lt;/ref&gt;
+</p>
+!! end
+
 #### --------------- Others ---------------
 !! test
 Escaping nowikis
@@ -15167,6 +17115,18 @@ Escaping nowikis
 <p>&lt;nowiki&gt;foo&lt;/nowiki&gt;
 </p>
 !! end
+
+## The quote-char in the input is necessary for triggering the bug
+!! test
+(Bug 52035) Nowiki-escaping should not get tripped by " :" in text
+!! options
+parsoid=wt2wt,html2wt
+!! input
+foo's bar :
+!! result
+<p>foo's bar :</p>
+!! end
+
 !! test
 
 Tag-like HTML structures are passed through as text
@@ -15196,12 +17156,10 @@ a>b
 !! end
 
 
-# This fails in the PHP parser (see bug 40670,
-# https://bugzilla.wikimedia.org/show_bug.cgi?id=40670), so disabled for it.
+# This was a bug in the PHP parser (see bug 17663 and its dups,
+# https://bugzilla.wikimedia.org/show_bug.cgi?id=17663)
 !! test
 Tag names followed by punctuation should not be recognized as tags
-!! options
-parsoid
 !! input
 <s.ome> text
 !! result
@@ -15460,7 +17418,7 @@ Indented table with an empty td
 Empty TR followed by a template-generated TR
 (Parsoid-specific since PHP parser doesn't handle this mixed tbl-wikitext)
 !!options
-parsoid=wt2html,wt2wt
+parsoid
 !!input
 {|
 |-
@@ -15470,8 +17428,9 @@ parsoid=wt2html,wt2wt
 <table>
 <tbody>
 <tr></tr>
-<tr typeof="mw:Transclusion">
-<td>foo</td></tr></tbody></table>
+<tr about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"<tr><td>foo</td></tr>"}},"i":0}}]}'>
+<td>foo</td></tr>
+</tbody></table>
 !!end
 
 ## PHP and parsoid output differ for this, and since this is primarily
@@ -15490,10 +17449,10 @@ parsoid
 !!result
 <table>
 <tbody>
+<tr></tr>
+ <!--c-->
 <tr>
-<td> <!--c--></td></tr>
-<tr>
-<td><!--c--> <!--d--></td></tr>
+<!--c--> </tr><!--d-->
 </tbody></table>
 
 !!end
@@ -15526,6 +17485,410 @@ parsoid
 </p>
 !!end
 
+!!test
+Encapsulate protected attributes from wt
+!!options
+parsoid
+!!input
+<div typeof="mw:placeholder stuff" data-parsoid="weird" data-parsoid-other="no" about="time" rel="mw:true">foo</div>
+!!result
+<body><div data-x-typeof="mw:placeholder stuff" data-x-data-parsoid="weird" data-x-data-parsoid-other="no" data-x-about="time" data-x-rel="mw:true">foo</div>
+</body>
+!!end
+
+## Currently the p-wrapper is fragile in how adds / removes transformations.
+## Having nested or stray pre tags results in the attempt to add duplicates,
+## causing an assertion fail. This test tries to prevent that situation.
+!!test
+Ensure ParagraphWrapper can deal with stray closing pre tags
+!!options
+parsoid=wt2html
+!!input
+plain text</pre>
+!!result
+plain text
+!!end
+
+!!test
+Ensure fostered text content is wrapped in spans
+!!options
+parsoid=wt2html
+!!input
+<table>hi</table><table>ho</table>
+!!result
+<span>hi</span>
+<table></table>
+<span>ho</span>
+<table></table>
+!!end
+
+!!test
+Encapsulation properly handles null DSR information from foster box
+!!options
+parsoid=wt2html,wt2wt
+!!input
+{{echo|<table>foo<tr><td>bar</td></tr></table>}}
+!!result
+<span typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;
+<table>foo
+<tr>
+<td>bar</td></tr></table>&quot;}},&quot;i&quot;:0}}]}">foo</span>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+1. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table>{{echo|foo<tr><td>bar</td></tr>}}</table>
+!!result
+<span typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo
+<tr>
+<td>bar</td></tr>&quot;}},&quot;i&quot;:0}},&quot;</table>&quot;]}">foo</span>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+2. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table><div>{{echo|foo}}</div><tr><td>bar</td></tr></table>
+!!result
+<div typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>
+<div>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo&quot;}},&quot;i&quot;:0}},&quot;</div>
+<tr>
+<td>bar</td></tr></table>&quot;]}">foo</div>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+3. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table><div><p>{{echo|foo</p></div><tr><td>}}bar</td></tr></table>
+!!result
+<div typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>
+<div>
+<p>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo</p></div>
+<tr>
+<td>&quot;}},&quot;i&quot;:0}},&quot;bar</td></tr></table>&quot;]}">
+<p>foo</p></div>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+4. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table><div><p>{{echo|foo</p></div><tr><td>}}bar</td></tr></table>
+!!result
+<div typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>
+<div>
+<p>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo</p></div>
+<tr>
+<td>&quot;}},&quot;i&quot;:0}},&quot;bar</td></tr></table>&quot;]}">
+<p>foo</p></div>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+5. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table><tr><td><div><p>{{echo|foo</p></div></td>foo}}</tr></table>
+!!result
+<span typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>
+<tr>
+<td>
+<div>
+<p>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo</p></div></td>foo&quot;}},&quot;i&quot;:0}},&quot;</tr></table>&quot;]}">foo</span>
+<table>
+<tbody>
+<tr>
+<td>
+<div>
+<p>foo</p></div></td></tr></tbody></table>
+!!end
+
+!!test
+6. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table><tr><td><div><p>{{echo|foo</p></div></td>foo</tr></table>}}<p>ok</p>
+!!result
+<span typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>
+<tr>
+<td>
+<div>
+<p>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;foo</p></div></td>foo</tr></table>&quot;}},&quot;i&quot;:0}}]}">foo</span>
+<table>
+<tbody>
+<tr>
+<td>
+<div>
+<p>foo</p></div></td></tr></tbody></table>
+<p>ok</p>
+!!end
+
+!!test
+7. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+<table>{{echo|<p>foo</p>}}<td>bar</td></table>
+!!result
+<p typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;
+<table>&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;
+<p>foo</p>&quot;}},&quot;i&quot;:0}},&quot;
+<td>bar</td></table>&quot;]}">foo</p>
+<table>
+<tbody>
+<tr>
+<td>bar</td></tr></tbody></table>
+!!end
+
+!!test
+8. Encapsulate foster-parented transclusion content
+!!options
+parsoid=wt2wt,wt2html
+!!input
+{{echo|a
+}}{|{{echo|style='color:red'}}
+|-
+|b
+|}
+!!result
+<p typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;1&quot;:{&quot;wt&quot;:&quot;a\n&quot;}},&quot;i&quot;:0}}]}">a</p><span typeof="mw:Transclusion" data-mw="{&quot;parts&quot;:[&quot;{|&quot;,{&quot;template&quot;:{&quot;target&quot;:{&quot;wt&quot;:&quot;echo&quot;,&quot;href&quot;:&quot;./Template:Echo&quot;},&quot;params&quot;:{&quot;style&quot;:{&quot;wt&quot;:&quot;'color:red'&quot;}},&quot;i&quot;:0}},&quot;\n|-\n|b\n|}&quot;]}">{{{1}}}</span>
+<table>
+<tbody>
+<tr>
+<td>b</td></tr></tbody></table>
+!!end
+
+# -----------------------------------------------------------------
+# The following section of tests are primarily to spec requirements
+# around serialization of new/edited content.
+#
+# All these tests are marked Parsoid html2wt and html2html only
+# ----------------------------------------------------------------
+
+!! test
+Image: Modifying size of an image
+!! options
+parsoid=html2wt
+!! input
+[[Image:Wiki.png|230x230px]]
+!! result
+<p data-parsoid='{"dsr":[0,24,0,0]}'><span typeof="mw:Image" data-parsoid='{"optList":[{"ck":"width","ak":"100px"}],"cacheKey":"[[Image:Wiki.png|100px]]","img":{"h":115,"w":100,"wdset":true},"dsr":[0,24,null,null]}'><a href="./File:Wiki.png" data-parsoid='{"a":{"href":"./File:Wiki.png"}}'><img resource="./File:Wiki.png" src="//upload.wikimedia.org/wikipedia/en/thumb/b/bc/Wiki.png/100px-Wiki.png" height="230" width="200" data-parsoid='{"a":{"resource":"./File:Wiki.png"},"sa":{"resource":"Image:Wiki.png"}}'></a></span></p>
+!!end
+
+!! test
+Image: New block level image should have \n before and after
+!! options
+parsoid=html2wt
+!! input
+123
+[[File:Wiki.png|right|thumb|150x150px]]
+456
+!! result
+<p>123</p><figure typeof="mw:Image/Thumb" class="mw-halign-right"><a href="./File:Wiki.png"><img src="http://192.168.142.128/mw/images/thumb/b/bc/Wiki.png/131px-Wiki.png" width="131" height="150" resource="./File:Wiki.png"></a></figure><p>456</p>
+!!end
+
+# Wacky -- the leading newline in input is required because
+# that is what the serializer emits. To be fixed. Not fixing
+# the test because this test is required to test serialization of
+# new content and preferred whitespace style.
+!! test
+Lists: Serialize correctly even when list content is wrapped in p-tags (like VE does)
+!! options
+parsoid=html2wt
+!! input
+
+* foo
+!! result
+<ul>
+<li><p>foo</p></li>
+</ul>
+!! end
+
+# Wacky -- the leading newline in input is required because
+# that is what the serializer emits. To be fixed. Not fixing
+# the test because this test is required to test serialization of
+# new content and preferred whitespace style.
+!! test
+Lists: Add space after bullets
+!! options
+parsoid=html2wt
+!! input
+
+* foo
+* bar
+* <span> baz</span>
+!! result
+<ul>
+<li>foo</li>
+<li> bar</li>
+<li><span> baz</span></li>
+</ul>
+!! end
+
+!! test
+Parsoid: Serialize positional parameters with = in them as named parameter
+!! options
+parsoid=html2wt
+!! input
+{{echo|1 = f=oo}}
+
+{{echo|1 = f=oo|2 = bar}}
+
+<!--Orig params with data-parsoid has heuristics for handling = chars-->
+<!--FIXME: But maybe the heuristic needs fixing to apply to new params as well-->
+{{echo|<nowiki>f=oo</nowiki>|bar}}
+!! result
+<p about="#mwt1" typeof="mw:Transclusion"
+data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"f=oo"}},"i":0}}]}'>foo</p>
+
+<p about="#mwt1" typeof="mw:Transclusion"
+data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"f=oo"}, "2":{"wt":"bar"}},"i":0}}]}'>foo</p>
+
+<!--Orig params with data-parsoid has heuristics for handling = chars-->
+<!--FIXME: But maybe the heuristic needs fixing to apply to new params as well-->
+<p data-parsoid='{"pi":[[{"k":"1","spc":["","","",""]},{"k":"2","spc":["","","",""]}]]}' about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"f=oo"},"2":{"wt":"bar"}},"i":0}}]}'>foo</p>
+!! end
+
+!! test
+Parsoid: Correctly serialize block-node children when they are a combination of text and p-nodes
+!! options
+parsoid=html2wt
+!! input
+<div>a
+b
+</div>
+<div>a
+b
+</div>
+<div>
+a
+
+b
+</div>
+!! result
+<div>a<p>b</p></div>
+<div>a
+<p>b</p></div>
+<div>
+a
+<p>b</p></div>
+!! end
+
+#-----------------------------
+# I/B quote minimization tests
+#-----------------------------
+
+!! test
+1. I/B quote minimization: wikitext-only tags should be combined
+!! options
+parsoid=html2wt
+!! input
+''AB''
+
+'''AB'''
+
+''A'''B'''''
+
+'''A''B'''''
+
+'''A''BC''D'''
+
+'''''AB'''''
+
+'''''AB'''''
+
+'''''AB'''''
+!! result
+<p><i>A</i><i>B</i></p>
+<p><b>A</b><b>B</b></p>
+<p><i>A</i><b><i>B</i></b></p>
+<p><b>A</b><i><b>B</b></i></p>
+<p><b>A</b><i><b>B</b><b>C</b></i><b>D</b></p>
+<p><i><b>A</b></i><i><b>B</b></i></p>
+<p><i><b>A</b></i><b><i>B</i></b></p>
+<p><b><i>A</i></b><i><b>B</b></i></p>
+!! end
+
+!! test
+2. I/B quote minimization: wikitext and html tags should not be combined
+!! options
+parsoid=html2wt
+!! input
+''A''<i>B</i>
+
+''A'''''<i>B</i>'''
+!! result
+<p><i>A</i><i data-parsoid='{"stx":"html"}'>B</i></p>
+<p><i>A</i><b><i data-parsoid='{"stx":"html"}'>B</i></b></p>
+!! end
+
+!! test
+3. I/B quote minimization: templated content stops minimization
+!! options
+parsoid=html2wt
+!! input
+''A''{{echo|''B''}}
+
+''A''{{echo|'''''B'''''}}
+!! result
+<p><i>A</i><i about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"&#39;&#39;B&#39;&#39;"}},"i":0}}]}'>B</i>
+<p><i>A</i><b about="#mwt1" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"echo","href":"./Template:Echo"},"params":{"1":{"wt":"&#39;&#39;&#39;&#39;&#39;B&#39;&#39;&#39;&#39;&#39;"}},"i":0}}]}'><i>B</i></b>
+!! end
+
+!! test
+4. I/B quote minimization: new content should be mimimized with adjacent old content
+!! options
+parsoid=html2wt
+!! input
+''AB''
+
+'''AB'''
+
+''A'''B'''''
+!! result
+<p><i>A</i><i data-parsoid='{}'>B</i></p>
+<p><b data-parsoid='{}'>A</b><b>B</b></p>
+<p><i>A</i><b data-parsoid='{}'><i data-parsoid='{}'>B</i></b></p>
+!! end
+
+# -----------------------------------------------------------------
+# End of section for Parsoid-only html2wt tests for serialization
+# of new content
+# -----------------------------------------------------------------
 
 TODO:
 more images

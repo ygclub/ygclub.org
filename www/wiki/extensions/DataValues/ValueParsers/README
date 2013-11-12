@@ -1,0 +1,8 @@
+These is the readme file for the ValueParsers library.
+
+Extension page on mediawiki.org: https://www.mediawiki.org/wiki/Extension:ValueParsers
+Latest version of the readme file: https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/extensions/DataValues.git;a=blob;f=ValueParsers/README
+
+== About ==
+
+ValueParser defines a collection of parsers that take some input and turn it into a DataValue.

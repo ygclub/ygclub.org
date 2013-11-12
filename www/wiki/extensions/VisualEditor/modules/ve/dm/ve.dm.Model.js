@@ -182,6 +182,7 @@ ve.dm.Model.static.enableAboutGrouping = false;
  * were already set by toDomElements().
  *
  * The value of this property can be one of the following:
+ *
  * - true, to preserve all attributes (default)
  * - false, to preserve none
  * - a string, to preserve only that attribute
@@ -240,6 +241,30 @@ ve.dm.Model.matchesAttributeSpec = function ( attribute, spec ) {
 		return matchesArray( spec );
 	}
 	return matchesArray( spec.whitelist || true ) && !matchesArray( spec.blacklist || false );
+};
+
+/**
+ * Get hash object of a linear model data element
+ *
+ * @static
+ * @param {Object} dataElement Data element
+ * @returns {Object} Hash object
+ */
+ve.dm.Model.static.getHashObject = function ( dataElement ) {
+	return {
+		type: dataElement.type,
+		attributes: dataElement.attributes,
+		htmlAttributes: dataElement.htmlAttributes
+	};
+};
+
+/**
+ * Array of RDFa types that this model should be a match candidate for.
+ * @static
+ * @returns {Array} Array of strings or regular expressions
+ */
+ve.dm.Model.static.getMatchRdfaTypes = function () {
+	return this.matchRdfaTypes;
 };
 
 /* Methods */
@@ -355,5 +380,20 @@ ve.dm.Model.prototype.hasAttributes = function ( attributes, strict ) {
  * @returns {Object} Cloned element object
  */
 ve.dm.Model.prototype.getClonedElement = function () {
-	return ve.copyObject( this.element );
+	return ve.copy( this.element );
+};
+
+/**
+ * Get the hash object of the linear model element.
+ *
+ * The actual logic is in a static function as this needs
+ * to be accessible from ve.dm.Converter
+ *
+ * This is a custom hash function for oo#getHash.
+ *
+ * @method
+ * @returns {Object} Hash object
+ */
+ve.dm.Model.prototype.getHashObject = function () {
+	return this.constructor.static.getHashObject( this.element );
 };

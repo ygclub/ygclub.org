@@ -41,7 +41,7 @@ class SpecialChangeEmail extends UnlistedSpecialPage {
 	protected $mNewEmail;
 
 	public function __construct() {
-		parent::__construct( 'ChangeEmail' );
+		parent::__construct( 'ChangeEmail', 'editmyprivateinfo' );
 	}
 
 	/**
@@ -88,6 +88,13 @@ class SpecialChangeEmail extends UnlistedSpecialPage {
 		}
 
 		$this->checkReadOnly();
+		$this->checkPermissions();
+
+		// This could also let someone check the current email address, so
+		// require both permissions.
+		if ( !$this->getUser()->isAllowed( 'viewmyprivateinfo' ) ) {
+			throw new PermissionsError( 'viewmyprivateinfo' );
+		}
 
 		$this->mPassword = $request->getVal( 'wpPassword' );
 		$this->mNewEmail = $request->getVal( 'wpNewEmail' );
@@ -218,7 +225,7 @@ class SpecialChangeEmail extends UnlistedSpecialPage {
 	 * @return bool|string true or string on success, false on failure
 	 */
 	protected function attemptChange( User $user, $pass, $newaddr ) {
-		global $wgAuth;
+		global $wgAuth, $wgPasswordAttemptThrottle;
 
 		if ( $newaddr != '' && !Sanitizer::validateEmail( $newaddr ) ) {
 			$this->error( 'invalidemailaddress' );
@@ -228,7 +235,8 @@ class SpecialChangeEmail extends UnlistedSpecialPage {
 
 		$throttleCount = LoginForm::incLoginThrottle( $user->getName() );
 		if ( $throttleCount === true ) {
-			$this->error( 'login-throttled' );
+			$lang = $this->getLanguage();
+			$this->error( array( 'login-throttled', $lang->formatDuration( $wgPasswordAttemptThrottle['seconds'] ) ) );
 
 			return false;
 		}

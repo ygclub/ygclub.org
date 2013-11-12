@@ -48,7 +48,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Ший теркама дагарленгах оагӀув чулаьца бола дакъалаьцархой таьрах хьахьокха',
 'tog-oldsig' => 'Дола кулгайоазув:',
 'tog-fancysig' => 'Ший кулга яздара массахоамбаккхам (ший лоӀаме Ӏинка йоацаш)',
-'tog-showjumplinks' => '"Дехьадала" яха новкъостала Ӏинк хьахьокха',
 'tog-uselivepreview' => 'Сиха бӀарахьажар (JavaScript) (Экспериментально)',
 'tog-forceeditsummary' => 'Хоам бе, хувцамий лоацам белгал даь деце',
 'tog-watchlisthideown' => 'Са хувцамаш теркама дагарчера къайладаккха',
@@ -236,7 +235,7 @@ $messages = array(
 'pool-queuefull' => 'Хаттарий цӀа хьалдизад',
 'pool-errorunknown' => 'Довзаш доаца гӀалат',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Лоацам {{SITENAME}}',
 'aboutpage' => 'Project:Лоацам',
 'copyright' => '$1 чулоацамаца тIакхоачаш да.',
@@ -672,7 +671,6 @@ $messages = array(
 'recentchangeslinked-feed' => 'Гаргалон хувцамаш',
 'recentchangeslinked-toolbox' => 'Гаргалон хувцамаш',
 'recentchangeslinked-title' => '$1ца хьалаьца хувцамаш',
-'recentchangeslinked-noresult' => 'Укх заманашка гаргарон оагIувнаш тIа хувцамаш хиннаяц.',
 'recentchangeslinked-summary' => "Ер, Iинк яь йола оагIув (е укх цатегачу чуйоагIараш), дукха ха йоацаш хьийца оагIувнашкий дагарле я.
 [[Special:Watchlist|Шун теркама дагарленашках]] чуйоагIа оагIувнаш '''белгалаяь я'''.",
 'recentchangeslinked-page' => 'ОагIува цIи',
@@ -741,8 +739,6 @@ $messages = array(
 # Statistics
 'statistics' => 'Дагара куц',
 'statistics-pages' => 'ОагIувнаш',
-
-'disambiguationspage' => 'Template: ЦаI маIандоацар',
 
 'brokenredirects-edit' => 'хувца',
 'brokenredirects-delete' => 'дIадаккха',

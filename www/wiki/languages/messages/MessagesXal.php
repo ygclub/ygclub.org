@@ -86,7 +86,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Тер халх шинҗлдг демнчнрин то үзүлх',
 'tog-oldsig' => 'Бәәдг тәвсн һарна хәләвр:',
 'tog-fancysig' => 'Эврән тәвсн һарна бики темдлһн (авто заалһта уга)',
-'tog-showjumplinks' => 'Туслмҗ заалһуд «-д/-т һарх» йовулх',
 'tog-uselivepreview' => 'Шамдһа хәләвр олзлх (JavaScript кергтә, амслһн)',
 'tog-forceeditsummary' => 'Учр-утх хоосн бәәхлә медүлх',
 'tog-watchlisthideown' => 'Шинҗллһнә сеткүлд мини сольлһиг бултулх',
@@ -277,7 +276,7 @@ $messages = array(
 
 $1',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} тускар',
 'aboutpage' => 'Project:Тодлҗ бичлһн',
 'copyright' => 'Өггцн $1 йоста орҗ болм',
@@ -356,17 +355,6 @@ $1',
 # General errors
 'error' => 'Эндү',
 'databaseerror' => 'Өггцнә базин эндү',
-'dberrortext' => 'Өггцнә базд сурврин синтаксисин эндү аҗглв.
-Эн заклһна теткүлин эндү болвза.
-Шидрә өггцнә базд сурвр:
-<blockquote><tt>$1</tt></blockquote>
-<tt>«$2»</tt> функцас һарад бәәнә.
-Өггцнә баз <tt>«$3: $4»</tt> эндү хәрү өгв.',
-'dberrortextcl' => 'Өггцнә базд сурврин синтаксисин эндү аҗглв.
-Шидрә өггцнә базд сурвр:
-«$1»
-«$2» функцас һарад бәәнә.
-Өггцнә баз «$3: $4» эндү хәрү өгв.',
 'missing-article' => 'Өггцнә халһлд сурсн халхин бичг олв уга. Эн халх олх йоста: "$1" нертә $2.
 
 Тер йовдл һарһсн халхна тууҗин өңгрсн заалһиг дахлһна арһ болад бәәнә.
@@ -384,7 +372,6 @@ $1',
 'badtitletext' => 'Сурсн нерн буру, хоосн, аль му бичсн келн хоорнд нертә. Тиим чигн биз, нерн зөв уга үзгтә.',
 'viewsource' => 'Ишиг хәләх',
 'actionthrottled' => 'Хурдна заг',
-'sqlhidden' => '(SQL сурвр бултулсн)',
 'ns-specialprotected' => 'Шишлң халх чиклсн бәәх болшго.',
 
 # Virus scanner
@@ -446,7 +433,7 @@ $1',
 'oldpassword' => 'Көгшн нууц үг:',
 'newpassword' => 'Шин нууц үг:',
 'retypenew' => 'Шин нууц үгиг дәкәд бичтн:',
-'resetpass_success' => 'Тана нууц үгиг йовудта сольв! Та ода орнат...',
+'changepassword-success' => 'Тана нууц үгиг йовудта сольв! Та ода орнат...',
 'resetpass-submit-loggedin' => 'Нууц үгиг сольх',
 'resetpass-submit-cancel' => 'Уга кех',
 
@@ -744,7 +731,6 @@ $1',
 'recentchangeslinked-feed' => 'Садта чикллһн',
 'recentchangeslinked-toolbox' => 'Садта чикллһн',
 'recentchangeslinked-title' => '$1 садта сольлһн',
-'recentchangeslinked-noresult' => 'Садта халх заасн цагт сольсн уга',
 'recentchangeslinked-summary' => "Эн тер халх заалдг халхсин (аль тер янзин халхсин) шидрә сольлһн.
 Тана [[Special:Watchlist|шинҗллһнә сеткүлин]] халхс '''тарһн''' бичәтә.",
 'recentchangeslinked-page' => 'Халхна нернь:',

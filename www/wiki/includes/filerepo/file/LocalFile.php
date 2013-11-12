@@ -539,7 +539,7 @@ class LocalFile extends File {
 				'img_media_type' => $this->media_type,
 				'img_major_mime' => $major,
 				'img_minor_mime' => $minor,
-				'img_metadata' => $this->metadata,
+				'img_metadata' => $dbw->encodeBlob($this->metadata),
 				'img_sha1' => $this->sha1,
 			),
 			array( 'img_name' => $this->getName() ),
@@ -604,17 +604,23 @@ class LocalFile extends File {
 	 * Return the width of the image
 	 *
 	 * @param $page int
-	 * @return bool|int Returns false on error
+	 * @return int
 	 */
 	public function getWidth( $page = 1 ) {
 		$this->load();
 
 		if ( $this->isMultipage() ) {
-			$dim = $this->getHandler()->getPageDimensions( $this, $page );
+			$handler = $this->getHandler();
+			if ( !$handler ) {
+				return 0;
+			}
+			$dim = $handler->getPageDimensions( $this, $page );
 			if ( $dim ) {
 				return $dim['width'];
 			} else {
-				return false;
+				// For non-paged media, the false goes through an
+				// intval, turning failure into 0, so do same here.
+				return 0;
 			}
 		} else {
 			return $this->width;
@@ -625,17 +631,23 @@ class LocalFile extends File {
 	 * Return the height of the image
 	 *
 	 * @param $page int
-	 * @return bool|int Returns false on error
+	 * @return int
 	 */
 	public function getHeight( $page = 1 ) {
 		$this->load();
 
 		if ( $this->isMultipage() ) {
-			$dim = $this->getHandler()->getPageDimensions( $this, $page );
+			$handler = $this->getHandler();
+			if ( !$handler ) {
+				return 0;
+			}
+			$dim = $handler->getPageDimensions( $this, $page );
 			if ( $dim ) {
 				return $dim['height'];
 			} else {
-				return false;
+				// For non-paged media, the false goes through an
+				// intval, turning failure into 0, so do same here.
+				return 0;
 			}
 		} else {
 			return $this->height;
@@ -776,10 +788,12 @@ class LocalFile extends File {
 
 		$backend = $this->repo->getBackend();
 		$files = array( $dir );
-		$iterator = $backend->getFileList( array( 'dir' => $dir ) );
-		foreach ( $iterator as $file ) {
-			$files[] = $file;
-		}
+		try {
+			$iterator = $backend->getFileList( array( 'dir' => $dir ) );
+			foreach ( $iterator as $file ) {
+				$files[] = $file;
+			}
+		} catch ( FileBackendError $e ) {} // suppress (bug 54674)
 
 		return $files;
 	}
@@ -794,7 +808,9 @@ class LocalFile extends File {
 	}
 
 	/**
-	 * Purge the shared history (OldLocalFile) cache
+	 * Purge the shared history (OldLocalFile) cache.
+	 *
+	 * @note This used to purge old thumbnails as well.
 	 */
 	function purgeHistory() {
 		global $wgMemc;
@@ -802,20 +818,20 @@ class LocalFile extends File {
 		$hashedName = md5( $this->getName() );
 		$oldKey = $this->repo->getSharedCacheKey( 'oldfile', $hashedName );
 
-		// Must purge thumbnails for old versions too! bug 30192
-		foreach ( $this->getHistory() as $oldFile ) {
-			$oldFile->purgeThumbnails();
-		}
-
 		if ( $oldKey ) {
 			$wgMemc->delete( $oldKey );
 		}
 	}
 
 	/**
-	 * Delete all previously generated thumbnails, refresh metadata in memcached and purge the squid
+	 * Delete all previously generated thumbnails, refresh metadata in memcached and purge the squid.
+	 *
+	 * @param Array $options An array potentially with the key forThumbRefresh.
+	 *
+	 * @note This used to purge old thumbnails by default as well, but doesn't anymore.
 	 */
 	function purgeCache( $options = array() ) {
+		wfProfileIn( __METHOD__ );
 		// Refresh metadata cache
 		$this->purgeMetadataCache();
 
@@ -824,6 +840,7 @@ class LocalFile extends File {
 
 		// Purge squid cache for this file
 		SquidUpdate::purge( array( $this->getURL() ) );
+		wfProfileOut( __METHOD__ );
 	}
 
 	/**
@@ -1208,7 +1225,7 @@ class LocalFile extends File {
 				'img_description' => $comment,
 				'img_user' => $user->getId(),
 				'img_user_text' => $user->getName(),
-				'img_metadata' => $this->metadata,
+				'img_metadata' => $dbw->encodeBlob($this->metadata),
 				'img_sha1' => $this->sha1
 			),
 			__METHOD__,
@@ -1259,7 +1276,7 @@ class LocalFile extends File {
 					'img_description' => $comment,
 					'img_user'        => $user->getId(),
 					'img_user_text'   => $user->getName(),
-					'img_metadata'    => $this->metadata,
+					'img_metadata'    => $dbw->encodeBlob($this->metadata),
 					'img_sha1'        => $this->sha1
 				),
 				array( 'img_name' => $this->getName() ),
@@ -1537,10 +1554,28 @@ class LocalFile extends File {
 			DeferredUpdates::addUpdate( SiteStatsUpdate::factory( array( 'images' => -1 ) ) );
 		}
 
-		$this->purgeEverything();
-		foreach ( $archiveNames as $archiveName ) {
-			$this->purgeOldThumbnails( $archiveName );
-		}
+		// Hack: the lock()/unlock() pair is nested in a transaction so the locking is not
+		// tied to BEGIN/COMMIT. To avoid slow purges in the transaction, move them outside.
+		$file = $this;
+		$this->getRepo()->getMasterDB()->onTransactionIdle(
+			function() use ( $file, $archiveNames ) {
+				global $wgUseSquid;
+
+				$file->purgeEverything();
+				foreach ( $archiveNames as $archiveName ) {
+					$file->purgeOldThumbnails( $archiveName );
+				}
+
+				if ( $wgUseSquid ) {
+					// Purge the squid
+					$purgeUrls = array();
+					foreach ( $archiveNames as $archiveName ) {
+						$purgeUrls[] = $file->getArchiveUrl( $archiveName );
+					}
+					SquidUpdate::purge( $purgeUrls );
+				}
+			}
+		);
 
 		return $status;
 	}
@@ -1560,6 +1595,7 @@ class LocalFile extends File {
 	 * @return FileRepoStatus object.
 	 */
 	function deleteOld( $archiveName, $reason, $suppress = false ) {
+		global $wgUseSquid;
 		if ( $this->getRepo()->getReadOnlyReason() !== false ) {
 			return $this->readOnlyFatalStatus();
 		}
@@ -1575,6 +1611,11 @@ class LocalFile extends File {
 		if ( $status->isOK() ) {
 			$this->purgeDescription();
 			$this->purgeHistory();
+		}
+
+		if ( $wgUseSquid ) {
+			// Purge the squid
+			SquidUpdate::purge( array( $this->getArchiveUrl( $archiveName ) ) );
 		}
 
 		return $status;
@@ -1633,9 +1674,11 @@ class LocalFile extends File {
 	 * Get the HTML text of the description page
 	 * This is not used by ImagePage for local files, since (among other things)
 	 * it skips the parser cache.
+	 *
+	 * @param $lang Language What language to get description in (Optional)
 	 * @return bool|mixed
 	 */
-	function getDescriptionText() {
+	function getDescriptionText( $lang = null ) {
 		$revision = Revision::newFromTitle( $this->title, false, Revision::READ_NORMAL );
 		if ( !$revision ) {
 			return false;
@@ -1644,7 +1687,7 @@ class LocalFile extends File {
 		if ( !$content ) {
 			return false;
 		}
-		$pout = $content->getParserOutput( $this->title, null, new ParserOptions() );
+		$pout = $content->getParserOutput( $this->title, null, new ParserOptions( null, $lang ) );
 		return $pout->getText();
 	}
 
@@ -1721,6 +1764,16 @@ class LocalFile extends File {
 				$this->lockedOwnTrx = true;
 			}
 			$this->locked++;
+			// Bug 54736: use simple lock to handle when the file does not exist.
+			// SELECT FOR UPDATE only locks records not the gaps where there are none.
+			$cache = wfGetMainCache();
+			$key = $this->getCacheKey();
+			if ( !$cache->lock( $key, 60 ) ) {
+				throw new MWException( "Could not acquire lock for '{$this->getName()}.'" );
+			}
+			$dbw->onTransactionIdle( function() use ( $cache, $key ) {
+				$cache->unlock( $key ); // release on commit
+			} );
 		}
 
 		return $dbw->selectField( 'image', '1',

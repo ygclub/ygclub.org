@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Geitost
  * @author Huslåke
  * @author Urhixidur
  * @author Ælsån
@@ -310,7 +311,7 @@ Førespørgsel: $2',
 'userlogin' => 'Åpret æ konto æller loĝ på',
 'logout' => 'Loĝ åf',
 'userlogout' => 'Loĝ åf',
-'nologin' => "Du har engen brugerkonto? '''$1'''.",
+'nologin' => 'Du har engen brugerkonto? $1.',
 'nologinlink' => 'Åpret ny brugerkonto',
 'createaccount' => 'Åpret en ny konto',
 'gotaccount' => "Du har ålerede en brugerkonto? '''$1'''.",
@@ -484,7 +485,6 @@ hersenenge, (førge) = førskel til den førge hersenenge, l = lile til mendre �
 'recentchangeslinked-feed' => 'Relaterede ændrenger',
 'recentchangeslinked-toolbox' => 'Relaterede ændrenger',
 'recentchangeslinked-title' => 'Ændrenger der vegånde til "$1"',
-'recentchangeslinked-noresult' => 'I det udvalgte tidsrum blev der ekke føretaget ændrenger på siderne der henveses til.',
 'recentchangeslinked-summary' => "Denne sonstside beser de seneste ændrenger på de sider der henveses til. Sider på din åvervågnengsliste er vest ve '''fed''' skreft.",
 
 # Upload

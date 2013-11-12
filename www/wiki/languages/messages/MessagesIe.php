@@ -161,7 +161,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Monstrar li númere de usatores vigilant',
 'tog-oldsig' => 'Prevision de signature in existentie:',
 'tog-fancysig' => 'Tractar signature quam textu wiki (sin un catenun auto-crate)',
-'tog-showjumplinks' => 'Permisser catenunes de accessebilitá "saltar a"',
 'tog-uselivepreview' => 'Usar prevision in vivi (exige JavaScript) (experimental)',
 'tog-forceeditsummary' => 'Suggester me quande intrar un redaction che summarium in blanc',
 'tog-watchlisthideown' => 'Ocultar mi redactiones del liste de págines vigilat',
@@ -336,7 +335,7 @@ Pleser atende un témpor quelc ante que vu prova accesser ti págine denov.
 
 $1',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Concernent {{SITENAME}}',
 'aboutpage' => 'Project:Concernent',
 'copyright' => 'Contenete disponibil sub $1.',
@@ -752,7 +751,6 @@ Tui adresse de e-mail ne es revelat quande altri usatores contacter vu.',
 'recentchangeslinked-feed' => 'Relatet modificationes',
 'recentchangeslinked-toolbox' => 'Changes referet',
 'recentchangeslinked-title' => 'Changes relatet por "$1"',
-'recentchangeslinked-noresult' => 'Nequant change in págines ligat durante li periode anunciat.',
 'recentchangeslinked-summary' => "Ti es un liste de changes fat recentmen por págines ligat de un págine specificat (o por membres de un categorie specificat).
 Págines in [[Special:Watchlist|tui liste de págines vigilat]] es '''nigri'''.",
 'recentchangeslinked-page' => 'Nómine de págine:',
@@ -886,8 +884,6 @@ Li descrition es in li [$2 págine de descrition del file] ta e es monstrat in i
 'statistics-users-active-desc' => 'Usatores qui have efectuat un action in li ultim {{PLURAL:$1|die|dies}}',
 'statistics-mostpopular' => 'Págines max visitat',
 
-'disambiguationspage' => 'Template:disambig',
-
 'brokenredirects-edit' => 'redacter',
 'brokenredirects-delete' => 'deleter',
 
@@ -987,7 +983,6 @@ Li descrition es in li [$2 págine de descrition del file] ta e es monstrat in i
 'watch' => 'Vigilar',
 'watchthispage' => 'Vigilar ti págine',
 'unwatch' => 'Desvigilar',
-'watchnochange' => 'Nequant de tui tui partes vigilat esset redactet in li periode de témpor monstrat.',
 'watchlist-details' => '{{PLURAL:$1|$1 págine|$1 págines}} in tui liste de págines vigilat, sin págines de discussion.',
 'wlheader-enotif' => 'Li notification de e-mail es permisset.',
 'wlheader-showupdated' => "Págines quel hat esset mutat desde tui ultim visitation es monstrat in '''nigri'''",
@@ -1353,7 +1348,6 @@ Vu posse anc [[Special:EditWatchlist|usar li redactor uniform]].',
 'version-other' => 'Altri',
 'version-mediahandlers' => 'Manuettes de media',
 'version-hooks' => 'Croces',
-'version-extension-functions' => 'Functiones de extension',
 'version-parser-extensiontags' => 'Puntales de extension analisatores',
 'version-parser-function-hooks' => 'Croces de functiones analisatores',
 'version-hook-name' => 'Nómine de croc',

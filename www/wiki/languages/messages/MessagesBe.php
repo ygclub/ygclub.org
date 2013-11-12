@@ -8,6 +8,7 @@
  * @file
  *
  * @author Cesco
+ * @author Geitost
  * @author Jim-by
  * @author Kaganer
  * @author LexArt
@@ -119,7 +120,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Паказваць колькасць назіральнікаў',
 'tog-oldsig' => 'Існуючы подпіс:',
 'tog-fancysig' => 'Апрацоўваць подпіс як вікі-тэкст (без аўтаматычнай спасылкі)',
-'tog-showjumplinks' => 'Дазволіць дапаможныя спасылкі "jump to"',
 'tog-uselivepreview' => 'Жывы перадпаказ (Яваскрыпт, эксперыментальн.)',
 'tog-forceeditsummary' => 'Папярэджваць пра пустое поле тлумачэння праўкі',
 'tog-watchlisthideown' => 'Не паказваць у назіраным сваіх правак',
@@ -333,7 +333,7 @@ $1',
 'pool-queuefull' => 'Чарга запытаў перапоўнена',
 'pool-errorunknown' => 'Невядомая памылка',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Пра {{GRAMMAR:вінавальны|{{SITENAME}}}}',
 'aboutpage' => 'Project:Пра {{GRAMMAR:вінавальны|{{SITENAME}}}}',
 'copyright' => 'Матэрыял даступны на ўмовах $1.',
@@ -417,18 +417,6 @@ $1',
 # General errors
 'error' => 'Памылка',
 'databaseerror' => 'Памылка базы дадзеных',
-'dberrortext' => 'Памылка ў сінтаксісе звароту ў базу даных.
-Магчыма, прычына ў памылцы ў праграмным забеспячэнні.
-Апошні зварот у базу, які спрабаваўся:
-
-<blockquote><tt>$1</tt></blockquote>
-з функцыі "<tt>$2</tt>".
-Памылка, вернутая з БД: "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'Памылка ў сінтаксісе звароту ў базу даных.
-Апошні зварот у базу, які спрабаваўся:
-"$1"
-з функцыі "$2".
-Памылка, вернутая з БД: "$3: $4"',
 'laggedslavemode' => 'Увага: Старонка можа не ўтрымліваць апошніх зменаў.',
 'readonly' => 'База звестак заблакаваная',
 'enterlockreason' => 'Упішыце прычыну зачынення, а таксама меркаваны час адчынення',
@@ -479,7 +467,6 @@ $1',
 'editinginterface' => "'''Увага:''' Вы правіце старонку, якая ўтрымлівае тэкст карыстальніцкага інтэрфейсу.
 Яе змяненне паўплывае на вонкавы выгляд праграмы для ўсіх удзельнікаў.
 Праект лакалізацыі MediaWiki: [//translatewiki.net/wiki/Main_Page?setlang=be translatewiki.net].",
-'sqlhidden' => '(зварот SQL не паказаны)',
 'cascadeprotected' => 'Старонка знаходзіцца пад аховай ад правак, таму што яна ўлучана ў наступн{{PLURAL:$1|ую старонку|ыя старонкі}}, якія ахоўваюцца з магчымасцю "каскаднага распаўсюджвання" аховы:
 $2',
 'namespaceprotected' => "Вам не дазволена правіць старонкі ў прасторы назваў '''$1'''.",
@@ -514,7 +501,6 @@ $2',
 'remembermypassword' => "Памятаць мяне на гэтым камп'ютары (не даўжэй за $1 {{PLURAL:$1|дзень|дзён}})",
 'userlogin-remembermypassword' => 'Заставацца ў сістэме',
 'userlogin-signwithsecure' => 'Выкарыстоўваць абароненае злучэнне',
-'securelogin-stick-https' => 'Працягваць злучэнне па HTTPS пасля ўвахода',
 'yourdomainname' => 'Ваш дамен',
 'externaldberror' => 'Або памылка вонкавай аўтэнтыкацыі ў базе дадзеных, або вам не дазволена абнаўляць свой вонкавы рахунак.',
 'login' => 'Увайсці ў сістэму',
@@ -525,7 +511,7 @@ $2',
 'logout' => 'Выйсці з сістэмы',
 'userlogout' => 'Выйсці з сістэмы',
 'notloggedin' => 'Не ўвайшоў',
-'nologin' => "Не маеце рахунку? '''$1'''.",
+'nologin' => 'Не маеце рахунку? $1.',
 'nologinlink' => 'Завесці рахунак',
 'createaccount' => 'Стварыць рахунак',
 'gotaccount' => "Ужо маеце рахунак? '''$1'''.",
@@ -601,7 +587,7 @@ $2',
 'newpassword' => 'Новы пароль:',
 'retypenew' => 'Новы пароль паўторна:',
 'resetpass_submit' => 'Наставіць пароль і ўвайсці',
-'resetpass_success' => 'Ваш пароль паспяхова зменены! Цяпер уваходзім...',
+'changepassword-success' => 'Ваш пароль паспяхова зменены! Цяпер уваходзім...',
 'resetpass_forbidden' => 'Не дазволена мяняць паролі',
 'resetpass-no-info' => 'Трэба ўвайсці ў сістэму, каб звяртацца да гэтай старонкі наўпрост.',
 'resetpass-submit-loggedin' => 'Змяніць пароль',
@@ -1137,7 +1123,6 @@ $1",
 'resetprefs' => 'Да пачатковых',
 'restoreprefs' => 'Аднавіць усе прадвызначэнні',
 'prefs-editing' => 'Праца',
-'prefs-edit-boxsize' => 'Памер рэдактарскага акна.',
 'rows' => 'Радкі:',
 'columns' => 'Калонкі:',
 'searchresultshead' => 'Пошук',
@@ -1148,9 +1133,6 @@ $1",
 'recentchangesdays-max' => '(найбольш $1 {{PLURAL:$1|дзень|дзён}})',
 'recentchangescount' => 'Прадвызначаная колькасць правак дзеля паказу:',
 'prefs-help-recentchangescount' => 'Гэта ўключае ў сябе апошнія змены, гісторыі старонак, журналы.',
-'prefs-help-watchlist-token' => 'Упісанне сакрэтнага ключа ў гэтае поле створыць RSS-струмень з вашага спісу назіранага. 
-Кожны, каму вядомы гэты ключ, зможа чытаць ваш спіс назіранага, таму выбірайце бяспечныя ключы. 
-Вось аўта-згенераваны ключ, які можна выкарыстаць: $1',
 'savedprefs' => 'Настáўленні замацаваныя.',
 'timezonelegend' => 'Часавы пояс:',
 'localtime' => 'Мясцовы час:',
@@ -1181,7 +1163,6 @@ $1",
 'prefs-reset-intro' => 'Тут можна вярнуць свае настаўленні да прадвызначэнняў, прынятых на гэтай пляцоўцы.
 Адкаціць гэтае дзеянне нельга.',
 'prefs-emailconfirm-label' => 'Пацверджанне адрасу эл.пошты:',
-'prefs-textboxsize' => 'Памер акна рэдагавання',
 'youremail' => 'Эл.пошта *',
 'username' => 'Імя ўдзельніка:',
 'uid' => 'ID удзельніка:',
@@ -1394,7 +1375,7 @@ $1",
 'rcshowhideliu' => '$1 пазнаных удзельнікаў',
 'rcshowhideanons' => '$1 ананімных удзельнікаў',
 'rcshowhidepatr' => '$1 ухваленых правак',
-'rcshowhidemine' => '$1 уласных правак',
+'rcshowhidemine' => '$1 ўласных правак',
 'rclinks' => 'Паказаць апошнія $1 зменаў за мінулыя $2 дзён<br />$3',
 'diff' => 'розн.',
 'hist' => 'гіст.',
@@ -1416,7 +1397,6 @@ $1",
 'recentchangeslinked-feed' => 'Звязаныя праўкі',
 'recentchangeslinked-toolbox' => 'Звязаныя праўкі',
 'recentchangeslinked-title' => 'Змяненні, якія датычаць "$1"',
-'recentchangeslinked-noresult' => 'Без змяненняў на далучаных старонках за азначаны перыяд.',
 'recentchangeslinked-summary' => "Гэта пералік нядаўніх змяненняў старонак, на якія спасылаецца азначаная старонка, або змяненняў складнікаў азначанай катэгорыі.
 Старонкі, якія ўваходзяць у [[Special:Watchlist|лік назіраных вамі]], выдзелены '''стылем'''.",
 'recentchangeslinked-page' => 'Назва старонкі:',
@@ -1538,9 +1518,9 @@ $1',
 'upload-proto-error' => 'Няправільны пратакол',
 'upload-proto-error-text' => 'Укладанне файла зводдаль патрабуе URL, які пачынаецца з <code>http://</code> або <code>ftp://</code>.',
 'upload-file-error' => 'Унутраная памылка',
-'upload-file-error-text' => 'Унутраная памылка пры спробе стварыць на серверы тымчасовы файл. Звярніцеся да аднаго з [[Special:ListUsers/sysop|сістэмных адміністратараў]].',
+'upload-file-error-text' => 'Унутраная памылка пры спробе стварыць на серверы тымчасовы файл. Звярніцеся да аднаго з [[Special:ListUsers/sysop|адміністратараў]].',
 'upload-misc-error' => 'Нявызначаная памылка пры ўкладанні',
-'upload-misc-error-text' => 'Нявызначаная памылка пры ўкладанні. Праверце правільнасць і даступнасць URL і паспрабуйце ізноў. Калі праблема трывалая, звярніцеся да аднаго з [[Special:ListUsers/sysop|сістэмных адміністратараў]].',
+'upload-misc-error-text' => 'Нявызначаная памылка пры ўкладанні. Праверце правільнасць і даступнасць URL і паспрабуйце ізноў. Калі праблема трывалая, звярніцеся да аднаго з [[Special:ListUsers/sysop|адміністратараў]].',
 'upload-too-many-redirects' => 'Занадта шмат перасылак за гэтым адрасам (URL)',
 'upload-unknown-size' => 'Невядомы памер',
 'upload-http-error' => 'Памылка HTTP: $1',
@@ -1762,12 +1742,6 @@ $1',
 'statistics-users-active' => 'Актыўныя ўдзельнікі',
 'statistics-users-active-desc' => 'Удзельнікі, якія хоць нешта зрабілі за апошн{{PLURAL:$1|і дзень|ія $1 дзён}}',
 'statistics-mostpopular' => 'Самыя папулярныя старонкі',
-
-'disambiguations' => 'Старонкі, якія спасылаюцца на старонкі вырашэння неадназначнасцяў',
-'disambiguationspage' => 'Template:Неадназначнасць',
-'disambiguations-text' => "Гэтыя старонкі спасылаюцца на '''старонкі развязкі неадназначнасцяў'''.
-Лепей, каб яны спасылаліся на канкрэтныя тэматычныя старонкі.<br />
-Старонка лічыцца старонкай развязкі, калі ў яе ўлучаецца такі шаблон, на які спасылаецца [[MediaWiki:Disambiguationspage]]",
 
 'doubleredirects' => 'Падвойныя перасылкі',
 'doubleredirectstext' => 'Тут пералічаныя старонкі-перасылкі, якія паказваюць на іншыя перасылкі.
@@ -2007,7 +1981,6 @@ $1',
 'unwatchthispage' => 'Спыніць назіранне',
 'notanarticle' => 'Гэта не змястоўная старонка',
 'notvisiblerev' => 'Версія сцёртая',
-'watchnochange' => 'Ніводзін з назіраных складнікаў не быў зменены за паказаны перыяд.',
 'watchlist-details' => 'Назіраю {{PLURAL:$1|$1 старонку|$1 старонак}} без уліку размоўных.',
 'wlheader-enotif' => 'Працуе апавяшчанне праз эл.пошту.',
 'wlheader-showupdated' => "Старонкі, якія былі зменены пасля вашага апошняга іх наведвання, паказаны '''абрысам шрыфту'''.",
@@ -3400,7 +3373,6 @@ $5
 'version-other' => 'Рознае',
 'version-mediahandlers' => 'Апрацоўнікі мультымедый',
 'version-hooks' => 'Хукі',
-'version-extension-functions' => 'Функцыі прыстаўкі',
 'version-parser-extensiontags' => 'Тагі прыстаўкі да парсера',
 'version-parser-function-hooks' => 'Хукі функцый парсера',
 'version-hook-name' => 'Назва хука',

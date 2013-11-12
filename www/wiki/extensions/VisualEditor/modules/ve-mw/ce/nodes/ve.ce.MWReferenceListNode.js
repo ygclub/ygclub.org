@@ -14,7 +14,7 @@
  *
  * @constructor
  * @param {ve.dm.MWReferenceListNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWReferenceListNode = function VeCeMWReferenceListNode( model, config ) {
 	// Parent constructor
@@ -28,23 +28,26 @@ ve.ce.MWReferenceListNode = function VeCeMWReferenceListNode( model, config ) {
 	this.internalList = null;
 	this.listNode = null;
 
-	// Initialization
-	this.$
-		.addClass( 've-ce-mwReferenceListNode', 'reference' )
-		.prop( 'contenteditable', false );
-	this.$reflist = $( '<ol class="references"></ol>' );
-	this.$refmsg = $( '<p>' )
+	// DOM changes
+	this.$element.addClass( 've-ce-mwReferenceListNode', 'reference' );
+	this.$reflist = this.$( '<ol class="references"></ol>' );
+	this.$refmsg = this.$( '<p>' )
 		.addClass( 've-ce-mwReferenceListNode-muted' );
+
+	// Events
+	this.model.connect( this, { 'attributeChange': 'onAttributeChange' } );
+
+	// Initialization
 	this.update();
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWReferenceListNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.MWReferenceListNode, ve.ce.LeafNode );
 
-ve.mixinClass( ve.ce.MWReferenceListNode, ve.ce.ProtectedNode );
+OO.mixinClass( ve.ce.MWReferenceListNode, ve.ce.ProtectedNode );
 
-ve.mixinClass( ve.ce.MWReferenceListNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWReferenceListNode, ve.ce.FocusableNode );
 
 /* Static Properties */
 
@@ -102,7 +105,7 @@ ve.ce.MWReferenceListNode.prototype.onInternalListUpdate = function ( groupsChan
 };
 
 /**
- * Handle attribute change events.
+ * Rerender when the 'listGroup' attribute changes in the model.
  *
  * @param {string} key Attribute key
  * @param {string} from Old value
@@ -142,22 +145,41 @@ ve.ce.MWReferenceListNode.prototype.update = function () {
 	this.$refmsg.detach();
 
 	if ( !nodes || !nodes.indexOrder.length ) {
-		this.$refmsg.text( ve.msg( 'visualeditor-referencelist-isempty', refGroup ) );
-		this.$.append( this.$refmsg );
+		if ( refGroup !== '' ) {
+			this.$refmsg.text( ve.msg( 'visualeditor-referencelist-isempty', refGroup ) );
+		} else {
+			this.$refmsg.text( ve.msg( 'visualeditor-referencelist-isempty-default' ) );
+		}
+		this.$element.append( this.$refmsg );
 	} else {
 		for ( i = 0, iLen = nodes.indexOrder.length; i < iLen; i++ ) {
 			index = nodes.indexOrder[i];
 			firstNode = nodes.firstNodes[index];
 
-			$li = $( '<li>' );
-
 			key = internalList.keys[index];
-			keyedNodes = nodes.keyedNodes[key] || [];
-			for ( j = 0, jLen = keyedNodes.length; j < jLen; j++ ) {
-				if ( keyedNodes.length > 1 ) {
+			keyedNodes = nodes.keyedNodes[key];
+			// Exclude references defined inside the reference list node
+			/*jshint loopfunc:true */
+			keyedNodes = keyedNodes.filter( function ( node ) {
+				while ( ( node = node.parent ) && node !== null ) {
+					if ( node instanceof ve.dm.MWReferenceListNode ) {
+						return false;
+					}
+				}
+				return true;
+			} );
+
+			if ( !keyedNodes.length ) {
+				continue;
+			}
+
+			$li = this.$( '<li>' );
+
+			if ( keyedNodes.length > 1 ) {
+				for ( j = 0, jLen = keyedNodes.length; j < jLen; j++ ) {
 					$li.append(
-						$( '<sup>' ).append(
-							$( '<a>' ).text( ( i + 1 ) + '.' + j )
+						this.$( '<sup>' ).append(
+							this.$( '<a>' ).text( ( i + 1 ) + '.' + j )
 						)
 					).append( ' ' );
 				}
@@ -168,19 +190,19 @@ ve.ce.MWReferenceListNode.prototype.update = function () {
 			if ( modelNode.length ) {
 				viewNode = new ve.ce.InternalItemNode( modelNode );
 				// HACK: PHP parser doesn't wrap single lines in a paragraph
-				if ( viewNode.$.children().length === 1 && viewNode.$.children( 'p' ).length === 1 ) {
+				if ( viewNode.$element.children().length === 1 && viewNode.$element.children( 'p' ).length === 1 ) {
 					// unwrap inner
-					viewNode.$.children().replaceWith( viewNode.$.children().contents() );
+					viewNode.$element.children().replaceWith( viewNode.$element.children().contents() );
 				}
 				$li.append(
-					$( '<span>' )
+					this.$( '<span>' )
 						.addClass( 'reference-text' )
-						.append( viewNode.$.clone().show() )
+						.append( viewNode.$element.clone().show() )
 				);
 				viewNode.destroy();
 			} else {
 				$li.append(
-					$( '<span>' )
+					this.$( '<span>' )
 						.addClass( 've-ce-mwReferenceListNode-muted' )
 						.text( ve.msg( 'visualeditor-referencelist-missingref' ) )
 				);
@@ -188,7 +210,7 @@ ve.ce.MWReferenceListNode.prototype.update = function () {
 
 			this.$reflist.append( $li );
 		}
-		this.$.append( this.$reflist );
+		this.$element.append( this.$reflist );
 	}
 };
 

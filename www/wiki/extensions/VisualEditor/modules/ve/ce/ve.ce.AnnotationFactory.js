@@ -9,17 +9,31 @@
  * ContentEditable annotation factory.
  *
  * @class
- * @extends ve.NamedClassFactory
+ * @extends OO.Factory
  * @constructor
  */
 ve.ce.AnnotationFactory = function VeCeAnnotationFactory() {
 	// Parent constructor
-	ve.NamedClassFactory.call( this );
+	OO.Factory.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.AnnotationFactory, ve.NamedClassFactory );
+OO.inheritClass( ve.ce.AnnotationFactory, OO.Factory );
+
+/* Methods */
+
+/**
+ * Check if an annotation needs to force continuation
+ * @param {string} type Annotation type
+ * @returns {boolean} Whether the annotation needs to force continuation
+ */
+ve.ce.AnnotationFactory.prototype.isAnnotationContinuationForced = function ( type ) {
+	if ( type in this.registry ) {
+		return this.registry[type].static.forceContinuation;
+	}
+	return false;
+};
 
 /* Initialization */
 

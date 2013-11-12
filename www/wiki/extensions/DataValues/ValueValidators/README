@@ -1,0 +1,8 @@
+These is the readme file for the ValueValidator library.
+
+Extension page on mediawiki.org: https://www.mediawiki.org/wiki/Extension:ValueValidators
+Latest version of the readme file: https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/extensions/DataValues.git;a=blob;f=ValueValidators/README
+
+== About ==
+
+Collection of validation components for DataValues.

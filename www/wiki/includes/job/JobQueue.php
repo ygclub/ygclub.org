@@ -36,6 +36,9 @@ abstract class JobQueue {
 	protected $maxTries; // integer; maximum number of times to try a job
 	protected $checkDelay; // boolean; allow delayed jobs
 
+	/** @var BagOStuff */
+	protected $dupCache;
+
 	const QOS_ATOMIC = 1; // integer; "all-or-nothing" job insertions
 	const QoS_Atomic = 1; // integer; "all-or-nothing" job insertions (b/c)
 
@@ -61,6 +64,7 @@ abstract class JobQueue {
 		if ( $this->checkDelay && !$this->supportsDelayedJobs() ) {
 			throw new MWException( __CLASS__ . " does not support delayed jobs." );
 		}
+		$this->dupCache = wfGetCache( CACHE_ANYTHING );
 	}
 
 	/**
@@ -168,7 +172,7 @@ abstract class JobQueue {
 	 * not distinguishable from the race condition between isEmpty() and pop().
 	 *
 	 * @return bool
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function isEmpty() {
 		wfProfileIn( __METHOD__ );
@@ -190,7 +194,7 @@ abstract class JobQueue {
 	 * If caching is used, this number might be out of date for a minute.
 	 *
 	 * @return integer
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function getSize() {
 		wfProfileIn( __METHOD__ );
@@ -212,7 +216,7 @@ abstract class JobQueue {
 	 * If caching is used, this number might be out of date for a minute.
 	 *
 	 * @return integer
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function getAcquiredCount() {
 		wfProfileIn( __METHOD__ );
@@ -234,7 +238,7 @@ abstract class JobQueue {
 	 * If caching is used, this number might be out of date for a minute.
 	 *
 	 * @return integer
-	 * @throws MWException
+	 * @throws JobQueueError
 	 * @since 1.22
 	 */
 	final public function getDelayedCount() {
@@ -259,7 +263,7 @@ abstract class JobQueue {
 	 * If caching is used, this number might be out of date for a minute.
 	 *
 	 * @return integer
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function getAbandonedCount() {
 		wfProfileIn( __METHOD__ );
@@ -284,7 +288,7 @@ abstract class JobQueue {
 	 * @param $jobs Job|Array
 	 * @param $flags integer Bitfield (supports JobQueue::QOS_ATOMIC)
 	 * @return bool Returns false on failure
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function push( $jobs, $flags = 0 ) {
 		return $this->batchPush( is_array( $jobs ) ? $jobs : array( $jobs ), $flags );
@@ -298,7 +302,7 @@ abstract class JobQueue {
 	 * @param array $jobs List of Jobs
 	 * @param $flags integer Bitfield (supports JobQueue::QOS_ATOMIC)
 	 * @return bool Returns false on failure
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function batchPush( array $jobs, $flags = 0 ) {
 		if ( !count( $jobs ) ) {
@@ -333,7 +337,7 @@ abstract class JobQueue {
 	 * Outside callers should use JobQueueGroup::pop() instead of this function.
 	 *
 	 * @return Job|bool Returns false if there are no jobs
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function pop() {
 		global $wgJobClasses;
@@ -374,7 +378,7 @@ abstract class JobQueue {
 	 *
 	 * @param $job Job
 	 * @return bool
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function ack( Job $job ) {
 		if ( $job->getType() !== $this->type ) {
@@ -421,7 +425,7 @@ abstract class JobQueue {
 	 *
 	 * @param $job Job
 	 * @return bool
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function deduplicateRootJob( Job $job ) {
 		if ( $job->getType() !== $this->type ) {
@@ -439,8 +443,6 @@ abstract class JobQueue {
 	 * @return bool
 	 */
 	protected function doDeduplicateRootJob( Job $job ) {
-		global $wgMemc;
-
 		if ( !$job->hasRootJobParams() ) {
 			throw new MWException( "Cannot register root job; missing parameters." );
 		}
@@ -452,13 +454,13 @@ abstract class JobQueue {
 		// deferred till "transaction idle", do the same here, so that the ordering is
 		// maintained. Having only the de-duplication registration succeed would cause
 		// jobs to become no-ops without any actual jobs that made them redundant.
-		$timestamp = $wgMemc->get( $key ); // current last timestamp of this job
+		$timestamp = $this->dupCache->get( $key ); // current last timestamp of this job
 		if ( $timestamp && $timestamp >= $params['rootJobTimestamp'] ) {
 			return true; // a newer version of this root job was enqueued
 		}
 
 		// Update the timestamp of the last root job started at the location...
-		return $wgMemc->set( $key, $params['rootJobTimestamp'], JobQueueDB::ROOTJOB_TTL );
+		return $this->dupCache->set( $key, $params['rootJobTimestamp'], JobQueueDB::ROOTJOB_TTL );
 	}
 
 	/**
@@ -466,7 +468,7 @@ abstract class JobQueue {
 	 *
 	 * @param $job Job
 	 * @return bool
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final protected function isRootJobOldDuplicate( Job $job ) {
 		if ( $job->getType() !== $this->type ) {
@@ -484,15 +486,14 @@ abstract class JobQueue {
 	 * @return bool
 	 */
 	protected function doIsRootJobOldDuplicate( Job $job ) {
-		global $wgMemc;
-
 		if ( !$job->hasRootJobParams() ) {
 			return false; // job has no de-deplication info
 		}
 		$params = $job->getRootJobParams();
 
+		$key = $this->getRootJobCacheKey( $params['rootJobSignature'] );
 		// Get the last time this root job was enqueued
-		$timestamp = $wgMemc->get( $this->getRootJobCacheKey( $params['rootJobSignature'] ) );
+		$timestamp = $this->dupCache->get( $key );
 
 		// Check if a new root job was started at the location after this one's...
 		return ( $timestamp && $timestamp > $params['rootJobTimestamp'] );
@@ -511,7 +512,7 @@ abstract class JobQueue {
 	 * Deleted all unclaimed and delayed jobs from the queue
 	 *
 	 * @return bool Success
-	 * @throws MWException
+	 * @throws JobQueueError
 	 * @since 1.22
 	 */
 	final public function delete() {
@@ -535,7 +536,7 @@ abstract class JobQueue {
 	 * This does nothing for certain queue classes.
 	 *
 	 * @return void
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	final public function waitForBackups() {
 		wfProfileIn( __METHOD__ );
@@ -597,23 +598,80 @@ abstract class JobQueue {
 	/**
 	 * Get an iterator to traverse over all available jobs in this queue.
 	 * This does not include jobs that are currently acquired or delayed.
-	 * This should only be called on a queue that is no longer being popped.
+	 * Note: results may be stale if the queue is concurrently modified.
 	 *
 	 * @return Iterator
-	 * @throws MWException
+	 * @throws JobQueueError
 	 */
 	abstract public function getAllQueuedJobs();
 
 	/**
 	 * Get an iterator to traverse over all delayed jobs in this queue.
-	 * This should only be called on a queue that is no longer being popped.
+	 * Note: results may be stale if the queue is concurrently modified.
 	 *
 	 * @return Iterator
-	 * @throws MWException
+	 * @throws JobQueueError
 	 * @since 1.22
 	 */
 	public function getAllDelayedJobs() {
 		return new ArrayIterator( array() ); // not implemented
+	}
+
+	/**
+	 * Do not use this function outside of JobQueue/JobQueueGroup
+	 *
+	 * @return string
+	 * @since 1.22
+	 */
+	public function getCoalesceLocationInternal() {
+		return null;
+	}
+
+	/**
+	 * Check whether each of the given queues are empty.
+	 * This is used for batching checks for queues stored at the same place.
+	 *
+	 * @param array $types List of queues types
+	 * @return array|null (list of non-empty queue types) or null if unsupported
+	 * @throws MWException
+	 * @since 1.22
+	 */
+	final public function getSiblingQueuesWithJobs( array $types ) {
+		$section = new ProfileSection( __METHOD__ );
+		return $this->doGetSiblingQueuesWithJobs( $types );
+	}
+
+	/**
+	 * @see JobQueue::getSiblingQueuesWithJobs()
+	 * @param array $types List of queues types
+	 * @return array|null (list of queue types) or null if unsupported
+	 */
+	protected function doGetSiblingQueuesWithJobs( array $types ) {
+		return null; // not supported
+	}
+
+	/**
+	 * Check the size of each of the given queues.
+	 * For queues not served by the same store as this one, 0 is returned.
+	 * This is used for batching checks for queues stored at the same place.
+	 *
+	 * @param array $types List of queues types
+	 * @return array|null (job type => whether queue is empty) or null if unsupported
+	 * @throws MWException
+	 * @since 1.22
+	 */
+	final public function getSiblingQueueSizes( array $types ) {
+		$section = new ProfileSection( __METHOD__ );
+		return $this->doGetSiblingQueueSizes( $types );
+	}
+
+	/**
+	 * @see JobQueue::getSiblingQueuesSize()
+	 * @param array $types List of queues types
+	 * @return array|null (list of queue types) or null if unsupported
+	 */
+	protected function doGetSiblingQueueSizes( array $types ) {
+		return null; // not supported
 	}
 
 	/**
@@ -640,3 +698,10 @@ abstract class JobQueue {
 		throw new MWException( "Queue namespacing not supported for this queue type." );
 	}
 }
+
+/**
+ * @ingroup JobQueue
+ * @since 1.22
+ */
+class JobQueueError extends MWException {}
+class JobQueueConnectionError extends JobQueueError {}

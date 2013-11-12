@@ -27,9 +27,9 @@ ve.dm.AlienNode = function VeDmAlienNode( length, element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.AlienNode, ve.dm.LeafNode );
+OO.inheritClass( ve.dm.AlienNode, ve.dm.LeafNode );
 
-ve.mixinClass( ve.dm.AlienNode, ve.dm.GeneratedContentNode );
+OO.mixinClass( ve.dm.AlienNode, ve.dm.GeneratedContentNode );
 
 /* Static members */
 
@@ -46,13 +46,25 @@ ve.dm.AlienNode.static.toDataElement = function ( domElements, converter ) {
 	return {
 		'type': type,
 		'attributes': {
-			'domElements': ve.copyArray( domElements )
+			'domElements': ve.copy( domElements )
 		}
 	};
 };
 
 ve.dm.AlienNode.static.toDomElements = function ( dataElement, doc ) {
 	return ve.copyDomElements( dataElement.attributes.domElements, doc );
+};
+
+ve.dm.AlienNode.static.getHashObject = function ( dataElement ) {
+	var parentResult = ve.dm.LeafNode.static.getHashObject( dataElement );
+	if ( parentResult.attributes && parentResult.attributes.domElements ) {
+		// If present, replace domElements with a DOM summary
+		parentResult.attributes = ve.copy( parentResult.attributes );
+		parentResult.attributes.domElements = ve.copy(
+			parentResult.attributes.domElements, ve.convertDomElements
+		);
+	}
+	return parentResult;
 };
 
 /* Concrete subclasses */
@@ -71,7 +83,7 @@ ve.dm.AlienBlockNode = function VeDmAlienBlockNode( length, element ) {
 	ve.dm.AlienNode.call( this, length, element );
 };
 
-ve.inheritClass( ve.dm.AlienBlockNode, ve.dm.AlienNode );
+OO.inheritClass( ve.dm.AlienBlockNode, ve.dm.AlienNode );
 
 ve.dm.AlienBlockNode.static.name = 'alienBlock';
 
@@ -89,7 +101,7 @@ ve.dm.AlienInlineNode = function VeDmAlienInlineNode( length, element ) {
 	ve.dm.AlienNode.call( this, length, element );
 };
 
-ve.inheritClass( ve.dm.AlienInlineNode, ve.dm.AlienNode );
+OO.inheritClass( ve.dm.AlienInlineNode, ve.dm.AlienNode );
 
 ve.dm.AlienInlineNode.static.name = 'alienInline';
 

@@ -30,7 +30,6 @@
  * @ingroup Exception
  */
 class MWException extends Exception {
-	var $logId;
 
 	/**
 	 * Should the exception use $wgOut to output the error?
@@ -127,11 +126,11 @@ class MWException extends Exception {
 
 		if ( $wgShowExceptionDetails ) {
 			return '<p>' . nl2br( htmlspecialchars( $this->getMessage() ) ) .
-				'</p><p>Backtrace:</p><p>' . nl2br( htmlspecialchars( $this->getTraceAsString() ) ) .
+				'</p><p>Backtrace:</p><p>' . nl2br( htmlspecialchars( MWExceptionHandler::formatRedactedTrace( $this ) ) ) .
 				"</p>\n";
 		} else {
 			return "<div class=\"errorbox\">" .
-				'[' . $this->getLogId() . '] ' .
+				'[' . MWExceptionHandler::getLogId( $this ) . '] ' .
 				gmdate( 'Y-m-d H:i:s' ) .
 				": Fatal exception of type " . get_class( $this ) . "</div>\n" .
 				"<!-- Set \$wgShowExceptionDetails = true; " .
@@ -152,7 +151,7 @@ class MWException extends Exception {
 
 		if ( $wgShowExceptionDetails ) {
 			return $this->getMessage() .
-				"\nBacktrace:\n" . $this->getTraceAsString() . "\n";
+				"\nBacktrace:\n" . MWExceptionHandler::formatRedactedTrace( $this ) . "\n";
 		} else {
 			return "Set \$wgShowExceptionDetails = true; " .
 				"in LocalSettings.php to show detailed debugging information.\n";
@@ -169,43 +168,28 @@ class MWException extends Exception {
 	}
 
 	/**
-	 * Get a random ID for this error.
-	 * This allows to link the exception to its corresponding log entry when
-	 * $wgShowExceptionDetails is set to false.
+	 * Get a the ID for this error.
 	 *
+	 * @since 1.20
+	 * @deprecated since 1.22 Use MWExceptionHandler::getLogId instead.
 	 * @return string
 	 */
 	function getLogId() {
-		if ( $this->logId === null ) {
-			$this->logId = wfRandomString( 8 );
-		}
-		return $this->logId;
+		wfDeprecated( __METHOD__, '1.22' );
+		return MWExceptionHandler::getLogId( $this );
 	}
 
 	/**
 	 * Return the requested URL and point to file and line number from which the
 	 * exception occurred
 	 *
+	 * @since 1.8
+	 * @deprecated since 1.22 Use MWExceptionHandler::getLogMessage instead.
 	 * @return string
 	 */
 	function getLogMessage() {
-		global $wgRequest;
-
-		$id = $this->getLogId();
-		$file = $this->getFile();
-		$line = $this->getLine();
-		$message = $this->getMessage();
-
-		if ( isset( $wgRequest ) && !$wgRequest instanceof FauxRequest ) {
-			$url = $wgRequest->getRequestURL();
-			if ( !$url ) {
-				$url = '[no URL]';
-			}
-		} else {
-			$url = '[no req]';
-		}
-
-		return "[$id] $url   Exception from line $line of $file: $message";
+		wfDeprecated( __METHOD__, '1.22' );
+		return MWExceptionHandler::getLogMessage( $this );
 	}
 
 	/**
@@ -247,16 +231,9 @@ class MWException extends Exception {
 	 * It will be either HTML or plain text based on isCommandLine().
 	 */
 	function report() {
-		global $wgLogExceptionBacktrace, $wgMimeType;
-		$log = $this->getLogMessage();
+		global $wgMimeType;
 
-		if ( $log ) {
-			if ( $wgLogExceptionBacktrace ) {
-				wfDebugLog( 'exception', $log . "\n" . $this->getTraceAsString() . "\n" );
-			} else {
-				wfDebugLog( 'exception', $log );
-			}
-		}
+		MWExceptionHandler::logException( $this );
 
 		if ( defined( 'MW_API' ) ) {
 			// Unhandled API exception, we can't be sure that format printer is alive
@@ -624,7 +601,7 @@ class MWExceptionHandler {
 				$message = "MediaWiki internal error.\n\n";
 
 				if ( $wgShowExceptionDetails ) {
-					$message .= 'Original exception: ' . $e->__toString() . "\n\n" .
+					$message .= 'Original exception: ' . self::formatRedactedTrace( $e ) . "\n\n" .
 						'Exception caught inside exception handler: ' . $e2->__toString();
 				} else {
 					$message .= "Exception caught inside exception handler.\n\n" .
@@ -641,11 +618,10 @@ class MWExceptionHandler {
 				}
 			}
 		} else {
-			$message = "Unexpected non-MediaWiki exception encountered, of type \"" . get_class( $e ) . "\"\n" .
-				$e->__toString() . "\n";
+			$message = "Unexpected non-MediaWiki exception encountered, of type \"" . get_class( $e ) . "\"";
 
 			if ( $wgShowExceptionDetails ) {
-				$message .= "\n" . $e->getTraceAsString() . "\n";
+				$message .= "\nexception '" . get_class( $e ) . "' in " . $e->getFile() . ":" . $e->getLine() . "\nStack trace:\n" . self::formatRedactedTrace( $e ) . "\n";
 			}
 
 			if ( $cmdLine ) {
@@ -700,4 +676,132 @@ class MWExceptionHandler {
 		// Exit value should be nonzero for the benefit of shell jobs
 		exit( 1 );
 	}
+
+	/**
+	 * Get the stack trace from the exception as a string, redacting certain function arguments in the process
+	 * @param Exception $e The exception
+	 * @return string The stack trace as a string
+	 */
+	public static function formatRedactedTrace( Exception $e ) {
+		global $wgRedactedFunctionArguments;
+		$finalExceptionText = '';
+
+		foreach ( $e->getTrace() as $i => $call ) {
+			$checkFor = array();
+			if ( isset( $call['class'] ) ) {
+				$checkFor[] = $call['class'] . '::' . $call['function'];
+				foreach ( class_parents( $call['class'] ) as $parent ) {
+					$checkFor[] = $parent . '::' . $call['function'];
+				}
+			} else {
+				$checkFor[] = $call['function'];
+			}
+
+			foreach ( $checkFor as $check ) {
+				if ( isset( $wgRedactedFunctionArguments[$check] ) ) {
+					foreach ( (array)$wgRedactedFunctionArguments[$check] as $argNo ) {
+						$call['args'][$argNo] = 'REDACTED';
+					}
+				}
+			}
+
+			if ( isset( $call['file'] ) && isset( $call['line'] ) ) {
+				$finalExceptionText .= "#{$i} {$call['file']}({$call['line']}): ";
+			} else {
+				// 'file' and 'line' are unset for calls via call_user_func (bug 55634)
+				// This matches behaviour of Exception::getTraceAsString to instead
+				// display "[internal function]".
+				$finalExceptionText .= "#{$i} [internal function]: ";
+			}
+
+			if ( isset( $call['class'] ) ) {
+				$finalExceptionText .= $call['class'] . $call['type'] . $call['function'];
+			} else {
+				$finalExceptionText .= $call['function'];
+			}
+			$args = array();
+			if ( isset( $call['args'] ) ) {
+				foreach ( $call['args'] as $arg ) {
+					if ( is_object( $arg ) ) {
+						$args[] = 'Object(' . get_class( $arg ) . ')';
+					} elseif( is_array( $arg ) ) {
+						$args[] = 'Array';
+					} else {
+						$args[] = var_export( $arg, true );
+					}
+				}
+			}
+			$finalExceptionText .=  '(' . implode( ', ', $args ) . ")\n";
+		}
+		return $finalExceptionText . '#' . ( $i + 1 ) . ' {main}';
+	}
+
+
+	/**
+	 * Get the ID for this error.
+	 *
+	 * The ID is saved so that one can match the one output to the user (when
+	 * $wgShowExceptionDetails is set to false), to the entry in the debug log.
+	 *
+	 * @since 1.22
+	 * @param Exception $e
+	 * @return string
+	 */
+	public static function getLogId( Exception $e ) {
+		if ( !isset( $e->_mwLogId ) ) {
+			$e->_mwLogId = wfRandomString( 8 );
+		}
+		return $e->_mwLogId;
+	}
+
+	/**
+	 * Return the requested URL and point to file and line number from which the
+	 * exception occurred.
+	 *
+	 * @since 1.22
+	 * @param Exception $e
+	 * @return string
+	 */
+	public static function getLogMessage( Exception $e ) {
+		global $wgRequest;
+
+		$id = self::getLogId( $e );
+		$file = $e->getFile();
+		$line = $e->getLine();
+		$message = $e->getMessage();
+
+		if ( isset( $wgRequest ) && !$wgRequest instanceof FauxRequest ) {
+			$url = $wgRequest->getRequestURL();
+			if ( !$url ) {
+				$url = '[no URL]';
+			}
+		} else {
+			$url = '[no req]';
+		}
+
+		return "[$id] $url   Exception from line $line of $file: $message";
+	}
+
+	/**
+	 * Log an exception to the exception log (if enabled).
+	 *
+	 * This method must not assume the exception is an MWException,
+	 * it is also used to handle PHP errors or errors from other libraries.
+	 *
+	 * @since 1.22
+	 * @param Exception $e
+	 */
+	public static function logException( Exception $e ) {
+		global $wgLogExceptionBacktrace;
+
+		$log = self::getLogMessage( $e );
+		if ( $log ) {
+			if ( $wgLogExceptionBacktrace ) {
+				wfDebugLog( 'exception', $log . "\n" . self::formatRedactedTrace( $e ) . "\n" );
+			} else {
+				wfDebugLog( 'exception', $log );
+			}
+		}
+	}
+
 }

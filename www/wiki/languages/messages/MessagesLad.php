@@ -34,8 +34,8 @@ $namespaceNames = array(
 	NS_TEMPLATE_TALK    => 'Diskusyón_de_Xablón',
 	NS_HELP             => 'Ayudo',
 	NS_HELP_TALK        => 'Diskusyón_de_Ayudo',
-	NS_CATEGORY         => 'Katēggoría',
-	NS_CATEGORY_TALK    => 'Diskusyón_de_Katēggoría',
+	NS_CATEGORY         => 'Kateggoría',
+	NS_CATEGORY_TALK    => 'Diskusyón_de_Kateggoría',
 );
 
 $namespaceAliases = array(
@@ -66,8 +66,8 @@ $namespaceAliases = array(
 	'Xabblón'                  => NS_TEMPLATE,
 	'Diskusyón_de_Xabblón'     => NS_TEMPLATE_TALK,
 	'Diskussión_de_Ayudo'      => NS_HELP_TALK,
-	'Kateggoría'               => NS_CATEGORY,
-	'Diskussión_de_Kateggoría' => NS_CATEGORY_TALK,
+	'Katēggoría'               => NS_CATEGORY,
+	'Diskusyón_de_Katēggoría'  => NS_CATEGORY_TALK,
 );
 
 // Remove Spanish gender aliases (bug 37090)
@@ -211,7 +211,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Àmostrar el kadhar de usadores que están akavidando las hojas',
 'tog-oldsig' => 'La firma presente',
 'tog-fancysig' => 'Tratar la firma como un vikiteksto (sin un atamiento otomatiko)',
-'tog-showjumplinks' => 'Aktivar los atamientos de ayudo "{{int:jumpto}}"',
 'tog-uselivepreview' => 'Usar el "previsteo bivo" (JavaScript es menester) (eksperimental)',
 'tog-forceeditsummary' => 'Avizarme cuando dexo el somaryo vazío',
 'tog-watchlisthideown' => 'Esconder mis trocamientos en mi lista de akavidamiento',
@@ -400,7 +399,7 @@ $messages = array(
 'jumptonavigation' => 'navigación',
 'jumptosearch' => 'búsquida',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Encima de la {{SITENAME}}',
 'aboutpage' => 'Project:Encima de',
 'copyright' => 'El contenido se puede topar debaxo de la <i>$1</i>',
@@ -792,7 +791,6 @@ Las búsquedas producen más o munco a buscar biervos comunes como «la» o «de
 'recentchangeslinked-feed' => 'Trocamientos conectados',
 'recentchangeslinked-toolbox' => 'Trocamientos relatados',
 'recentchangeslinked-title' => 'Los trocamientos relacionados con "$1"',
-'recentchangeslinked-noresult' => 'Sin trokamientos en las ójas atadas en la data demandada',
 'recentchangeslinked-summary' => "Esto es la lista de los trocamientos de alcavo de las hojas que relatan á una hoja spēcifik (ou de los miembros de la katēggoría spēcifikada).
 Las hojas en tu [[Special:Watchlist|lista de akavidamiento]] son escritas '''con letras grexas'''.",
 'recentchangeslinked-page' => 'Nombre de la hoja',
@@ -838,8 +836,6 @@ La descripción en su [$2 hoja de descripción del arxivo] está amostrada debax
 
 # Statistics
 'statistics' => 'Estatísticas',
-
-'disambiguationspage' => 'Template:Aklarasion',
 
 # Miscellaneous special pages
 'nbytes' => '$1 {{PLURAL:$1|bayt|baytes}}',

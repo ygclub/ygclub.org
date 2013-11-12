@@ -95,6 +95,7 @@ class SearchEngine {
 	public function supports( $feature ) {
 		switch ( $feature ) {
 		case 'list-redirects':
+		case 'search-update':
 			return true;
 		case 'title-suffix-filter':
 		default:
@@ -453,20 +454,43 @@ class SearchEngine {
 	 * Load up the appropriate search engine class for the currently
 	 * active database backend, and return a configured instance.
 	 *
+	 * @param String $type Type of search backend, if not the default
 	 * @return SearchEngine
 	 */
-	public static function create() {
+	public static function create( $type = null ) {
 		global $wgSearchType;
 		$dbr = null;
-		if ( $wgSearchType ) {
+
+		$alternatives = self::getSearchTypes();
+
+		if ( $type && in_array( $type, $alternatives ) ) {
+			$class = $type;
+		} elseif ( $wgSearchType !== null ) {
 			$class = $wgSearchType;
 		} else {
 			$dbr = wfGetDB( DB_SLAVE );
 			$class = $dbr->getSearchEngine();
 		}
+
 		$search = new $class( $dbr );
 		$search->setLimitOffset( 0, 0 );
 		return $search;
+	}
+
+	/**
+	 * Return the search engines we support. If only $wgSearchType
+	 * is set, it'll be an array of just that one item.
+	 *
+	 * @return array
+	 */
+	public static function getSearchTypes() {
+		global $wgSearchType, $wgSearchTypeAlternatives;
+		static $alternatives = null;
+		if ( $alternatives === null ) {
+			$alternatives = $wgSearchTypeAlternatives ?: array();
+			array_unshift( $alternatives, $wgSearchType );
+		}
+		return $alternatives;
 	}
 
 	/**
@@ -522,6 +546,31 @@ class SearchEngine {
 			}
 			return $wgCanonicalServer . wfScript( 'api' ) . '?action=opensearch&search={searchTerms}&namespace=' . $ns;
 		}
+	}
+
+	/**
+	 * Get the raw text for updating the index from a content object
+	 * Nicer search backends could possibly do something cooler than
+	 * just returning raw text
+	 *
+	 * @todo This isn't ideal, we'd really like to have content-specific handling here
+	 * @param Title $t Title we're indexing
+	 * @param Content $c Content of the page to index
+	 * @return string
+	 */
+	public function getTextFromContent( Title $t, Content $c = null ) {
+		return $c ? $c->getTextForSearchIndex() : '';
+	}
+
+	/**
+	 * If an implementation of SearchEngine handles all of its own text processing
+	 * in getTextFromContent() and doesn't require SearchUpdate::updateText()'s
+	 * rather silly handling, it should return true here instead.
+	 *
+	 * @return bool
+	 */
+	public function textAlreadyUpdatedForIndex() {
+		return false;
 	}
 }
 
@@ -815,11 +864,8 @@ class SearchResult {
 	protected function initText() {
 		if ( !isset( $this->mText ) ) {
 			if ( $this->mRevision != null ) {
-				//TODO: if we could plug in some code that knows about special content models *and* about
-				//      special features of the search engine, the search could benefit. See similar
-				//      comment in SearchUpdate's constructor
-				$content = $this->mRevision->getContent();
-				$this->mText = $content ? $content->getTextForSearchIndex() : '';
+				$this->mText = SearchEngine::create()
+					->getTextFromContent( $this->mTitle, $this->mRevision->getContent() );
 			} else { // TODO: can we fetch raw wikitext for commons images?
 				$this->mText = '';
 			}
@@ -831,11 +877,11 @@ class SearchResult {
 	 * @return String: highlighted text snippet, null (and not '') if not supported
 	 */
 	function getTextSnippet( $terms ) {
-		global $wgUser, $wgAdvancedSearchHighlighting;
+		global $wgAdvancedSearchHighlighting;
 		$this->initText();
 
 		// TODO: make highliter take a content object. Make ContentHandler a factory for SearchHighliter.
-		list( $contextlines, $contextchars ) = SearchEngine::userHighlightPrefs( $wgUser );
+		list( $contextlines, $contextchars ) = SearchEngine::userHighlightPrefs();
 		$h = new SearchHighlighter();
 		if ( $wgAdvancedSearchHighlighting ) {
 			return $h->highlightText( $this->mText, $terms, $contextlines, $contextchars );

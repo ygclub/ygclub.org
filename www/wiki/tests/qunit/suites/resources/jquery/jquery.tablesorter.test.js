@@ -362,7 +362,7 @@
 		function ( $table ) {
 			// Make colspanned header for test
 			$table.find( 'tr:eq(0) th:eq(1), tr:eq(0) th:eq(2)' ).remove();
-			$table.find( 'tr:eq(0) th:eq(0)' ).prop( 'colspan', '3' );
+			$table.find( 'tr:eq(0) th:eq(0)' ).attr( 'colspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(0)' ).click();
@@ -375,7 +375,7 @@
 		function ( $table ) {
 			// Make colspanned header for test
 			$table.find( 'tr:eq(0) th:eq(1), tr:eq(0) th:eq(2)' ).remove();
-			$table.find( 'tr:eq(0) th:eq(0)' ).prop( 'colspan', '3' );
+			$table.find( 'tr:eq(0) th:eq(0)' ).attr( 'colspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(0)' ).click();
@@ -389,7 +389,7 @@
 		function ( $table ) {
 			// Make colspanned header for test
 			$table.find( 'tr:eq(0) th:eq(1), tr:eq(0) th:eq(2)' ).remove();
-			$table.find( 'tr:eq(0) th:eq(0)' ).prop( 'colspan', '3' );
+			$table.find( 'tr:eq(0) th:eq(0)' ).attr( 'colspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(1)' ).click();
@@ -402,7 +402,7 @@
 		function ( $table ) {
 			// Make colspanned header for test
 			$table.find( 'tr:eq(0) th:eq(1), tr:eq(0) th:eq(2)' ).remove();
-			$table.find( 'tr:eq(0) th:eq(0)' ).prop( 'colspan', '3' );
+			$table.find( 'tr:eq(0) th:eq(0)' ).attr( 'colspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(1)' ).click();
@@ -410,6 +410,19 @@
 		}
 	);
 
+
+	tableTest(
+		'Basic planet table: one unsortable column',
+		header,
+		planets,
+		planets,
+		function ( $table ) {
+			$table.find( 'tr:eq(0) > th:eq(0)' ).addClass( 'unsortable' );
+
+			$table.tablesorter();
+			$table.find( 'tr:eq(0) > th:eq(0)' ).click();
+		}
+	);
 
 	// Regression tests!
 	tableTest(
@@ -561,12 +574,12 @@
 		$table.find( 'tr:eq(3) td:eq(1), tr:eq(4) td:eq(1)' ).remove();
 		// - Set rowspan for 2nd cell of 3rd row to 3.
 		//   This covers the removed cell in the 4th and 5th row.
-		$table.find( 'tr:eq(2) td:eq(1)' ).prop( 'rowspan', '3' );
+		$table.find( 'tr:eq(2) td:eq(1)' ).attr( 'rowspan', '3' );
 
 		$table.tablesorter();
 
 		assert.equal(
-			$table.find( 'tr:eq(2) td:eq(1)' ).prop( 'rowspan' ),
+			$table.find( 'tr:eq(2) td:eq(1)' ).prop( 'rowSpan' ),
 			3,
 			'Rowspan not exploded'
 		);
@@ -593,7 +606,7 @@
 			$table.find( 'tr:eq(3) td:eq(1), tr:eq(4) td:eq(1)' ).remove();
 			// - Set rowspan for 2nd cell of 3rd row to 3.
 			//   This covers the removed cell in the 4th and 5th row.
-			$table.find( 'tr:eq(2) td:eq(1)' ).prop( 'rowspan', '3' );
+			$table.find( 'tr:eq(2) td:eq(1)' ).attr( 'rowspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(0)' ).click();
@@ -610,7 +623,7 @@
 			$table.find( 'tr:eq(3) td:eq(1), tr:eq(4) td:eq(1)' ).remove();
 			// - Set rowspan for 2nd cell of 3rd row to 3.
 			//   This covers the removed cell in the 4th and 5th row.
-			$table.find( 'tr:eq(2) td:eq(1)' ).prop( 'rowspan', '3' );
+			$table.find( 'tr:eq(2) td:eq(1)' ).attr( 'rowspan', '3' );
 
 			$table.tablesorter( { sortList: [
 				{ 0: 'asc' }
@@ -628,7 +641,7 @@
 			$table.find( 'tr:eq(3) td:eq(0), tr:eq(4) td:eq(0)' ).remove();
 			// - Set rowspan for 1st cell of 3rd row to 3.
 			//   This covers the removed cell in the 4th and 5th row.
-			$table.find( 'tr:eq(2) td:eq(0)' ).prop( 'rowspan', '3' );
+			$table.find( 'tr:eq(2) td:eq(0)' ).attr( 'rowspan', '3' );
 
 			$table.tablesorter();
 			$table.find( '.headerSort:eq(0)' ).click();
@@ -1079,6 +1092,61 @@
 			$table.find( 'td' ).text(),
 			'4517',
 			'Applied correct sorting order'
+		);
+	} );
+
+	QUnit.test( 'bug 38911 - The row with the largest amount of columns should receive the sort indicators', 3, function ( assert ) {
+		var $table = $(
+			'<table class="sortable">' +
+				'<thead>' +
+				'<tr><th rowspan="2" id="A1">A1</th><th colspan="2">B2a</th></tr>' +
+				'<tr><th id="B2b">B2b</th><th id="C2b">C2b</th></tr>' +
+				'</thead>' +
+				'<tr><td>A</td><td>Aa</td><td>Ab</td></tr>' +
+				'<tr><td>B</td><td>Ba</td><td>Bb</td></tr>' +
+				'</table>'
+		);
+		$table.tablesorter();
+
+		assert.equal(
+			$table.find( '#A1' ).attr( 'class' ),
+			'headerSort',
+			'The first column of the first row should be sortable'
+		);
+		assert.equal(
+			$table.find( '#B2b' ).attr( 'class' ),
+			'headerSort',
+			'The th element of the 2nd row of the 2nd column should be sortable'
+		);
+		assert.equal(
+			$table.find( '#C2b' ).attr( 'class' ),
+			'headerSort',
+			'The th element of the 2nd row of the 3rd column should be sortable'
+		);
+	} );
+
+	QUnit.test( 'rowspans in table headers should prefer the last row when rows are equal in length', 2, function ( assert ) {
+		var $table = $(
+			'<table class="sortable">' +
+				'<thead>' +
+				'<tr><th rowspan="2" id="A1">A1</th><th>B2a</th></tr>' +
+				'<tr><th id="B2b">B2b</th></tr>' +
+				'</thead>' +
+				'<tr><td>A</td><td>Aa</td></tr>' +
+				'<tr><td>B</td><td>Ba</td></tr>' +
+				'</table>'
+		);
+		$table.tablesorter();
+
+		assert.equal(
+			$table.find( '#A1' ).attr( 'class' ),
+			'headerSort',
+			'The first column of the first row should be sortable'
+		);
+		assert.equal(
+			$table.find( '#B2b' ).attr( 'class' ),
+			'headerSort',
+			'The th element of the 2nd row of the 2nd column should be sortable'
 		);
 	} );
 

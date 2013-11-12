@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Geitost
  * @author Maartenvdbent
  * @author Purodha
  * @author Pyt
@@ -171,7 +172,6 @@ $messages = array(
 'tog-shownumberswatching' => 'It tal brûkers sjen litte dat dizze side folget',
 'tog-oldsig' => 'Hûdige sinjatuerprintallyk:',
 'tog-fancysig' => 'Sinjatuer as wikitekst behannelje (sûnder automatyske keppeling)',
-'tog-showjumplinks' => '"gean nei"-tapaslikens-links ynskeakelje',
 'tog-uselivepreview' => '"live proefbyld" brûke (JavaScript nedich - eksperimenteel)',
 'tog-forceeditsummary' => 'Warskôgje at ik de gearfetting leech lit.',
 'tog-watchlisthideown' => 'Eigen bewurkings op myn folchlist ferbergje',
@@ -357,7 +357,7 @@ Wachtsje efkes foardatsto op 'e nij tagong ta dizze side probearrest te krijen.
 
 $1",
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Oer de {{SITENAME}}',
 'aboutpage' => 'Project:Ynfo',
 'copyright' => 'Ynhâld is beskikber ûnder de $1.',
@@ -431,16 +431,6 @@ $1",
 # General errors
 'error' => 'Fout',
 'databaseerror' => 'Databankfout',
-'dberrortext' => 'Sinboufout in databankfraach.
-De lêst besochte databankfraach wie:
-<blockquote><tt>$1</tt></blockquote>
-fan funksje "<tt>$2</tt>" út.
-MySQL joech fout "<tt>$3: $4</tt>" werom.',
-'dberrortextcl' => 'Sinboufout yn databankfraach.
-De lêst besochte databankfraach wie:
-"$1"
-fanút funksje "$2" .
-MySQL joech fout "$3: $4"',
 'laggedslavemode' => 'Warskôging: Mûglik binne resinte bewurkings noch net trochfierd.',
 'readonly' => "Databank is 'Net-skriuwe'.",
 'enterlockreason' => "Skriuw wêrom de databank 'net-skriuwe' makke is, en hoenear't men wêr nei alle gedachten wer skriuwe kin.",
@@ -485,7 +475,6 @@ Query: $2',
 'viewsourcetext' => 'Jo kinne de boarnetekst fan dizze side besjen en kopiearje:',
 'protectedinterface' => "Dizze side befettet tekst foar berjochten fan 'e software en is befeilige om misbrûk tefoaren te kommen.",
 'editinginterface' => "'''Warskôging;''' Jo bewurkje in side dy't brûkt wurdt troch software. Bewurkings op dizze side beynfloedzje de gebrûksynterface fan elkenien. Oerweagje foar oersettings [//translatewiki.net/wiki/Main_Page?setlang=fy translatewiki.net] te brûken, it oersetprojekt foar MediaWiki.",
-'sqlhidden' => '(SQL query ferburgen)',
 'cascadeprotected' => 'Dizze side is skoattele tsjin wizigjen, om\'t der in ûnderdiel útmakket fan de neikommende {{PLURAL:$1|side|siden}}, dy\'t skoattele {{PLURAL:$1|is|binne}} mei de "ûnderlizzende siden" opsje ynskeakele: $2',
 'namespaceprotected' => "Jo hawwe gjin rjochten om siden yn'e nammerûmte '''$1''' te bewurkjen.",
 'ns-specialprotected' => "Siden yn'e nammerûmte {{ns:special}} kinne net bewurke wurde.",
@@ -515,7 +504,7 @@ Mûglik wurdt noch in tal siden werjûn as wiene Jo oanmeld, oant Jo de cache fa
 'logout' => 'Ofmelde',
 'userlogout' => 'Ofmelde',
 'notloggedin' => 'Net oanmelde',
-'nologin' => "Noch net oanmelden as meidogger? '''$1'''.",
+'nologin' => 'Noch net oanmelden as meidogger? $1.',
 'nologinlink' => 'Meitsje in brûker oan',
 'createaccount' => 'Nije ynstellings oanmeitsje',
 'gotaccount' => "Hawwe jo jo al as meidogger oanmelde? '''$1'''.",
@@ -581,7 +570,7 @@ Jo moatte efkes wachtsje foar't jo it op'e nij besykje kinne.",
 'newpassword' => 'Nij wachtwurd',
 'retypenew' => 'Nij wachtwurd (nochris)',
 'resetpass_submit' => 'Wachtwurd ynstelle en oanmelde',
-'resetpass_success' => 'Jo wachtwurd is feroare. Dwaande mei oanmelden ...',
+'changepassword-success' => 'Jo wachtwurd is feroare. Dwaande mei oanmelden ...',
 'resetpass_forbidden' => 'Wachtwurden kinne net feroare wurde',
 'resetpass-no-info' => "Jo moatte oanmeld wêze foar't Jo dizze side brûke kinne.",
 'resetpass-submit-loggedin' => 'Wachtwurd feroarje',
@@ -980,7 +969,6 @@ Jo kinne ek in nammerûmte as foarheaksel brûke.",
 'resetprefs' => 'Ynstellings werom sette',
 'restoreprefs' => 'Tebek nei de standertynstellings',
 'prefs-editing' => 'Siden bewurkje',
-'prefs-edit-boxsize' => 'Ofmjittings fan it bewurkingsfinster',
 'rows' => 'Rigen',
 'columns' => 'Kolommen',
 'searchresultshead' => 'Sykje',
@@ -1015,7 +1003,6 @@ Jo kinne ek in nammerûmte as foarheaksel brûke.",
 'prefs-files' => 'Triemen',
 'prefs-custom-js' => 'Persoanlik JS',
 'prefs-emailconfirm-label' => 'Netpostbefêstiging:',
-'prefs-textboxsize' => 'Ofmjittings bewurkingsskerm',
 'youremail' => 'Jo netpostadres:',
 'username' => 'Meidochnamme:',
 'uid' => 'Wikinûmer:',
@@ -1224,7 +1211,6 @@ Jo kinne ek oaren de mûglikheid jaan kontakt mei jo op te nimmen troch in ferwi
 'recentchangeslinked-feed' => 'Folgje keppelings',
 'recentchangeslinked-toolbox' => 'Folgje keppelings',
 'recentchangeslinked-title' => 'Feroarings yn ferbân mei "$1"',
-'recentchangeslinked-noresult' => "Der hawwe gjin bewurkings yn 'e bedoelde perioade west op'e siden dy't hjirwei linke wurde.",
 'recentchangeslinked-summary' => "Dizze spesjale side lit de lêste bewurkings sjen op siden dy't keppele wurde fan in spesifisearre side ôf (of fan in spesifisearre Kategory ôf). Siden dy't op [[Special:Watchlist|jo folchlist]] steane, wurde '''tsjûk''' werjûn.",
 'recentchangeslinked-page' => 'Sidenamme:',
 'recentchangeslinked-to' => 'Feroarings oan siden mei ferwizings nei dizze side besjen',
@@ -1338,12 +1324,12 @@ PICT # ferskaat
 'upload-proto-error-text' => "Oanbieden mei dizze metoade freget URL's dy't begjinne mei <code>http://</code> of <code>ftp://</code>.",
 'upload-file-error' => 'Ynterne fout',
 'upload-file-error-text' => "Der wie in ynterne fout doe't in tydlike triem op'e server oanmakke waard.
-Nim kontakt op mei in [[Special:ListUsers/sysop|systeembehearder]].",
+Nim kontakt op mei in [[Special:ListUsers/sysop|behearder]].",
 'upload-misc-error' => 'Unbekende oanbiedfout',
 'upload-misc-error-text' => 'Der is by it oanbieden in ûnbekende fout optreden.
 Kontrolearje of de URL krekt en beskikber is en besykje it nochris.
 As it probleem oanhâldt, nim dan kontakt op mei in
-[[Special:ListUsers/sysop|systeembehearder]].',
+[[Special:ListUsers/sysop|behearder]].',
 'upload-unknown-size' => 'Unbekinde grutte',
 
 # Some likely curl errors. More could be added from <http://curl.haxx.se/libcurl/c/libcurl-errors.html>
@@ -1480,11 +1466,6 @@ Ferjit net de "Wat is hjirmei keppele" nei te gean foar it fuortheljen fan dit s
 'statistics-users-active' => 'Aktive brûkers',
 'statistics-users-active-desc' => "Brûkers dy't yn 'e ôfrûne {{PLURAL:$1|dei|$1 dagen}} in hanneling útfierd hawwe",
 'statistics-mostpopular' => 'Meast besjoene siden',
-
-'disambiguations' => 'Betsjuttingssiden',
-'disambiguationspage' => 'Template:Neibetsjuttings',
-'disambiguations-text' => "De ûndersteande siden keppelje mei in '''Betsjuttingssiden'''.
-Se soenen mei de side sels keppele wurde moatte.<br /> In side wurdt sjoen as betsjuttingssiden, as de side ien berjocht fan [[MediaWiki:Disambiguationspage]] brûkt.",
 
 'doubleredirects' => 'Dûbelde synonimen',
 'doubleredirectstext' => '<b>Let op!</b> Der kinne missen yn dizze list stean! Dat komt dan ornaris troch oare keppelings ûnder de "#REDIRECT". Eltse rigel jout keppelings nei it earste synonym, it twadde synonym en dan it werklike doel.',
@@ -1684,7 +1665,6 @@ At jo letter in side net mear folgje wolle, dan brûke jo op dy side de keppelin
 'unwatch' => 'Ferjit',
 'unwatchthispage' => 'Ferjit dizze side',
 'notanarticle' => 'Dit kin net folge wurde.',
-'watchnochange' => "Fan de siden dy't jo folgje is der yn dizze perioade net ien feroare.",
 'watchlist-details' => 'Jo folchlist hat {{PLURAL:$1|$1 side|$1 siden}}, oerlissiden net meiteld.',
 'watchmethod-recent' => 'Koartlyn feroare ...',
 'watchmethod-list' => 'Folge ...',

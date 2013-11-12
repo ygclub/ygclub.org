@@ -74,7 +74,6 @@ Delete
 Deletedrevs
 Denied
 Dfile
-Disambiguations
 Double
 Duplicate
 EAGAIN
@@ -1284,8 +1283,11 @@ editinterface
 editintro
 edititis
 editlink
+editmyoptions
+editmyprivateinfo
 editmyusercss
 editmyuserjs
+editmywatchlist
 editnotice
 editnotsupported
 editondblclick
@@ -1300,6 +1302,7 @@ edits
 editsection
 editsectionhint
 editsectiononrightclick
+editsemiprotected
 editsonly
 editthispage
 edittime
@@ -4342,6 +4345,8 @@ view
 viewcount
 viewdeleted
 viewhelppage
+viewmyprivateinfo
+viewmywatchlist
 viewprevnext
 viewsource
 viewsourcelink
@@ -4441,7 +4446,6 @@ wikipage
 wikipedia
 wikipedian
 wikipedias
-wikiprintable
 wikis
 wikisyntax
 wikitable

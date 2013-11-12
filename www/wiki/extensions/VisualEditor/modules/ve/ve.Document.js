@@ -9,14 +9,14 @@
  * Generic document.
  *
  * @class
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  * @param {ve.Node} model Model to observe
  */
 ve.Document = function VeDocument( documentNode ) {
 	// Mixin constructors
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.documentNode = documentNode;
@@ -24,7 +24,7 @@ ve.Document = function VeDocument( documentNode ) {
 
 /* Inheritance */
 
-ve.mixinClass( ve.Document, ve.EventEmitter );
+OO.mixinClass( ve.Document, OO.EventEmitter );
 
 /* Methods */
 
@@ -48,8 +48,8 @@ ve.Document.prototype.getDocumentNode = function () {
  * - `leaves`: Return all leaf nodes in the given range (descends all the way down)
  * - `branches`': Return all branch nodes in the given range
  * - `covered`: Do not descend into nodes that are entirely covered by the range. The result
- *    is similar to that of 'leaves' except that if a node is entirely covered, its
- *    children aren't returned separately.
+ *   is similar to that of 'leaves' except that if a node is entirely covered, its
+ *   children aren't returned separately.
  * - `siblings`: Return a set of adjacent siblings covered by the range (descends as long as the
  *   range is in a single node)
  * @returns {Array} List of objects describing nodes in the selection and the ranges therein:
@@ -65,7 +65,7 @@ ve.Document.prototype.getDocumentNode = function () {
  * - `nodeRange`: Range covering the inside of the entire node, not including wrapper
  * - `nodeOuterRange`: Range covering the entire node, including wrapper
  * - `parentOuterRange`: Outer range of node's parent. Missing if there is no parent
- *    or if indexInNode is set.
+ *   or if indexInNode is set.
  *
  * @throws {Error} Range.start is out of range
  * @throws {Error} Range.end is out of range
@@ -493,9 +493,10 @@ ve.Document.prototype.selectNodes = function ( range, mode ) {
  *
  * @param {ve.Range} selection Range
  * @returns {Array} Array of objects. Each object has the following keys:
- *     nodes: Array of sibling nodes covered by a part of range
- *     parent: Parent of all of these nodes
- *     grandparent: parent's parent
+ *
+ *  - nodes: Array of sibling nodes covered by a part of range
+ *  - parent: Parent of all of these nodes
+ *  - grandparent: parent's parent
  */
 ve.Document.prototype.getCoveredSiblingGroups = function ( selection ) {
 	var i, firstCoveredSibling, lastCoveredSibling, node, parentNode, siblingNode,

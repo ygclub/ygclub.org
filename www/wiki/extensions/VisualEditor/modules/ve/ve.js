@@ -5,7 +5,7 @@
  * @license The MIT License (MIT); see LICENSE.txt
  */
 
-( function ( oo ) {
+( function () {
 	var ve, hasOwn;
 
 	/**
@@ -25,27 +25,12 @@
 	/* Static Methods */
 
 	/**
-	 * Create an object that inherits from another object.
-	 *
-	 * @method
-	 * @until ES5: Object#create
-	 * @inheritdoc Object#create
-	 */
-	ve.createObject = Object.create;
-
-	/**
-	 * @method
-	 * @inheritdoc OO#inheritClass
-	 */
-	ve.inheritClass = oo.inheritClass;
-
-	/**
 	 * Checks if an object is an instance of one or more classes.
 	 *
 	 * @method
 	 * @param {Object} subject Object to check
 	 * @param {Function[]} classes Classes to compare with
-	 * @return {boolean} Object inherits from one or more of the classes
+	 * @returns {boolean} Object inherits from one or more of the classes
 	 */
 	ve.isInstanceOfAny = function ( subject, classes ) {
 		var i = classes.length;
@@ -60,42 +45,15 @@
 
 	/**
 	 * @method
-	 * @inheritdoc OO#mixinClass
+	 * @inheritdoc OO#cloneObject
 	 */
-	ve.mixinClass = function ( targetFn, originFn ) {
-		oo.mixinClass( targetFn, originFn );
-
-		// Track mixins
-		targetFn.mixins = targetFn.mixins || [];
-		targetFn.mixins.push( originFn );
-	};
-
-	/**
-	 * Check if a constructor or object contains a certain mixin.
-	 *
-	 * @param {Function|Object} a Class or object to check
-	 * @param {Function} mixin Mixin to check for
-	 * @returns {boolean} Class or object uses mixin
-	 */
-	ve.isMixedIn = function ( subject, mixin ) {
-		// Traverse from instances to the constructor
-		if ( $.type( subject ) !== 'function' ) {
-			subject = subject.constructor;
-		}
-		return !!subject.mixins && subject.mixins.indexOf( mixin ) !== -1;
-	};
+	ve.cloneObject = OO.cloneObject;
 
 	/**
 	 * @method
 	 * @inheritdoc OO#cloneObject
 	 */
-	ve.cloneObject = oo.cloneObject;
-
-	/**
-	 * @method
-	 * @inheritdoc OO#cloneObject
-	 */
-	ve.getObjectValues = oo.getObjectValues;
+	ve.getObjectValues = OO.getObjectValues;
 
 	/**
 	 * @method
@@ -108,26 +66,20 @@
 	 * @method
 	 * @inheritdoc OO#compare
 	 */
-	ve.compare = oo.compare;
+	ve.compare = OO.compare;
 
 	/**
 	 * @method
 	 * @inheritdoc OO#copy
 	 */
-	ve.copyArray = oo.copy;
-
-	/**
-	 * @method
-	 * @inheritdoc OO#copy
-	 */
-	ve.copyObject = oo.copy;
+	ve.copy = OO.copy;
 
 	/**
 	 * Copy an array of DOM elements, optionally into a different document.
 	 *
 	 * @param {HTMLElement[]} domElements DOM elements to copy
 	 * @param {HTMLDocument} [doc] Document to create the copies in; if unset, simply clone each element
-	 * @return {HTMLElement[]} Copy of domElements with copies of each element
+	 * @returns {HTMLElement[]} Copy of domElements with copies of each element
 	 */
 	ve.copyDomElements = function ( domElements, doc ) {
 		return domElements.map( function ( domElement ) {
@@ -178,7 +130,7 @@
 	 * @param {Function} func Function to bind
 	 * @param {Object} context Context for the function
 	 * @param {Mixed...} [args] Variadic list of arguments to prepend to arguments
-	 *   to the bound function
+	 *  to the bound function
 	 * @returns {Function} The bound
 	 */
 	ve.bind = $.proxy;
@@ -197,86 +149,6 @@
 	 * @returns {number} Index of value in array, or -1 if not found
 	 */
 	ve.indexOf = $.inArray;
-
-	/**
-	 * Compute the union (duplicate-free merge) of a set of arrays.
-	 *
-	 * Arrays values must be convertable to object keys (strings)
-	 *
-	 * By building an object (with the values for keys) in parallel with
-	 * the array, a new item's existence in the union can be computed faster
-	 *
-	 * @param {Array...} arrays Arrays to union
-	 * @returns {Array} Union of the arrays
-	 */
-	ve.simpleArrayUnion = function () {
-		var i, ilen, j, jlen, arr, obj = {}, result = [];
-		for ( i = 0, ilen = arguments.length; i < ilen; i++ ) {
-			arr = arguments[i];
-			for ( j = 0, jlen = arr.length; j < jlen; j++ ) {
-				if ( !obj[arr[j]] ) {
-					obj[arr[j]] = true;
-					result.push( arr[j] );
-				}
-			}
-		}
-		return result;
-	};
-
-	/**
-	 * Compute the intersection of two arrays (items in both arrays).
-	 *
-	 * Arrays values must be convertable to object keys (strings)
-	 *
-	 * @param {Array} a First array
-	 * @param {Array} b Second array
-	 * @returns {Array} Intersection of arrays
-	 */
-	ve.simpleArrayIntersection = function ( a, b ) {
-		return ve.simpleArrayCombine( a, b, true );
-	};
-
-	/**
-	 * Compute the difference of two arrays (items in 'a' but not 'b').
-	 *
-	 * Arrays values must be convertable to object keys (strings)
-	 *
-	 * @param {Array} a First array
-	 * @param {Array} b Second array
-	 * @returns {Array} Intersection of arrays
-	 */
-	ve.simpleArrayDifference = function ( a, b ) {
-		return ve.simpleArrayCombine( a, b, false );
-	};
-
-	/**
-	 * Combine arrays (intersection or difference).
-	 *
-	 * An intersection checks the item exists in 'b' while difference checks it doesn't.
-	 *
-	 * Arrays values must be convertable to object keys (strings)
-	 *
-	 * By building an object (with the values for keys) of 'b' we can
-	 * compute the result faster
-	 *
-	 * @param {Array} a First array
-	 * @param {Array} b Second array
-	 * @param {boolean} includeB Include items in 'b'
-	 * @returns {Array} Combination (intersection or difference) of arrays
-	 */
-	ve.simpleArrayCombine = function ( a, b, includeB ) {
-		var i, ilen, isInB, bObj = {}, result = [];
-		for ( i = 0, ilen = b.length; i < ilen; i++ ) {
-			bObj[b[i]] = true;
-		}
-		for ( i = 0, ilen = a.length; i < ilen; i++ ) {
-			isInB = !!bObj[a[i]];
-			if ( isInB === includeB ) {
-				result.push( a[i] );
-			}
-		}
-		return result;
-	};
 
 	/**
 	 * Merge properties of one or more objects into another.
@@ -298,59 +170,6 @@
 	ve.extendObject = $.extend;
 
 	/**
-	 * Generates a hash of an object based on its name and data.
-	 * Performance optimization: http://jsperf.com/ve-gethash-201208#/toJson_fnReplacerIfAoForElse
-	 *
-	 * To avoid two objects with the same values generating different hashes, we utilize the replacer
-	 * argument of JSON.stringify and sort the object by key as it's being serialized. This may or may
-	 * not be the fastest way to do this; we should investigate this further.
-	 *
-	 * Objects and arrays are hashed recursively. When hashing an object that has a .getHash()
-	 * function, we call that function and use its return value rather than hashing the object
-	 * ourselves. This allows classes to define custom hashing.
-	 *
-	 * @param {Object} val Object to generate hash for
-	 * @returns {string} Hash of object
-	 */
-	ve.getHash = function ( val ) {
-		return JSON.stringify( val, ve.getHash.keySortReplacer );
-	};
-
-	/**
-	 * Helper function for ve.getHash which sorts objects by key.
-	 *
-	 * This is a callback passed into JSON.stringify.
-	 *
-	 * @param {string} key Property name of value being replaced
-	 * @param {Mixed} val Property value to replace
-	 * @returns {Mixed} Replacement value
-	 */
-	ve.getHash.keySortReplacer = function ( key, val ) {
-		var normalized, keys, i, len;
-		if ( val && typeof val.getHashObject === 'function' ) {
-			// This object has its own custom hash function, use it
-			val = val.getHashObject();
-		}
-		if ( !ve.isArray( val ) && Object( val ) === val ) {
-			// Only normalize objects when the key-order is ambiguous
-			// (e.g. any object not an array).
-			normalized = {};
-			keys = ve.getObjectKeys( val ).sort();
-			i = 0;
-			len = keys.length;
-			for ( ; i < len; i += 1 ) {
-				normalized[keys[i]] = val[keys[i]];
-			}
-			return normalized;
-
-		// Primitive values and arrays get stable hashes
-		// by default. Lets those be stringified as-is.
-		} else {
-			return val;
-		}
-	};
-
-	/**
 	 * Splice one array into another.
 	 *
 	 * This is the equivalent of arr.splice( offset, remove, d1, d2, d3, ... ) except that arguments are
@@ -360,36 +179,80 @@
 	 * performance tests should be conducted on each use of this method to verify this is true for the
 	 * particular use. Also, browsers change fast, never assume anything, always test everything.
 	 *
-	 * @param {Array} arr Array to remove from and insert into. Will be modified
+	 * Includes a replacement for broken implementation of Array.prototype.splice() found in Opera 12.
+	 *
+	 * @param {Array|ve.dm.BranchNode} arr Object supporting .splice() to remove from and insert into. Will be modified
 	 * @param {number} offset Offset in arr to splice at. This may NOT be negative, unlike the
 	 *  'index' parameter in Array#splice
 	 * @param {number} remove Number of elements to remove at the offset. May be zero
 	 * @param {Array} data Array of items to insert at the offset. May not be empty if remove=0
 	 * @returns {Array} Array of items removed
 	 */
-	ve.batchSplice = function ( arr, offset, remove, data ) {
-		// We need to splice insertion in in batches, because of parameter list length limits which vary
-		// cross-browser - 1024 seems to be a safe batch size on all browsers
-		var index = 0, batchSize = 1024, toRemove = remove, spliced, removed = [];
-		if ( data.length === 0 ) {
-			// Special case: data is empty, so we're just doing a removal
-			// The code below won't handle that properly, so we do it here
-			return arr.splice( offset, remove );
+	ve.batchSplice = ( function () {
+		var arraySplice;
+
+		// This yields 'true' on Opera 12.15.
+		function isSpliceBroken() {
+			var n = 256, a = [];
+			a[n] = 'a';
+
+			a.splice( n + 1, 0, 'b' );
+
+			return a[n] !== 'a';
 		}
-		while ( index < data.length ) {
-			// Call arr.splice( offset, remove, i0, i1, i2, ..., i1023 );
-			// Only set remove on the first call, and set it to zero on subsequent calls
-			spliced = arr.splice.apply(
-				arr, [index + offset, toRemove].concat( data.slice( index, index + batchSize ) )
-			);
-			if ( toRemove > 0 ) {
-				removed = spliced;
+
+		if ( !isSpliceBroken() ) {
+			arraySplice = Array.prototype.splice;
+		} else {
+			// Standard Array.prototype.splice() function implemented using .slice() and .push().
+			arraySplice = function ( offset, remove/*, data... */ ) {
+				var data, begin, removed, end;
+
+				data = Array.prototype.slice.call( arguments, 2 );
+
+				begin = this.slice( 0, offset );
+				removed = this.slice( offset, remove );
+				end = this.slice( offset + remove );
+
+				this.length = 0;
+				// This polyfill only been discovered to be necessary on Opera
+				// and it seems to handle up to 1048575 function parameters.
+				this.push.apply( this, begin );
+				this.push.apply( this, data );
+				this.push.apply( this, end );
+
+				return removed;
+			};
+		}
+
+		return function ( arr, offset, remove, data ) {
+			// We need to splice insertion in in batches, because of parameter list length limits which vary
+			// cross-browser - 1024 seems to be a safe batch size on all browsers
+			var splice, index = 0, batchSize = 1024, toRemove = remove, spliced, removed = [];
+
+			splice = ve.isArray( arr ) ? arraySplice : arr.splice;
+
+			if ( data.length === 0 ) {
+				// Special case: data is empty, so we're just doing a removal
+				// The code below won't handle that properly, so we do it here
+				return splice.call( arr, offset, remove );
 			}
-			index += batchSize;
-			toRemove = 0;
-		}
-		return removed;
-	};
+
+			while ( index < data.length ) {
+				// Call arr.splice( offset, remove, i0, i1, i2, ..., i1023 );
+				// Only set remove on the first call, and set it to zero on subsequent calls
+				spliced = splice.apply(
+					arr, [index + offset, toRemove].concat( data.slice( index, index + batchSize ) )
+				);
+				if ( toRemove > 0 ) {
+					removed = spliced;
+				}
+				index += batchSize;
+				toRemove = 0;
+			}
+			return removed;
+		};
+	}() );
 
 	/**
 	 * Insert one array into another.
@@ -513,6 +376,22 @@
 	};
 
 	/**
+	 * Move the selection to the end of an input.
+	 *
+	 * @param {HTMLElement} element Input element
+	 */
+	ve.selectEnd = function ( element ) {
+		element.focus();
+		if ( element.selectionStart !== undefined ) {
+			element.selectionStart = element.selectionEnd = element.value.length;
+		} else if ( element.createTextRange ) {
+			var textRange = element.createTextRange();
+			textRange.collapse( false );
+			textRange.select();
+		}
+	};
+
+	/**
 	 * Get a localized message.
 	 *
 	 * @param {string} key Message key
@@ -561,6 +440,37 @@
 	 */
 	ve.getClusterOffset = function ( text, byteOffset ) {
 		return ve.splitClusters( text.substring( 0, byteOffset ) ).length;
+	};
+
+	/**
+	 * Get a text substring, taking care not to split grapheme clusters.
+	 *
+	 * @param {string} text Text to take the substring from
+	 * @param {number} start Start offset
+	 * @param {number} end End offset
+	 * @param {boolean} [outer=false] Include graphemes if the offset splits them
+	 * @returns {string} Substring of text
+	 */
+	ve.graphemeSafeSubstring = function ( text, start, end, outer ) {
+		// TODO: improve performance by incrementally inspecting characters around the offsets
+		var unicodeStart = ve.getByteOffset( text, ve.getClusterOffset( text, start ) ),
+			unicodeEnd = ve.getByteOffset( text, ve.getClusterOffset( text, end ) );
+
+		// If the selection collapses and we want an inner, then just return empty
+		// otherwise we'll end up crossing over start and end
+		if ( unicodeStart === unicodeEnd && !outer ) {
+			return '';
+		}
+
+		// The above calculations always move to the right of a multibyte grapheme.
+		// Depending on the outer flag, we may want to move to the left:
+		if ( unicodeStart > start && outer ) {
+			unicodeStart = ve.getByteOffset( text, ve.getClusterOffset( text, start ) - 1 );
+		}
+		if ( unicodeEnd > end && !outer ) {
+			unicodeEnd = ve.getByteOffset( text, ve.getClusterOffset( text, end ) - 1 );
+		}
+		return text.substring( unicodeStart, unicodeEnd );
 	};
 
 	/**
@@ -682,17 +592,21 @@
 	 *
 	 * @private
 	 * @param {HTMLElement} element Element to summarize
+	 * @param {boolean} [includeHtml=false] Include an HTML summary for element nodes
 	 * @returns {Object} Summary of element.
 	 */
-	ve.getDomElementSummary = function ( element ) {
+	ve.getDomElementSummary = function ( element, includeHtml ) {
 		var i,
-			$element = $( element ),
 			summary = {
 				'type': element.nodeName.toLowerCase(),
-				'text': $element.text(),
+				'text': element.textContent,
 				'attributes': {},
 				'children': []
 			};
+
+		if ( includeHtml && element.nodeType === Node.ELEMENT_NODE ) {
+			summary.html = element.outerHTML;
+		}
 
 		// Gather attributes
 		if ( element.attributes ) {
@@ -704,7 +618,7 @@
 		if ( element.childNodes ) {
 			for ( i = 0; i < element.childNodes.length; i++ ) {
 				if ( element.childNodes[i].nodeType !== Node.TEXT_NODE ) {
-					summary.children.push( ve.getDomElementSummary( element.childNodes[i] ) );
+					summary.children.push( ve.getDomElementSummary( element.childNodes[i], includeHtml ) );
 				}
 			}
 		}
@@ -712,7 +626,7 @@
 	};
 
 	/**
-	 * Callback for #copyArray and #copyObject to convert nodes to a comparable summary.
+	 * Callback for #copy to convert nodes to a comparable summary.
 	 *
 	 * @private
 	 * @param {Object} value Value in the object/array
@@ -837,6 +751,32 @@
 	};
 
 	/**
+	 * Resolve a URL according to a given base.
+	 *
+	 * Passing a string for the base parameter causes a throwaway document to be created, which is
+	 * slow.
+	 *
+	 * @param {string} url URL to resolve
+	 * @param {HTMLDocument|string} base Document whose base URL to use, or base URL as a string
+	 * @returns {string} Resolved URL
+	 */
+	ve.resolveUrl = function ( url, base ) {
+		var doc, node;
+		if ( typeof base === 'string' ) {
+			doc = ve.createDocumentFromHtml( '' );
+			node = doc.createElement( 'base' );
+			node.setAttribute( 'href', base );
+			doc.head.appendChild( node );
+		} else {
+			doc = base;
+		}
+
+		node = doc.createElement( 'a' );
+		node.setAttribute( 'href', url );
+		return node.href;
+	};
+
+	/**
 	 * Get the actual inner HTML of a DOM node.
 	 *
 	 * In most browsers, .innerHTML is broken and eats newlines in `<pre>` elements, see
@@ -904,25 +844,22 @@
 		return $element.get( 0 );
 	};
 
-	// Add more as you need
-	ve.Keys = {
-		'UNDEFINED': 0,
-		'BACKSPACE': 8,
-		'DELETE': 46,
-		'LEFT': 37,
-		'RIGHT': 39,
-		'UP': 38,
-		'DOWN': 40,
-		'ENTER': 13,
-		'END': 35,
-		'HOME': 36,
-		'TAB': 9,
-		'PAGEUP': 33,
-		'PAGEDOWN': 34,
-		'ESCAPE': 27,
-		'SHIFT': 16
-	};
+	/**
+	 * Get the current time, measured in milliseconds since January 1, 1970 (UTC).
+	 *
+	 * On browsers that implement the Navigation Timing API, this function will produce floating-point
+	 * values with microsecond precision that are guaranteed to be monotonic. On all other browsers,
+	 * it will fall back to using `Date.now`.
+	 *
+	 * @returns {number} Current time
+	 */
+	ve.now = ( function () {
+		var perf = window.performance,
+			navStart = perf && perf.timing && perf.timing.navigationStart;
+		return navStart && typeof perf.now === 'function' ?
+			function () { return navStart + perf.now(); } : Date.now;
+	}() );
 
 	// Expose
 	window.ve = ve;
-}( OO ) );
+}() );

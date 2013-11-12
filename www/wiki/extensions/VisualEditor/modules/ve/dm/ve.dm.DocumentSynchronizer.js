@@ -13,6 +13,7 @@
  * actions when the transaction is done being processed.
  *
  * IMPORTANT NOTE: It is assumed that:
+ *
  *   - The linear model has already been updated for the pushed actions
  *   - Actions are pushed in increasing offset order
  *   - Actions are non-overlapping
@@ -248,7 +249,7 @@ ve.dm.DocumentSynchronizer.prototype.queueEvent = function ( node ) {
 	// Check if this is already queued
 	var
 		args = Array.prototype.slice.call( arguments, 1 ),
-		hash = ve.getHash( args );
+		hash = OO.getHash( args );
 
 	if ( !node.queuedEventHashes ) {
 		node.queuedEventHashes = {};

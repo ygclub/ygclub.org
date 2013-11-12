@@ -12,19 +12,16 @@
  * @extends ve.ce.BranchNode
  * @constructor
  * @param {ve.dm.InternalItemNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.InternalItemNode = function VeCeInternalItemNode( model, config ) {
 	// Parent constructor
 	ve.ce.BranchNode.call( this, model, config );
-
-	// TODO: render nothing
-	this.$.hide();
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.InternalItemNode, ve.ce.BranchNode );
+OO.inheritClass( ve.ce.InternalItemNode, ve.ce.BranchNode );
 
 /* Static Properties */
 

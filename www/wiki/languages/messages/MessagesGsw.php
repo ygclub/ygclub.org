@@ -163,7 +163,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Aazahl Benutzer aazeige, wo ne Syten am Aaluege sy (i den Artikelsyte, i de «letschten Änderigen» und i der Beobachtigslischte)',
 'tog-oldsig' => 'Vorschau vu dr Unterschrift:',
 'tog-fancysig' => 'Signatur as Wikitext behandle (ohni automatischi Vergleichig)',
-'tog-showjumplinks' => '«Wächsle-zu»-Links ermügleche',
 'tog-uselivepreview' => 'Live-Vorschau bruche (JavaScript) (experimentell)',
 'tog-forceeditsummary' => 'Sag mer s, wänn i s Zämmefassigsfeld läär loss',
 'tog-watchlisthideown' => 'Eigeni Änderige uf d Beobachtigslischt usblände',
@@ -364,7 +363,7 @@ Di maximal Wartezyt fir e Lock isch umme',
 'pool-queuefull' => 'D Warteschlang isch voll',
 'pool-errorunknown' => 'Nit bekannte Fähler',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Über {{GRAMMAR:akkusativ|{{SITENAME}}}}',
 'aboutpage' => 'Project:Über {{UCFIRST:{{GRAMMAR:akkusativ|{{SITENAME}}}}}}',
 'copyright' => 'Der Inhalt vo dere Syte stoht unter der $1.',
@@ -450,17 +449,6 @@ Alli verfiegbare Spezialsyte sin in dr [[Special:SpecialPages|Lischt vu Spezials
 # General errors
 'error' => 'Fähler',
 'databaseerror' => 'Fähler in dr Datebank',
-'dberrortext' => 'S isch e Datebankfähler ufträtte.
-Dr Grund cha ne e Programmierfähler syy.
-Di letscht Datebankabfrog isch
-<blockquote><code>$1</code></blockquote>
-us dr Funktion „<code>$2</code>“ gsi.
-D Datebank het dr Fähler „<samp>$3: $4</samp>“ gmäldet.',
-'dberrortextcl' => 'S het e Syntaxfähler gee in dr Abfrog vu dr Datebank.
-Di letscht Datebankabfrog isch
-„$1“
-us dr Funktion „$2“ gsi.
-D Datebank het dr Fähler „$3: $4“ gmäldet.',
 'laggedslavemode' => 'Warnig: di letschte Änderige wäre u. U. nonig aazeigt!',
 'readonly' => 'Datebank isch gsperrt',
 'enterlockreason' => 'Bitte gib e Grund y, worum d Datebank soll gsperrt wäre un e Yschätzig wie lang si soll gsperrt blybe',
@@ -508,7 +496,6 @@ Abfrog: $2',
 'viewyourtext' => "Du chasch dr Quälltext vu '''Dyre Bearbeitig''' vu däre Syte aaluege un kopiere:",
 'protectedinterface' => 'In däre Syte het s Text fir s Sproch-Interface vu dr Software un si isch gsperrt, zum Missbruch z verhindre.',
 'editinginterface' => "'''Obacht:''' Du bisch e Syten am Verändere, wu zum User.Interface ghert. Wänn Du die Syte veränderesch, no änderet sich s User-Interface au fir di andere Benutzer vu däm Wiki. Fir Ibersetzige lueg bitte, eb Du doodefir s [//translatewiki.net/wiki/Main_Page?setlang=gsw Translatewiki] witt bruuche, s MediaWiki-Lokalisierigsprojäkt.",
-'sqlhidden' => '(SQL-Abfrog verschteckt)',
 'cascadeprotected' => 'Die Syte isch fir s Bearbeite gsperrt. Si isch yybunde in {{PLURAL:$1|die Syte, wu do chunnt|die Syte, wu do chemme}} , wu mit ere Kaskadesperroption gschitzt {{PLURAL:$1|isch|sin}}:
 $2',
 'namespaceprotected' => "Du hesch kei Berächtigung, die Syte im '''$1'''-Namensruum z bearbeite.",
@@ -540,7 +527,6 @@ Ochat: s cha syy, ass bstimmti Syte eso aazeigt wäre, wie wänn Du allno aagmä
 'yourpassword' => 'Passwort:',
 'yourpasswordagain' => 'Passwort no mol yygee:',
 'remembermypassword' => 'Uf däm Computer duurhaft aamälde (Maximal fir $1 {{PLURAL:$1|Tag|Täg}})',
-'securelogin-stick-https' => 'Noch em Aamälde mit HTTPS verbunde blybe',
 'yourdomainname' => 'Dyyni Domäne',
 'password-change-forbidden' => 'Du chasch uf däm Wiki kei Passwerter ändere.',
 'externaldberror' => 'Entwäder s lit e Fähler bi dr externe Authentifizierung vor, oder Du derfsch Dyy extern Benutzerkonto nid aktualisiere.',
@@ -552,7 +538,7 @@ Ochat: s cha syy, ass bstimmti Syte eso aazeigt wäre, wie wänn Du allno aagmä
 'logout' => 'Abmälde',
 'userlogout' => 'Abmälde',
 'notloggedin' => 'Nit aagmäldet',
-'nologin' => "No kei Benutzerkonto? '''$1'''.",
+'nologin' => 'No kei Benutzerkonto? $1.',
 'nologinlink' => '»Konto aaleege«',
 'createaccount' => 'Nöis Benutzerkonto aalege',
 'gotaccount' => "Du häsch scho a Konto? '''$1'''",
@@ -642,7 +628,7 @@ Wänn s Benutzerkonto us Versäh aaglait woren isch, chasch die Nochricht ignori
 'newpassword' => 'Nöis Passwort',
 'retypenew' => 'Nöis Passwort (es zwöits Mal)',
 'resetpass_submit' => 'Passwort ibermittle un aamälde',
-'resetpass_success' => 'Dyy Passwort isch erfolgryych gänderet wore. Jetz chunnt d Aamäldig …',
+'changepassword-success' => 'Dyy Passwort isch erfolgryych gänderet wore. Jetz chunnt d Aamäldig …',
 'resetpass_forbidden' => 'S Passwort cha nid gänderet wäre.',
 'resetpass-no-info' => 'Du muesch Di aamälde zum uf die Syte diräkt zuegryfe z chenne.',
 'resetpass-submit-loggedin' => 'Passwort ändere',
@@ -1200,7 +1186,6 @@ Einzelheite chasch im [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}
 'resetprefs' => 'Änderige doch nid spychere',
 'restoreprefs' => 'Alli Standardyystellige widerhärstelle',
 'prefs-editing' => 'Tekscht-Ygab',
-'prefs-edit-boxsize' => 'Gressi vum Bearbeitigsfänschter.',
 'rows' => 'Zylene',
 'columns' => 'Spaltene',
 'searchresultshead' => 'Suech-Ergäbnis',
@@ -1211,9 +1196,6 @@ Einzelheite chasch im [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}
 'recentchangesdays-max' => '(Maximal $1 {{PLURAL:$1|Tag|Täg}})',
 'recentchangescount' => 'Aazahl vu Bearbeitige, wu standardmässig aazeigt wäre:',
 'prefs-help-recentchangescount' => 'Des umfasst d Lischt vu dr letschte Änderige, d Versionsgschicht un d Logbiecher.',
-'prefs-help-watchlist-token' => 'S Uusfille vu däm Fäld mit eme gheime Schlissel generiert e RSS-Feed fir Dyy Beobachtigslischt.
-E jede, wu dää Schlissel chännt, chaa Dyy Beobachtigslischt bschaue. Wehl wäge däm e sichere Wärt.
-Do het s e zuefellig generierte Wärt, wu du chasch bruche: $1',
 'savedprefs' => 'Dyni Ystellige sy gspycheret worde.',
 'timezonelegend' => 'Zytzone:',
 'localtime' => 'Ortszyt:',
@@ -1244,7 +1226,6 @@ Do het s e zuefellig generierte Wärt, wu du chasch bruche: $1',
 'prefs-reset-intro' => 'Du chasch die Syte verwände go d Yystellige uf dr Standard zrucksetze.
 Des cha nimmi ruckgängig gmacht wäre.',
 'prefs-emailconfirm-label' => 'E-Mail-Bstätigung:',
-'prefs-textboxsize' => 'Greßi vum Bearbeitigsfänschter',
 'youremail' => 'E-Mail-Adräss:',
 'username' => 'Benutzername:',
 'uid' => 'Benutzer-ID:',
@@ -1480,7 +1461,6 @@ Des cha nimmi ruckgängig gmacht wäre.',
 'recentchangeslinked-feed' => 'Verlinktes prüefe',
 'recentchangeslinked-toolbox' => 'Verlinktes prüefe',
 'recentchangeslinked-title' => 'Änderigen a Sytene, wo „$1“ druf verlinkt',
-'recentchangeslinked-noresult' => 'Kener Änderigen a verlinkte Sytenen im usgwählte Zytruum.',
 'recentchangeslinked-summary' => "Die Spezialsyte zeigt d Änderige vo allne Syte, wo ei vo dir bestimmti Syte druf verlinkt, bzw. vo allne Syte, wo zu eire vo dir bestimmte Kategorie ghöre.
 Sytene, wo zu dyre [[Special:Watchlist|Beobachtigslischte]] ghöre, erschyne '''fett'''.",
 'recentchangeslinked-page' => 'Syte:',
@@ -1851,12 +1831,6 @@ Iberprief anderi Link zue dr Vorlage, voreb Du die leschesch.',
 'statistics-users-active-desc' => 'Benutzer mit Bearbeitige {{PLURAL:$1|in dr letschte 24 Stund|in dr letschte $1 Täg}}',
 'statistics-mostpopular' => 'Am meischte aagluegti Syte',
 
-'disambiguations' => 'Syte, wu uf Begriffsklärigssyte verlinke',
-'disambiguationspage' => 'Template:Begriffsklärig',
-'disambiguations-text' => 'Die Syte verwyyse uf e Begriffsklärigs-Syte. Sie sotte aber besser uf d Syte verwyyse, wu eigetli gmeint sin.
-
-E Syte wird as Begriffsklärigs-Syte behandlet, wänn [[MediaWiki:Disambiguationspage]] uf si verwyyst.',
-
 'doubleredirects' => 'Doppleti Wyterleitige (Redirects)',
 'doubleredirectstext' => 'Die Lischt zeigt Wyterleitige, wu uf anderi Wyterleitige verwyyse.
 In jedere Zyylete het s Link zue dr erschte un dr zwote Wyterleitig un s Ziil vu dr zwote Wyterleitig, wu normalerwys di gwinscht Ziilsyten isch. Do sott eigetli scho di erscht Wyterleitig druf zeige.
@@ -2103,7 +2077,6 @@ Wänn Du d Syte speter wider vu dr Lischt witt stryyche, deno druck eifach uf �
 'unwatchthispage' => 'Nimmi beobachte',
 'notanarticle' => 'Kei Syte',
 'notvisiblerev' => 'Version isch glescht wore',
-'watchnochange' => 'Vo den Artikle, wo du beobachtisch, isch im aazeigte Zytruum kene veränderet worde.',
 'watchlist-details' => '{{PLURAL:$1|1 Syte wird|$1 Sytene wärde}} beobachtet (Diskussionssyte nid zelt, aber ou beobachtet).',
 'wlheader-enotif' => 'Dr E-Mail-Benochrichtigungsdienscht isch aktiviert.',
 'wlheader-showupdated' => "Syte mit Anderige, wu no nit aagluegt sin, sin '''fett''' dargstellt.",
@@ -3517,7 +3490,6 @@ Du chasch au d [[Special:EditWatchlist|Standard-Bearbeitigssyte]] bruuche.',
 'version-other' => 'Anders',
 'version-mediahandlers' => 'Medie-Handler',
 'version-hooks' => "Schnittstelle ''(Hook)''",
-'version-extension-functions' => 'Funktionsufruef',
 'version-parser-extensiontags' => "Parser-Erwyterige ''(tags)''",
 'version-parser-function-hooks' => 'Parser-Funktione',
 'version-hook-name' => 'Schnittstellename',

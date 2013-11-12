@@ -12,7 +12,7 @@ class ApiVisualEditor extends ApiBase {
 
 	protected function getHTML( $title, $parserParams ) {
 		global $wgVisualEditorParsoidURL, $wgVisualEditorParsoidPrefix,
-			$wgVisualEditorParsoidTimeout;
+			$wgVisualEditorParsoidTimeout, $wgVisualEditorParsoidForwardCookies;
 
 		$restoring = false;
 
@@ -45,10 +45,27 @@ class ApiVisualEditor extends ApiBase {
 					'timeout' => $wgVisualEditorParsoidTimeout
 				)
 			);
+			// Forward cookies, but only if configured to do so and if there are read restrictions
+			if ( $wgVisualEditorParsoidForwardCookies && !User::isEveryoneAllowed( 'read' ) ) {
+				$req->setHeader( 'Cookie', $this->getRequest()->getHeader( 'Cookie' ) );
+			}
 			$status = $req->execute();
 
 			if ( $status->isOK() ) {
 				$content = $req->getContent();
+				// Pass thru performance data from Parsoid to the client, unless the response was
+				// served directly from Varnish, in  which case discard the value of the XPP header
+				// and use it to declare the cache hit instead.
+				$xCache = $req->getResponseHeader( 'X-Cache' );
+				if ( is_string( $xCache ) && strpos( $xCache, 'hit' ) !== false ) {
+					$xpp = 'cached-response=true';
+				} else {
+					$xpp = $req->getResponseHeader( 'X-Parsoid-Performance' );
+				}
+				if ( $xpp !== null ) {
+					$resp = $this->getRequest()->response();
+					$resp->header( 'X-Parsoid-Performance: ' . $xpp );
+				}
 			} elseif ( $status->isGood() ) {
 				$this->dieUsage( $req->getContent(), 'parsoidserver-http-'.$req->getStatus() );
 			} elseif ( $errors = $status->getErrorsByType( 'error' ) ) {
@@ -84,14 +101,15 @@ class ApiVisualEditor extends ApiBase {
 
 	protected function postHTML( $title, $html, $parserParams ) {
 		global $wgVisualEditorParsoidURL, $wgVisualEditorParsoidPrefix,
-			$wgVisualEditorParsoidTimeout;
+			$wgVisualEditorParsoidTimeout, $wgVisualEditorParsoidForwardCookies;
 		if ( $parserParams['oldid'] === 0 ) {
 			$parserParams['oldid'] = '';
 		}
-		return Http::post(
+		$req = MWHttpRequest::factory(
 			$wgVisualEditorParsoidURL . '/' . $wgVisualEditorParsoidPrefix .
 				'/' . urlencode( $title->getPrefixedDBkey() ),
 			array(
+				'method' => 'POST',
 				'postData' => array(
 					'content' => $html,
 					'oldid' => $parserParams['oldid']
@@ -99,6 +117,17 @@ class ApiVisualEditor extends ApiBase {
 				'timeout' => $wgVisualEditorParsoidTimeout
 			)
 		);
+		// Forward cookies, but only if configured to do so and if there are read restrictions
+		if ( $wgVisualEditorParsoidForwardCookies && !User::isEveryoneAllowed( 'read' ) ) {
+			$req->setHeader( 'Cookie', $this->getRequest()->getHeader( 'Cookie' ) );
+		}
+		$status = $req->execute();
+		if ( !$status->isOK() ) {
+			// TODO proper error handling, merge with getHTML above
+			return false;
+		}
+		// TODO pass through X-Parsoid-Performance header, merge with getHTML above
+		return $req->getContent();
 	}
 
 	protected function parseWikitext( $title ) {
@@ -194,8 +223,8 @@ class ApiVisualEditor extends ApiBase {
 	}
 
 	public function execute() {
-		global $wgVisualEditorNamespaces, $wgVisualEditorUseChangeTagging,
-			$wgVisualEditorEditNotices;
+		global $wgVisualEditorNamespaces, $wgVisualEditorEditNotices;
+
 		$user = $this->getUser();
 		$params = $this->extractRequestParams();
 		$page = Title::newFromText( $params['page'] );
@@ -235,22 +264,37 @@ class ApiVisualEditor extends ApiBase {
 						$wgVisualEditorEditNotices[] = 'protectedpagewarning';
 					}
 				}
-				// Page protected from creation
-				if ( !$page->exists() && $page->getRestrictions( 'create' ) ) {
-					$wgVisualEditorEditNotices[] = 'titleprotectedwarning';
+				// Creating new page
+				if ( !$page->exists() ) {
+					$wgVisualEditorEditNotices[] = $user->isLoggedIn() ? 'newarticletext' : 'newarticletextanon';
+					// Page protected from creation
+					if ( $page->getRestrictions( 'create' ) ) {
+						$wgVisualEditorEditNotices[] = 'titleprotectedwarning';
+					}
 				}
 				if ( count( $wgVisualEditorEditNotices ) ) {
 					foreach ( $wgVisualEditorEditNotices as $key ) {
 						$notices[] = wfMessage( $key )->parseAsBlock();
 					}
 				}
+
+				// HACK: Build a fake EditPage so we can get checkboxes from it
+				$article = new Article( $page ); // Deliberately omitting ,0 so oldid comes from request
+				$ep = new EditPage( $article );
+				$req = $this->getRequest();
+				$ep->importFormData( $req ); // By reference for some reason (bug 52466)
+				$tabindex = 0;
+				$states = array( 'minor' => false, 'watch' => false );
+				$checkboxes = $ep->getCheckboxes( $tabindex, $states );
+
 				if ( $parsed === false ) {
 					$this->dieUsage( 'Error contacting the Parsoid server', 'parsoidserver' );
 				} else {
 					$result = array_merge(
 						array(
 							'result' => 'success',
-							'notices' => $notices
+							'notices' => $notices,
+							'checkboxes' => $checkboxes,
 						),
 						$parsed['result']
 					);
@@ -259,7 +303,7 @@ class ApiVisualEditor extends ApiBase {
 			case 'parsefragment':
 				$content = $this->parseWikitextFragment( $params['wikitext'], $page->getText() );
 				if ( $content === false ) {
-					$this->dieUsage( 'Error contacting the Parsoid server', 'parsoidserver' );
+					$this->dieUsage( 'Error querying MediaWiki API', 'parsoidserver' );
 				} else {
 					$result = array(
 						'result' => 'success',

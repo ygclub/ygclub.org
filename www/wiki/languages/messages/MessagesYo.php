@@ -83,7 +83,6 @@ $messages = array(
 'tog-shownumberswatching' => "S'àfihàn iye àwọn oníṣe tí wọn tẹjú mọ́ọ",
 'tog-oldsig' => 'Ìtọwọ́bọ̀wé tówà:',
 'tog-fancysig' => 'Ṣe ìtọwọ́bọ̀wé bíi ìkọ wiki (láìní ìjápọ̀ fúnrararẹ̀)',
-'tog-showjumplinks' => 'Ìgbàláyè "fò lọ sí" àwọn ìjápọ̀ ìṣeégbà',
 'tog-uselivepreview' => 'Ìlo àkọ́kọ́yẹ̀wò lẹ́ṣẹ̀kẹṣẹ̀ (JavaScript pọndandan) (aládànhánwò)',
 'tog-forceeditsummary' => 'Kìlọ̀ fún mi tí àkótán àtúnṣe bá jẹ́ òfo',
 'tog-watchlisthideown' => 'Ìbòmọ́lẹ̀ àwọn àtúnṣe mi nínú ìmójútó',
@@ -297,7 +296,7 @@ $1',
 'pool-queuefull' => 'Oríìlà dátà ti kún',
 'pool-errorunknown' => 'Àsìṣe àwámárìdí',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Nípa {{SITENAME}}',
 'aboutpage' => 'Project:Nípa',
 'copyright' => 'Gbogbo ohun inú ibí yìí wà lábẹ́  $1.',
@@ -384,17 +383,6 @@ $1',
 # General errors
 'error' => 'Àsìṣe',
 'databaseerror' => 'Àsìṣe ibùdó dátà',
-'dberrortext' => 'Àṣìṣe ìsoọ̀rọ̀pọ̀ ìtọrọ ibùdó-dátà kan ti ṣẹlẹ̀.
-Ó lè jẹ́ nítorí àṣìṣe inú atòlànà.
-Ìgbìyànjú ìtọrọ ibùdó-dátà ṣẹlẹ̀ jẹ́: 
-<blockquote><code>$1</code></blockquote>
-láti inú ìmúṣiṣẹ́ "<code>$2</code>".
-Ibùdó-dátà mú àṣìṣe "<samp>$3: $4</samp>" padà.',
-'dberrortextcl' => 'Àṣìṣe ìsoọ̀rọ̀pọ̀ ìtọrọ ibùdó-dátà kan ti ṣẹlẹ̀.
-Ìgbìyànjú ìtọrọ ibùdó-dátà ṣẹlẹ̀ jẹ́: 
-"$1"
-láti inú ìmúṣiṣẹ́ "$2".
-Ibùdó-dátà mú àṣìṣe "$3: $4" padà',
 'laggedslavemode' => "'''Ìkìlọ̀:''' Ojúewé náà le mọ́ nìí àwọn àtúnṣe tuntun.",
 'readonly' => 'Títìpa ibùdó dátà',
 'enterlockreason' => 'Ẹ ṣàlàyé ìtìpa náà, àti ìgbàtí ẹ rò pé ìtìpa náà yíò kúrò.',
@@ -450,7 +438,6 @@ Kò ṣe àlàyé kankan.',
 'editinginterface' => "'''Ìkìlọ̀:''' Ẹ ún ṣàtúnṣe ojúewé tó jẹ́ lílò láti pèsè ìkọ ìfojúkojú fún àtòlànà kọ̀mpútà.
 Àwọn ìyípadà sí ojúewé yìí yíò kan ìhànsí ìfojúkojú oníṣe fún àwọn oníṣe míràn lọ́rí wiki yìí.
 Láti ṣ'àfikún tàbí ṣ'àyípadà àwọn ìyédèpadà fún gbogbo àwọn wiki, ẹ jọ̀wọ́ ẹ lo [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net], iṣẹ́-ọwọ́ ìṣọdìbílẹ̀ MediaWiki.",
-'sqlhidden' => '(bíbòmọ́lẹ̀ ìbéèrè SQL)',
 'cascadeprotected' => 'Ojúewé yìí ti jẹ́ dídáàbòbò sí àtùnṣe, nítorípé ó wà nínú {{PLURAL:$1|ojúewé ìsàlẹ̀ yìí, tó jẹ́|àwọn ojúewé ìsàlẹ̀ wọ̀nyí, tí wọ́n jẹ́}} dídáàbòbò pẹ̀lú ìyàn "ajámọ́ra" ní títàn: $2',
 'namespaceprotected' => "A kò gbàyín ní ààyè láti ṣ'àtúnṣe àwọn ojúewé tó wà nínú orúkọàyè '''$1'''.",
 'customcssprotected' => 'Ẹ kò ní ìyọ̀nda láti ṣàtúnṣe ojúewé CSS yìí nítorípé ó ní àwọn ìtòjọ oníṣe ẹlòmíràn.',
@@ -493,7 +480,6 @@ Olùṣeàmójútó tó típa ṣe àlàyé yìí: "$3".',
 'remembermypassword' => "Ṣè'rántí ìwọlé mi lórí kọ̀mpútà yìí (fún ó pẹ́ jù {{PLURAL:$1|ọjọ́|ọjọ́}} $1)",
 'userlogin-remembermypassword' => 'Fi mí sí ìwọlé',
 'userlogin-signwithsecure' => 'Lo ìsopọ̀ ẹ̀rọ tó ní àbò',
-'securelogin-stick-https' => 'Ìwàní sísopọ̀ mọ́ HTTPS lẹ́yín ìwọlé',
 'yourdomainname' => 'Domain yín:',
 'password-change-forbidden' => 'Ẹ kò le ṣe ìyípadà ọ̀rọ̀ìpamọ́ lórí wiki yìí.',
 'externaldberror' => 'Bóyá àsìṣe ìfidájú ibùdó dátà ló ṣẹlẹ̀ tàbí ẹ kò jẹ́ gbígbà ní ààyè láti sọ àpamọ́ òde yín di ọ̀tun.',
@@ -524,12 +510,14 @@ Olùṣeàmójútó tó típa ṣe àlàyé yìí: "$3".',
 'createacct-realname' => 'Orúkọ yín gangan (kò pọndandan)',
 'createaccountreason' => 'Ìdíẹ̀:',
 'createacct-reason' => 'Ìdí',
+'createacct-reason-ph' => 'Ìdí tí ẹ ṣe fẹ́ dá àkópamọ́ míràn',
 'createacct-captcha' => 'Àyẹ̀wò àbò',
 'createacct-imgcaptcha-ph' => 'Ẹ kọ ìkọ̀rọ̀ tí ẹ rí lókè',
+'createacct-submit' => 'Ìdá àkópamọ́ yín',
 'createacct-benefit-heading' => 'Àwọn ènìyàn bíi yín ni wọ́n dá {{SITENAME}}.',
-'createacct-benefit-body1' => 'àtúnṣe',
-'createacct-benefit-body2' => 'ojúewé',
-'createacct-benefit-body3' => 'olùkópa ní oṣù yìí',
+'createacct-benefit-body1' => '{{PLURAL:$1|àtúnṣe|àwọn àtúnṣe}}',
+'createacct-benefit-body2' => '{{PLURAL:$1|ojúewé|àwọn ojúewé}}',
+'createacct-benefit-body3' => ' {{PLURAL:$1|olùkópa|Àwọn olùkópa}} aṣẹ̀ṣẹ̀ṣe',
 'badretype' => 'Àwọn ọ̀rọ̀ìpamọ́ tí ẹ kọ kò jọ ra wọn.',
 'userexists' => 'Orúkọ oníṣe tí ẹ mú wà lọ́wọ́ ẹlòmíràn.
 Ẹjọ̀wọ́ ẹ yan orúkọ mìíràn tó yàtọ̀.',
@@ -593,7 +581,7 @@ E-mail kankan kò ní jẹ́ fífiránṣẹ́ fún ìkankan nínú àwọn ìn�
 'cannotchangeemail' => 'Àwọn àdírẹ́sì e-mail àpamọ́ kò ṣe é yípadà lórí wiki yìí.',
 'emaildisabled' => 'Ibiìtàkùn yìí kò le fi e-mail ránṣẹ́.',
 'accountcreated' => 'Ẹ ti fi orúkọ sílẹ̀',
-'accountcreatedtext' => "A ti ṣ'èdá àkópamọ́ oniṣe fún $1.",
+'accountcreatedtext' => 'Àkópamọ́ oniṣe fún [[{{ns:User}}:$1|$1]] ([[{{ns:User talk}}:$1|ọ̀rọ̀]]) ti jẹ́ dídá.',
 'createaccount-title' => 'Ìforúkọ sílẹ̀ fún {{SITENAME}}',
 'createaccount-text' => 'Ẹnìkan dá àpamọ́ kan fún àdírẹ́sì e-mail yín sórí {{SITENAME}} ($4) tóún jẹ́ "$2", pẹ̀kú ọ̀rọ̀ìpamọ́ \'\'$3\'\'.
 Ẹ gbọ́dọ̀ wọlé kí ẹ sì ṣàyípadà ọ́rọ́ìpamọ́ yín nísinsìyí.
@@ -620,7 +608,7 @@ Láti parí ìmúwọlẹ́, ẹ gbọ́dọ̀ ṣètò ọ̀rọ̀ìpamọ́ tu
 'newpassword' => 'Ọ̀rọ̀ìpamọ́ tuntun:',
 'retypenew' => 'Àtúntẹ̀ ọ̀rọ̀ìpamọ́ tuntun:',
 'resetpass_submit' => 'Ẹ ṣe àtúntò ọ̀rọ̀ìpamọ́ kí ẹ tó wọlé',
-'resetpass_success' => 'Ìyípadà ọ̀rọ̀ìpamọ́ yín ti já sí rere! Ẹ̀ ún wọlé lọ́wọ́...',
+'changepassword-success' => 'Ìyípadà ọ̀rọ̀ìpamọ́ yín ti já sí rere! Ẹ̀ ún wọlé lọ́wọ́...',
 'resetpass_forbidden' => 'Àwọn ọ̀rọ̀ìpamọ́ kò ṣe é yípadà',
 'resetpass-no-info' => 'Ẹ gbọ́dọ̀ wọlẹ́ láti le lọ sí ojúewé yìí tààrà.',
 'resetpass-submit-loggedin' => 'Ìyípadà ọ̀rọ̀ìpamọ́',
@@ -628,6 +616,7 @@ Láti parí ìmúwọlẹ́, ẹ gbọ́dọ̀ ṣètò ọ̀rọ̀ìpamọ́ tu
 'resetpass-wrong-oldpass' => 'Ọ̀rọ̀ìpamọ́ ìgbàdíẹ̀ tàbí tìsinsìnyí àìtọ́.
 Ó le jẹ́ pé ẹ ti yí ọ̀rọ̀ìpamọ́ yín padà sí òmíràn tàbí ẹ ti tọrọ ọ́rọ́ìpamọ́ tuntun ìgbàdíẹ̀.',
 'resetpass-temp-password' => 'Ọ̀rọ̀ìpamọ́ fún ìgbà díẹ̀',
+'resetpass-abort-generic' => 'Ìyípadà ọ̀rọ̀ìpamọ́ ti jẹ́ jíjáwọ́ látọwọ́ àsomọ́ kan.',
 
 # Special:PasswordReset
 'passwordreset' => 'Ìtúntò ọ̀rọ̀ìpamọ́',
@@ -640,13 +629,13 @@ Láti parí ìmúwọlẹ́, ẹ gbọ́dọ̀ ṣètò ọ̀rọ̀ìpamọ́ tu
 'passwordreset-capture-help' => 'Tí ẹ bá fagi sínú àpótí yìí, e-mail náà (pẹ̀lú ọ̀rọ̀ìpamọ́ onígbàdíẹ̀) yíò hàn si yín bákannáà yíò jẹ́ fífiránṣẹ́ sí oníṣe náà.',
 'passwordreset-email' => 'Àdírẹ̀sì e-mail:',
 'passwordreset-emailtitle' => 'Àwọn ẹ̀kúnrẹ́rẹ́ àpamọ́ lórí {{SITENAME}}',
-'passwordreset-emailtext-ip' => 'Ẹnìkan (bóyá ẹ̀yin ni, láti àdírẹ̀sì IP $1) tọrọ ìránlétí àwọn ẹ̀kúnrẹ́rẹ́ àkópamọ́ yín fùn {{SITENAME}} ($4). {{PLURAL:$3|Àkópamọ́|Àwọn àkópamọ́}} oníṣe ìsàlẹ̀ yìí ní ìbáṣe pọ̀ mọ́ àdírẹ̀sì e-mail yìí:
+'passwordreset-emailtext-ip' => 'Ẹnìkan (bóyá ẹ̀yin ni, láti àdírẹ̀sì IP $1) tọrọ àtúntò ọ̀rọ̀ìpamọ́ yín fún {{SITENAME}} ($4). {{PLURAL:$3|Àkópamọ́|Àwọn àkópamọ́}} oníṣe ìsàlẹ̀ yìí ní ìbáṣe pọ̀ mọ́ àdírẹ̀sì e-mail yìí:
 
 $2
 
 {{PLURAL:$3|Ọ̀rọ̀ìpamọ́ onígbàdíẹ̀ yìí|Àwọn ọ̀rọ̀ìpamọ́ onígbàdíẹ̀ wọ̀nyí}} yíò dópin lẹ́yìn {{PLURAL:$5|ọjọ́ kan|ọjọ́ $5}}.
 Ẹ gbọ́dọ̀ lọ yan ọ̀rọ̀ìpamọ́ tuntun báyìí. Tóbá jẹ́ pé ẹ̀lòmíràn ló ṣe ìtọrọ yìí, tàbí tọ́bá jẹ́ pé ẹ ti rántí ọ̀rọ̀ìpamọ́ àtètèkọ́ṣe yín, tí ẹ kọ̀ sí fẹ́ yíipadà mọ́, ẹ lé ṣàìkàsí ìránṣẹ́ yìí, kí ẹ sì tẹ̀síwájú ní lo ọ̀rọ̀ìpamọ́ àtijọ́ yín.',
-'passwordreset-emailtext-user' => 'Oníṣe $1 lórí {{SITENAME}} tọrọ ìránlétí àwọn ẹ̀kúnrẹ́rẹ́ àkópamọ́ yín fùn {{SITENAME}} ($4). {{PLURAL:$3|Àkópamọ́|Àwọn àkópamọ́}} oníṣe ìsàlẹ̀ yìí ní ìbáṣe pọ̀ mọ́ àdírẹ̀sì e-mail yìí:
+'passwordreset-emailtext-user' => 'Oníṣe $1 lórí {{SITENAME}} tọrọ àtúntò ọ̀rọ̀ìpamọ́ yín fùn {{SITENAME}} ($4). {{PLURAL:$3|Àkópamọ́|Àwọn àkópamọ́}} oníṣe ìsàlẹ̀ yìí ní ìbáṣe pọ̀ mọ́ àdírẹ̀sì e-mail yìí:
 
 $2
 
@@ -654,8 +643,8 @@ $2
 Ẹ gbọ́dọ̀ lọ yan ọ̀rọ̀ìpamọ́ tuntun báyìí. Tóbá jẹ́ pé ẹ̀lòmíràn ló ṣe ìtọrọ yìí, tàbí tọ́bá jẹ́ pé ẹ ti rántí ọ̀rọ̀ìpamọ́ àtètèkọ́ṣe yín, tí ẹ kọ̀ sí fẹ́ yíipadà mọ́, ẹ lé ṣàìkàsí ìránṣẹ́ yìí, kí ẹ sì tẹ̀síwájú ní lo ọ̀rọ̀ìpamọ́ àtijọ́ yín.',
 'passwordreset-emailelement' => 'Orúkọ oníṣe: $1
 Ọ̀rọ̀ìpamọ́ ìgbàdíẹ̀: $2',
-'passwordreset-emailsent' => 'E-mail olùrántí ti jẹ́ fífiránṣẹ́.',
-'passwordreset-emailsent-capture' => 'E-mail ìránlétí kan ti jẹ́ fífiránṣẹ́. Òhun nìyí nísàlẹ̀.',
+'passwordreset-emailsent' => 'E-mail àtúntò ọ̀rọ̀ìpamọ́ ti jẹ́ fífiránṣẹ́.',
+'passwordreset-emailsent-capture' => 'E-mail àtúntò ọ̀rọ̀ìpamọ́ kan ti jẹ́ fífiránṣẹ́. Òhun nìyí nísàlẹ̀.',
 'passwordreset-emailerror-capture' => 'E-mail ìránlétì jẹ́ dídá, òhun lóhàn nísàlẹ̀ yìí, sùgbọ́n ìfiránṣẹ́ rẹ̀ sí oníṣe náà kùnà: $1',
 
 # Special:ChangeEmail
@@ -839,7 +828,7 @@ Bákannà ẹ tún ṣèlérí fún wa wípé ẹ̀yin lẹkọ́ fúnra arayín
 'longpageerror' => "'''Àsìṣe: Ìkọ̀wé tí ẹ fisílẹ̀ gùn tó {{PLURAL:$1|kilobyte kan|$1 kilobytes}}, èyí gùn ju {{PLURAL:$2|kilobyte kan|$2 kilobytes}} lọ tó jẹ́ àjà.'''
 Kò ṣe é múpamọ́.",
 'readonlywarning' => "'''Ìkìlọ̀: Ibùdó dátà ti jẹ́ títìpàdé fún ìtọ́jú, nípa bẹ́ẹ̀ ẹ kò ní le fi àwọn àtúnṣe yín pamọ́ lásìkò yìí.'''
-Tí ẹ bá fẹ́ ẹ le fi ìkọ̀rọ̀ náà pamọ́ sínú fáìlì ìkọ̀rọ̀ (pẹ̀lú ìgékúrò-àti-ìlẹ̀mọ́) fún ìgbà míràn.
+Tí ẹ bá fẹ́ ẹ le fi ìkọ̀rọ̀ náà pamọ́ sínú fáìlì ìkọ̀rọ̀ fún ìgbà míràn.
 
 Olùmójútó tó tìípadé ṣe àlàyé yìí: $1",
 'protectedpagewarning' => "'''Ìkìlọ̀: Ojúewé yìí ti jẹ́ títìpa, nítoríẹ̀ àwọn alámòjútó nìkan ni wọ́n ní ẹ̀tọ́ láti ṣàtúnṣe rẹ̀.'''
@@ -861,7 +850,7 @@ Olùmójútó tó tìípadé ṣe àlàyé yìí: $1",
 'nocreate-loggedin' => "Ẹ kò ní ìyọ̀nda láti ṣe'dá ojúewé tuntun.",
 'sectioneditnotsupported-title' => 'Ko sí títìlẹ́yìn àtúnṣe abala',
 'sectioneditnotsupported-text' => 'Ko sí títìlẹ́yìn àtúnṣe abala lórí ojúewé yìí.',
-'permissionserrors' => 'Àṣìṣe ìyọ̀nda',
+'permissionserrors' => 'Àwọn àṣìṣe ìyọ̀nda',
 'permissionserrorstext' => 'Ẹ kò ní ìyọ̀nda láti ṣè yí nítorí {{PLURAL:$1|ìdí ìsàlẹ̀ yìí|àwọn ìdí ìsàlẹ̀ wọ̀nyí}}:',
 'permissionserrorstext-withaction' => 'Ẹ kò ní ìyọ̀nda láti $2, fún {{PLURAL:$1|ìdí yìí|àwọn ìdí wọ̀nyí}}:',
 'recreate-moveddeleted-warn' => "'''Ìkìlọ̀: Ẹ̀ ún ṣ'èdá ojúewé tí a ti parẹ́ tẹ́lẹ̀.'''
@@ -877,6 +866,7 @@ Kò ṣe àlàyé kankan.',
 Ó dà bíi pé a ti paárẹ́.',
 'edit-conflict' => 'Ìtakora áwọn àtúnṣe',
 'edit-no-change' => 'A ṣe àìkàsí àtúnṣe yín, nítorípé ìkọ̀wé kò ní àtúnṣe kankan.',
+'postedit-confirmation' => 'Àtúnṣe yín ti jẹ́ gbígbépamọ́.',
 'edit-already-exists' => "A kò le è ṣè'dá ojúewé tuntun.
 Ó pilẹ̀ ti wà.",
 'defaultmessagetext' => 'Ìkọ ìránṣẹ́ àtìbẹ̀rẹ̀',
@@ -946,8 +936,8 @@ Tó bá jẹ́ pé ẹ ti wọlé, ẹ lè dẹ́kun ìkìlọ̀ yìí nínù ab
 Àlàyé: '''({{int:cur}})''' = ìyàtọ̀ sí àtúnyẹ̀wò tìsinyìí, '''({{int:last}})''' = ìyàtọ̀ sí àtúnyẹ̀wò tókọjá, '''{{int:minoreditletter}}''' = àtúnṣe kékeré.",
 'history-fieldset-title' => 'Ìṣíwò ìwé ìtàn àtúnṣe',
 'history-show-deleted' => 'Ajẹ́píparẹ́ níkan',
-'histfirst' => 'Pípẹ́jùlọ',
-'histlast' => 'Tuntunjùlọ',
+'histfirst' => 'pípẹ́jùlọ',
+'histlast' => 'tuntunjùlọ',
 'historysize' => '({{PLURAL:$1|1 byte|$1 bytes}})',
 'historyempty' => '(òfo)',
 
@@ -1149,7 +1139,7 @@ Kò ṣe é bòmọ́lẹ̀.',
 'search-interwiki-default' => 'èsì $1',
 'search-interwiki-more' => '(tókù)',
 'search-relatedarticle' => 'Tóbáramu',
-'mwsuggest-disable' => 'Ìdálẹ́kun àwọn àbá AJAX',
+'mwsuggest-disable' => 'Ìdálẹ́kun àwọn àbá ìṣàwárí',
 'searcheverything-enable' => 'Àwárí nínú gbogbo orúkọàyè:',
 'searchrelated' => 'tóbáramu',
 'searchall' => 'gbogbo',
@@ -1204,7 +1194,6 @@ Ní báyìí ná ẹ le ṣàwárí lọ́dọ̀ Google.
 'resetprefs' => 'Ìpalẹ̀mọ́ àwọn àyípadà àìmúpamọ́',
 'restoreprefs' => 'Ìdápadà áwọn ìtò àtìbẹ̀rẹ̀',
 'prefs-editing' => 'Àtúnṣe ṣíṣẹ',
-'prefs-edit-boxsize' => 'Ìtóbi fèrèsé àtúnṣe',
 'rows' => 'Àwọn ìtẹ̀lé gbọlọjọ:',
 'columns' => 'Àwọn ìtẹ̀lé gogoro:',
 'searchresultshead' => 'Àwárí',
@@ -1215,9 +1204,6 @@ Ní báyìí ná ẹ le ṣàwárí lọ́dọ̀ Google.
 'recentchangesdays-max' => '{{PLURAL:$1|Ọjọ́|Ọjọ́}} $1 púpọ̀jùlọ',
 'recentchangescount' => 'Iye àtúnṣe láti fihàn látìbẹ̀rẹ̀:',
 'prefs-help-recentchangescount' => 'Àwọn àtúnṣe tuntun, ìtàn ojúewé, àti àkọọ́lẹ̀ wà nínú èyí.',
-'prefs-help-watchlist-token' => 'Tí ẹ bá fílì fọ́ọ̀mù yìí pẹ̀lú kọ́kọ́rọ́ àmìọ̀rọ̀ àsírí yíò dá feed RSS fún ìmójútó yín.
-Ẹnikẹ́ni tó bá mọ kọ́kọ́rọ́ àmìọ̀rọ̀ náà nínú fọ́ọ̀mù yìí yíò le ka ìmójútó yín, nítoríẹ̀ ẹ mú nọ́mbà tó pamọ́.
-Nọ́mbà àrìnnàkò kan nìyí tí ẹ le lò: $1',
 'savedprefs' => 'Àwọn ìfẹ́ràn yín ti jẹ́mímúpapọ́.',
 'timezonelegend' => 'Àsìkò ilẹ̀àmùrè:',
 'localtime' => 'Àkókò ìbílẹ̀:',
@@ -1248,7 +1234,6 @@ Nọ́mbà àrìnnàkò kan nìyí tí ẹ le lò: $1',
 'prefs-reset-intro' => 'Ẹ le lo ojúewé yìí láti ṣàtùntò àwọn ìfẹ́ràn yín sí àkọ́kọ́ṣe ibiìtakùn yìí.
 Kò ní ṣeé dápadà mọ́.',
 'prefs-emailconfirm-label' => 'E-mail ìmúdájú:',
-'prefs-textboxsize' => 'Ìtóbi fèrèsé àtúnṣe',
 'youremail' => 'E-mail:',
 'username' => '{{GENDER:$1|Orúkọ oníṣe}}:',
 'uid' => 'Nọmba ìdámọ̀ {{GENDER:$1|oníṣe}}:',
@@ -1282,7 +1267,7 @@ Tí ẹ bá fisílẹ̀ a ó lòó láti tóka iṣẹ́ yín fún yín.',
 'prefs-signature' => 'Ìtọwọ́bọ̀wé',
 'prefs-dateformat' => 'Irú ọjọ́ọdún',
 'prefs-timeoffset' => 'Ìyàtọ̀ àsìkò',
-'prefs-advancedediting' => 'Àwọn àṣàyàn onígíga',
+'prefs-advancedediting' => 'Àwọn àṣàyàn gíga',
 'prefs-advancedrc' => 'Àwọn àṣàyàn onígíga',
 'prefs-advancedrendering' => 'Àwọn àṣàyàn onígíga',
 'prefs-advancedsearchoptions' => 'Àwọn àṣàyàn onígíga',
@@ -1490,7 +1475,6 @@ Tí ẹ bá fisílẹ̀ a ó lòó láti tóka iṣẹ́ yín fún yín.',
 'recentchangeslinked-feed' => 'Àtúnṣe tó báramu',
 'recentchangeslinked-toolbox' => 'Àtúnṣe tó báramu',
 'recentchangeslinked-title' => 'Àtúnṣe tó báramu mọ́ "$1"',
-'recentchangeslinked-noresult' => 'Kò sí ìyàtọ̀ nínú àwọn ojúewé ìjápọ̀ láàrin ìgbà tí ẹ sọ.',
 'recentchangeslinked-summary' => "Àkójọ àwọn àtúnṣe tí a sẹ̀sẹ̀ ṣe sí àwọn ojúewé tó jápọ̀ wá láti ojúewé pàtó kan (tàbí sí ìkan nìnú ẹ̀ka pàtó kan).
 Àwọn ojúewé inú [[Special:Watchlist|ìmójútó yín]] jẹ́ '''kedere'''.",
 'recentchangeslinked-page' => 'Orúkọ ojúewé:',
@@ -1502,7 +1486,7 @@ Tí ẹ bá fisílẹ̀ a ó lòó láti tóka iṣẹ́ yín fún yín.',
 'reuploaddesc' => 'Fagilé ìrùsókè kí ó tó padà sí fọ́ọ̀mù ìrùsókè',
 'upload-tryagain' => 'Ìkóólẹ̀ fáìlì ìjúwe aláàtúnṣe',
 'uploadnologin' => 'Ẹ kò tíì wọlé',
-'uploadnologintext' => 'Ẹ gbọ́dọ̀ [[Special:UserLogin|wọlè]] láti rùsókè faili.',
+'uploadnologintext' => 'Ẹ gbọ́dọ̀ [[Special:UserLogin|wọlè]] láti ṣe ìrùsókè faili.',
 'upload_directory_missing' => 'Àpò ìrùsókè ($1) kòsí bẹ́ẹ̀sìni kò le jẹ́ dídá látọwọ́ ẹ̀rọ-ìwọ̀fà.',
 'upload_directory_read_only' => 'Àpò ìrùsókè ($1) kò ṣeékọ sí nínú látọwọ́ ẹ̀rọ-ìwọ̀fà.',
 'uploaderror' => 'Àsìse ìrùsókè',
@@ -1878,11 +1862,11 @@ Tó bá jẹ́ jíjọ̀ gẹ́gẹ́bí oníṣe, àwọn fáìlì tí oníṣe
 'statistics-users-active-desc' => 'Àwọn oníṣe tí wọ́n ti ṣe ìgbéṣe kan ní {{PLURAL:$1|ọjọ́ kan|ọjọ́ $1}} sẹ́yìn',
 'statistics-mostpopular' => 'Àwọn ojúewé tí wọ́n jẹ́ wíwò jùlọ',
 
-'disambiguations' => 'Àwọn ojúewé tó jápọ̀ mọ́ àwọn ojúewé ìṣeojútùú',
-'disambiguationspage' => 'Template:ojútùú',
-'disambiguations-text' => "Àwọn ojúewé ìsàlẹ̀ yìí, ó kéréjù ní àjápọ̀ kan sí '''ojúewé ìṣeojúùtú'''.
-Ó yẹ kí wọn ó jápọ̀ sí ojúewé tó yẹ wọ́n.<br />
-Ojúewé kan jẹ́ ṣíṣe bíi ojúewé ìṣeojúùtú tí ó bá lo àdàkọ tó jápọ̀ láti [[MediaWiki:Disambiguationspage]].",
+'pageswithprop' => 'Àwọn ojúewé tó ní ohun-ìní ojúewé',
+'pageswithprop-legend' => 'Àwọn ojúewé tó ní ohun-ìní ojúewé',
+'pageswithprop-text' => 'Ojúewé yìí ṣe àtòjọ àwọn ojúewé tó únlo ohun-ìní ojúewé pàtò kan.',
+'pageswithprop-prop' => 'Orúkọ ohun-ìní:',
+'pageswithprop-submit' => 'Lọ',
 
 'doubleredirects' => 'Àwọn àtúnjúwe ẹ̀mẹjì',
 'doubleredirectstext' => 'Ojúewé yìí ṣe àtòjọ àwọn ojúewé tó ṣe àtúnjúwe sí àwọn ojúewé àtúnjúwe míràn. 
@@ -2132,7 +2116,6 @@ A óò ṣ\'àkójọ àwọn àtúnṣe ọjọ́wajú sí ojúewé yìí àti 
 'unwatchthispage' => "Já'wọ́ ìmójútó ojúewé yi",
 'notanarticle' => 'Kìí ṣe ojúewé àkóónú',
 'notvisiblerev' => 'Àtúnyẹ̀wò gbígbẹ̀yìn látọwọ́ oníṣe míràn ti jẹ́ píparẹ́',
-'watchnochange' => 'Kò sí ìkankan nínú àwọn ohun ìmójútó yín tó jẹ́ títúnṣe láàrin àsìkò títẹ́kalẹ̀.',
 'watchlist-details' => '{{PLURAL:$1|Ojúewé $1|Àwọn ojúewé $1}} ló wà nínú ìmójútó yín, tí a kò bá ka àwọn ojúewé ọ̀rọ̀.',
 'wlheader-enotif' => 'Ìfitónilétí e-mail wà ní gbígbàláyè.',
 'wlheader-showupdated' => "Àwọn ojúewé tí wọn ti yípadà látìgbà tí ẹ ṣàbẹ̀wò wọn gbẹ̀yìn jẹ́ fífihàn ní ''kedere'''",
@@ -2266,6 +2249,8 @@ a ti fagilé gbogbo ohun tí ẹ ti ṣe nísìnsinyì kí ẹlòmíràn ó mọ
 'prot_1movedto2' => '[[$1]] ti yípò sí [[$2]]',
 'protect-badnamespace-title' => 'Orúkọàyè aláìleèní àbò',
 'protect-badnamespace-text' => 'Àwọn ojúewé nínú orúkọàyè yìí kò ṣe é dá àbò bò.',
+'protect-norestrictiontypes-text' => 'Ojúewé yìí kò ṣe é dá àbò bò nítorípé kò sí àwọn irú ìdínà kankan.',
+'protect-norestrictiontypes-title' => 'Ojúewé tí kò ṣe é dá àbò bò',
 'protect-legend' => 'Ìmúdájú ìdábòbò',
 'protectcomment' => 'Ìdíẹ̀:',
 'protectexpiry' => 'Ìparí:',
@@ -2282,8 +2267,8 @@ Bí a ṣe to ojúewé '''$1''' nì yí:",
 'protect-cascadeon' => 'Ojúewé yìí jẹ́ dídàbòbò lọ́wọ́lọ́wọ́ nítorí ó jẹ́ mímúpọ nínú {{PLURAL:$1|ojúewé ìsàlẹ̀ yìí, tó ní|àwọn ojúewé ìsàlẹ̀ wọ̀nyí, tí wọ́n ní}} àbò onípele tó ún ṣiṣé.
 Ẹ le paradà ìpele àbò ojúewé yìí, sùgbọ́n kò ní nípa lórí àbò onípele náà.',
 'protect-default' => 'Ẹ gba gbogbo àwọn oníṣe láàyè',
-'protect-fallback' => 'Ìyọ̀nda "$1" pọn dandan',
-'protect-level-autoconfirmed' => 'Dínà àwọn oníṣe tuntun àti tíkòforúkọ sílẹ́',
+'protect-fallback' => 'Ìyọ̀nda àwọn oníṣe tó ní "$1" nìkan',
+'protect-level-autoconfirmed' => 'Ìyọ̀nda àwọn oníṣe adáraẹnilójú nìkan',
 'protect-level-sysop' => 'Gba àwọn alámùójútó nìkan láyè',
 'protect-summary-cascade' => 'títẹ̀léra',
 'protect-expiring' => 'parí ní $1 (UTC)',
@@ -2388,7 +2373,7 @@ $1',
 'mycontris' => 'Àwọn àfikún',
 'contribsub2' => 'Fún $1 ($2)',
 'nocontribs' => 'Kò sí àtúnṣe tuntun tó bá àwárí mu.',
-'uctop' => '(lókè)',
+'uctop' => '(lówọ́)',
 'month' => 'Láti osù (àti sẹ́yìn):',
 'year' => 'Láti ọdún (àti sẹ́yìn):',
 
@@ -2776,6 +2761,7 @@ Fáìlì náà jẹ́ rírùsóké ní àbọ̀.',
 'import-error-interwiki' => 'Ojúewé "$1" kò jẹ́ kíkówọlé nítorípé orúkọ rẹ̀ wà fún ìṣàjápọ̀ òde (láàrin wiki).',
 'import-error-special' => 'Ojúewé "$1" kò jẹ́ kíkówọlé nítorípé ó wà fún orúkọàyè pàtàkì tí kò gba ojúewé ní àyè.',
 'import-error-invalid' => 'Ojúewé "$1" kò jẹ́ kíkówọlé nítorí orúkọ rẹ̀ tí kò yẹ.',
+'import-error-unserialize' => "Àtúnyẹ̀wò $2 ojúewé ''$1'' kò ṣe é múkúrò nínú àtòléra. Àtúnyẹ̀wò náà sọ pé ó únlo àpéjúwé àkóónú $3 tó jẹ́ títòléra bíi $4.",
 'import-options-wrong' => '{{PLURAL:$2|Ìṣsàyàn|Ìṣsàyàn}} tí kò dára: <nowiki>$1</nowiki>',
 'import-rootpage-invalid' => 'Ipasẹ̀ ojúewé tó jẹ́ títọ́kasí jẹ́ àkọlé àìyẹ.',
 'import-rootpage-nosubpage' => 'Orúkọàyè "$1" fún ipasẹ̀ ojúewé kò gba ojúewé abẹ́ ní àyè.',
@@ -2923,6 +2909,7 @@ Fáìlì náà jẹ́ rírùsóké ní àbọ̀.',
 'pageinfo-magic-words' => '{{PLURAL:$1|Ọ̀rọ̀|Àwọn ọ̀rọ̀}} májìkì ($1)',
 'pageinfo-hidden-categories' => '{{PLURAL:$1|Ẹ̀ka|Àwọn ẹ̀ka}} bíbòmọ́lẹ̀ ($1)',
 'pageinfo-templates' => '{{PLURAL:$1|Àdàkọ|Àwọn àdàkọ}} ìkópọ̀mọ́ra ($1)',
+'pageinfo-transclusions' => '{{PLURAL:$1|Ojúewé|Àwọn ojúewé}} tó jẹ́ kíkópọ̀mọ́ra sínú ($1)',
 'pageinfo-toolboxlink' => 'Ọ̀rọ̀ẹ̀kúnrẹ́rẹ́ ojúewé',
 'pageinfo-redirectsto' => 'Àtúnjúwe sí',
 'pageinfo-redirectsto-info' => 'ọ̀rọ̀ẹ̀kúnrẹ̀rẹ̀',
@@ -2931,7 +2918,9 @@ Fáìlì náà jẹ́ rírùsóké ní àbọ̀.',
 'pageinfo-protect-cascading' => 'Àbò bẹ̀rẹ̀ láti ibí',
 'pageinfo-protect-cascading-yes' => 'Bẹ́ẹ̀ni',
 'pageinfo-protect-cascading-from' => 'Àbò bẹ̀rẹ̀ láti',
+'pageinfo-category-info' => 'Ọ̀rọ̀ nípa ẹ̀ka',
 'pageinfo-category-pages' => 'Iye àwọn ojúewé',
+'pageinfo-category-subcats' => 'Iye àwọn ẹ̀ka abẹ́',
 'pageinfo-category-files' => 'Iye àwọn fáìlì',
 
 # Patrolling
@@ -3009,8 +2998,20 @@ Tí ẹ bá jẹ́ ó ṣiṣẹ́, ẹ̀rọ sístẹ́mù yín le kó sí ewu.
 'minutes' => '{{PLURAL:$1|ìṣẹ́jú $1}}',
 'hours' => '{{PLURAL:$1|wákàtí $1}}',
 'days' => '{{PLURAL:$1|ọjọ́ $1}}',
+'months' => '{{PLURAL:$1|oṣù $1|oṣù $1}}',
+'years' => '{{PLURAL:$1|ọdún $1|ọdún $1}}',
 'ago' => '$1 sẹ́yìn',
 'just-now' => 'nísinsìnyí',
+
+# Human-readable timestamps
+'monday-at' => 'Ọjọ́ajé ní ago $1',
+'tuesday-at' => 'Ọjọ́ìṣẹ́gun ní ago $1',
+'wednesday-at' => 'Ọjọ́rú ní ago $1',
+'thursday-at' => 'Ọjọ́bọ̀ ní ago $1',
+'friday-at' => 'Ọjọ́ẹtì ní ago $1',
+'saturday-at' => 'Ọjọ́àbámẹ́ta ní ago $1',
+'sunday-at' => 'Ọjọ́àìkú ní ago $1',
+'yesterday-at' => 'Àná ní ago $1',
 
 # Bad image list
 'bad_image_list' => 'Onírú jẹ́ gẹ́gẹ́ bíi àtèlé yìí:
@@ -3045,6 +3046,7 @@ Tóbájẹ́pé fáìlì ọ̀hún ti jẹ́ títúnṣe sí bóṣewà ní bẹ
 'exif-imagelength' => 'Gígasí',
 'exif-bitspersample' => 'Bit fún àkóónú kọ̀ọ̀kan',
 'exif-compression' => 'Ètò ìtẹ̀pọ̀',
+'exif-photometricinterpretation' => 'Ìdákójọ pixel',
 'exif-orientation' => 'Ìdojúdé',
 'exif-samplesperpixel' => 'Iye àkóónú',
 'exif-planarconfiguration' => 'Ìṣètò dátà',
@@ -3444,7 +3446,6 @@ $5
 'version-skins' => 'Skin (Àwọ̀)',
 'version-other' => 'Òmíràn',
 'version-hooks' => 'Àwọn hook',
-'version-extension-functions' => 'Àwọn ìmúṣe ìfàgùn',
 'version-hook-name' => 'Orúkọ hook',
 'version-version' => '(Àtẹ̀jáde $1)',
 'version-license' => 'Ìwé àṣẹ',
@@ -3529,8 +3530,7 @@ $5
 
 # Database error messages
 'dberr-header' => 'Wiki yìí ní ìsòro',
-'dberr-problems' => 'Àforìjì!
-Ibiìtakùn yìí únkojú ìsòro ìṣìṣẹ́ẹ̀rọ.',
+'dberr-problems' => 'Àforìjì! Ibiìtakùn yìí únkojú ìsòro ìṣìṣẹ́ẹ̀rọ.',
 'dberr-again' => 'Ẹ mú sùúrù fún ìṣẹ́jú díẹ̀ kí ẹ tó tún ṣe ìrùsókè.',
 'dberr-info' => '(Kò le farakan ẹ̀rọ-ìpèsè ibùdó dátà: $1)',
 'dberr-usegoogle' => 'Ẹ le ṣàwárí lórí Google báyìí ná.',
@@ -3584,8 +3584,8 @@ Ibiìtakùn yìí únkojú ìsòro ìṣìṣẹ́ẹ̀rọ.',
 'logentry-newusers-create2' => 'Àpamọ́ oníṣe $3 jẹ́ dídá látọwọ́ $1',
 'logentry-newusers-autocreate' => 'Àkópamọ́ $1 jẹ́ dídá fúnrarẹ̀',
 'logentry-rights-rights' => '$1 yí ìjọ́mọ ẹgbẹ́ padà fún $3 láti $4 sí $5',
-'logentry-rights-rights-legacy' => '$1 yí ìjọ́mọ ẹgbẹ́ padà fún $3',
-'logentry-rights-autopromote' => '$1 jẹ́ gbígbéga nífúnraẹni láti $4 sí $5',
+'logentry-rights-rights-legacy' => '$1 {{GENDER:$2|yí}} ọmọ ẹgbẹ́ padà fún $3',
+'logentry-rights-autopromote' => '$1 jẹ́ {{GENDER:$2|gbígbénípòga}} nífúnraẹni láti $4 sí $5',
 'rightsnone' => '(kòsí)',
 
 # Feedback
@@ -3640,6 +3640,7 @@ Bíbẹ̀ẹ̀kọ́, ẹ le lo fọ́ọ̀mù ìsàlẹ̀. Ẹjọ́ yín yíò
 'api-error-ok-but-empty' => 'Àsìṣe inú: Kò sí ìdáhùn látọwọ́ ẹ̀rọ-ìpèsè.',
 'api-error-overwrite' => 'Ìkọlélórí fáìlì tó wà kò jẹ́ gbígbà ní àyè.',
 'api-error-stashfailed' => 'Àsìṣe inú: Ẹ̀rọ-ìpèsè kùnà láti fi fáìlì ìgbàdíẹ̀ pamọ́.',
+'api-error-publishfailed' => 'Àṣìṣe inú: Ẹ̀rọ-ìpèsè kùnà láti tẹ fáìlì ìgbàdíẹ̀ jáde.',
 'api-error-timeout' => 'Ẹ̀rọ-ìpèsè kò dáhùn ní àrin àsìkò tó yẹ.',
 'api-error-unclassified' => 'Àsìṣe àìdámọ̀ kan ti ṣẹlẹ̀.',
 'api-error-unknown-code' => 'Àsìṣe aláìlójúùtú: "$1".',
@@ -3659,5 +3660,8 @@ Bíbẹ̀ẹ̀kọ́, ẹ le lo fọ́ọ̀mù ìsàlẹ̀. Ẹjọ́ yín yíò
 'duration-decades' => '{{PLURAL:$1|ẹ̀wàdún|ẹ̀wàdún}} $1',
 'duration-centuries' => '{{PLURAL:$1|ọ̀rúndún|ọ̀rúndún}} $1',
 'duration-millennia' => '{{PLURAL:$1|ẹ̀rúndún|ẹ̀rúndún}} $1',
+
+# Image rotation
+'rotate-comment' => 'Àwòrán jẹ́ mímúyípo ní {{PLURAL:$1|degree|ìyí}} $1 bíi ọwọ́ ago',
 
 );

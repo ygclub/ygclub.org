@@ -46,7 +46,6 @@ $messages = array(
 'tog-shownumberswatching' => 'biyn aadad lmostakhdimin lmoraqibin',
 'tog-oldsig' => 'moaayana litawqia lmawjod',
 'tog-fancysig' => 'aaml nass bhal nass wiki (bla wsla otomatikia)',
-'tog-showjumplinks' => 'mkkn wassalat "sir l" lmossaaida',
 'tog-uselivepreview' => 'staml listiarad saria (khasso javascipt) (tjribi)',
 'tog-forceeditsummary' => 'nbhni ila kandkhl molkhass taadil khawi',
 'tog-watchlisthideown' => 'khbi tadilat dyali mn qaaimat lmoraqaba',
@@ -143,7 +142,7 @@ $messages = array(
 'noindex-category' => 'shat mamfhtsach',
 'broken-file-category' => 'ṣfaḫi fiha wṣlat milffaṫ mhrrsa',
 
-'linkprefix' => '/^(.*?)([a-zA-Z\\x80-\\xff]+)$/sD',
+'linkprefix' => '/^((?>.*(?<![a-zA-Z\\x80-\\xff])))(.+)$/sD',
 
 'about' => 'ala',
 'article' => 'sfht mohtawa',
@@ -247,7 +246,7 @@ $1',
 'pool-queuefull' => 'Ṣeff l-ĥedma ĝamṛa',
 'pool-errorunknown' => 'khata mjhol',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Kolċi ĝla {{SITENAME}}',
 'aboutpage' => 'Project:Meĝlomaṫ',
 'copyright' => 'L-moḫṫawa mojod fe $1',
@@ -283,7 +282,6 @@ chof [[Special:Version|sfht lversion]]',
 'newmessagesdifflink' => 'ṫ-ṫeġyir l-leĥĥer',
 'youhavenewmessagesmulti' => 'Jawek méṣajaṫ jdad fe $1',
 'editsection' => 'Ṣayeb',
-'editsection-brackets' => '[$1]',
 'editold' => 'ṣayeb',
 'viewsourceold' => 'Ċof l-masdar',
 'editlink' => 'ṣayeb',
@@ -334,21 +332,6 @@ lista dyal safahat lkhassa ghatlgaha f [[Special:SpecialPages|{{int:specialpages
 # General errors
 'error' => "ĥata'",
 'databaseerror' => 'khataaa f qaaaidat lbayanat',
-'dberrortext' => 'khata fsight amr qaaaidat lbayanat
-hadchi iqdr ikon raja lchi khataa f lbrnamaj
-akhir amr dyal qaaidat lbayanat kan
-<blockquote><tt>$1</tt></blockquote>
-dakhl had dalla "<tt>$2</tt>".
-qaaidat lbayant rddat bhad lkhataa "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'wqĝ waḫd lmoċkil f siġt istiĝlam qaĝidat lbayanat
-
-aĥir talab istiĝlam qaĝidat lbayanat kan
-
-"$1"
-
-li hwa mn daĥl ddala "$2".
-
-qaĝidat lbayanat rjĝat lĥata\' "$3: $4"',
 'laggedslavemode' => "'''attansyo''' sfḫa iqdr mafihach aĥir tḫditaṫ",
 'readonly' => 'qaĝidat lbayanat msdoda',
 'enterlockreason' => 'dĥl sabab lli ĥllak tsdha, okadalik lwaqt li momkin thll bqdha',
@@ -396,7 +379,6 @@ Query: $2',
 'viewsourcetext' => 'imkn lik  tchof otcopie lmasdar dyak had sfha',
 'protectedinterface' => 'had ṣfḫa ka-ṫĝti n-naṣṣ dl-interface dial l-logiciel, o-raḫa mḫmiyya baċ maymknċ ṫṫĥrab.',
 'editinginterface' => "'''ṫḫdir:''' rak ka-ĝddal waḫd ṣ-ṣfḫa lli msṫĝmla baċ ṫĝti n-naṣṣ dl-interface dial l-logiciel. ṫĥyiraṫ fiha ġadi ṫ'aṫṫar ĝla l-mḍhr dial l-interface dl-mosṫaĥdim ĝnd l-mosṫaĥdimin l-aĥrin. l-ttarjamaṫ, ċoflik mĝa [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net], the MediaWiki localisation project.",
-'sqlhidden' => '(talab SQL mĥfi)',
 'cascadeprotected' => 'had ṣfḫa mḫmiyya mn ṫĝdil, ḫqaċ fiha {{PLURAL:$1|ṣfḫa|ṣfaḫi}} mḫmiyya mĝa l-option "cascading" ĥḍḍama:
 $2',
 'namespaceprotected' => "ma msmoh-likċ baċ ṫĝddl ṣfahi mn n-nitaq '''$1'''.",
@@ -421,7 +403,6 @@ tqdr tchof baad sfahi bhal ila msjl hta tfrgh lcache dyalk",
 'yourpassword' => 'Saroṫ:',
 'yourpasswordagain' => 'aaawd ktb lmot de passe dyalk',
 'remembermypassword' => 'Ĝqel ĝla smiyṫ l-ḫsab dyali fe had l-ordinaṫør (ġir limoddaṫ {{PLURAL:$1|yom waḫed|$1 iyyam}})',
-'securelogin-stick-https' => 'bqa mṫṫasl bl-HTTPS moṛa d-doĥol',
 'yourdomainname' => 'domain dyalk',
 'externaldberror' => "kayn imma ċi ĥata' f-doĥol qaĝidaṫ l-bayanaṫ wlla rah ma msmoḫ-likċ baċ ṫḫddṫ l-ḫisab l-ĥariji taĝk.",
 'login' => 'Dĥel',
@@ -528,7 +509,7 @@ baċ ṫsali d-doĥol, ĥask ddir ċi klmṫ s-srr jdida hna:",
 'newpassword' => 'lmot de passe jdida :',
 'retypenew' => 'aaawd ktb lmot de passe jdida :',
 'resetpass_submit' => 'rigler lmot de pass odkhl',
-'resetpass_success' => 'klmṫ s-srr taĝk rah ṫbddlaṫ!
+'changepassword-success' => 'klmṫ s-srr taĝk rah ṫbddlaṫ!
 daba hanta ka-tdĥol...',
 'resetpass_forbidden' => 'ma ymkn-ċ ṫbddal klmaṫ s-srr',
 'resetpass-no-info' => 'ĥaṣṣ tkon daĥol baĥ tqdr twṣl l-had ṣfḫa niċan.',
@@ -999,7 +980,6 @@ Laḫed ana imken ikono l-indexaṫ dial {{SITENAME}} qdam o ma bqaoċ ṣalḫi
 'resetprefs' => 'hiyd tgyirat li mamsjlach',
 'restoreprefs' => 'rjaa kaml liadadat liftiradiya',
 'prefs-editing' => 'thrir',
-'prefs-edit-boxsize' => 'hajm nafidat thrir',
 'rows' => 'sofof:',
 'columns' => 'aaamida:',
 'searchresultshead' => 'Qelleb',
@@ -1038,7 +1018,6 @@ Laḫed ana imken ikono l-indexaṫ dial {{SITENAME}} qdam o ma bqaoċ ṣalḫi
 'prefs-custom-js' => 'personalisé JavaScript',
 'prefs-common-css-js' => 'CSS/JavaScript l-moċṫarak bin jmiĝ s-skinaṫ:',
 'prefs-emailconfirm-label' => "konfirmi l'email:",
-'prefs-textboxsize' => 'hajm nafidat tahrir',
 'youremail' => 'I-Méyl',
 'username' => 'smiṫ l-mosṫĥdim:',
 'uid' => 'raqm lmostakhdim :',
@@ -1254,7 +1233,6 @@ Laḫed ana imken ikono l-indexaṫ dial {{SITENAME}} qdam o ma bqaoċ ṣalḫi
 'recentchangeslinked-feed' => 'L-mṫidad dyal ṣ-ṣefḫaṫ l-li mlaqyin',
 'recentchangeslinked-toolbox' => 'L-mṫidad dyal ṣ-ṣefḫaṫ l-li mlaqyin',
 'recentchangeslinked-title' => 'Ṫ-Ṫeġyiraṫ li mlaqyin mĝa "$1"',
-'recentchangeslinked-noresult' => 'ta tghyir f sfahi mrtabta f lmodda li drtiha',
 'recentchangeslinked-summary' => "Hadi lista dial 'ṫ-ṫeġyiraṫ li ṫdaro mo'aĥarane le 'ṣ-ṣefḫaṫ li mlaqyin mĝa 'ṣ-ṣefḫa l-meĝniya (ola le 'aĝda' dial ċi ṣefa mĝayana). 'Ṣ-Ṣefḫaṫ li [[Special:Watchlist|mṫebeĝ]] mekṫobine be ḫrof ġlaḍ.",
 'recentchangeslinked-page' => 'Smiyṫ ṣ-ṣefḫa',
 'recentchangeslinked-to' => 'Ċof ṫ-ṫeġyiraṫ dyal ṣ-ṣefḫaṫ li fihom ċi lyan kayddik le ṣ-ṣefḫa li bġiṫi fe blaṣt ma ṫdir l-ĝeks',
@@ -1463,9 +1441,6 @@ $1',
 'statistics-views-peredit' => 'l-moċahadaĝ l-koll ṫĝdil',
 'statistics-users-active' => 'mostakhdimon nachtin',
 'statistics-mostpopular' => 'aktar sfahi mochahada',
-
-'disambiguations' => 'sfahi dyal tawdih',
-'disambiguationspage' => 'Template:tawdih',
 
 'doubleredirects' => 'ṫḫwila mḍoḅla',
 'double-redirect-fixed-move' => '[[$1]] ṫnqlaṫ.
@@ -2596,7 +2571,6 @@ jrreb l-ĝṛḍ l-ĝadi.',
 'version-other' => 'okhra',
 'version-mediahandlers' => 'motahakkimat lmedia',
 'version-hooks' => 'lkhtatif',
-'version-extension-functions' => 'wadaif lmohallil',
 'version-parser-extensiontags' => 'wossom imtidad lmohallil',
 'version-parser-function-hooks' => 'khtatif dyal dalat lmohllil',
 'version-hook-name' => 'smiyt lkhttaf',

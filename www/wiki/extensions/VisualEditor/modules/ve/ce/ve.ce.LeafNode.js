@@ -16,7 +16,7 @@
  *
  * @constructor
  * @param {ve.dm.LeafNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.LeafNode = function VeCeLeafNode( model, config ) {
 	// Mixin constructor
@@ -25,17 +25,17 @@ ve.ce.LeafNode = function VeCeLeafNode( model, config ) {
 	// Parent constructor
 	ve.ce.Node.call( this, model, config );
 
-	// DOM Changes
+	// DOM changes
 	if ( model.isWrapped() ) {
-		this.$.addClass( 've-ce-leafNode' );
+		this.$element.addClass( 've-ce-leafNode' );
 	}
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.LeafNode, ve.ce.Node );
+OO.inheritClass( ve.ce.LeafNode, ve.ce.Node );
 
-ve.mixinClass( ve.ce.LeafNode, ve.LeafNode );
+OO.mixinClass( ve.ce.LeafNode, ve.LeafNode );
 
 /* Static Properties */
 
@@ -43,14 +43,16 @@ ve.ce.LeafNode.static.tagName = 'span';
 
 /* Methods */
 
+/** */
 ve.ce.LeafNode.prototype.onSetup = function () {
 	ve.ce.Node.prototype.onSetup.call( this );
-	this.$.addClass( 've-ce-leafNode' );
+	this.$element.addClass( 've-ce-leafNode' );
 };
 
+/** */
 ve.ce.LeafNode.prototype.onTeardown = function () {
 	ve.ce.Node.prototype.onTeardown.call( this );
-	this.$.removeClass( 've-ce-leafNode' );
+	this.$element.removeClass( 've-ce-leafNode' );
 };
 
 /**
@@ -69,8 +71,8 @@ ve.ce.LeafNode.prototype.onTeardown = function () {
  *
  * @method
  * @returns {Array} Array of HTML fragments, i.e.
- *                   [ string | jQuery | [string|jQuery, ve.dm.AnnotationSet] ]
+ *  [ string | jQuery | [string|jQuery, ve.dm.AnnotationSet] ]
  */
 ve.ce.LeafNode.prototype.getAnnotatedHtml = function () {
-	return [ [ this.$, this.getModel().getAnnotations() ] ];
+	return [ [ this.$element, this.getModel().getAnnotations() ] ];
 };

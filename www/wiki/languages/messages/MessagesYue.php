@@ -264,7 +264,6 @@ $messages = array(
 'tog-shownumberswatching' => '顯示有幾多人監視',
 'tog-oldsig' => '原有簽名嘅預覽：',
 'tog-fancysig' => '將簽名以維基字對待（冇自動連結）',
-'tog-showjumplinks' => '啟用 "跳至" 協助連結',
 'tog-uselivepreview' => '用即時預覽（需要JavaScript）（實驗緊）',
 'tog-forceeditsummary' => '我冇入修改註解時通知我',
 'tog-watchlisthideown' => '響監視清單度隱藏我嘅編輯',
@@ -279,6 +278,7 @@ $messages = array(
 'tog-noconvertlink' => '唔轉連結標題',
 'tog-norollbackdiff' => '進行反轉之後略過差異',
 'tog-useeditwarning' => '當我離開未保存好嘅修改嗰陣警告我',
+'tog-prefershttps' => '簽到後繼續用加密連線',
 
 'underline-always' => '全部',
 'underline-never' => '永不',
@@ -463,7 +463,7 @@ $1',
 'pool-queuefull' => '隊池已滿',
 'pool-errorunknown' => '未知嘅錯誤',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '關於{{SITENAME}}',
 'aboutpage' => 'Project:關於',
 'copyright' => '響版度嘅內容係根據$1嘅條款發佈。',
@@ -543,17 +543,6 @@ $1',
 # General errors
 'error' => '錯誤',
 'databaseerror' => '資料庫錯誤',
-'dberrortext' => '資料庫查詢語法錯咗。
-咁係可能指出軟件中可能有臭蟲。
-最後一次資料庫嘅嘗試係：
-<blockquote><tt>$1</tt></blockquote>
-於 "<tt>$2</tt>" 功能中。
-數據庫嘅錯誤回應 "<tt>$3: $4</tt>"。',
-'dberrortextcl' => '資料庫查詢語法錯咗。
-最後一次資料庫嘅嘗試係：
-"$1"
-於 "$2"功能中。
-數據庫嘅錯誤回應 "$3: $4"',
 'laggedslavemode' => '警告：呢頁可能未包括最新嘅更新。',
 'readonly' => '資料庫鎖咗',
 'enterlockreason' => '輸入鎖資料庫嘅原因，同埋預計幾耐後會解鎖',
@@ -599,7 +588,6 @@ $1',
 'viewsourcetext' => '你可以睇吓或者複製呢一頁嘅原始碼：',
 'protectedinterface' => '呢一頁提供軟件嘅介面文字，呢一頁已經保護咗以預防濫用。',
 'editinginterface' => "'''警告：'''你而家編輯緊嘅呢一個用嚟提供介面文字嘅頁面。響呢一頁嘅更改會影響到其他用戶使用中嘅介面外觀。要翻譯，請考慮利用[//translatewiki.net/wiki/Main_Page?setlang=yue translatewiki.net]，一個用來為MediaWiki軟件本地化嘅計劃。",
-'sqlhidden' => '(SQL 查詢隱藏)',
 'cascadeprotected' => '呢一版已經保護咗唔能夠編輯，因為佢係響以下嘅{{PLURAL:$1|一|幾}}頁度包含咗，當中啟用咗"連串"保護選項來保護嗰一版: $2',
 'namespaceprotected' => "你無權編輯響'''$1'''空間名裏面嘅呢一版。",
 'ns-specialprotected' => '特別頁係唔可以編輯嘅。',
@@ -619,7 +607,6 @@ $1',
 'yourpassword' => '密碼:',
 'yourpasswordagain' => '再輸入密碼:',
 'remembermypassword' => '響呢個瀏覽器度記住我嘅登入資料 (最高維持$1{{PLURAL:$1|日|日}})',
-'securelogin-stick-https' => '登入後繼續以HTTPS連接',
 'yourdomainname' => '你嘅網域:',
 'externaldberror' => '驗證資料庫出錯，或者唔允許你更新你嘅外部帳戶。',
 'login' => '登入',
@@ -708,7 +695,7 @@ $1',
 'newpassword' => '新密碼:',
 'retypenew' => '打多次新密碼:',
 'resetpass_submit' => '設定密碼同登入',
-'resetpass_success' => '你嘅密碼已經成功噉改咗！
+'changepassword-success' => '你嘅密碼已經成功噉改咗！
 而家幫你登入緊...',
 'resetpass_forbidden' => '唔可以更改密碼',
 'resetpass-no-info' => '你一定要登入咗去直接入來呢一版。',
@@ -893,7 +880,7 @@ $1',
 
 你應該要考慮吓繼續編輯呢一版係唔係適合嘅。
 為咗方便起見，呢一版嘅刪除同搬版記錄已經響下面提供:",
-'moveddeleted-notice' => '呢一版已經刪除咗。
+'moveddeleted-notice' => '呢一版已經刪咗。
 呢版嘅刪除同搬版日誌響下面提供咗以便參考。',
 'log-fulllog' => '睇成個日誌',
 'edit-hook-aborted' => '編輯由鈎取消咗。
@@ -1193,7 +1180,6 @@ $1",
 'resetprefs' => '清除未保存嘅更改',
 'restoreprefs' => '恢復全部預設設定',
 'prefs-editing' => '編輯中',
-'prefs-edit-boxsize' => '編寫框大細',
 'rows' => '列：',
 'columns' => '行：',
 'searchresultshead' => '搵嘢',
@@ -1204,9 +1190,6 @@ $1",
 'recentchangesdays-max' => '最多 $1 日',
 'recentchangescount' => '預設顯示嘅編輯數：',
 'prefs-help-recentchangescount' => '呢個包埋最近修改、頁歷史同埋日誌紀錄。',
-'prefs-help-watchlist-token' => '響呢欄加入一個秘密匙會生成一個對你監視清單嘅RSS源。
-任何一位知道響呢個欄位嘅匙會睇到你嘅監視清單，請揀一個安全嘅值。
-呢度有一個任意生成嘅值，你係可以去揀嘅: $1',
 'savedprefs' => '你嘅喜好設定已經儲存。',
 'timezonelegend' => '時區:',
 'localtime' => '本地時間:',
@@ -1236,7 +1219,6 @@ $1",
 'prefs-common-css-js' => '共有嘅CSS同埋JavaScript畀所有畫面用：',
 'prefs-reset-intro' => '你可以用呢版去重設你嘅喜好設定到網站預設值。呢個動作無得番轉頭。',
 'prefs-emailconfirm-label' => '電郵確認:',
-'prefs-textboxsize' => '編寫框大細',
 'youremail' => '電郵:',
 'username' => '用戶名:',
 'uid' => '用戶 ID:',
@@ -1468,7 +1450,6 @@ $1",
 'recentchangeslinked-feed' => '連結頁嘅更改',
 'recentchangeslinked-toolbox' => '連結頁嘅更改',
 'recentchangeslinked-title' => '對「$1」有關嘅更改',
-'recentchangeslinked-noresult' => '響呢一段時間內連結頁並無更改。',
 'recentchangeslinked-summary' => "呢一個特別頁列示咗''由''所畀到嘅一版連結到頁嘅最近更改（或者係指定分類嘅成員）。
 響[[Special:Watchlist|你張監視清單]]嘅版會以'''粗體'''顯示。",
 'recentchangeslinked-page' => '頁名:',
@@ -1780,11 +1761,6 @@ $1',
 'statistics-users-active-desc' => '響$1日前做過動作嘅用戶',
 'statistics-mostpopular' => '最多人睇嘅頁',
 
-'disambiguations' => '搞清楚頁',
-'disambiguationspage' => 'Template:disambig
-Template:搞清楚',
-'disambiguations-text' => "以下呢啲頁面連結去一個'''搞清楚頁'''。佢哋先至應該指去正確嘅主題。<br />如果一個頁面連結自[[MediaWiki:Disambiguationspage]]，噉就會當佢係搞清楚頁。",
-
 'doubleredirects' => '雙重跳轉',
 'doubleredirectstext' => '每一行都順次序寫住第一頁名，佢嘅目的頁，同埋目的頁再指去邊度。改嘅時候，應該將第一個跳轉頁轉入第三頁。
 <del>劃咗</del>嘅項目係已經解決咗嘅。',
@@ -2008,7 +1984,6 @@ Template:搞清楚',
 'unwatchthispage' => '停止監視',
 'notanarticle' => '唔係一個內容頁',
 'notvisiblerev' => '上次由唔同用戶嘅修訂已經刪除咗',
-'watchnochange' => '響顯示嘅時間之內，你所監視嘅頁面並無任何嘅更改。',
 'watchlist-details' => '唔計討論頁，有 $1 版響你個監視清單度。',
 'wlheader-enotif' => '電子郵件通知已經啟用。',
 'wlheader-showupdated' => "'''粗體字'''嘅頁響你上次嚟之後被人改過",
@@ -3219,7 +3194,6 @@ $5
 'version-other' => '其他',
 'version-mediahandlers' => '媒體處理器',
 'version-hooks' => '鈎',
-'version-extension-functions' => '擴展函數',
 'version-parser-extensiontags' => '語法擴展標籤',
 'version-parser-function-hooks' => '語法函數鈎',
 'version-hook-name' => '鈎名',
@@ -3304,8 +3278,7 @@ MediaWiki是基於使用目的而加以發佈，但係就唔會負上任何嘅�
 
 # Database error messages
 'dberr-header' => '呢個 wiki 出咗問題',
-'dberr-problems' => '對唔住！
-呢一版出現咗一啲技術性問題。',
+'dberr-problems' => '對唔住！呢一版出現咗一啲技術性問題。',
 'dberr-again' => '試吓等多幾分種然後開試。',
 'dberr-info' => '(唔能夠連繫個資料伺服器: $1)',
 'dberr-usegoogle' => '響現階段你可以用 Google 去搵嘢。',

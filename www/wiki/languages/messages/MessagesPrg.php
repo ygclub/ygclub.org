@@ -43,7 +43,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Waidinnais gīrbin stēisan nadirīntin tērpautajan',
 'tog-oldsig' => 'Twājs tēntiskas papeisāsenis',
 'tog-fancysig' => 'Laikais papeisāsenin per wikitekstan (šlāit autōmatiskan sēisnan)',
-'tog-showjumplinks' => 'Enklaūjais autengīnsenins "sākais en"',
 'tog-uselivepreview' => 'Tērpaus dināmiskan pirmādiran (JavaScript) (eksperimentālin)',
 'tog-forceeditsummary' => 'Pawakēis mi nierpilninsenin stesse ebpeisāsenin stēisan kitawīdinsnan',
 'tog-watchlisthideown' => 'Kliptinais majjans redigīsenins en listei stēisan nadirītan',
@@ -223,7 +222,7 @@ Pāusai en kategōrijai "$1"',
 'jumptonavigation' => 'nawigaciōni',
 'jumptosearch' => 'laukīsna',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Ezze {{SITENAME}}',
 'aboutpage' => 'Project:Ezze',
 'copyright' => 'Ēnturs preiēiminan pa $1 licēncin.',
@@ -301,18 +300,6 @@ Listi stēisan preiēiminan speciālin pāusan aupalla si [[Special:SpecialPages
 # General errors
 'error' => 'Blānda',
 'databaseerror' => 'Dātanbazis blānda',
-'dberrortext' => 'Sīntaksis blānda tikka en prasīseņu stessei dātanbazin.
-Sta mazzi būtwei blānda en prōgramijai.
-Panzdaums, niizpalts prasīsenis ast:
-<blockquote><tt>$1</tt></blockquote>
-tengīntan pra funkciōnin „<tt>$2</tt>”.
-Dātanbazi etwārtai wartinna blāndan "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'Sīntaksis blānda tikka en prasīseņu stessei dātanbazin.
-Panzdaums, niizpalts prasīsenis ast:
-"$1"
-<blockquote><tt>$1</tt></blockquote>
-izwakītan iz funkciōnin „$2”.
-Dātanbazi etwārtai wartinna blāndan "$3: $4".',
 'laggedslavemode' => 'Nōda: Šin pāusan mazzi ni turritun ēn sen ukanāunaisins ernaunīnsenins.',
 'readonly' => 'Dātanbazi ast auklaūtan',
 'enterlockreason' => 'Dāis brewīnslin stesse dātanbazis auklaūsenin be enkaīnintan etklaūsenes kērdan',
@@ -356,7 +343,6 @@ Prasīsenis: $2',
 'editinginterface' => "'''Ēmpirsergīsenis:''' Tu redigijja pāusan, kawīdan turri en sen prōgraminin interfācas tekstan.
 Kitawīdinsnas en šismu pāusan wīrst kitawīdinušas interfācas pawīdan per kittans tērpautajans.
 Per tulkausnans, madli endirēis tērpautun [//translatewiki.net/wiki/Main_Page?setlang=prg translatewiki.net], - MediaWiki tulkausnan prōjaktan.",
-'sqlhidden' => '(SQL prasīsenis kliptintan)',
 'cascadeprotected' => 'Šin pāusan ast pakūnstan ezze redigīsnan, beggi ast ebīmtan en {{PLURAL:$1|ripīntsmu pāusan, kawīdan|ripīntimans pāusans, kawīdai}} turri mazīngiskwan "pakūnsnas weldīsnan" enklaūtan:
 $2',
 'namespaceprotected' => "Tū ni assei preiwērptan, kāi redigīlai pāusans en '''$1''' tītelin plattibei.",
@@ -466,7 +452,7 @@ Gēideis biskin, pirzdau tu wīrst bandāwuns etkūmps.',
 'newpassword' => 'Nāuns kliptaswīrds',
 'retypenew' => 'Āntrinais nāunan kliptaswīrdan',
 'resetpass_submit' => 'Ensadinnais kliptaswīrdan be enjaīs',
-'resetpass_success' => 'Twājs kliptaswīrds pastāi izpalewīngi kitawīdintan! Eneisnā wēraui...',
+'changepassword-success' => 'Twājs kliptaswīrds pastāi izpalewīngi kitawīdintan! Eneisnā wēraui...',
 'resetpass_forbidden' => 'Kliptaswīrdai ni mazzi būtwei kitawīdintan',
 'resetpass-no-info' => 'Tū turri būtwei engūbun, kāi turīlai entikriskan preiēisenin prei šin pāusan.',
 'resetpass-submit-loggedin' => 'Kitawīdinais kliptaswīrdan',
@@ -861,7 +847,6 @@ Pamēnais, kāi tenēisan indicai mazzi ni būtwei aktuālin.',
 'saveprefs' => 'Enpeisāis',
 'resetprefs' => 'Ausadinnais nienpeisātans kitawīdinsnans',
 'restoreprefs' => 'Etwārtai wartinnais wissans auprestaminans pirminiskwans',
-'prefs-edit-boxsize' => 'Redigīsnas langstas debban.',
 'rows' => 'Rīndas:',
 'columns' => 'Kōlunis:',
 'searchresultshead' => 'Laukīs',
@@ -896,7 +881,6 @@ Pamēnais, kāi tenēisan indicai mazzi ni būtwei aktuālin.',
 'prefs-custom-css' => 'swājs CSS',
 'prefs-custom-js' => 'swājs JavaScript',
 'prefs-emailconfirm-label' => 'E-mailas padruktinsna:',
-'prefs-textboxsize' => 'Redigīsnas langstas debban',
 'youremail' => 'Twajā e-mail adressi:',
 'username' => 'Tērpautajas pabilisnā:',
 'uid' => 'Tērpautajas ID:',
@@ -1108,7 +1092,6 @@ Tū mazzi dīgi etrīnktun dātun kitēimans drāugautwei sen tin pra tērpautaj
 # Recent changes linked
 'recentchangeslinked' => 'Kitawīdinsnas en preiristamans',
 'recentchangeslinked-title' => 'Kitawīdinsnas en pāusamans, prei kawīdans "$1" autenginna',
-'recentchangeslinked-noresult' => 'Ni bēi niaīnas kitawīdinsnas en preiristamans anga autenginantimmans pāusans en etrīnktan kērdasetrapan.',
 'recentchangeslinked-summary' => 'Zemmais ast listi stēisan panzdauman kitawīdinsnan en pāusamans prei kawīdans autenginna dātan pāusan (anga en wisēimans pāusans perlānkintimans prei dātan kategōrijan).
 Pāusai iz [[Special:Watchlist|nadirītan listin]] ast pastarīntan.',
 'recentchangeslinked-page' => 'Pāusas tītels',
@@ -1359,12 +1342,6 @@ Tērpausna: ēnturas_tīps/pōtips, perw. <code>image/jpeg</code>.',
 'statistics-users-active-desc' => 'Tērpautajai sēntei aktīwai en {{PLURAL:$1|panzdauman dēinan|panzdaumans dēinans}}',
 'statistics-mostpopular' => 'Ukadeznimai kāimalukitai pāusai',
 
-'disambiguations' => 'Ainapreslinsnas pāusai',
-'disambiguationspage' => 'Template:Ainapreslinsna',
-'disambiguations-text' => "Zemmaišai pāusai autenginna prei '''ainapreslinsnas pāusan'''.
-Tenēimans prawerru autengīntun entikriskai prei pāusas ēnturan. </br>
-Pāusan ast laikātan per ainapreslinsnan pāusan ik tennan tērpaui šablōnin prei kawīdan autenginna [[MediaWiki:Disambiguationspage]]",
-
 'doubleredirects' => 'Dwigubbai prawessenei',
 'doubleredirectstext' => 'Zemmais ast listi wisēisan pāusan sen prawessenins en pāusans, kawīdai prawedda en kittan pāusan.
 Erainā rindā turri ēn sen autengīnsenins en pirman be āntran prawessenin, tīt dīgi autengīnsenin kwēi wedda āntars prawessenis. Jāuku panzdaums autengīnsenin wedda en pāusan, en kawīdan prawerru prawestun pirmasmu pāusan.
@@ -1573,7 +1550,6 @@ Eraīna šisse pāusas ēnturas kitawīdinsna anga diskusiōnis pāusas sēitan 
 'unwatchthispage' => 'Wanginnais nadirītun',
 'notanarticle' => 'Sta ni ast artīkels',
 'notvisiblerev' => 'Wersiōni pastāi āupausintan',
-'watchnochange' => 'Niaīnan iz nadirītans pāusans ni bēi redigītan en padātan kērdasetrapan.',
 'watchlist-details' => 'Ast {{PLURAL:$1|$1 pāusan|$1 pāusai}} en twajjai listin stēisan nadirītan, ni gīrbawintei diskusiōnis pāusans.',
 'wlheader-enotif' => 'E-mail pawakīsenei ast enklaūtan.',
 'wlheader-showupdated' => "Pastāi '''pastarīntan''' pāusai,  kawīdai bēi kitawīdintan ezze Twajjai panzdauman tenēisan kāimalukisnan..",
@@ -2602,7 +2578,6 @@ Tu mazzi dīgi [[Special:EditWatchlist|tērpautun stāndardiskan editōran]].',
 'version-variables' => 'Wariāblis',
 'version-other' => 'Kitāi',
 'version-hooks' => 'Ānsai',
-'version-extension-functions' => 'Plattinsenes funkciōnis',
 'version-parser-extensiontags' => 'Parseras plattinsenes zentlitajai',
 'version-parser-function-hooks' => 'Parseras funkciōnis ānsai',
 'version-hook-name' => 'Ānsas pabilisnā',

@@ -51,7 +51,6 @@ $messages = array(
 'tog-shownumberswatching' => 'ویکھن آلے لوکاں دی گنتی وکھاؤ۔',
 'tog-oldsig' => 'ہن والے دسخط:',
 'tog-fancysig' => 'دستخط نوں وکی ٹیکسڈ ونگوں؎ ورتو(without an automatic link)',
-'tog-showjumplinks' => '"ایدر چلو" نوں رلن والے جوڑان نال جوڑو',
 'tog-uselivepreview' => 'لائیو پریویو ورتو',
 'tog-forceeditsummary' => 'مینون اوسے ویلے دسو جدوں خالی سمری تے آؤ۔',
 'tog-watchlisthideown' => 'میری اپنی لکھائی نوں اکھ تھلیوں لکاؤ',
@@ -247,7 +246,7 @@ $messages = array(
 'pool-queuefull' => 'چنوتی کرن ل‏ئی بندے پورے نیں۔',
 'pool-errorunknown' => 'انجان غلطی',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'بارے چ {{SITENAME}}',
 'aboutpage' => 'Project:بارے وچ',
 'copyright' => 'مال $1 دے تھلے ہے گا اے۔',
@@ -330,17 +329,6 @@ $messages = array(
 # General errors
 'error' => 'غلطی',
 'databaseerror' => 'ڈیٹابیس دی غلطی',
-'dberrortext' => 'اک ڈیٹابیس کویری سنٹیکس غلطی ہوگئی اے۔
-اے سوفٹویر چ اک بگ وی ہوسکدا اے۔
-آخری کوشش کیتی ڈیٹابیس کھوج:
-<blockquote><tt>$1</tt></blockquote>
-فنکشن چوں "<tt>$2</tt>".
-ڈیٹا بیس ریٹرنڈ غلطی "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'اکڈیٹابیس کویری سنٹیکس غلطی ہوگئی اے
-آخری ڈیٹابیس کویری سی:
-"$1"
-فنکش دے اندروں "$2"
-ڈیٹابیس ریٹرنڈ غلطی "$3: $4"',
 'laggedslavemode' => "'''خبردار:''' صفے تے نیڑےتریڈے ہون والیاں تبدیلیاں کوئی نیں۔",
 'readonly' => 'ڈیٹابیس تے تالا',
 'enterlockreason' => 'تالا لان دی وجہ دسو تے اہ وی دسو جے کدوں تالا کھلے گا',
@@ -389,7 +377,6 @@ $messages = array(
 'viewyourtext' => 'تسیں آپنی تبدیلیاں دا ذریعہ ایس صفے تے ویکھ تے کاپی کرسکدے او۔',
 'protectedinterface' => 'اے صفحے سافٹویئر نوں ورتن دی تھاں دیندا اے تے ایدے غلط ورتن نوں روکن واسطے اینوں بچایا ہویا اے۔',
 'editinginterface' => "'''خبردار:''' تسیں اک ایسا صفہ بدل رۓ او جیہڑا مکھی صفے دے سوفٹویر نوں لکھت دیندا اے۔ ایس صفے ج تبدیلی ورتنن والیاں دے مکھی صفے دے وکھالے نوں بدل دے گی۔ بولی وٹاندرے لئی، مہربانی کرکے میڈیاوکی بولی ویونت [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net] ول ویکھو۔",
-'sqlhidden' => '(SQL کھوج چھپائی ہوئي اے)',
 'cascadeprotected' => "ایس صفے نوں تبدیلی توں بچایا گیا اے، کیوں جے ایہ تھلے دتے گۓ {{PLURAL:$1|صفہ|صفے}} چ ہیگا اے تے اینوں ''کیسکیڈنگ'' چنوتی نال بچایا گیا اے:
 
  $2",
@@ -414,7 +401,6 @@ Note that some pages may continue to be displayed as if you were still logged in
 'yourpassword' => 'کنجی:',
 'yourpasswordagain' => 'کنجی دوبارہ لکھو:',
 'remembermypassword' => 'اس براؤزر تے میرا ورتن ناں یاد رکھو ($1 {{PLURAL:$1|دن|دناں}} واسطے)',
-'securelogin-stick-https' => 'لاک ان ہون دے مگروں HTTPS  نال جڑے روو۔',
 'yourdomainname' => 'تواڈا علاقہ:',
 'externaldberror' => 'ڈیٹابیس چ توانوں پہچاننے چ کوئی مسئلہ ہویا اے یا فیر تسی اپنا بارلا کھاتا نئیں بدل سکدے۔',
 'login' => 'اندر آؤ جی',
@@ -513,7 +499,7 @@ Note that some pages may continue to be displayed as if you were still logged in
 'newpassword' => 'نوی کنجی:',
 'retypenew' => 'نئی کنجی دوبارہ لکھو:',
 'resetpass_submit' => 'کنجی رکھو تے لاگ ان ہو جاو',
-'resetpass_success' => 'تھواڈی کنجی بدلی جاچکی اے!
+'changepassword-success' => 'تھواڈی کنجی بدلی جاچکی اے!
 تسی لاگ ان ہورۓ او۔۔۔۔۔۔',
 'resetpass_forbidden' => 'کنجی بدلی نئیں جاسکدی',
 'resetpass-no-info' => 'تسی لاگ ان ہوکے ای اس صفحے نوں ویکھ سکدے او۔',
@@ -1048,7 +1034,6 @@ $1",
 'resetprefs' => 'ناں بچائیاں ہویاں تبدیلیاں مکاؤ',
 'restoreprefs' => 'ڈیفالٹ سیٹنگز دوبارہ لیاؤ',
 'prefs-editing' => 'لکھائی',
-'prefs-edit-boxsize' => 'تبدیلی کرن والی ونڈو دا ناپ',
 'rows' => 'قطار:',
 'columns' => 'کالم:',
 'searchresultshead' => 'کھوج',
@@ -1059,8 +1044,6 @@ $1",
 'recentchangesdays-max' => 'میکسیمم $1 {{PLURAL:$1|دن|دن}}',
 'recentchangescount' => 'ڈیفالٹ چ تبدیلیاں دی گنتی:',
 'prefs-help-recentchangescount' => 'ہن دیاں تبدیلیاں صفیاں دے رکارڈ تے لاگاں ہیگیاں نیں۔',
-'prefs-help-watchlist-token' => 'ایس فیلڈ نوں پعرنا اک لکی کنجی نال تواڈی اکھ تھلے رکھی لسٹ لئی اک آر ایس ایس فیڈ بناۓ گا۔ کوئی وی ایس فیلڈ چ جیہڑا کنجی جاندا اے  تواڈی اکھ تھلے رکھی  لسٹ نوں پڑھ لے گا، ایس لئی اک پکا نمبر چنو۔
-ایتھے اک الٹا پلٹا نمبر دتا گیا اے جینوں تسیں ورت سکدے او: $1',
 'savedprefs' => 'تواڈیاں تانگاں بچا لئیاں گئیاں نیں۔',
 'timezonelegend' => 'ویلے دا علاقہ',
 'localtime' => 'مقامی ویلا:',
@@ -1092,7 +1075,6 @@ $1",
 
 اے واپس نئیں ہوسکدا۔',
 'prefs-emailconfirm-label' => 'ای-میل کنفرمیشن:',
-'prefs-textboxsize' => 'تبدیلی کرن والی ونڈو دا ناپ',
 'youremail' => 'ای میل:',
 'username' => 'ورتن آلے دا ناں:',
 'uid' => 'ورتن والے دی آئی ڈی',
@@ -1333,7 +1315,6 @@ $1",
 'recentchangeslinked-feed' => 'ملدیاں جلدیاں تبدیلیاں',
 'recentchangeslinked-toolbox' => 'ملدیاں جلدیاں تبدیلیاں',
 'recentchangeslinked-title' => '"$1" نال تعلق آلیاں تبدیلیاں',
-'recentchangeslinked-noresult' => 'جڑیاں صفحیاں چ دتے ہوۓ ویلے چ کوئی تبدیلیاں نہیں۔',
 'recentchangeslinked-summary' => "اے اوناں تبدیلیاں دی لسٹ اے جیڑیاں تھوڑا چر پہلاں بنائیاں گئیاں اوناں صفحیاں تے جیڑے خاص صفحے تے جڑدے نے یا کسی خاص کیٹاگری دے ممبراں نوں۔<br />
 تواڈی [[Special:Watchlist|اکھ تھلے صفحے]] '''موٹے''' نیں۔",
 'recentchangeslinked-page' => 'صفے دا ناں:',
@@ -1706,12 +1687,6 @@ $1",
 'statistics-users-active-desc' => 'ورتنوالے جناں نیں پچھلے {{PLURAL:$1|دن|$1 دناں}}  چ کم کیتا اے۔',
 'statistics-mostpopular' => 'سب توں بوتے ویکھے گۓ صفے',
 
-'disambiguations' => 'اوہ صفے جیہڑے گنجل کھول صفیاں نال جڑدے نیں۔',
-'disambiguationspage' => 'سانچہ: ڈسایمبگ',
-'disambiguations-text' => "تھلے دتے گۓ صفیاں دا اک '''گنجل کھول''' نال جوڑ اے۔
-ایدے بجاۓ ایدا جوڑ کسے ٹھیک سرناویں نال جوڑو<br />
-اک صفہ گنجل کھول صفے لئی منیا جائیگا  اگر اے اک ٹمپلیٹ ورتدا جیدا جوڑ [[MediaWiki:Disambiguationspage]] نال ہووے۔",
-
 'doubleredirects' => 'دوہری ریڈیرکٹس',
 'doubleredirectstext' => 'ایس صفے تے اوناں صفیاں دی لسٹ اے جیہڑے ریڈائرکٹ کردے نیں دوجے ریڈائرکٹ صفیاں ول۔
 ہر قطار چ جوڑ نیں  پہلے تے دوجے ریڈائرکٹ نال ، نال دوجے دیڑائرکٹ ول دا تارگٹ نیں جیہڑا کے ٹھیک تارگٹ صفہ ہوندا اے جیہڑا کہ پہلے ریڈائرکٹ نوں اشارہ کرنا چائیدا اے۔
@@ -1950,7 +1925,6 @@ $1",
 'unwatchthispage' => 'اکھ رکھنا چھڈو',
 'notanarticle' => 'لکھن صفہ نئیں۔',
 'notvisiblerev' => 'آخری ریوین کسے ہور ورتن والے دی مٹادتی گئی اے۔',
-'watchnochange' => 'دسے گۓ ویلے چ تھواڈیاں ویکھیاںشیواں نئیں بدلیاں گیاں۔',
 'watchlist-details' => '{{PLURAL:$1|$1 صفحہ|$1 صفحہ}} تواڈی اکھ تھلے گلاں باتاں شامل نہیں۔',
 'wlheader-enotif' => 'ای-میل نوٹیفیکیشن قابل',
 'wlheader-showupdated' => ' صفے جیہڑے بدلے کۓ تھواڈے آخری وار آن مکرون  اونان نوں موٹا کرکے دسیا گیا اے۔',
@@ -3366,7 +3340,6 @@ $5
 'version-other' => 'دوجے',
 'version-mediahandlers' => 'میڈیا ہینڈلرز',
 'version-hooks' => 'ہکز',
-'version-extension-functions' => 'ایکسٹنشن فنکشن',
 'version-parser-extensiontags' => 'پاسر ایکسٹنشن ٹیگز',
 'version-parser-function-hooks' => 'پاسر فنکشن ہکز',
 'version-hook-name' => 'ہک ناں',
@@ -3456,8 +3429,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
 
 # Database error messages
 'dberr-header' => 'ایس وکی چ کوئی مسلہ اے۔',
-'dberr-problems' => 'معاف کرنا !
-ایس صفے تے تکنیکی مسلے آرۓ نیں۔',
+'dberr-problems' => 'معاف کرنا ! ایس صفے تے تکنیکی مسلے آرۓ نیں۔',
 'dberr-again' => 'تھو ڑے منٹ انتظار کرو تے دوبارہ لوڈ کرو۔',
 'dberr-info' => '(ڈیٹابیس سرور نال میل نئیں ہوسکیا:$1)',
 'dberr-usegoogle' => 'تسیں گوکل راہیں کھوج کر سکدے او۔',

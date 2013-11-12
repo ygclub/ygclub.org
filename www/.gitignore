@@ -1,100 +1,64 @@
-# For ygclub #
-answer/config.php
+# Repository management
+.svn
 
-bbs/config/config_ucenter.php
-bbs/config/config_global.php
-bbs/uc_client/data/cache/*
-bbs/data/backup*
-bbs/data/*.lock
-bbs/data/threadcache/*
+# git-deploy status file:
+/.deploy
 
-uc/data/config.inc.php
-uc/data/install.lock
-uc/data/upgrade.lock
-
-hdwiki/api/ucconfig.inc.php
-hdwiki/config.php
-hdwiki/plugins/ucenter/ucconfig.inc.php
-hdwiki/data
-hdwiki/uploads
-
-wp/wp-config.php
-
-wiki/LocalSettings.php
-wiki/extensions/Auth_UC/config.inc.php
-wiki/api/ucconfig.inc.php
-wiki/images/*
-wiki/extensions/DataValues
-wiki/baidu.xml
-wiki/.htaccess
-
-pm/tmp/*
-pm/module/ucenter/config.php
-pm/config/*
-pm/module/mail/ext/config/*
-pm/www/data/upload/*
-
-phpmyadmin
-pma
-mad
-w
-ctrip
-media
-sky
-apc.php
-test.php
-piwik
-to_be_deleted
-
-*~
-*.swp
-.*.swp
-*.bak
+# Editors
 *.kate-swp
+*~
+\#*#
+.#*
+.*.swp
 .project
-.settings
+cscope.files
+cscope.out
+## NetBeans
+nbproject*
+project.index
+## Sublime
+sublime-*
+sftp-config.json
 
-# Compiled source #
-###################
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
+# MediaWiki install & usage
+/cache
+/docs/js
+/images/[0-9a-f]
+/images/archive
+/images/deleted
+/images/lockdir
+/images/temp
+/images/thumb
+## Extension:EasyTimeline
+/images/timeline
+/images/tmp
+/maintenance/.mweval_history
+/maintenance/.mwsql_history
+/maintenance/dev/data
+/AdminSettings.php
+/LocalSettings.php
+/StartProfiler.php
 
-# Packages #
-############
-# it's better to unpack these files and commit the raw source
-# git has its own built in compression methods
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
+# Building & testing
+node_modules/
 
-# Logs and databases #
-######################
-*.log
-*.sql
-*.sqlite
+# Composer
+/vendor
+/composer.lock
+/composer.json
 
-# OS generated files #
-######################
+# Operating systems
+## Mac OS X
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-Icon?
-ehthumbs.db
+## Windows
 Thumbs.db
 
-## Xbbs ###
+# Misc
+.buildpath
+.classpath
 .idea
-
-#*.doc
-
+.metadata*
+.settings
+/favicon.ico
+/static*
+/tags

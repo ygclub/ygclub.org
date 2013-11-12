@@ -135,8 +135,13 @@ class ProtectionForm {
 			if ( isset( $val ) && in_array( $val, $wgRestrictionLevels ) ) {
 				// Prevent users from setting levels that they cannot later unset
 				if ( $val == 'sysop' ) {
-					// Special case, rewrite sysop to either protect and editprotected
-					if ( !$wgUser->isAllowedAny( 'protect', 'editprotected' ) ) {
+					// Special case, rewrite sysop to editprotected
+					if ( !$wgUser->isAllowed( 'editprotected' ) ) {
+						continue;
+					}
+				} elseif ( $val == 'autoconfirmed' ) {
+					// Special case, rewrite autoconfirmed to editsemiprotected
+					if ( !$wgUser->isAllowed( 'editsemiprotected' ) ) {
 						continue;
 					}
 				} elseif ( !$wgUser->isAllowed( $val ) ) {
@@ -297,14 +302,7 @@ class ProtectionForm {
 			}
 		}
 
-		# They shouldn't be able to do this anyway, but just to make sure, ensure that cascading restrictions aren't being applied
-		#  to a semi-protected page.
-		$edit_restriction = isset( $this->mRestrictions['edit'] ) ? $this->mRestrictions['edit'] : '';
 		$this->mCascade = $wgRequest->getBool( 'mwProtect-cascade' );
-		if ( $this->mCascade && ( $edit_restriction != 'protect' ) &&
-			!User::groupHasPermission( $edit_restriction, 'protect' ) ) {
-			$this->mCascade = false;
-		}
 
 		$status = $this->mArticle->doUpdateRestrictions( $this->mRestrictions, $expiry, $this->mCascade, $reasonstr, $wgUser );
 
@@ -320,7 +318,7 @@ class ProtectionForm {
 		 *             you can also return an array of message name and its parameters
 		 */
 		$errorMsg = '';
-		if ( !wfRunHooks( 'ProtectionForm::save', array( $this->mArticle, &$errorMsg ) ) ) {
+		if ( !wfRunHooks( 'ProtectionForm::save', array( $this->mArticle, &$errorMsg, $reasonstr ) ) ) {
 			if ( $errorMsg == '' ) {
 				$errorMsg = array( 'hookaborted' );
 			}
@@ -330,13 +328,8 @@ class ProtectionForm {
 			return false;
 		}
 
-		if ( $wgUser->isLoggedIn() && $wgRequest->getCheck( 'mwProtectWatch' ) != $wgUser->isWatched( $this->mTitle ) ) {
-			if ( $wgRequest->getCheck( 'mwProtectWatch' ) ) {
-				WatchAction::doWatch( $this->mTitle, $wgUser );
-			} else {
-				WatchAction::doUnwatch( $this->mTitle, $wgUser );
-			}
-		}
+		WatchAction::doWatchOrUnwatch( $wgRequest->getCheck( 'mwProtectWatch' ), $this->mTitle, $wgUser );
+
 		return true;
 	}
 
@@ -370,8 +363,10 @@ class ProtectionForm {
 			Xml::openElement( 'table', array( 'id' => 'mwProtectSet' ) ) .
 			Xml::openElement( 'tbody' );
 
+		// Not all languages have V_x <-> N_x relation
 		foreach ( $this->mRestrictions as $action => $selected ) {
-			/* Not all languages have V_x <-> N_x relation */
+			// Messages:
+			// restriction-edit, restriction-move, restriction-create, restriction-upload
 			$msg = wfMessage( 'restriction-' . $action );
 			$out .= "<tr><td>" .
 			Xml::openElement( 'fieldset' ) .
@@ -567,8 +562,13 @@ class ProtectionForm {
 		foreach ( $wgRestrictionLevels as $key ) {
 			//don't let them choose levels above their own (aka so they can still unprotect and edit the page). but only when the form isn't disabled
 			if ( $key == 'sysop' ) {
-				//special case, rewrite sysop to protect and editprotected
-				if ( !$wgUser->isAllowedAny( 'protect', 'editprotected' ) && !$this->disabled ) {
+				//special case, rewrite sysop to editprotected
+				if ( !$wgUser->isAllowed( 'editprotected' ) && !$this->disabled ) {
+					continue;
+				}
+			} elseif ( $key == 'autoconfirmed' ) {
+				//special case, rewrite autoconfirmed to editsemiprotected
+				if ( !$wgUser->isAllowed( 'editsemiprotected' ) && !$this->disabled ) {
 					continue;
 				}
 			} else {
@@ -605,6 +605,7 @@ class ProtectionForm {
 		if ( $permission == '' ) {
 			return wfMessage( 'protect-default' )->text();
 		} else {
+			// Messages: protect-level-autoconfirmed, protect-level-sysop
 			$msg = wfMessage( "protect-level-{$permission}" );
 			if ( $msg->exists() ) {
 				return $msg->text();

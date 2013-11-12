@@ -129,7 +129,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Va ota va rupes favesik nedir !',
 'tog-oldsig' => 'Tisa sugdara',
 'tog-fancysig' => 'Krafiara va sugdaks wetce wikitext (a mivaskafi gluyasiki)',
-'tog-showjumplinks' => 'Tutegirara va "grablera" vansarafi gluyasiki',
 'tog-uselivepreview' => 'Favera va abdiwira (JavaScript) (bagalon)',
 'tog-forceeditsummary' => 'Zo walzé viele betaravildeks tir vlardaf !',
 'tog-watchlisthideown' => 'Palsera va jinaf suzdasikif betakseem',
@@ -301,7 +300,7 @@ $messages = array(
 'jumptonavigation' => 'exulera',
 'jumptosearch' => 'aneyara',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Icde {{SITENAME}}',
 'aboutpage' => 'Project:Icdeuca',
 'copyright' => 'Deraykan cek kare $1.',
@@ -378,14 +377,6 @@ Vexala dem enafu aptafu bu tir rotrasina dene [[Special:SpecialPages|{{int:speci
 # General errors
 'error' => 'Rokla',
 'databaseerror' => 'Origakrokla',
-'dberrortext' => 'Vurarokla pu origak. Ironokafa kucilara suleyena gan origak tiyir :
-<blockquote><tt>$1</tt></blockquote>
-mal fliok « <tt>$2</tt> ».
-MySQL va « <tt>$3: $4</tt> » rokla al katacer.',
-'dberrortextcl' => 'Bibera va origak tir roklakirafa. Ironokafa stakseyena bibera tiyir:
-« $1 »
-skuyuna gan « $2 » fliok
-MySQL va « $3 : $4 » rokla al dimstakser.',
 'laggedslavemode' => 'Obral : bu va ironakaf tuenakseem rotir meruldar',
 'readonly' => 'Beta elekana nuskera va origak',
 'enterlockreason' => 'Va elekaradanda is uldinera va elekaracek bazel',
@@ -427,7 +418,6 @@ Erura : $2',
 'viewyourtext' => "Rowil va klita ke '''rinafa betara''' ise ko batu bu roksudal :",
 'protectedinterface' => 'Batu bu va walasikikrent ke talpeyot dafur nume ta djira va favejera zo ixatcar.',
 'editinginterface' => "'''Obral !''' Rin va bu favenu koe talpeyotwalasiki betal. Betara va batu bu va laviuca ke favesikafi walasiki dolge ar favesik vanolatar. Kalavason, va [//translatewiki.net/wiki/Main_Page?setlang=avk translatewiki.net], va MediaWiki abdumimaks va tulizukara, vay favel.",
-'sqlhidden' => '(SQL kucilara palsena)',
 'cascadeprotected' => 'Batu bu icde betara zo nendar, kire va vlevefu {{PLURAL:$1|bu|bu}} pasur, danu kan tegisa "stoyakorafa" rotisaca zo nendad : $2',
 'namespaceprotected' => "Va bu koe '''$1''' yoltxo me robetal !",
 'ns-specialprotected' => 'Aptafu bu tir merobetanu.',
@@ -520,7 +510,7 @@ Ta da wan zo pilkomodal, va warzaf remravlem batlize gobazel :",
 'newpassword' => 'Warzaf remravlem',
 'retypenew' => 'Va warzaf remravlem gruyel',
 'resetpass_submit' => 'Va beksa bazel nume zo dogluyatal !',
-'resetpass_success' => 'Rinaf remravlem kiewatcon su zo betar ! Nume rinafa dogluyara tir...',
+'changepassword-success' => 'Rinaf remravlem kiewatcon su zo betar ! Nume rinafa dogluyara tir...',
 'resetpass_forbidden' => 'Kona beksa tir merobetana',
 'resetpass-submit-loggedin' => 'Betara va remravlem',
 'resetpass-submit-cancel' => 'Kuidera',
@@ -884,7 +874,6 @@ Kan ''all:'' laganeyal ta varafa exulera (gon keyaksexo is teza ikz-), oke wetce
 'saveprefs' => 'Va lodamaceem tuená',
 'resetprefs' => 'Va lodamceem dimplekú',
 'prefs-editing' => 'Sutelaxo',
-'prefs-edit-boxsize' => 'Lum ke betaradilk.',
 'rows' => 'Emacekeem',
 'columns' => 'Brizeem',
 'searchresultshead' => 'Nedira va aneyaratrasikseem',
@@ -1085,7 +1074,6 @@ Rinafe e-mail mane me zo razdar viele ar webesik uzerar.',
 'recentchangeslinked-feed' => 'Gluyasikisuzdara',
 'recentchangeslinked-toolbox' => 'Gluyasikisuzdara',
 'recentchangeslinked-title' => 'Betakseem skedas va "$1"',
-'recentchangeslinked-noresult' => 'Meka betara va gluyasikikirafu bu remi bata rekola.',
 'recentchangeslinked-summary' => "Batu aptafu bu va ironokaf betakseem va gluyasikikirafu bu vexalar.
 Bu koe [[Special:Watchlist|rinafi suzdasiki]] tid '''vastaakorafu'''.",
 'recentchangeslinked-page' => 'Buyolt :',
@@ -1276,9 +1264,6 @@ Abdi sulara, setikel da va ari skedasiki va teza stujel.',
 'statistics-users-active' => 'Tegiraf pakesikeem',
 'statistics-mostpopular' => 'Tel lorupen bueem',
 
-'disambiguations' => 'Bu dem milyoltaca yo',
-'disambiguationspage' => '{{ns:template}}:Milyoltaca',
-
 'doubleredirects' => 'Jontolafa graskara',
 'doubleredirectstext' => "<b>Attention:</b> cette liste peut contenir des « faux positifs ». Dans ce cas, c'est probablement la page du premier #REDIRECT contient aussi du texte.<br />Chaque ligne contient les liens à la 1re et 2e page de redirection, ainsi que la première ligne de cette dernière, qui donne normalement la « vraie » destination. Le premier #REDIRECT devrait lier vers cette destination.",
 'double-redirect-fixed-move' => 'arrundayan [[$1]], dure graskan kal [[$2]]',
@@ -1458,7 +1443,6 @@ Ta sulara va batu bu div rinafi suzdasiki, koe grablexo va « Mea suzdá » vule
 'unwatchthispage' => 'Va batu bu mea suzdá',
 'notanarticle' => 'Nedoy teliz',
 'notvisiblerev' => 'Betaks sulayan',
-'watchnochange' => 'Nedoyu rinafu suzdanu bu al zo betar bak bazena rekola',
 'watchlist-details' => '{{PLURAL:$1|$1 bu|$1 bu}} koe rinafi suzdasiki rade prilarabueem.',
 'wlheader-enotif' => 'Email walzera tir tegisa.',
 'wlheader-showupdated' => "Bu betayanu vielu rin ironokon worayal tir '''sulatcalakorafu'''.",
@@ -2328,7 +2312,6 @@ This confirmation code will expire at $4.',
 'version-variables' => 'Remvodeem',
 'version-other' => 'Ar',
 'version-hooks' => 'Demi se',
-'version-extension-functions' => 'Divatces fliok se',
 'version-parser-extensiontags' => 'Exulerafa divatcenafa tcala',
 'version-parser-function-hooks' => 'Exuleraflidemi',
 'version-hook-name' => 'Demiyolt',

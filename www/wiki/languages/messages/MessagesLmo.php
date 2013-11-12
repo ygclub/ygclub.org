@@ -13,6 +13,7 @@
  * @author DracoRoboter
  * @author Flavio05
  * @author GatoSelvadego
+ * @author Geitost
  * @author Insübrich
  * @author Kemmótar
  * @author Malafaya
@@ -312,7 +313,7 @@ Per piasè, specia un mument prima de pruà a vardà anmò quela pagina chì.
 
 $1",
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'A prupòsit de {{SITENAME}}',
 'aboutpage' => 'Project:A pruposit',
 'copyright' => "El cuntegnüü a l'è dispunibil sota a una licenza $1.",
@@ -430,7 +431,7 @@ Tegné cünt che certi paginn pödass che i seguiten a vedess tant 'me se a füd
 'logout' => 'Va fö',
 'userlogout' => 'Và fö',
 'notloggedin' => 'Te seet minga dent in del sistema',
-'nologin' => "Gh'avii anmò da registrav? '''$1'''.",
+'nologin' => "Gh'avii anmò da registrav? $1.",
 'nologinlink' => 'Creé un cünt!',
 'createaccount' => 'Creá un cünt',
 'gotaccount' => "Gh'hee-t giamò un cünt? '''$1'''.",
@@ -861,8 +862,6 @@ La descrizión sura la sua [$2 pagina de descrizión del file] l'è mustrada ch�
 'statistics-users-active' => 'Druvadur ativ',
 'statistics-users-active-desc' => "Druvadur che i hann faa un'azión int {{PLURAL:$1|l'ültem dì|i ültem $1 dì}}",
 
-'disambiguations' => 'Pagin da disambiguazziún',
-
 'doubleredirects' => 'Redirezziún dópi',
 
 'brokenredirects' => 'Redirezziún interótt',
@@ -958,7 +957,6 @@ i vegnarann segnalaa chichinscì e la pagina la se vedarà cun caràter '''grev'
 'watch' => "Tegn d'öcc",
 'watchthispage' => "Tegn d'ögg quela pagina chì",
 'unwatch' => "Tegn pü d'ögg",
-'watchnochange' => "Nissün cambiament l'è stai faa ins i pàginn che te tegn d'ögg ind 'l períud de temp indicaa.",
 'watchlist-details' => '{{PLURAL:$1|$1 pagina|$1 paginn}} tegnüü sot ögg, fö che i paginn de discüssión.',
 'wlshowlast' => 'Fa vidé i ültim $1 ur $2 dì $3',
 'watchlist-options' => "Upzión lista d'ussevazión",

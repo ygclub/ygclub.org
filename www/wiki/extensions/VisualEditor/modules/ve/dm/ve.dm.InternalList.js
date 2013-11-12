@@ -9,14 +9,14 @@
  * DataModel meta item.
  *
  * @class
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  * @param {ve.dm.Document} doc Document model
  */
 ve.dm.InternalList = function VeDmInternalList( doc ) {
 	// Mixin constructors
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.document = doc;
@@ -26,6 +26,7 @@ ve.dm.InternalList = function VeDmInternalList( doc ) {
 	this.groupsChanged = [];
 	this.keyIndexes = {};
 	this.keys = [];
+	this.nextUniqueNumber = 0;
 
 	// Event handlers
 	if ( doc ) {
@@ -35,7 +36,7 @@ ve.dm.InternalList = function VeDmInternalList( doc ) {
 
 /* Inheritance */
 
-ve.mixinClass( ve.dm.InternalList, ve.EventEmitter );
+OO.mixinClass( ve.dm.InternalList, OO.EventEmitter );
 
 /* Events */
 
@@ -65,9 +66,7 @@ ve.dm.InternalList.prototype.queueItemHtml = function ( groupName, key, html ) {
 
 	if ( index === undefined ) {
 		index = this.itemHtmlQueue.length;
-		if ( key !== null ) {
-			this.keyIndexes[groupName + '/' + key] = index;
-		}
+		this.keyIndexes[groupName + '/' + key] = index;
 		this.itemHtmlQueue.push( html );
 		isNew = true;
 	} else if ( this.itemHtmlQueue[index] === '' ) {
@@ -164,20 +163,39 @@ ve.dm.InternalList.prototype.getNodeGroup = function ( groupName ) {
 /**
  * Get a unique list key for a given group.
  *
- * Generated list keys begin with ":", so that they are obviously different from hand-coded ones.
+ * The returned list key is added to the list of unique list keys used in this group so that it
+ * won't be allocated again. It will also be associated to oldListKey so that if the same oldListKey
+ * is passed in again later, the previously allocated name will be returned.
  *
  * @method
  * @param {string} groupName Name of the group
- * @returns {string} Unique list key
+ * @param {string} oldListKey Current list key to associate the generated list key with
+ * @param {string} prefix Prefix to distinguish generated keys from non-generated ones
+ * @returns {string} Generated unique list key, or existing unique key associated with oldListKey
  */
-ve.dm.InternalList.prototype.getUniqueListKey = function ( groupName ) {
+ve.dm.InternalList.prototype.getUniqueListKey = function ( groupName, oldListKey, prefix ) {
 	var group = this.getNodeGroup( groupName ),
 		num = 0;
 
-	while ( group.keyedNodes[':' + num ] ) {
+	if ( group.uniqueListKeys[oldListKey] !== undefined ) {
+		return group.uniqueListKeys[oldListKey];
+	}
+
+	while ( group.keyedNodes[prefix + num] || group.uniqueListKeysInUse[prefix + num] ) {
 		num++;
 	}
-	return ':' + num;
+
+	group.uniqueListKeys[oldListKey] = prefix + num;
+	group.uniqueListKeysInUse[prefix + num] = true;
+	return prefix + num;
+};
+
+/**
+ * Get the next number in a monotonically increasing series.
+ * @returns {number} One higher than the return value of the previous call, or 0 on the first call
+ */
+ve.dm.InternalList.prototype.getNextUniqueNumber = function () {
+	return this.nextUniqueNumber++;
 };
 
 /**
@@ -190,16 +208,17 @@ ve.dm.InternalList.prototype.getUniqueListKey = function ( groupName ) {
  *
  * @method
  * @param {ve.dm.Converter} converter Converter object
+ * @param {HTMLDocument} doc Document to create nodes in
  * @returns {Array} Linear model data
  */
-ve.dm.InternalList.prototype.convertToData = function ( converter ) {
+ve.dm.InternalList.prototype.convertToData = function ( converter, doc ) {
 	var i, length, itemData,
 		itemHtmlQueue = this.getItemHtmlQueue(), list = [];
 
 	list.push( { 'type': 'internalList' } );
 	for ( i = 0, length = itemHtmlQueue.length; i < length; i++ ) {
 		if ( itemHtmlQueue[i] !== '' ) {
-			itemData = converter.getDataFromDomRecursion( $( '<div>' ).html( itemHtmlQueue[i] )[0] );
+			itemData = converter.getDataFromDomRecursion( $( '<div>', doc ).html( itemHtmlQueue[i] )[0] );
 			list = list.concat(
 				[{ 'type': 'internalItem' }],
 				itemData,
@@ -229,9 +248,7 @@ ve.dm.InternalList.prototype.getItemInsertion = function ( groupName, key, data 
 
 	if ( index === undefined ) {
 		index = this.getItemNodeCount();
-		if ( key !== null ) {
-			this.keyIndexes[groupName + '/' + key] = index;
-		}
+		this.keyIndexes[groupName + '/' + key] = index;
 
 		itemData = [{ 'type': 'internalItem' }].concat( data,  [{ 'type': '/internalItem' }] );
 		tx = ve.dm.Transaction.newFromInsertion(
@@ -266,7 +283,7 @@ ve.dm.InternalList.prototype.getIndexPosition = function ( groupName, index ) {
  * @returns {number|undefined} The index of the group key, or undefined if it doesn't exist yet
  */
 ve.dm.InternalList.prototype.getKeyIndex = function ( groupName, key ) {
-	return key !== null ? this.keyIndexes[groupName + '/' + key] : undefined;
+	return this.keyIndexes[groupName + '/' + key];
 };
 
 /**
@@ -284,40 +301,38 @@ ve.dm.InternalList.prototype.addNode = function ( groupName, key, index, node ) 
 		group = this.nodes[groupName] = {
 			'keyedNodes': {},
 			'firstNodes': [],
-			'indexOrder': []
+			'indexOrder': [],
+			'uniqueListKeys': {},
+			'uniqueListKeysInUse': {}
 		};
 	}
-	if ( key !== null ) {
-		keyedNodes = group.keyedNodes[key];
-		this.keys[index] = key;
-		// The key may not exist yet
-		if ( keyedNodes === undefined ) {
-			keyedNodes = group.keyedNodes[key] = [];
-		}
-		if ( node.getDocument().buildingNodeTree ) {
-			// If the document is building the original node tree
-			// then every item is being added in order, so we don't
-			// need to worry about sorting.
-			keyedNodes.push( node );
-			if ( keyedNodes.length === 1 ) {
-				group.firstNodes[index] = node;
-			}
-		} else {
-			// TODO: We could use binary search insertion sort
-			start = node.getRange().start;
-			for ( i = 0, len = keyedNodes.length; i < len; i++ ) {
-				if ( start < keyedNodes[i].getRange().start ) {
-					break;
-				}
-			}
-			// 'i' is now the insertion point, so add the node here
-			keyedNodes.splice( i, 0, node );
-			if ( i === 0 ) {
-				group.firstNodes[index] = node;
-			}
+	keyedNodes = group.keyedNodes[key];
+	this.keys[index] = key;
+	// The key may not exist yet
+	if ( keyedNodes === undefined ) {
+		keyedNodes = group.keyedNodes[key] = [];
+	}
+	if ( node.getDocument().buildingNodeTree ) {
+		// If the document is building the original node tree
+		// then every item is being added in order, so we don't
+		// need to worry about sorting.
+		keyedNodes.push( node );
+		if ( keyedNodes.length === 1 ) {
+			group.firstNodes[index] = node;
 		}
 	} else {
-		group.firstNodes[index] = node;
+		// TODO: We could use binary search insertion sort
+		start = node.getRange().start;
+		for ( i = 0, len = keyedNodes.length; i < len; i++ ) {
+			if ( start < keyedNodes[i].getRange().start ) {
+				break;
+			}
+		}
+		// 'i' is now the insertion point, so add the node here
+		keyedNodes.splice( i, 0, node );
+		if ( i === 0 ) {
+			group.firstNodes[index] = node;
+		}
 	}
 	if ( ve.indexOf( index, group.indexOrder ) === -1 ) {
 		group.indexOrder.push( index );
@@ -337,7 +352,7 @@ ve.dm.InternalList.prototype.markGroupAsChanged = function ( groupName ) {
 
 /**
  * Handle document transaction events
- * @emits update
+ * @fires update
  */
 ve.dm.InternalList.prototype.onTransact = function () {
 	var i;
@@ -363,25 +378,20 @@ ve.dm.InternalList.prototype.removeNode = function ( groupName, key, index, node
 	var i, len, j, keyedNodes,
 		group = this.nodes[groupName];
 
-	if ( key !== null ) {
-		keyedNodes = group.keyedNodes[key];
-		for ( i = 0, len = keyedNodes.length; i < len; i++ ) {
-			if ( keyedNodes[i] === node ) {
-				keyedNodes.splice( i, 1 );
-				if ( i === 0 ) {
-					group.firstNodes[index] = keyedNodes[0];
-				}
-				break;
+	keyedNodes = group.keyedNodes[key];
+	for ( i = 0, len = keyedNodes.length; i < len; i++ ) {
+		if ( keyedNodes[i] === node ) {
+			keyedNodes.splice( i, 1 );
+			if ( i === 0 ) {
+				group.firstNodes[index] = keyedNodes[0];
 			}
-		}
-		if ( keyedNodes.length === 0 ) {
-			delete group.keyedNodes[key];
-			key = null;
+			break;
 		}
 	}
-	// If the all the item in this key have been removed (or if there was no key)
+	// If the all the items in this key have been removed
 	// then remove this index from indexOrder and firstNodes
-	if ( key === null ) {
+	if ( keyedNodes.length === 0 ) {
+		delete group.keyedNodes[key];
 		delete group.firstNodes[index];
 		j = ve.indexOf( index, group.indexOrder );
 		group.indexOrder.splice( j, 1 );
@@ -407,5 +417,63 @@ ve.dm.InternalList.prototype.sortGroupIndexes = function ( group ) {
  * @returns {ve.dm.InternalList} Clone of this internal
  */
 ve.dm.InternalList.prototype.clone = function ( doc ) {
-	return new this.constructor( doc || this.getDocument() );
+	var clone = new this.constructor( doc || this.getDocument() );
+	// Most properties don't need to be copied, because addNode() will be invoked when the new
+	// document tree is built. But some do need copying:
+	clone.nextUniqueNumber = this.nextUniqueNumber;
+	clone.itemHtmlQueue = ve.copy( this.itemHtmlQueue );
+	return clone;
+};
+
+/**
+ * Merge another internal list into this one.
+ *
+ * This function updates the state of this list, and returns a mapping from indexes in list to
+ * indexes in this, as well as a set of ranges that should be copied from list's linear model
+ * into this list's linear model by the caller.
+ *
+ * @param {ve.dm.InternalList} list Internal list to merge into this list
+ * @param {number} commonLength The number of elements, counted from the beginning, that the lists have in common
+ * @returns {Object} 'mapping' is an object mapping indexes in list to indexes in this; newItemRanges is an array
+ *  of ranges of internal nodes in list's document that should be copied into our document
+ */
+ve.dm.InternalList.prototype.merge = function ( list, commonLength ) {
+	var i, k, key,
+		listLen = list.getItemNodeCount(),
+		nextIndex = this.getItemNodeCount(),
+		newItemRanges = [],
+		mapping = {};
+	for ( i = 0; i < commonLength; i++ ) {
+		mapping[i] = i;
+	}
+	for ( i = commonLength; i < listLen; i++ ) {
+		// Try to find i in list.keyIndexes
+		key = undefined;
+		for ( k in list.keyIndexes ) {
+			if ( list.keyIndexes[k] === i ) {
+				key = k;
+				break;
+			}
+		}
+
+		if ( this.keyIndexes[key] !== undefined ) {
+			// We already have this key in this internal list. Ignore the duplicate that the other
+			// list is trying to merge in.
+			// NOTE: This case cannot occur in VE currently, but may be possible in the future with
+			// collaborative editing, which is why this code needs to be rewritten before we do
+			// collaborative editing.
+			mapping[i] = this.keyIndexes[key];
+		} else {
+			mapping[i] = nextIndex;
+			if ( key !== undefined ) {
+				this.keyIndexes[key] = nextIndex;
+			}
+			nextIndex++;
+			newItemRanges.push( list.getItemNode( i ).getOuterRange() );
+		}
+	}
+	return {
+		'mapping': mapping,
+		'newItemRanges': newItemRanges
+	};
 };

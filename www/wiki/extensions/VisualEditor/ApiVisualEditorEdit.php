@@ -23,6 +23,8 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 
 		if ( $params['minor'] ) {
 			$apiParams['minor'] = true;
+		} else {
+			$apiParams['notminor'] = true;
 		}
 
 		// FIXME add some way that the user's preferences can be respected
@@ -39,7 +41,7 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 		$api = new ApiMain(
 			new DerivativeRequest(
 				$this->getRequest(),
-				$apiParams,
+				$apiParams + $this->getRequest()->getValues(),
 				true // was posted
 			),
 			true // enable write
@@ -51,8 +53,8 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 	}
 
 	public function execute() {
-		global $wgVisualEditorNamespaces, $wgVisualEditorUseChangeTagging,
-			$wgVisualEditorEditNotices;
+		global $wgVisualEditorNamespaces, $wgVisualEditorUseChangeTagging;
+
 		$user = $this->getUser();
 		$params = $this->extractRequestParams();
 		$page = Title::newFromText( $params['page'] );

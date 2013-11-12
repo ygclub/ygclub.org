@@ -61,10 +61,14 @@ class ApiUpload extends ApiBase {
 		}
 
 		// Select an upload module
-		if ( !$this->selectUploadModule() ) {
-			return; // not a true upload, but a status request or similar
-		} elseif ( !isset( $this->mUpload ) ) {
-			$this->dieUsage( 'No upload module set', 'nomodule' );
+		try {
+			if ( !$this->selectUploadModule() ) {
+				return; // not a true upload, but a status request or similar
+			} elseif ( !isset( $this->mUpload ) ) {
+				$this->dieUsage( 'No upload module set', 'nomodule' );
+			}
+		} catch ( UploadStashException $e ) { // XXX: don't spam exception log
+			$this->dieUsage( get_class( $e ) . ": " . $e->getMessage(), 'stasherror' );
 		}
 
 		// First check permission to upload
@@ -106,9 +110,13 @@ class ApiUpload extends ApiBase {
 		}
 
 		// Get the result based on the current upload context:
-		$result = $this->getContextResult();
-		if ( $result['result'] === 'Success' ) {
-			$result['imageinfo'] = $this->mUpload->getImageInfo( $this->getResult() );
+		try {
+			$result = $this->getContextResult();
+			if ( $result['result'] === 'Success' ) {
+				$result['imageinfo'] = $this->mUpload->getImageInfo( $this->getResult() );
+			}
+		} catch ( UploadStashException $e ) { // XXX: don't spam exception log
+			$this->dieUsage( get_class( $e ) . ": " . $e->getMessage(), 'stasherror' );
 		}
 
 		$this->getResult()->addValue( null, $this->getModuleName(), $result );
@@ -402,6 +410,10 @@ class ApiUpload extends ApiBase {
 				$this->dieUsageMsg( 'copyuploadbaddomain' );
 			}
 
+			if ( !UploadFromUrl::isAllowedUrl( $this->mParams['url'] ) ) {
+				$this->dieUsageMsg( 'copyuploadbadurl' );
+			}
+
 			$async = false;
 			if ( $this->mParams['asyncdownload'] ) {
 				$this->checkAsyncDownloadEnabled();
@@ -492,7 +504,7 @@ class ApiUpload extends ApiBase {
 			case UploadBase::FILETYPE_BADTYPE:
 				$extradata = array(
 					'filetype' => $verification['finalExt'],
-					'allowed' => $wgFileExtensions
+					'allowed' => array_values( array_unique( $wgFileExtensions ) )
 				);
 				$this->getResult()->setIndexedTagName( $extradata['allowed'], 'ext' );
 
@@ -553,7 +565,8 @@ class ApiUpload extends ApiBase {
 			if ( isset( $warnings['exists'] ) ) {
 				$warning = $warnings['exists'];
 				unset( $warnings['exists'] );
-				$warnings[$warning['warning']] = $warning['file']->getName();
+				$localFile = isset( $warning['normalizedFile'] ) ? $warning['normalizedFile'] : $warning['file'];
+				$warnings[$warning['warning']] = $localFile->getName();
 			}
 		}
 		return $warnings;
@@ -807,6 +820,7 @@ class ApiUpload extends ApiBase {
 				array( 'code' => 'publishfailed', 'info' => 'Publishing of stashed file failed' ),
 				array( 'code' => 'internal-error', 'info' => 'An internal error occurred' ),
 				array( 'code' => 'asynccopyuploaddisabled', 'info' => 'Asynchronous copy uploads disabled' ),
+				array( 'code' => 'stasherror', 'info' => 'An upload stash error occurred' ),
 				array( 'fileexists-forbidden' ),
 				array( 'fileexists-shared-forbidden' ),
 			)

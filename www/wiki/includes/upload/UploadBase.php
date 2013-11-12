@@ -410,10 +410,10 @@ abstract class UploadBase {
 			return $status;
 		}
 
-		if ( $wgVerifyMimeType ) {
-			$this->mFileProps = FSFile::getPropsFromPath( $this->mTempPath, $this->mFinalExtension );
-			$mime = $this->mFileProps['file-mime'];
+		$this->mFileProps = FSFile::getPropsFromPath( $this->mTempPath, $this->mFinalExtension );
+		$mime = $this->mFileProps['file-mime'];
 
+		if ( $wgVerifyMimeType ) {
 			# XXX: Missing extension will be caught by validateName() via getTitle()
 			if ( $this->mFinalExtension != '' && !$this->verifyExtension( $mime, $this->mFinalExtension ) ) {
 				wfProfileOut( __METHOD__ );
@@ -618,9 +618,10 @@ abstract class UploadBase {
 		// Check whether the file extension is on the unwanted list
 		global $wgCheckFileExtensions, $wgFileExtensions;
 		if ( $wgCheckFileExtensions ) {
-			if ( !$this->checkFileExtension( $this->mFinalExtension, $wgFileExtensions ) ) {
+			$extensions = array_unique( $wgFileExtensions );
+			if ( !$this->checkFileExtension( $this->mFinalExtension, $extensions ) ) {
 				$warnings['filetype-unwanted-type'] = array( $this->mFinalExtension,
-					$wgLang->commaList( $wgFileExtensions ), count( $wgFileExtensions ) );
+					$wgLang->commaList( $extensions ), count( $extensions ) );
 			}
 		}
 
@@ -688,7 +689,7 @@ abstract class UploadBase {
 
 		if ( $status->isGood() ) {
 			if ( $watch ) {
-				$user->addWatch( $this->getLocalFile()->getTitle() );
+				WatchAction::doWatch( $this->getLocalFile()->getTitle(), $user, WatchedItem::IGNORE_USER_RIGHTS );
 			}
 			wfRunHooks( 'UploadComplete', array( &$this ) );
 		}
@@ -940,8 +941,13 @@ abstract class UploadBase {
 		$match = $magic->isMatchingExtension( $extension, $mime );
 
 		if ( $match === null ) {
-			wfDebug( __METHOD__ . ": no file extension known for mime type $mime, passing file\n" );
-			return true;
+			if ( $magic->getTypesForExtension( $extension ) !== null ) {
+				wfDebug( __METHOD__ . ": No extension known for $mime, but we know a mime for $extension\n" );
+				return false;
+			} else {
+				wfDebug( __METHOD__ . ": no file extension known for mime type $mime, passing file\n" );
+				return true;
+			}
 		} elseif ( $match === true ) {
 			wfDebug( __METHOD__ . ": mime type $mime matches extension $extension, passing file\n" );
 
@@ -1318,7 +1324,7 @@ abstract class UploadBase {
 		# NOTE: there's a 50 line workaround to make stderr redirection work on windows, too.
 		#      that does not seem to be worth the pain.
 		#      Ask me (Duesentrieb) about it if it's ever needed.
-		$output = wfShellExec( "$command 2>&1", $exitCode );
+		$output = wfShellExecWithStderr( $command, $exitCode );
 
 		# map exit code to AV_xxx constants.
 		$mappedCode = $exitCode;

@@ -11,21 +11,21 @@
  * ContentEditable surface observer.
  *
  * @class
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  * @param {ve.ce.Document} documentView Document to observe
  */
 ve.ce.SurfaceObserver = function VeCeSurfaceObserver( documentView ) {
 	// Mixin constructors
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.documentView = documentView;
 	this.domDocument = null;
 	this.polling = false;
 	this.timeoutId = null;
-	this.frequency = 250; //ms
+	this.frequency = 250; // ms
 
 	// Initialization
 	this.clear();
@@ -33,7 +33,7 @@ ve.ce.SurfaceObserver = function VeCeSurfaceObserver( documentView ) {
 
 /* Inheritance */
 
-ve.mixinClass( ve.ce.SurfaceObserver, ve.EventEmitter );
+OO.mixinClass( ve.ce.SurfaceObserver, OO.EventEmitter );
 
 /* Events */
 
@@ -80,33 +80,51 @@ ve.ce.SurfaceObserver.prototype.clear = function ( range ) {
 };
 
 /**
- * Start polling.
- *
- * If {async} is false or undefined the first poll cycle will occur immediately and synchronously.
+ * Detach from the document view
  *
  * @method
- * @param {boolean} async Poll the first time asynchronously
  */
-ve.ce.SurfaceObserver.prototype.start = function ( async ) {
-	this.domDocument = this.documentView.getDocumentNode().getElementDocument();
-	this.polling = true;
-	this.poll( async );
+ve.ce.SurfaceObserver.prototype.detach = function () {
+	this.documentView = null;
+	this.domDocument = null;
 };
 
 /**
- * Stop polling.
- *
- * If {poll} is false or undefined than no final poll cycle will occur and changes can be lost. If
- * it's true then a final poll cycle will occur immediately and synchronously.
+ * Start the setTimeout synchronisation loop
  *
  * @method
- * @param {boolean} poll Poll one last time before stopping future polling
  */
-ve.ce.SurfaceObserver.prototype.stop = function ( poll ) {
+ve.ce.SurfaceObserver.prototype.startTimerLoop = function () {
+	this.domDocument = this.documentView.getDocumentNode().getElementDocument();
+	this.polling = true;
+	this.timerLoop( true ); // will not sync immediately, because timeoutId should be null
+};
+
+/**
+ * Loop once with `setTimeout`
+ * @method
+ * @param {boolean} firstTime Wait before polling
+ */
+ve.ce.SurfaceObserver.prototype.timerLoop = function ( firstTime ) {
+	if ( this.timeoutId ) {
+		// in case we're not running from setTimeout
+		clearTimeout( this.timeoutId );
+		this.timeoutId = null;
+	}
+	if ( !firstTime ) {
+		this.pollOnce();
+	}
+	// only reach this point if pollOnce does not throw an exception
+	this.timeoutId = setTimeout( ve.bind( this.timerLoop, this ), this.frequency );
+};
+
+/**
+ * Stop polling
+ *
+ * @method
+ */
+ve.ce.SurfaceObserver.prototype.stopTimerLoop = function () {
 	if ( this.polling === true ) {
-		if ( poll === true ) {
-			this.poll();
-		}
 		this.polling = false;
 		clearTimeout( this.timeoutId );
 		this.timeoutId = null;
@@ -116,39 +134,47 @@ ve.ce.SurfaceObserver.prototype.stop = function ( poll ) {
 /**
  * Poll for changes.
  *
- * If `async` is false or undefined then polling will occcur asynchronously.
- *
  * TODO: fixing selection in certain cases, handling selection across multiple nodes in Firefox
  *
- * FIXME: Does not work well (selectionChange is not emited) when cursor is placed inside a slug
+ * FIXME: Does not work well (selectionChange is not emitted) when cursor is placed inside a slug
  * with a mouse.
  *
  * @method
- * @param {boolean} async Poll asynchronously
- * @emits contentChange
- * @emits selectionChange
+ * @fires contentChange
+ * @fires selectionChange
  */
-ve.ce.SurfaceObserver.prototype.poll = function ( async ) {
-	var delayPoll, $nodeOrSlug, node, text, hash, range, rangyRange;
+ve.ce.SurfaceObserver.prototype.pollOnce = function () {
+	this.pollOnceInternal( true );
+};
 
-	if ( this.polling === false ) {
-		return;
-	}
+/**
+ * Poll to update SurfaceObserver, but don't emit change events
+ *
+ * @method
+ */
 
-	if ( this.timeoutId !== null ) {
-		clearTimeout( this.timeoutId );
-		this.timeoutId = null;
-	}
+ve.ce.SurfaceObserver.prototype.pollOnceNoEmit = function () {
+	this.pollOnceInternal( false );
+};
 
-	delayPoll = ve.bind( function ( async ) {
-		this.timeoutId = setTimeout(
-			ve.bind( this.poll, this ),
-			async === true ? 0 : this.frequency
-		);
-	}, this );
+/**
+ * Poll for changes.
+ *
+ * TODO: fixing selection in certain cases, handling selection across multiple nodes in Firefox
+ *
+ * FIXME: Does not work well (selectionChange is not emitted) when cursor is placed inside a slug
+ * with a mouse.
+ *
+ * @method
+ * @private
+ * @param {boolean} emitChanges Emit change events if selection changed
+ * @fires contentChange
+ * @fires selectionChange
+ */
+ve.ce.SurfaceObserver.prototype.pollOnceInternal = function ( emitChanges ) {
+	var $nodeOrSlug, node, text, hash, range, rangyRange;
 
-	if ( async === true ) {
-		delayPoll( true );
+	if ( !this.domDocument ) {
 		return;
 	}
 
@@ -174,36 +200,37 @@ ve.ce.SurfaceObserver.prototype.poll = function ( async ) {
 			this.hash = null;
 			this.node = null;
 		} else {
-			this.text = ve.ce.getDomText( node.$[0] );
-			this.hash = ve.ce.getDomHash( node.$[0] );
+			this.text = ve.ce.getDomText( node.$element[0] );
+			this.hash = ve.ce.getDomHash( node.$element[0] );
 			this.node = node;
 		}
-	} else {
-		if ( node !== null ) {
-			text = ve.ce.getDomText( node.$[0] );
-			hash = ve.ce.getDomHash( node.$[0] );
-			if ( this.text !== text || this.hash !== hash ) {
+	} else if ( node !== null ) {
+		text = ve.ce.getDomText( node.$element[0] );
+		hash = ve.ce.getDomHash( node.$element[0] );
+		if ( this.text !== text || this.hash !== hash ) {
+			if ( emitChanges ) {
 				this.emit(
 					'contentChange',
 					node,
-					{ 'text': this.text, 'hash': this.hash, 'range': this.range },
+					{ 'text': this.text, 'hash': this.hash,
+						'range': this.range },
 					{ 'text': text, 'hash': hash, 'range': range }
 				);
-				this.text = text;
-				this.hash = hash;
 			}
+			this.text = text;
+			this.hash = hash;
 		}
 	}
 
 	// Only emit selectionChange event if there's a meaningful range difference
 	if ( ( this.range && range ) ? !this.range.equals( range ) : ( this.range !== range ) ) {
-		this.emit(
-			'selectionChange',
-			this.range,
-			range
-		);
+		if ( emitChanges ) {
+			this.emit(
+				'selectionChange',
+				this.range,
+				range
+			);
+		}
 		this.range = range;
 	}
-
-	delayPoll();
 };

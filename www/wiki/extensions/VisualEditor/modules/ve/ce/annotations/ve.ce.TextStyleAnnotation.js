@@ -12,23 +12,30 @@
  * @extends ve.ce.Annotation
  * @constructor
  * @param {ve.dm.TextStyleAnnotation} model Model to observe
- * @param {Object} [config] Config options
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleAnnotation = function VeCeTextStyleAnnotation( model, config ) {
+ve.ce.TextStyleAnnotation = function VeCeTextStyleAnnotation( model, parentNode, config ) {
 	// Parent constructor
-	ve.ce.Annotation.call( this, model, config );
+	ve.ce.Annotation.call( this, model, parentNode, config );
 
 	// DOM changes
-	this.$.addClass( 've-ce-TextStyleAnnotation' );
+	this.$element.addClass( 've-ce-TextStyleAnnotation' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.TextStyleAnnotation, ve.ce.Annotation );
+OO.inheritClass( ve.ce.TextStyleAnnotation, ve.ce.Annotation );
 
 /* Static Properties */
 
 ve.ce.TextStyleAnnotation.static.name = 'textStyle';
+
+/* Methods */
+
+ve.ce.TextStyleAnnotation.prototype.getTagName = function () {
+	return this.getModel().getAttribute( 'nodeName' ) || this.constructor.static.tagName;
+};
 
 /* Registration */
 
@@ -42,13 +49,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleBoldAnnotation} model
+ * @param {ve.dm.TextStyleBoldAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleBoldAnnotation = function VeCeTextStyleBoldAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleBoldAnnotation' );
+ve.ce.TextStyleBoldAnnotation = function VeCeTextStyleBoldAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleBoldAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleBoldAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleBoldAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleBoldAnnotation.static.name = 'textStyle/bold';
 ve.ce.TextStyleBoldAnnotation.static.tagName = 'b';
 ve.ce.annotationFactory.register( ve.ce.TextStyleBoldAnnotation );
@@ -59,13 +68,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleBoldAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleItalicAnnotation} model
+ * @param {ve.dm.TextStyleItalicAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleItalicAnnotation = function VeCeTextStyleItalicAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleItalicAnnotation' );
+ve.ce.TextStyleItalicAnnotation = function VeCeTextStyleItalicAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleItalicAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleItalicAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleItalicAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleItalicAnnotation.static.name = 'textStyle/italic';
 ve.ce.TextStyleItalicAnnotation.static.tagName = 'i';
 ve.ce.annotationFactory.register( ve.ce.TextStyleItalicAnnotation );
@@ -76,13 +87,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleItalicAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleUnderlineAnnotation} model
+ * @param {ve.dm.TextStyleUnderlineAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleUnderlineAnnotation = function VeCeTextStyleUnderlineAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleUnderlineAnnotation' );
+ve.ce.TextStyleUnderlineAnnotation = function VeCeTextStyleUnderlineAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleUnderlineAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleUnderlineAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleUnderlineAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleUnderlineAnnotation.static.name = 'textStyle/underline';
 ve.ce.TextStyleUnderlineAnnotation.static.tagName = 'u';
 ve.ce.annotationFactory.register( ve.ce.TextStyleUnderlineAnnotation );
@@ -93,13 +106,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleUnderlineAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleStrikeAnnotation} model
+ * @param {ve.dm.TextStyleStrikeAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleStrikeAnnotation = function VeCeTextStyleStrikeAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleStrikeAnnotation' );
+ve.ce.TextStyleStrikeAnnotation = function VeCeTextStyleStrikeAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleStrikeAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleStrikeAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleStrikeAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleStrikeAnnotation.static.name = 'textStyle/strike';
 ve.ce.TextStyleStrikeAnnotation.static.tagName = 's';
 ve.ce.annotationFactory.register( ve.ce.TextStyleStrikeAnnotation );
@@ -110,13 +125,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleStrikeAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleSmallAnnotation} model
+ * @param {ve.dm.TextStyleSmallAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleSmallAnnotation = function VeCeTextStyleSmallAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleSmallAnnotation' );
+ve.ce.TextStyleSmallAnnotation = function VeCeTextStyleSmallAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleSmallAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleSmallAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleSmallAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleSmallAnnotation.static.name = 'textStyle/small';
 ve.ce.TextStyleSmallAnnotation.static.tagName = 'small';
 ve.ce.annotationFactory.register( ve.ce.TextStyleSmallAnnotation );
@@ -127,13 +144,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleSmallAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleBigAnnotation} model
+ * @param {ve.dm.TextStyleBigAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleBigAnnotation = function VeCeTextStyleBigAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleBigAnnotation' );
+ve.ce.TextStyleBigAnnotation = function VeCeTextStyleBigAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleBigAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleBigAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleBigAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleBigAnnotation.static.name = 'textStyle/big';
 ve.ce.TextStyleBigAnnotation.static.tagName = 'big';
 ve.ce.annotationFactory.register( ve.ce.TextStyleBigAnnotation );
@@ -144,13 +163,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleBigAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleSpanAnnotation} model
+ * @param {ve.dm.TextStyleSpanAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleSpanAnnotation = function VeCeTextStyleSpanAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleSpanAnnotation' );
+ve.ce.TextStyleSpanAnnotation = function VeCeTextStyleSpanAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleSpanAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleSpanAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleSpanAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleSpanAnnotation.static.name = 'textStyle/span';
 ve.ce.TextStyleSpanAnnotation.static.tagName = 'span';
 ve.ce.annotationFactory.register( ve.ce.TextStyleSpanAnnotation );
@@ -161,13 +182,15 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleSpanAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleStrongAnnotation} model
+ * @param {ve.dm.TextStyleStrongAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleStrongAnnotation = function VeCeTextStyleStrongAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleStrongAnnotation' );
+ve.ce.TextStyleStrongAnnotation = function VeCeTextStyleStrongAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleStrongAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleStrongAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleStrongAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleStrongAnnotation.static.name = 'textStyle/strong';
 ve.ce.TextStyleStrongAnnotation.static.tagName = 'strong';
 ve.ce.annotationFactory.register( ve.ce.TextStyleStrongAnnotation );
@@ -178,47 +201,72 @@ ve.ce.annotationFactory.register( ve.ce.TextStyleStrongAnnotation );
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleEmphasizeAnnotation} model
+ * @param {ve.dm.TextStyleEmphasizeAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleEmphasizeAnnotation = function VeCeTextStyleEmphasizeAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleEmphasizeAnnotation' );
+ve.ce.TextStyleEmphasizeAnnotation = function VeCeTextStyleEmphasizeAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleEmphasizeAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleEmphasizeAnnotation, ve.ce.TextStyleAnnotation );
+OO.inheritClass( ve.ce.TextStyleEmphasizeAnnotation, ve.ce.TextStyleAnnotation );
 ve.ce.TextStyleEmphasizeAnnotation.static.name = 'textStyle/emphasize';
 ve.ce.TextStyleEmphasizeAnnotation.static.tagName = 'em';
 ve.ce.annotationFactory.register( ve.ce.TextStyleEmphasizeAnnotation );
 
 /**
- * ContentEditable superScript annotation.
+ * ContentEditable superscript annotation.
  *
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleSuperScriptAnnotation} model
+ * @param {ve.dm.TextStyleSuperscriptAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleSuperScriptAnnotation = function VeCeTextStyleSuperScriptAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleSuperScriptAnnotation' );
+ve.ce.TextStyleSuperscriptAnnotation = function VeCeTextStyleSuperscriptAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleSuperscriptAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleSuperScriptAnnotation, ve.ce.TextStyleAnnotation );
-ve.ce.TextStyleSuperScriptAnnotation.static.name = 'textStyle/superScript';
-ve.ce.TextStyleSuperScriptAnnotation.static.tagName = 'sup';
-ve.ce.annotationFactory.register( ve.ce.TextStyleSuperScriptAnnotation );
+OO.inheritClass( ve.ce.TextStyleSuperscriptAnnotation, ve.ce.TextStyleAnnotation );
+ve.ce.TextStyleSuperscriptAnnotation.static.name = 'textStyle/superscript';
+ve.ce.TextStyleSuperscriptAnnotation.static.tagName = 'sup';
+ve.ce.annotationFactory.register( ve.ce.TextStyleSuperscriptAnnotation );
 
 /**
- * ContentEditable subScript annotation.
+ * ContentEditable subscript annotation.
  *
  * @class
  * @extends ve.ce.TextStyleAnnotation
  * @constructor
- * @param {ve.dm.TextStyleSubScriptAnnotation} model
+ * @param {ve.dm.TextStyleSubscriptAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
  */
-ve.ce.TextStyleSubScriptAnnotation = function VeCeTextStyleSubScriptAnnotation( model, config ) {
-	ve.ce.TextStyleAnnotation.call( this, model, config );
-	this.$.addClass( 've-ce-TextStyleSubScriptAnnotation' );
+ve.ce.TextStyleSubscriptAnnotation = function VeCeTextStyleSubscriptAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleSubscriptAnnotation' );
 };
-ve.inheritClass( ve.ce.TextStyleSubScriptAnnotation, ve.ce.TextStyleAnnotation );
-ve.ce.TextStyleSubScriptAnnotation.static.name = 'textStyle/subScript';
-ve.ce.TextStyleSubScriptAnnotation.static.tagName = 'sub';
-ve.ce.annotationFactory.register( ve.ce.TextStyleSubScriptAnnotation );
+OO.inheritClass( ve.ce.TextStyleSubscriptAnnotation, ve.ce.TextStyleAnnotation );
+ve.ce.TextStyleSubscriptAnnotation.static.name = 'textStyle/subscript';
+ve.ce.TextStyleSubscriptAnnotation.static.tagName = 'sub';
+ve.ce.annotationFactory.register( ve.ce.TextStyleSubscriptAnnotation );
+
+/**
+ * ContentEditable code annotation.
+ *
+ * @class
+ * @extends ve.ce.TextStyleAnnotation
+ * @constructor
+ * @param {ve.dm.TextStyleCodeAnnotation} model Model to observe
+ * @param {ve.ce.ContentBranchNode} [parentNode] Node rendering this annotation
+ * @param {Object} [config] Configuration options
+ */
+ve.ce.TextStyleCodeAnnotation = function VeCeTextStyleCodeAnnotation( model, parentNode, config ) {
+	ve.ce.TextStyleAnnotation.call( this, model, parentNode, config );
+	this.$element.addClass( 've-ce-TextStyleCodeAnnotation' );
+};
+OO.inheritClass( ve.ce.TextStyleCodeAnnotation, ve.ce.TextStyleAnnotation );
+ve.ce.TextStyleCodeAnnotation.static.name = 'textStyle/code';
+ve.ce.TextStyleCodeAnnotation.static.tagName = 'code';
+ve.ce.annotationFactory.register( ve.ce.TextStyleCodeAnnotation );

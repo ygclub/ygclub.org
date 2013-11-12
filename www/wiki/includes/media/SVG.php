@@ -177,16 +177,16 @@ class SvgHandler extends ImageHandler {
 						wfEscapeShellArg( $srcPath ),
 						wfEscapeShellArg( $dstPath ) ),
 					$wgSVGConverters[$wgSVGConverter]
-				) . " 2>&1";
+				);
 
 				$env = array();
-				if( $lang !== false ) {
+				if ( $lang !== false ) {
 					$env['LANG'] = $lang;
 				}
 
 				wfProfileIn( 'rsvg' );
 				wfDebug( __METHOD__ . ": $cmd\n" );
-				$err = wfShellExec( $cmd, $retval, $env );
+				$err = wfShellExecWithStderr( $cmd, $retval, $env );
 				wfProfileOut( 'rsvg' );
 			}
 		}
@@ -348,6 +348,7 @@ class SvgHandler extends ImageHandler {
 			'description' => 'imagedescription',
 			'title' => 'objectname',
 		);
+		$showMeta = false;
 		foreach ( $metadata as $name => $value ) {
 			$tag = strtolower( $name );
 			if ( isset( $conversion[$tag] ) ) {
@@ -356,6 +357,7 @@ class SvgHandler extends ImageHandler {
 				// Do not output other metadata not in list
 				continue;
 			}
+			$showMeta = true;
 			self::addMeta( $result,
 				in_array( $tag, $visibleFields ) ? 'visible' : 'collapsed',
 				'exif',
@@ -363,7 +365,7 @@ class SvgHandler extends ImageHandler {
 				$value
 			);
 		}
-		return $result;
+		return $showMeta ? $result : false;
 	}
 
 
@@ -376,9 +378,9 @@ class SvgHandler extends ImageHandler {
 		if ( in_array( $name, array( 'width', 'height' ) ) ) {
 			// Reject negative heights, widths
 			return ( $value > 0 );
-		} elseif( $name == 'lang' ) {
+		} elseif ( $name == 'lang' ) {
 			// Validate $code
-			if( !Language::isValidBuiltinCode( $value ) ) {
+			if ( !Language::isValidBuiltinCode( $value ) ) {
 				wfDebug( "Invalid user language code\n" );
 				return false;
 			}
@@ -394,7 +396,7 @@ class SvgHandler extends ImageHandler {
 	 */
 	function makeParamString( $params ) {
 		$lang = '';
-		if( isset( $params['lang'] ) && $params['lang'] !== 'en' ) {
+		if ( isset( $params['lang'] ) && $params['lang'] !== 'en' ) {
 			$params['lang'] = mb_strtolower( $params['lang'] );
 			$lang = "lang{$params['lang']}-";
 		}
@@ -408,7 +410,7 @@ class SvgHandler extends ImageHandler {
 		$m = false;
 		if ( preg_match( '/^lang([a-z]+(?:-[a-z]+)*)-(\d+)px$/', $str, $m ) ) {
 			return array( 'width' => array_pop( $m ), 'lang' => $m[1] );
-		} elseif( preg_match( '/^(\d+)px$/', $str, $m ) ) {
+		} elseif ( preg_match( '/^(\d+)px$/', $str, $m ) ) {
 			return array( 'width' => $m[1], 'lang' => 'en' );
 		} else {
 			return false;

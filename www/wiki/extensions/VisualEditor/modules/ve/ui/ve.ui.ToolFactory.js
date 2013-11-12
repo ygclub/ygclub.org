@@ -6,20 +6,21 @@
  */
 
 /**
- * UserInterface tool factory.
+ * Factory for tools.
  *
  * @class
- * @extends ve.Factory
+ * @extends OO.ui.ToolFactory
+ *
  * @constructor
  */
-ve.ui.ToolFactory = function VeUiToolFactory() {
+ve.ui.ToolFactory = function OoUiToolFactory() {
 	// Parent constructor
-	ve.Factory.call( this );
+	OO.ui.ToolFactory.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.ToolFactory, ve.Factory );
+OO.inheritClass( ve.ui.ToolFactory, OO.ui.ToolFactory );
 
 /* Methods */
 
@@ -51,7 +52,7 @@ ve.ui.ToolFactory.prototype.getToolsForAnnotations = function ( annotations ) {
 		candidateTool = null;
 		for ( name in this.registry ) {
 			tool = this.registry[name];
-			if ( tool.static.canEditModel( annotation ) ) {
+			if ( tool.static.isCompatibleWith( annotation ) ) {
 				if ( !candidateTool || tool.prototype instanceof candidateTool ) {
 					candidateTool = tool;
 					candidateToolName = name;
@@ -88,7 +89,7 @@ ve.ui.ToolFactory.prototype.getToolForNode = function ( node ) {
 
 	for ( name in this.registry ) {
 		tool = this.registry[name];
-		if ( tool.static.canEditModel( node ) ) {
+		if ( tool.static.isCompatibleWith( node ) ) {
 			if ( !candidateTool || tool.prototype instanceof candidateTool ) {
 				candidateTool = tool;
 				candidateToolName = name;

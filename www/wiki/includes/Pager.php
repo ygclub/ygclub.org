@@ -150,7 +150,8 @@ abstract class IndexPager extends ContextSource implements Pager {
 		}
 
 		$this->mIsBackwards = ( $this->mRequest->getVal( 'dir' ) == 'prev' );
-		$this->mDb = wfGetDB( DB_SLAVE );
+		# Let the subclass set the DB here; otherwise use a slave DB for the current wiki
+		$this->mDb = $this->mDb ?: wfGetDB( DB_SLAVE );
 
 		$index = $this->getIndexField(); // column to sort on
 		$extraSort = $this->getExtraSortFields(); // extra columns to sort on for query planning
@@ -256,7 +257,7 @@ abstract class IndexPager extends ContextSource implements Pager {
 	 * @param $limit Int|String
 	 */
 	function setLimit( $limit ) {
-		$limit = (int) $limit;
+		$limit = (int)$limit;
 		// WebRequest::getLimitOffset() puts a cap of 5000, so do same here.
 		if ( $limit > 5000 ) {
 			$limit = 5000;
@@ -872,9 +873,10 @@ abstract class ReverseChronologicalPager extends IndexPager {
 			$year = $this->mYear;
 		} else {
 			// If no year given, assume the current one
-			$year = gmdate( 'Y' );
+			$timestamp = MWTimestamp::getInstance();
+			$year = $timestamp->format( 'Y' );
 			// If this month hasn't happened yet this year, go back to last year's month
-			if ( $this->mMonth > gmdate( 'n' ) ) {
+			if ( $this->mMonth > $timestamp->format( 'n' ) ) {
 				$year--;
 			}
 		}
@@ -1172,11 +1174,15 @@ abstract class TablePager extends IndexPager {
 	/**
 	 * Get a "<select>" element which has options for each of the allowed limits
 	 *
+	 * @param $attribs String: Extra attributes to set
 	 * @return String: HTML fragment
 	 */
-	public function getLimitSelect() {
+	public function getLimitSelect( $attribs = array() ) {
 		$select = new XmlSelect( 'limit', false, $this->mLimit );
 		$select->addOptions( $this->getLimitSelectList() );
+		foreach ( $attribs as $name => $value ) {
+			$select->setAttribute( $name, $value );
+		}
 		return $select->getHTML();
 	}
 

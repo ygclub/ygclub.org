@@ -27,7 +27,7 @@ ve.dm.MWReferenceNode = function VeDmMWReferenceNode( length, element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.MWReferenceNode, ve.dm.LeafNode );
+OO.inheritClass( ve.dm.MWReferenceNode, ve.dm.LeafNode );
 
 /* Static members */
 
@@ -41,13 +41,13 @@ ve.dm.MWReferenceNode.static.isContent = true;
 
 ve.dm.MWReferenceNode.static.toDataElement = function ( domElements, converter ) {
 	var dataElement,
-		about = domElements[0].getAttribute( 'about' ),
 		mwDataJSON = domElements[0].getAttribute( 'data-mw' ),
 		mwData = mwDataJSON ? JSON.parse( mwDataJSON ) : {},
 		body = mwData.body ? mwData.body.html : '',
 		refGroup = mwData.attrs && mwData.attrs.group || '',
 		listGroup = this.name + '/' + refGroup,
-		listKey = mwData.attrs && mwData.attrs.name !== undefined ? mwData.attrs.name : null,
+		autoKeyed = !mwData.attrs || mwData.attrs.name === undefined,
+		listKey = autoKeyed ? 'auto/' + converter.internalList.getNextUniqueNumber() : 'literal/' + mwData.attrs.name,
 		queueResult = converter.internalList.queueItemHtml( listGroup, listKey, body ),
 		listIndex = queueResult.index,
 		contentsUsed = ( body !== '' && queueResult.isNew );
@@ -57,8 +57,7 @@ ve.dm.MWReferenceNode.static.toDataElement = function ( domElements, converter )
 		'attributes': {
 			'mw': mwData,
 			'originalMw': mwDataJSON,
-			'childDomElements': ve.copyArray( Array.prototype.slice.apply( domElements[0].childNodes ) ),
-			'about': about,
+			'childDomElements': ve.copy( Array.prototype.slice.apply( domElements[0].childNodes ) ),
 			'listIndex': listIndex,
 			'listGroup': listGroup,
 			'listKey': listKey,
@@ -71,19 +70,18 @@ ve.dm.MWReferenceNode.static.toDataElement = function ( domElements, converter )
 
 ve.dm.MWReferenceNode.static.toDomElements = function ( dataElement, doc, converter ) {
 	var itemNodeHtml, originalHtml, mwData, i, iLen, keyedNodes, setContents, contentsAlreadySet,
-		originalMw, childDomElements,
+		originalMw, childDomElements, listKeyParts, name,
 		el = doc.createElement( 'span' ),
 		itemNodeWrapper = doc.createElement( 'div' ),
 		itemNode = converter.internalList.getItemNode( dataElement.attributes.listIndex ),
 		itemNodeRange = itemNode.getRange();
 
-	el.setAttribute( 'about', dataElement.attributes.about );
 	el.setAttribute( 'typeof', 'mw:Extension/ref' );
 
-	mwData = dataElement.attributes.mw ? ve.copyObject( dataElement.attributes.mw ) : {};
+	mwData = dataElement.attributes.mw ? ve.copy( dataElement.attributes.mw ) : {};
 	mwData.name = 'ref';
 
-	setContents = dataElement.attributes.contentsUsed || dataElement.attributes.listKey === null;
+	setContents = dataElement.attributes.contentsUsed;
 
 	keyedNodes = converter.internalList
 		.getNodeGroup( dataElement.attributes.listGroup )
@@ -134,12 +132,30 @@ ve.dm.MWReferenceNode.static.toDomElements = function ( dataElement, doc, conver
 		}
 	}
 
-	// Set or clear key
-	if ( dataElement.attributes.listKey !== null ) {
-		ve.setProp( mwData, 'attrs', 'name', dataElement.attributes.listKey );
-	} else if ( mwData.attrs ) {
-		delete mwData.attrs.listKey;
+	// Generate name
+	listKeyParts = dataElement.attributes.listKey.match( /^(auto|literal)\/(.*)$/ );
+	if ( listKeyParts[1] === 'auto' ) {
+		// Only render a name if this key was reused
+		if ( keyedNodes.length > 1 ) {
+			// Allocate a unique list key, then strip the 'literal/'' prefix
+			name = converter.internalList.getUniqueListKey(
+				dataElement.attributes.listGroup,
+				dataElement.attributes.listKey,
+				// Generate a name starting with ':' to distinguish it from normal names
+				'literal/:'
+			).substr( 'literal/'.length );
+		} else {
+			name = undefined;
+		}
+	} else {
+		// Use literal name
+		name = listKeyParts[2];
 	}
+	// Set name
+	if ( name !== undefined ) {
+		ve.setProp( mwData, 'attrs', 'name', name );
+	}
+
 	// Set or clear group
 	if ( dataElement.attributes.refGroup !== '' ) {
 		ve.setProp( mwData, 'attrs', 'group', dataElement.attributes.refGroup );
@@ -234,9 +250,11 @@ ve.dm.MWReferenceNode.prototype.removeFromInternalList = function () {
 	);
 };
 
+/** */
 ve.dm.MWReferenceNode.prototype.getClonedElement = function () {
 	var clone = ve.dm.LeafNode.prototype.getClonedElement.call( this );
 	delete clone.attributes.contentsUsed;
+	delete clone.attributes.mw;
 	delete clone.attributes.originalMw;
 	return clone;
 };

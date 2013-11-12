@@ -8,6 +8,7 @@
  * @file
  *
  * @author Als-Holder
+ * @author Geitost
  * @author Jens Liebenau
  * @author Jonny84
  * @author Kaganer
@@ -54,7 +55,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Oazoahl derr beobachtenden Nutzer oazäan',
 'tog-oldsig' => 'Vorschau der aktuella Signatur:',
 'tog-fancysig' => 'Signatur ols Wikitext behandeln (ohne automatische Verlinkung)',
-'tog-showjumplinks' => '„Wechseln zu“-Verknipfunga aktiviern',
 'tog-uselivepreview' => 'Direkte Vurschau notza (beneetigt JavaScript) (vrsuchsweise)',
 'tog-forceeditsummary' => 'Warnen, wenn bem Speichern de Zsoammafassung fahln tutt',
 'tog-watchlisthideown' => 'Eigene Bearbeitungen ausblenden',
@@ -232,7 +232,7 @@ Bitte warte eenige Minuta, bevur du 's noo eemool versuchst.
 
 $1",
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Ieber {{SITENAME}}',
 'aboutpage' => 'Project:Ieber',
 'copyright' => 'Inhalt ies verfügbar unter der $1.',
@@ -305,15 +305,6 @@ Oalle verfügbara Spezialseyta sein ei der [[Special:SpecialPages|Liste der Spez
 
 # General errors
 'databaseerror' => 'Fehler ei der Datenbank',
-'dberrortext' => 'Is ies a Datenbankfahler uffgetreten.
-Dar Grund koan a Programmierfahler sei.
-De letzte Datenbankoabfroage lautete:
-<blockquote><tt>$1</tt></blockquote>
-aus dar Funksjonn „<tt>$2</tt>“.
-De Datenbank meldete dann Fahler „<tt>$3: $4</tt>“.',
-'dberrortextcl' => "Is goab an'n Syntaxfahler ei dar Datenbankobfroage.
-De letzte Datenbankobfroage lautete: „$1“ aus dar Funksjonn „<tt>$2</tt>“.
-De Datenbank meldete dann Fahler: „<tt>$3: $4</tt>“.",
 'laggedslavemode' => 'Achtung: Die angezeigte Seite enthält unter Umständen nicht die jüngsten Bearbeitungen.',
 'readonly' => 'Datenbanksperre',
 'missing-article' => 'Der Text von „$1“ $2 wurde nicht in der Datenbank gefunden.
@@ -343,7 +334,6 @@ Abfroage: $2',
 'editinginterface' => "'''Warnung:''' Diese Seite enthält vu der MediaWiki-Software benutzta Text.
 Änderunga wirka siech uff de Benutzeroberfläche aus.
 Fier Iebersetzunga ziehe bitte ei Betracht, diese eim [//translatewiki.net/wiki/Main_Page?setlang=de Translatewiki], damm MediaWiki-Lokalisierungsprojekt, durchzufiehra.",
-'sqlhidden' => '(SQL-Abfroage versteckt)',
 'cascadeprotected' => 'Diese Seite ies zur Beoarbeetung gesperrt. Se ies ei de {{PLURAL:$1|fulgende Seite|fulgenda Seita}} eengebunda, de mittels der Kaskadensperroption geschitzt {{PLURAL:$1|ies|sein}}:
 $2',
 'namespaceprotected' => "Du host kenne Berechtigung, de Seite eim '''$1'''-Noamensraum zu bearbta.",
@@ -374,7 +364,7 @@ Beachte, doas einige Seyta noo oazeiga kinna, doas du oagemeldet best, sulange d
 'logout' => 'Oabmelda',
 'userlogout' => 'Oabmelda',
 'notloggedin' => 'Nä oangemeldet',
-'nologin' => "Du hast keen Benutzerkonto? '''$1'''.",
+'nologin' => 'Du hast keen Benutzerkonto? $1.',
 'nologinlink' => 'Neues Benutzerkonto oanleega',
 'createaccount' => 'Benutzerkonto oanlega',
 'gotaccount' => "Du hast bereits a Benutzerkonto? '''$1'''.",
@@ -445,7 +435,7 @@ Bitte warte, bevor du is erneut probierst.',
 'newpassword' => 'Neues Passwurt:',
 'retypenew' => 'Neues Passwurt (nuchmoal):',
 'resetpass_submit' => 'Poaßwurt iebermitteln und oamelda',
-'resetpass_success' => 'Dei Poaßwurt wurde erfolgreich geändert. Is fulgt de Oameldung …',
+'changepassword-success' => 'Dei Poaßwurt wurde erfolgreich geändert. Is fulgt de Oameldung …',
 'resetpass_forbidden' => 'Doas Poaßwurt koan ne geändert waan.',
 'resetpass-no-info' => 'Du muoßt diech oamelda, im uff diese Seite direkt zuzugreifa.',
 'resetpass-submit-loggedin' => 'Poaßwurt ändern',
@@ -821,7 +811,6 @@ Stelle sicher, doaß de Versionsgeschichte anner Seite historisch korrekt ies.',
 'saveprefs' => 'Eenstallunga speichern',
 'restoreprefs' => 'Olle Standardeinstallunga wiederherstalla',
 'prefs-editing' => 'Bearbta',
-'prefs-edit-boxsize' => 'Griße des Beoarbeetungsfansters:',
 'rows' => 'Zeila:',
 'columns' => 'Spalta:',
 'resultsperpage' => 'Treffer pro Seite:',
@@ -840,7 +829,6 @@ Stelle sicher, doaß de Versionsgeschichte anner Seite historisch korrekt ies.',
 'prefs-namespaces' => 'Noamasräume',
 'defaultns' => 'Andernfoalls ei diesen Noamasräumen sucha:',
 'prefs-custom-js' => 'Nutzerdefiniertes JS',
-'prefs-textboxsize' => 'Griße des Beoarbeetungsfansters',
 'youremail' => 'E-Mail-Adresse:',
 'username' => 'Benutzernoame:',
 'prefs-memberingroups' => 'Mitglied dar {{PLURAL:$1|Nutzergruppe|Nutzergruppen}}:',
@@ -1030,7 +1018,6 @@ Stelle sicher, doaß de Versionsgeschichte anner Seite historisch korrekt ies.',
 'recentchangeslinked-feed' => 'Änderunga oa verlinkta Seyta',
 'recentchangeslinked-toolbox' => 'Änderunga oa verlinkta Seyta',
 'recentchangeslinked-title' => 'Änneronga oa Seyta, de voo „$1“ verlinkt sein',
-'recentchangeslinked-noresult' => 'Eim ausgewählta Zeitraum wurden oa dann verlinkten Seyta kenne Änderunga vurgenumma.',
 'recentchangeslinked-summary' => "Diese Spezialseyte listet de letzta Änderunga oa dan verlinkta Seyta uff (bzw. bei Kategoria oa dan Mitgliedern dieser Kategorie). Seyta uff denner [[Special:Watchlist|Beobachtungsliste]] sein '''fett''' dargestellt.",
 'recentchangeslinked-page' => 'Seite:',
 'recentchangeslinked-to' => 'Zeige Änneronga uff Seita, de hierher verlinka',
@@ -1089,11 +1076,11 @@ Bitte gieb dar Datei an'n Noama, dar dann Inhalt besser beschreibt.",
 'upload-proto-error' => 'Foalsches Protokoll',
 'upload-proto-error-text' => 'De URL muuß miet <code>http://</code> oder <code>ftp://</code> beginna.',
 'upload-file-error-text' => "Bei dar Erstellung a'r temporären Datei uff'd Server ies a interner Fahler uffgetreta.
-Bitte informiere an'n [[Special:ListUsers/sysop|System-Administrator]].",
+Bitte informiere an'n [[Special:ListUsers/sysop|Administrator]].",
 'upload-misc-error' => 'Unbekennter Fahler beim Huchloada',
 'upload-misc-error-text' => "Beim Huchloada ies a unbekennter Fahler uffgetreta.
 Priefe de URL uff Fahler, dann Online-Status der Seite und versuche 's erneut.
-Wenn doas Problem wetter bestieht, informiere anna [[Special:ListUsers/sysop|System-Administrator]].",
+Wenn doas Problem wetter bestieht, informiere anna [[Special:ListUsers/sysop|Administrator]].",
 'upload-too-many-redirects' => 'De URL beinhaltete zu viele Wetterleitunga',
 'upload-unknown-size' => 'Unbekennte Grieße',
 'upload-http-error' => 'A HTTP-Fahler ies uffgetreta: $1',
@@ -1219,10 +1206,6 @@ Ieberpriefe andere Links zu den Vurlooga, bevur du diese läscht.',
 'statistics-users' => 'Registrierte [[Special:ListUsers|Nutzer]]',
 'statistics-users-active-desc' => 'Nutzer miet Beoarbeetunga {{PLURAL:$1|enn letzta 24 Stunden|enn vergangenen $1 Tagen}}',
 'statistics-mostpopular' => 'Meistbesichte Seyta',
-
-'disambiguations' => 'Begriffsklärungsseyta',
-'disambiguationspage' => 'Template:Begriffsklärung',
-'disambiguations-text' => 'De fulgenda Seita verlinka uff anne Seite zur Begriefsklärung. Se sullta stoats dassens uff de eigentlich gemeente Seite verlinka.<br />Anne Seite werd ols Begriefsklärungsseite behandelt, wenn [[MediaWiki:Disambiguationspage]] uff se verlinkt.<br />Links aus Noamasräumen waan hier ne uffgelistet.',
 
 'doubleredirects' => 'Doppelte Weiterleitunga',
 'doubleredirectstext' => 'Diese Liste enthält Weiterleitunga, de uff wettere Wetterleitunga verlinka.
@@ -1407,7 +1390,6 @@ Wenn du de Seite wieder vu denner Beobachtungsliste entferna mechtest, klicke uf
 'unwatch' => 'nä mehr beobachta',
 'unwatchthispage' => 'Nä mehr beobachta',
 'notanarticle' => 'Keene Seite',
-'watchnochange' => 'Kenne dar vu dir beobachteta Seyta wurde während des oagezeigta Zeitraums beoarbeetet.',
 'watchlist-details' => 'Du beobachtest {{PLURAL:$1|1 Seite|$1 Seita}}.',
 'wlheader-enotif' => 'Dar E-Mail-Benoachrichtigungsdienst ies aktiviert.',
 'wlheader-showupdated' => "Seyta miet noo ne gesehenen Änderunga waan '''fett''' dargestellt.",
@@ -2285,7 +2267,6 @@ Du koast au de [[Special:EditWatchlist|Standard-Beoarbeetungsseyte]] benutza.',
 'version-specialpages' => 'Spezialseyta',
 'version-other' => 'Oanderes',
 'version-hooks' => "Schnittstalla ''(Hooks)''",
-'version-extension-functions' => 'Funksjonnsuffruffe',
 'version-parser-extensiontags' => "Parser-Erweiterunga ''(tags)''",
 'version-parser-function-hooks' => 'Parser-Funksjonna',
 'version-hook-name' => 'Schnittstallanoame',

@@ -26,8 +26,8 @@ class SpecialWatchlist extends SpecialPage {
 	/**
 	 * Constructor
 	 */
-	public function __construct( $page = 'Watchlist' ) {
-		parent::__construct( $page );
+	public function __construct( $page = 'Watchlist', $restriction = 'viewmywatchlist' ) {
+		parent::__construct( $page, $restriction );
 	}
 
 	/**
@@ -54,16 +54,15 @@ class SpecialWatchlist extends SpecialPage {
 			return;
 		}
 
-		// Add feed links
-		$wlToken = $user->getOption( 'watchlisttoken' );
-		if ( !$wlToken ) {
-			$wlToken = MWCryptRand::generateHex( 40 );
-			$user->setOption( 'watchlisttoken', $wlToken );
-			$user->saveSettings();
-		}
+		// Check permissions
+		$this->checkPermissions();
 
-		$this->addFeedLinks( array( 'action' => 'feedwatchlist', 'allrev' => 'allrev',
-							'wlowner' => $user->getName(), 'wltoken' => $wlToken ) );
+		// Add feed links
+		$wlToken = $user->getTokenFromOption( 'watchlisttoken' );
+		if ( $wlToken ) {
+			$this->addFeedLinks( array( 'action' => 'feedwatchlist', 'allrev' => 'allrev',
+								'wlowner' => $user->getName(), 'wltoken' => $wlToken ) );
+		}
 
 		$this->setHeaders();
 		$this->outputHeader();
@@ -101,7 +100,7 @@ class SpecialWatchlist extends SpecialPage {
 
 		// @todo use FormOptions!
 		$defaults = array(
-		/* float */ 'days' => floatval( $user->getOption( 'watchlistdays' ) ), /* 3.0 or 0.5, watch further below */
+		/* float */ 'days' => floatval( $user->getOption( 'watchlistdays' ) ),
 		/* bool  */ 'hideMinor' => (int)$user->getBoolOption( 'watchlisthideminor' ),
 		/* bool  */ 'hideBots' => (int)$user->getBoolOption( 'watchlisthidebots' ),
 		/* bool  */ 'hideAnons' => (int)$user->getBoolOption( 'watchlisthideanons' ),
@@ -122,7 +121,7 @@ class SpecialWatchlist extends SpecialPage {
 		# Extract variables from the request, falling back to user preferences or
 		# other default values if these don't exist
 		$values = array();
-		$values['days'] = $request->getVal( 'days', $defaults['days'] );
+		$values['days'] = floatval( $request->getVal( 'days', $defaults['days'] ) );
 		$values['hideMinor'] = (int)$request->getBool( 'hideMinor', $defaults['hideMinor'] );
 		$values['hideBots'] = (int)$request->getBool( 'hideBots', $defaults['hideBots'] );
 		$values['hideAnons'] = (int)$request->getBool( 'hideAnons', $defaults['hideAnons'] );
@@ -159,18 +158,6 @@ class SpecialWatchlist extends SpecialPage {
 		$values['invert'] = $invert;
 		$values['associated'] = $associated;
 
-		if ( is_null( $values['days'] ) || !is_numeric( $values['days'] ) ) {
-			$big = 1000; /* The magical big */
-			if ( $nitems > $big ) {
-				# Set default cutoff shorter
-				$values['days'] = $defaults['days'] = ( 12.0 / 24.0 ); # 12 hours...
-			} else {
-				$values['days'] = $defaults['days']; # default cutoff for shortlisters
-			}
-		} else {
-			$values['days'] = floatval( $values['days'] );
-		}
-
 		// Dump everything here
 		$nondefaults = array();
 		foreach ( $defaults as $name => $defValue ) {
@@ -191,14 +178,6 @@ class SpecialWatchlist extends SpecialPage {
 		if ( $values['days'] > 0 ) {
 			$conds[] = 'rc_timestamp > ' . $dbr->addQuotes( $dbr->timestamp( time() - intval( $values['days'] * 86400 ) ) );
 		}
-
-		# If the watchlist is relatively short, it's simplest to zip
-		# down its entirety and then sort the results.
-
-		# If it's relatively long, it may be worth our while to zip
-		# through the time-sorted page list checking for watched items.
-
-		# Up estimate of watched items by 15% to compensate for talk pages...
 
 		# Toggles
 		if ( $values['hideOwn'] ) {
@@ -240,12 +219,8 @@ class SpecialWatchlist extends SpecialPage {
 			$output->showLagWarning( $lag );
 		}
 
-		# Create output form
-		$form = Xml::fieldset(
-			$this->msg( 'watchlist-options' )->text(),
-			false,
-			array( 'id' => 'mw-watchlist-options' )
-		);
+		# Create output
+		$form = '';
 
 		# Show watchlist header
 		$form .= "<p>";
@@ -270,7 +245,16 @@ class SpecialWatchlist extends SpecialPage {
 			$form .= Xml::closeElement( 'form' ) . "\n";
 		}
 
-		$form .= "<hr />\n";
+		$form .= Xml::openElement( 'form', array(
+			'method' => 'post',
+			'action' => $this->getTitle()->getLocalURL(),
+			'id' => 'mw-watchlist-form'
+		) );
+		$form .= Xml::fieldset(
+			$this->msg( 'watchlist-options' )->text(),
+			false,
+			array( 'id' => 'mw-watchlist-options' )
+		);
 
 		$tables = array( 'recentchanges', 'watchlist' );
 		$fields = RecentChange::selectFields();
@@ -350,7 +334,6 @@ class SpecialWatchlist extends SpecialPage {
 		$form .= $wlInfo;
 		$form .= $cutofflinks;
 		$form .= $lang->pipeList( $links ) . "\n";
-		$form .= Xml::openElement( 'form', array( 'method' => 'post', 'action' => $this->getTitle()->getLocalURL(), 'id' => 'mw-watchlist-form-namespaceselector' ) ) . "\n";
 		$form .= "<hr />\n<p>";
 		$form .= Html::namespaceSelector(
 			array(
@@ -381,13 +364,15 @@ class SpecialWatchlist extends SpecialPage {
 		foreach ( $hiddenFields as $key => $value ) {
 			$form .= Html::hidden( $key, $value ) . "\n";
 		}
-		$form .= Xml::closeElement( 'form' ) . "\n";
 		$form .= Xml::closeElement( 'fieldset' ) . "\n";
+		$form .= Xml::closeElement( 'form' ) . "\n";
 		$output->addHTML( $form );
 
 		# If there's nothing to show, stop here
 		if ( $numRows == 0 ) {
-			$output->addWikiMsg( 'watchnochange' );
+			$output->wrapWikiMsg(
+				"<div class='mw-changeslist-empty'>\n$1\n</div>", 'recentchanges-noresult'
+			);
 			return;
 		}
 
@@ -447,7 +432,7 @@ class SpecialWatchlist extends SpecialPage {
 
 	protected function showHideLink( $options, $message, $name, $value ) {
 		$label = $this->msg( $value ? 'show' : 'hide' )->escaped();
-		$options[$name] = 1 - (int) $value;
+		$options[$name] = 1 - (int)$value;
 
 		return $this->msg( $message )->rawParams( Linker::linkKnown( $this->getTitle(), $label, array(), $options ) )->escaped();
 	}

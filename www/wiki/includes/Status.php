@@ -31,6 +31,11 @@
  * An operation which is not OK should have errors so that the user can be
  * informed as to what went wrong. Calling the fatal() function sets an error
  * message and simultaneously switches off the OK flag.
+ *
+ * The recommended pattern for Status objects is to return a Status object
+ * unconditionally, i.e. both on success and on failure -- so that the
+ * developer of the calling code is reminded that the function can fail, and
+ * so that a lack of error-handling will be explicit.
  */
 class Status {
 	var $ok = true;
@@ -269,7 +274,8 @@ class Status {
 	/**
 	 * Get the list of errors (but not warnings)
 	 *
-	 * @return Array
+	 * @return array A list in which each entry is an array with a message key as its first element.
+	 *         The remaining array elements are the message parameters.
 	 */
 	function getErrorsArray() {
 		return $this->getStatusArray( "error" );
@@ -278,7 +284,8 @@ class Status {
 	/**
 	 * Get the list of warnings (but not errors)
 	 *
-	 * @return Array
+	 * @return array A list in which each entry is an array with a message key as its first element.
+	 *         The remaining array elements are the message parameters.
 	 */
 	function getWarningsArray() {
 		return $this->getStatusArray( "warning" );
@@ -295,7 +302,7 @@ class Status {
 		foreach ( $this->errors as $error ) {
 			if ( $error['type'] === $type ) {
 				if ( $error['message'] instanceof Message ) {
-					$result[] = $error['message'];
+					$result[] = array_merge( array( $error['message']->getKey() ), $error['message']->getParams() );
 				} elseif ( $error['params'] ) {
 					$result[] = array_merge( array( $error['message'] ), $error['params'] );
 				} else {

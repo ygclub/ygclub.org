@@ -43,7 +43,7 @@ class SpecialPasswordReset extends FormSpecialPage {
 	private $result;
 
 	public function __construct() {
-		parent::__construct( 'PasswordReset' );
+		parent::__construct( 'PasswordReset', 'editmyprivateinfo' );
 	}
 
 	public function userCanExecute( User $user ) {
@@ -104,6 +104,13 @@ class SpecialPasswordReset extends FormSpecialPage {
 
 	public function alterForm( HTMLForm $form ) {
 		global $wgPasswordResetRoutes;
+
+		$form->setDisplayFormat( 'vform' );
+		// Turn the old-school line around the form off.
+		// XXX This wouldn't be necessary here if we could set the format of
+		// the HTMLForm to 'vform' at its creation, but there's no way to do so
+		// from a FormSpecialPage class.
+		$form->setWrapperLegend( false );
 
 		$i = 0;
 		if ( isset( $wgPasswordResetRoutes['username'] ) && $wgPasswordResetRoutes['username'] ) {

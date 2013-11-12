@@ -311,7 +311,7 @@ $messages = array(
 'protectedpage' => 'تحفظيل صفحو',
 'jumptosearch' => 'ڳولا',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} بابت',
 'aboutpage' => 'Project:بابت',
 'copyright' => 'سمورو مواد $1 تحت ميسر ڪجي ٿو',
@@ -582,7 +582,6 @@ $1 {{PLURAL:$1|اکر|اکرن}} کان ننڍي هوڻ گھرجي.',
 'recentchangeslinked-feed' => 'لاڳاپيل تبديليون',
 'recentchangeslinked-toolbox' => 'لاڳاپيل تبديليون',
 'recentchangeslinked-title' => '"$1" سان لاڳاپيل تبديليون',
-'recentchangeslinked-noresult' => 'ڄاڻايل مدي دوران ڳنڍيل صفحن ۾ ڪا به تبديلي ناهي ٿي.',
 
 # Upload
 'upload' => 'فائيل چاڙهيو',
@@ -626,8 +625,6 @@ $1 {{PLURAL:$1|اکر|اکرن}} کان ننڍي هوڻ گھرجي.',
 
 # Statistics
 'statistics' => 'انگ اکر',
-
-'disambiguations' => 'سلجھائپ صفحا',
 
 'doubleredirects' => 'ٻٽا چورڻا',
 

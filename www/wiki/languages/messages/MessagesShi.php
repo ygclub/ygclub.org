@@ -43,7 +43,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Ml uṭṭun n Midn lli swurn ɣ tasna yad',
 'tog-oldsig' => 'Asmmaql (Tiẓṛi) n ukrraj n ufus lli illan:',
 'tog-fancysig' => 'Skr akrrag n ufus s taɣarast  n  wikitext (bla azday utumatik)',
-'tog-showjumplinks' => 'Srɣ izdayn « Amuddu » d « acnubc » niḍ « Asiǧl » ɣ uflla n tasna',
 'tog-uselivepreview' => 'Skr s umẓri amaynu izrbn (ira JavaScript) (Arm)',
 'tog-forceeditsummary' => 'Ayyit tini iɣ ur iwiɣ imsmun n imbdln',
 'tog-watchlisthideown' => 'hbo ghayli bdlgh gh omdfor inu',
@@ -237,7 +236,7 @@ $1',
 'pool-queuefull' => 'Umuɣ n twuri iẓun (iεmr)',
 'pool-errorunknown' => 'Anzri (error) ur ittuyssan.',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'F {{SITENAME}}',
 'aboutpage' => "Project:f' mayad",
 'copyright' => 'Mayllan gis illa ɣ ddu $1.',
@@ -273,7 +272,6 @@ $1',
 'newmessagesdifflink' => 'Imbddeln imĝura',
 'youhavenewmessagesmulti' => 'Dark tibratin timaynutin ɣ $1',
 'editsection' => 'Ẓreg (bddel)',
-'editsection-brackets' => '[$1]',
 'editold' => 'Ẓreg (bddel)',
 'viewsourceold' => 'Mel aɣbalu',
 'editlink' => 'Ẓreg (bddel)',
@@ -323,12 +321,6 @@ Tifilit n tasnayin gaddanin ratn taft ɣid [[Special:SpecialPages|{{int:specialp
 # General errors
 'error' => 'Laffut',
 'databaseerror' => 'Laffut ɣ database',
-'dberrortext' => 'Tlla laffut ɣikli s tskert database.
-Ulla mayad kis kra ntmukrist.
-May igguran ittu isigal ɣ mayad igat.
-<blockquote><tt>$1</tt></blockquote>
-S ussiglad "<tt>$2</tt>".
-laffut d yurrin ɣ database "<tt>$3: $4</tt>".',
 'laggedslavemode' => 'Ḥan tasnayad ur gis graygan ambddel amaynu.',
 'readonly' => 'Tqqn tabase',
 'missing-article' => 'lqaa\'ida n lbayanat ortofa nass ad gh tawriqt  liss ikhssa asti taf limism "$1" $2.
@@ -413,7 +405,7 @@ Ussaɣ n isqdacn ḥiln hlli.
 'newpassword' => 'Awal iḥḍan amaynu:',
 'retypenew' => 'Als i tirra n w-awal iḥḍan:',
 'resetpass_submit' => 'Sbadl awal n uzri tkcmt',
-'resetpass_success' => 'Awal n uzri nk ibudl mzyan! rad nit tilit ɣ ifalan',
+'changepassword-success' => 'Awal n uzri nk ibudl mzyan! rad nit tilit ɣ ifalan',
 'resetpass_forbidden' => 'Iwaliwn n uzri ur ufan ad badln.',
 'resetpass-no-info' => 'illa fllak ad zwar tilit ɣ ifalan bac ad tkcmt s tasna yad',
 'resetpass-submit-loggedin' => 'Bdl awal n ukccum (tangalt)',
@@ -677,7 +669,6 @@ Izdar ad urtili ɣ isbidn n mayllan ɣ {{SITENAME}} .',
 'resetprefs' => 'hiyd tghyirat li orsjilnin',
 'restoreprefs' => 'sglbd kollo regalega',
 'prefs-editing' => 'tahrir',
-'prefs-edit-boxsize' => 'hajm nafida n thrir',
 'rows' => 'sfof:',
 'columns' => 'aamida:',
 'searchresultshead' => 'Cabba',
@@ -781,7 +772,6 @@ Izdar ad urtili ɣ isbidn n mayllan ɣ {{SITENAME}} .',
 'recentchangeslinked-feed' => 'Imbddeln zund ɣwid',
 'recentchangeslinked-toolbox' => 'Imbddeln zund ɣwid',
 'recentchangeslinked-title' => 'Imbddeln li izdin "$1"',
-'recentchangeslinked-noresult' => 'Ur illi may budeln ɣ tisniwin li dar izdayn s ɣid',
 'recentchangeslinked-summary' => 'Ɣid umuɣ iymbddeln li ittyskarnin tigira yad ɣ tisniwin li ittuyzdayn d kra n tasna (ulla i igmamn n kra taggayt ittuyzlayn). Tisniwin  ɣ [[Special:Watchlist|Umuɣ n tisniwin li ttsaggat]].',
 'recentchangeslinked-page' => 'Assaɣ n tasna',
 'recentchangeslinked-to' => 'Afficher les changements vers les pages liées au lieu de la page donnée
@@ -834,8 +824,6 @@ Mel imbddeln z tisniwin li ittuyzdayni bla tasna li trit.',
 
 # Statistics
 'statistics' => 'Tisnaddanin',
-
-'disambiguationspage' => 'Template:Homonymie',
 
 # Miscellaneous special pages
 'nbytes' => '$1 {{PLURAL:$1|byt|byt}}',
@@ -1274,7 +1262,6 @@ Wiyyaḍ raggis ḥbun s ɣiklli sttin kkan gantn.
 'version-other' => 'wayya',
 'version-mediahandlers' => 'motahakkimat lmedia',
 'version-hooks' => 'lkhtatif',
-'version-extension-functions' => 'lkhdaym n limtidad',
 'version-parser-extensiontags' => 'imarkiwn n limtidad n lmohalil',
 'version-parser-function-hooks' => 'lkhtatif ndala',
 'version-poweredby-others' => 'wiyyad',

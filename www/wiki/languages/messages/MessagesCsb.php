@@ -68,7 +68,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Pòkażë lëczba ùzérającëch brëkòwników',
 'tog-oldsig' => 'Pòdzérk wëzdrzatkù twòjegò pòdpisënka',
 'tog-fancysig' => 'Wzérôj na pòdpisënk jakno na wikikòd (bez aùtomatnych lënków)',
-'tog-showjumplinks' => 'Włączë lënczi przëstãpù "òbaczë téż"',
 'tog-uselivepreview' => 'Brëkùjë wtimczasnegò pòdzérkù (JavaScript) (eksperimentalné)',
 'tog-forceeditsummary' => 'Pëtôj przed wéńdzenim do pùstégò pòdrechòwania edicëji',
 'tog-watchlisthideown' => 'Zatacë mòjé edicëje z lëstë ùzérónëch artiklów',
@@ -251,7 +250,7 @@ $messages = array(
 'jumptonavigation' => 'nawigacëji',
 'jumptosearch' => 'szëkbë',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Ò {{SITENAME}}',
 'aboutpage' => 'Project:Ò_{{SITENAME}}',
 'copyright' => 'Zamkłosc hewòtny starnë je ùżëczónô wedle reglów $1.',
@@ -636,7 +635,6 @@ Spróbùjë szëkbë z przëdôwkã ''all:'' dlô całowny zamkłoscë starnów 
 'prefs-reset-intro' => 'Na ti starnie mòże doprowôdzëc nazôd domëslné nastôwë dlô ti starnë.
 Negò dzéjaniô ni mòżé pòzdze ju copnąc.',
 'prefs-emailconfirm-label' => 'Pòcwierdzenié e-mailowi adresë:',
-'prefs-textboxsize' => 'Miara edicjowégò òkna',
 'youremail' => 'E-mail:',
 'username' => 'Miono brëkòwnika:',
 'uid' => 'ID brëkòwnika:',
@@ -812,8 +810,6 @@ Wszëtczé gòdzënë tikają conë ùniwersalnégò czasë.',
 # Statistics
 'statistics' => 'Statisticzi',
 'statistics-header-users' => 'Statistika brëkòwników',
-
-'disambiguationspage' => 'Template:Starnë_ùjednoznacznieniô',
 
 'doubleredirects' => 'Dëbeltné przeczérowania',
 

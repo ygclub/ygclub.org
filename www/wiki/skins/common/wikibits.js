@@ -137,7 +137,7 @@ window.killEvt = function( evt ) {
 };
 
 window.mwEditButtons = [];
-window.mwCustomEditButtons = []; // eg to add in MediaWiki:Common.js
+mw.log.deprecate( window, 'mwCustomEditButtons', [], 'Use mw.toolbar.addButton instead.' );
 
 window.escapeQuotes = function( text ) {
 	var re = new RegExp( "'", "g" );
@@ -492,8 +492,6 @@ window.removeHandler = function( element, remove, handler ) {
 		element.detachEvent( 'on' + remove, handler );
 	}
 };
-// note: all skins should call runOnloadHook() at the end of html output,
-//      so the below should be redundant. It's there just in case.
 window.hookEvent( 'load', window.runOnloadHook );
 
 if ( isIE6 ) {

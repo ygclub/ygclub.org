@@ -15,11 +15,12 @@
  * @extends ve.ce.LeafNode
  * @mixins ve.ce.ProtectedNode
  * @mixins ve.ce.FocusableNode
+ * @mixins ve.ce.RelocatableNode
  * @mixins ve.ce.GeneratedContentNode
  *
  * @constructor
  * @param {ve.dm.MWTransclusionNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWTransclusionNode = function VeCeMWTransclusionNode( model, config ) {
 	// Parent constructor
@@ -28,21 +29,24 @@ ve.ce.MWTransclusionNode = function VeCeMWTransclusionNode( model, config ) {
 	// Mixin constructors
 	ve.ce.ProtectedNode.call( this );
 	ve.ce.FocusableNode.call( this );
+	ve.ce.RelocatableNode.call( this );
 	ve.ce.GeneratedContentNode.call( this );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-mwTransclusionNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-mwTransclusionNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.MWTransclusionNode, ve.ce.LeafNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.ProtectedNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.ProtectedNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.GeneratedContentNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.RelocatableNode );
+
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.GeneratedContentNode );
 
 /* Static Properties */
 
@@ -52,15 +56,16 @@ ve.ce.MWTransclusionNode.static.renderHtmlAttributes = false;
 
 /* Methods */
 
-ve.ce.MWTransclusionNode.prototype.generateContents = function () {
-	var deferred = $.Deferred();
-	$.ajax( {
+/** */
+ve.ce.MWTransclusionNode.prototype.generateContents = function ( config ) {
+	var xhr, deferred = $.Deferred();
+	xhr = $.ajax( {
 		'url': mw.util.wikiScript( 'api' ),
 		'data': {
 			'action': 'visualeditor',
 			'paction': 'parsefragment',
 			'page': mw.config.get( 'wgRelevantPageName' ),
-			'wikitext': this.model.getWikitext(),
+			'wikitext': ( config && config.wikitext ) || this.model.getWikitext(),
 			'token': mw.user.tokens.get( 'editToken' ),
 			'format': 'json'
 		},
@@ -68,26 +73,46 @@ ve.ce.MWTransclusionNode.prototype.generateContents = function () {
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
 		'timeout': 100000,
-		'cache': 'false',
-		'success': ve.bind( this.onParseSuccess, this, deferred ),
-		'error': ve.bind( this.onParseError, this, deferred )
-	} );
-	return deferred.promise();
+		'cache': 'false'
+	} )
+		.done( ve.bind( this.onParseSuccess, this, deferred ) )
+		.fail( ve.bind( this.onParseError, this, deferred ) );
+
+	return deferred.promise( { abort: xhr.abort} );
 };
 
 /**
  * Handle a successful response from the parser for the wikitext fragment.
  *
- * @param {jQuery.Deferred} deferred The Deferred object created by generateContents
+ * @param {jQuery.Deferred} deferred The Deferred object created by #generateContents
  * @param {Object} response Response data
  */
 ve.ce.MWTransclusionNode.prototype.onParseSuccess = function ( deferred, response ) {
-	var data = response.visualeditor, contentNodes = $( data.content ).get();
+	var contentNodes, $placeHolder;
+
+	if ( !response || response.error || !response.visualeditor || response.visualeditor.result !== 'success' ) {
+		return this.onParseError.call( this, deferred );
+	}
+
+	contentNodes = this.$( response.visualeditor.content ).get();
 	// HACK: if $content consists of a single paragraph, unwrap it.
 	// We have to do this because the PHP parser wraps everything in <p>s, and inline templates
 	// will render strangely when wrapped in <p>s.
 	if ( contentNodes.length === 1 && contentNodes[0].nodeName.toLowerCase() === 'p' ) {
 		contentNodes = Array.prototype.slice.apply( contentNodes[0].childNodes );
+	}
+
+	// Check if the final result of the imported template is empty.
+	// If it is empty, put an inline placeholder inside it so that it can
+	// be accessible to users (either to remove or edit)
+	if ( contentNodes.length === 0 ) {
+		$placeHolder = this.$( '<span>' )
+			.css( { 'display': 'block' } )
+			// adapted from ve.ce.BranchNode.$blockSlugTemplate
+			// IE support may require using &nbsp;
+			.html( '&#xFEFF;' );
+
+		contentNodes.push( $placeHolder[0] );
 	}
 	deferred.resolve( contentNodes );
 };
@@ -95,7 +120,7 @@ ve.ce.MWTransclusionNode.prototype.onParseSuccess = function ( deferred, respons
 /**
  * Handle an unsuccessful response from the parser for the wikitext fragment.
  *
- * @param {jQuery.Deferred} deferred The promise object created by generateContents
+ * @param {jQuery.Deferred} deferred The promise object created by #generateContents
  * @param {Object} response Response data
  */
 ve.ce.MWTransclusionNode.prototype.onParseError = function ( deferred ) {
@@ -116,13 +141,13 @@ ve.ce.MWTransclusionBlockNode = function VeCeMWTransclusionBlockNode( model ) {
 	// Parent constructor
 	ve.ce.MWTransclusionNode.call( this, model );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-mwTransclusionBlockNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-mwTransclusionBlockNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionBlockNode, ve.ce.MWTransclusionNode );
+OO.inheritClass( ve.ce.MWTransclusionBlockNode, ve.ce.MWTransclusionNode );
 
 /* Static Properties */
 
@@ -142,13 +167,13 @@ ve.ce.MWTransclusionInlineNode = function VeCeMWTransclusionInlineNode( model ) 
 	// Parent constructor
 	ve.ce.MWTransclusionNode.call( this, model );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-mwTransclusionInlineNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-mwTransclusionInlineNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionInlineNode, ve.ce.MWTransclusionNode );
+OO.inheritClass( ve.ce.MWTransclusionInlineNode, ve.ce.MWTransclusionNode );
 
 /* Static Properties */
 

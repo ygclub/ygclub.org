@@ -167,7 +167,7 @@ class LoadBalancer {
 		#wfDebugLog( 'connect', var_export( $loads, true ) );
 
 		# Return a random representative of the remainder
-		return $this->pickRandom( $loads );
+		return ArrayUtils::pickRandom( $loads );
 	}
 
 	/**
@@ -236,7 +236,7 @@ class LoadBalancer {
 			$currentLoads = $nonErrorLoads;
 			while ( count( $currentLoads ) ) {
 				if ( $wgReadOnly || $this->mAllowLagged || $laggedSlaveMode ) {
-					$i = $this->pickRandom( $currentLoads );
+					$i = ArrayUtils::pickRandom( $currentLoads );
 				} else {
 					$i = $this->getRandomNonLagged( $currentLoads, $wiki );
 					if ( $i === false && count( $currentLoads ) != 0 ) {
@@ -244,7 +244,7 @@ class LoadBalancer {
 						wfDebugLog( 'replication', "All slaves lagged. Switch to read-only mode\n" );
 						$wgReadOnly = 'The database has been automatically locked ' .
 							'while the slave database servers catch up to the master';
-						$i = $this->pickRandom( $currentLoads );
+						$i = ArrayUtils::pickRandom( $currentLoads );
 						$laggedSlaveMode = true;
 					}
 				}
@@ -546,6 +546,38 @@ class LoadBalancer {
 	}
 
 	/**
+	 * Get a database connection handle reference
+	 *
+	 * The handle's methods wrap simply wrap those of a DatabaseBase handle
+	 *
+	 * @see LoadBalancer::getConnection() for parameter information
+	 *
+	 * @param integer $db
+	 * @param mixed $groups
+	 * @param string $wiki
+	 * @return DBConnRef
+	 */
+	public function getConnectionRef( $db, $groups = array(), $wiki = false ) {
+		return new DBConnRef( $this, $this->getConnection( $db, $groups, $wiki ) );
+	}
+
+	/**
+	 * Get a database connection handle reference without connecting yet
+	 *
+	 * The handle's methods wrap simply wrap those of a DatabaseBase handle
+	 *
+	 * @see LoadBalancer::getConnection() for parameter information
+	 *
+	 * @param integer $db
+	 * @param mixed $groups
+	 * @param string $wiki
+	 * @return DBConnRef
+	 */
+	public function getLazyConnectionRef( $db, $groups = array(), $wiki = false ) {
+		return new DBConnRef( $this, array( $db, $groups, $wiki ) );
+	}
+
+	/**
 	 * Open a connection to the server given by the specified index
 	 * Index must be an actual index into the array.
 	 * If the server is already open, returns it.
@@ -637,6 +669,7 @@ class LoadBalancer {
 			$server = $this->mServers[$i];
 			$server['serverIndex'] = $i;
 			$server['foreignPoolRefCount'] = 0;
+			$server['foreign'] = true;
 			$conn = $this->reallyOpenConnection( $server, $dbName );
 			if ( !$conn->isOpen() ) {
 				wfDebug( __METHOD__ . ": error opening connection for $i/$wiki\n" );
@@ -1066,5 +1099,48 @@ class LoadBalancer {
 	 */
 	function clearLagTimeCache() {
 		$this->mLagTimes = null;
+	}
+}
+
+/**
+ * Helper class to handle automatically marking connectons as reusable (via RAII pattern)
+ * as well handling deferring the actual network connection until the handle is used
+ *
+ * @ingroup Database
+ * @since 1.22
+ */
+class DBConnRef implements IDatabase {
+	/** @var LoadBalancer */
+	protected $lb;
+	/** @var DatabaseBase|null */
+	protected $conn;
+	/** @var Array|null */
+	protected $params;
+
+	/**
+	 * @param $lb LoadBalancer
+	 * @param $conn DatabaseBase|array Connection or (server index, group, wiki ID) array
+	 */
+	public function __construct( LoadBalancer $lb, $conn ) {
+		$this->lb = $lb;
+		if ( $conn instanceof DatabaseBase ) {
+			$this->conn = $conn;
+		} else {
+			$this->params = $conn;
+		}
+	}
+
+	public function __call( $name, $arguments ) {
+		if ( $this->conn === null ) {
+			list( $db, $groups, $wiki ) = $this->params;
+			$this->conn = $this->lb->getConnection( $db, $groups, $wiki );
+		}
+		return call_user_func_array( array( $this->conn, $name ), $arguments );
+	}
+
+	function __destruct() {
+		if ( $this->conn !== null ) {
+			$this->lb->reuseConnection( $this->conn );
+		}
 	}
 }

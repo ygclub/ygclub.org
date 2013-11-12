@@ -10,28 +10,25 @@ QUnit.module( 've.ui.ListAction' );
 /* Tests */
 
 function runListConverterTest( assert, html, method, style, range, expectedSelection, expectedData, expectedOriginalData, msg ) {
-	var selection,
-		dom = ve.createDocumentFromHtml( html || ve.dm.example.html ),
-		target = new ve.init.sa.Target( $( '#qunit-fixture' ), dom ),
-		surface = target.surface,
+	var surface = ve.test.utils.createSurfaceFromHtml( html || ve.dm.example.html ),
 		listAction = new ve.ui.ListAction( surface ),
-		data = ve.copyArray( surface.getModel().getDocument().getFullData() ),
-		originalData = ve.copyArray( data );
+		data = ve.copy( surface.getModel().getDocument().getFullData() ),
+		originalData = ve.copy( data );
 
 	expectedData( data );
 	if ( expectedOriginalData ) {
 		expectedOriginalData( originalData );
 	}
-	surface.getModel().change( null, range );
+	surface.getModel().setSelection( range );
 	listAction[method]( style );
 
 	assert.deepEqual( surface.getModel().getDocument().getFullData(), data, msg + ': data models match' );
 	assert.deepEqual( surface.getModel().getSelection(), expectedSelection, msg + ': selections match' );
 
-	selection = surface.getModel().undo();
+	surface.getModel().undo();
 
 	assert.deepEqual( surface.getModel().getDocument().getFullData(), originalData, msg + ' (undo): data models match' );
-	assert.deepEqual( selection, range, msg + ' (undo): selections match' );
+	assert.deepEqual( surface.getModel().getSelection(), range, msg + ' (undo): selections match' );
 
 	surface.destroy();
 }

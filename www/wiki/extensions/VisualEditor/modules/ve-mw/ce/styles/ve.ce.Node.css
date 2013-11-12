@@ -12,11 +12,14 @@
 }
 
 /* HACK: Hide Ref errors in templates */
-.ve-ce-mwTransclusionNode strong.error,
-.ve-ce-mwTransclusionNode span.error,
-.ve-ce-mwTransclusionNode p.error,
-.ve-ce-mwTransclusionNode div.error {
+.ve-ce-mwTransclusionNode .mw-ext-cite-error {
 	display: none;
+}
+
+/* HACK: Fake superscript style for references generated as spans in templates */
+.ve-ce-mwTransclusionNode span.reference {
+	vertical-align: super;
+	font-size: smaller;
 }
 
 /* ve.ce.MWReferenceListNode */
@@ -40,4 +43,39 @@
 
 .ve-ce-mwInlineImageNode {
 	display: inline-block;
+}
+
+/* ve.ce.MWBlockImageNode */
+
+.ve-ce-mwBlockImageNode-inner {
+	display: inline-block;
+}
+
+/* ve.ce.MWAlienExtensionNode */
+
+.ve-ce-mwAlienExtensionNode {
+	display: inline-block;
+}
+
+/* ve.ce.MWMathNode */
+
+.ve-ce-mwMathNode {
+	display: inline-block;
+}
+
+/* ve.ce.MWHieroNode */
+
+.ve-ce-mwHieroNode {
+	display: table;
+}
+
+/* ve.ce.MWNumberedExternalLinkNode */
+
+.ve-ce-surface {
+    counter-reset: ve-ce-mwNumberedExternalLinkNode;
+}
+
+.ve-ce-mwNumberedExternalLinkNode a:empty:after {
+    content: "[" counter(ve-ce-mwNumberedExternalLinkNode) "]";
+    counter-increment: ve-ce-mwNumberedExternalLinkNode;
 }

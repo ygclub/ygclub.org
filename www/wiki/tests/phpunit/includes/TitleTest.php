@@ -33,6 +33,150 @@ class TitleTest extends MediaWikiTestCase {
 	}
 
 	/**
+	 * See also mediawiki.Title.test.js
+	 */
+	function testSecureAndSplit() {
+		// Valid
+		foreach ( array(
+			'Sandbox',
+			'A "B"',
+			'A \'B\'',
+			'.com',
+			'~',
+			'"',
+			'\'',
+			'Talk:Sandbox',
+			'Talk:Foo:Sandbox',
+			'File:Example.svg',
+			'File_talk:Example.svg',
+			'Foo/.../Sandbox',
+			'Sandbox/...',
+			'A~~',
+			// Length is 256 total, but only title part matters
+			'Category:' . str_repeat( 'x', 248 ),
+			str_repeat( 'x', 252 )
+		) as $text ) {
+			$this->assertInstanceOf( 'Title', Title::newFromText( $text ), "Valid: $text" );
+		}
+
+		// Invalid
+		foreach ( array(
+			'',
+			'__  __',
+			'  __  ',
+			// Bad characters forbidden regardless of wgLegalTitleChars
+			'A [ B',
+			'A ] B',
+			'A { B',
+			'A } B',
+			'A < B',
+			'A > B',
+			'A | B',
+			// URL encoding
+			'A%20B',
+			'A%23B',
+			'A%2523B',
+			// XML/HTML character entity references
+			// Note: Commented out because they are not marked invalid by the PHP test as
+			// Title::newFromText runs Sanitizer::decodeCharReferencesAndNormalize first.
+			//'A &eacute; B',
+			//'A &#233; B',
+			//'A &#x00E9; B',
+			// Subject of NS_TALK does not roundtrip to NS_MAIN
+			'Talk:File:Example.svg',
+			// Directory navigation
+			'.',
+			'..',
+			'./Sandbox',
+			'../Sandbox',
+			'Foo/./Sandbox',
+			'Foo/../Sandbox',
+			'Sandbox/.',
+			'Sandbox/..',
+			// Tilde
+			'A ~~~ Name',
+			'A ~~~~ Signature',
+			'A ~~~~~ Timestamp',
+			str_repeat( 'x', 256 ),
+			// Namespace prefix without actual title
+			// ':', // bug 54044
+			'Talk:',
+			'Category: ',
+			'Category: #bar'
+		) as $text ) {
+			$this->assertNull( Title::newFromText( $text ), "Invalid: $text" );
+		}
+	}
+
+	public static function provideConvertByteClassToUnicodeClass() {
+		return array(
+			array(
+				' %!"$&\'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\\x80-\\xFF+',
+				' %!"$&\'()*,\\-./0-9:;=?@A-Z\\\\\\^_`a-z~+\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTYf-\\xFF+',
+				'QWERTYf-\\x7F+\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTY\\x66-\\xFD+',
+				'QWERTYf-\\x7F+\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTYf-y+',
+				'QWERTYf-y+',
+			),
+			array(
+				'QWERTYf-\\x80+',
+				'QWERTYf-\\x7F+\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTY\\x66-\\x80+\\x23',
+				'QWERTYf-\\x7F+#\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTY\\x66-\\x80+\\xD3',
+				'QWERTYf-\\x7F+\\u0080-\\uFFFF',
+			),
+			array(
+				'\\\\\\x99',
+				'\\\\\\u0080-\\uFFFF',
+			),
+			array(
+				'-\\x99',
+				'\\-\\u0080-\\uFFFF',
+			),
+			array(
+				'QWERTY\\-\\x99',
+				'QWERTY\\-\\u0080-\\uFFFF',
+			),
+			array(
+				'\\\\x99',
+				'\\\\x99',
+			),
+			array(
+				'A-\\x9F',
+				'A-\\x7F\\u0080-\\uFFFF',
+			),
+			array(
+				'\\x66-\\x77QWERTY\\x88-\\x91FXZ',
+				'f-wQWERTYFXZ\\u0080-\\uFFFF',
+			),
+			array(
+				'\\x66-\\x99QWERTY\\xAA-\\xEEFXZ',
+				'f-\\x7FQWERTYFXZ\\u0080-\\uFFFF',
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider provideConvertByteClassToUnicodeClass
+	 */
+	function testConvertByteClassToUnicodeClass( $byteClass, $unicodeClass ) {
+		$this->assertEquals( $unicodeClass, Title::convertByteClassToUnicodeClass( $byteClass ) );
+	}
+
+	/**
 	 * @dataProvider provideBug31100
 	 */
 	function testBug31100FixSpecialName( $text, $expectedParam ) {

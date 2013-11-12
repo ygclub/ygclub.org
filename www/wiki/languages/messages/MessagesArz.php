@@ -9,6 +9,7 @@
  *
  * @author Alnokta
  * @author Dudi
+ * @author Ebraminio
  * @author Ghaly
  * @author Meno25
  * @author Ouda
@@ -333,7 +334,6 @@ $messages = array(
 'tog-shownumberswatching' => 'بين عدد اليوزرز المراقبين',
 'tog-oldsig' => 'الامضا دلوقتى:',
 'tog-fancysig' => 'امضا خام (من غير لينك أوتوماتيك)',
-'tog-showjumplinks' => 'خلى وصلات "روح لـ" تكون شغالة.',
 'tog-uselivepreview' => 'استخدم البروفة السريعة (جافاسكريبت) (تجريبي)',
 'tog-forceeditsummary' => 'نبهنى عند تدخيل ملخص للتعديل  فاضي',
 'tog-watchlisthideown' => 'خبى التعديلات بتاعتى من لستة المراقبة',
@@ -517,7 +517,7 @@ $messages = array(
 'lastmodifiedat' => 'الصفحه دى اتعدلت اخر مره فى $1,‏ $2.',
 'viewcount' => 'الصفحة دى اتدخل عليها{{PLURAL:$1|مرة واحدة|مرتين|$1 مرات|$1 مرة}}.',
 'protectedpage' => 'صفحه محميه',
-'jumpto' => 'نُط على:',
+'jumpto' => 'روح على:',
 'jumptonavigation' => 'استكشاف',
 'jumptosearch' => 'تدوير',
 'view-pool-error' => 'متأسفين, السيرفرات عليها حمل كبير دلوقتى.
@@ -529,7 +529,7 @@ $1',
 'pool-queuefull' => 'طابور الانتخاب مليان',
 'pool-errorunknown' => 'غلط مش معروف',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'عن {{SITENAME}}',
 'aboutpage' => 'Project:معلومات عن',
 'copyright' => 'المحتوى موجود تحت $1.',
@@ -608,17 +608,6 @@ $1',
 # General errors
 'error' => 'غلطه',
 'databaseerror' => 'غلط فى قاعدة البيانات (database)',
-'dberrortext' => 'حصل غلط فى صيغة الاستعلام فى قاعدة البيانات (database).
-ممكن يكون بسبب عيب فى البرنامج.
-آخر محاوله استعلام اتطلبت من قاعدة البيانات كانت:
-<blockquote><tt>$1</tt></blockquote>
-من جوه الخاصيه "<tt>$2</tt>".
-قاعدة البيانات رجعت الغلط "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'حصل غلط فى صيغة الاستعلام فى قاعدة البيانات (database).
-آخر محاوله استعلام اتطلبت من قاعدة البيانات كانت:
-"$1"
-من جوه الخاصيه "$2".
-قاعدة البيانات رجعت الغلط "$3: $4"',
 'laggedslavemode' => "'''تحذير:''' الصفحه يمكن ما يكونش فيها تحديثات جديده.",
 'readonly' => 'قاعدة البيانات (الـ database) مقفوله',
 'enterlockreason' => 'اكتب سبب القفل, و قول امتى تقريبا ح يتلغى القفل',
@@ -666,7 +655,6 @@ $1',
 'viewsourcetext' => 'ممكن تشوف وتنسخ مصدر  الصفحه دى:',
 'protectedinterface' => 'الصفحة دى هى اللى بتوفر نص الواجهة بتاعة البرنامج،وهى مقفولة لمنع التخريب.',
 'editinginterface' => "'''تحذير''': أنت بتعدل صفحة بتستخدم فى الواجهة النصية  بتاعة البرنامج. التغييرات فى الصفحة دى ها تأثر على مظهر واجهة اليوزر لليوزرز التانيين. للترجمات، لو سمحت استخدم [//translatewiki.net/wiki/Main_Page?setlang=ar بيتاويكى]، مشروع ترجمة الميدياويكى.",
-'sqlhidden' => '(استعلام إس‌كيو‌إل متخبي)',
 'cascadeprotected' => 'الصفحة دى محمية من التعديل، بسبب انها مدمجة فى {{PLURAL:$1|الصفحة|الصفحات}} دي، اللى مستعمل فيها خاصية "حماية الصفحات المدمجة" :
 $2',
 'namespaceprotected' => "ما عندكش صلاحية تعديل الصفحات  اللى فى نطاق '''$1'''.",
@@ -761,7 +749,7 @@ $2',
 'invalidemailaddress' => 'مش ممكن نقبل عنوان الايميل لانه مش مظبوط.
 دخل ايميل مظبوط او امسحه من الخانة.',
 'accountcreated' => 'الحساب اتفتح',
-'accountcreatedtext' => 'اتفتح حساب لليوزر ب$1.',
+'accountcreatedtext' => 'حساب اليوزر  [[{{ns:User}}:$1|$1]] ([[{{ns:User talk}}:$1|talk]])اتفتح .',
 'createaccount-title' => 'فتح حساب فى {{SITENAME}}',
 'createaccount-text' => 'فى واحد فتح حساب باسم الايمل بتاعك على {{SITENAME}} ($4) بالاسم "$2"، وبباسورد "$3". لازم تسجل دخولك دلوقتى و تغير الباسورد بتاعتك.
 
@@ -780,7 +768,7 @@ $2',
 'newpassword' => 'الباسورد جديدة:',
 'retypenew' => 'اكتب الباسورد الجديده تانى:',
 'resetpass_submit' => 'اظبط الباسورد و ادخل',
-'resetpass_success' => 'الباسورد بتاعتك اتغيرت بنجاح! دلوقتى  بنسجل دخولك...',
+'changepassword-success' => 'الباسورد بتاعتك اتغيرت بنجاح! دلوقتى  بنسجل دخولك...',
 'resetpass_forbidden' => 'مش ممكن تغيير الباسورد',
 'resetpass-no-info' => 'لازم تسجل دخولك علشان تقدر توصل للصفحة دى على طول.',
 'resetpass-submit-loggedin' => 'غير الباسورد',
@@ -1273,7 +1261,6 @@ $1",
 'resetprefs' => 'امسح التغييرات اللى مش المحفوظة',
 'restoreprefs' => 'استرجع التظبيطات الاصليه',
 'prefs-editing' => 'تعديل',
-'prefs-edit-boxsize' => 'كُبر الويندو بتاعة التحرير',
 'rows' => 'صفوف:',
 'columns' => 'عمدان:',
 'searchresultshead' => 'تدوير',
@@ -1284,9 +1271,6 @@ $1",
 'recentchangesdays-max' => '(الحد الاقصى $1 {{PLURAL:$1|يوم|ايام}})',
 'recentchangescount' => 'عدد التعديلات اللى بتظهر اوتوماتيكى فى اخر التغييرات, تواريخ الصفحه, و فى السجلات, :',
 'prefs-help-recentchangescount' => 'بيحتوى على احدث التغييرات ، تواريخ الصفحات و السجلات.',
-'prefs-help-watchlist-token' => 'ملى الحقل ده بمفتاح سرى حيعمل تلقيم RSS لقايمه مراقبتك.
-اى واحد بعرف المفتاح فى الحقل ده ممكن يقرأ قايمه مراقبتك، علشان كده اختار قيمه متأمنه.
-دى قيمه متولده عشوائى وممكن تستخدمها: $1',
 'savedprefs' => 'التفضيلات بتاعتك اتحفظت.',
 'timezonelegend' => 'منطقة التوقيت',
 'localtime' => 'التوقيت المحلى',
@@ -1316,7 +1300,6 @@ $1",
 'prefs-reset-intro' => 'ممكن تستعمل الصفحه دى عشان تعيد ظبط التفضيلات بتاعتك و تخليها زى الحاله الافتراضيه للموقع.
 ماينفعش الرجوع فى التعديل دا.',
 'prefs-emailconfirm-label' => 'التأكد من الايميل:',
-'prefs-textboxsize' => 'حجم شباك التعديل',
 'youremail' => 'الايميل:',
 'username' => 'اسم اليوزر:',
 'uid' => 'رقم اليوزر:',
@@ -1550,7 +1533,6 @@ $1",
 'recentchangeslinked-feed' => 'تعديلات  ليها علاقه',
 'recentchangeslinked-toolbox' => 'تعديلات  ليها علاقه',
 'recentchangeslinked-title' => 'التعديلات المرتبطه  ب "$1"',
-'recentchangeslinked-noresult' => 'مافيش تعديلات حصلت فى الصفحات اللى ليها وصلات هنا خلال الفترة المحدده.',
 'recentchangeslinked-summary' => "دى ليستة تغييرات اتعملت قريب فى صفح معمول ليها لينك من صفح مخصوصه (او لاعضاء فى تصنيف معين).
 الصفح اللى فى [[Special:Watchlist|لستة الصفح اللى بتراقبها]] معروضه '''بالـbold'''",
 'recentchangeslinked-page' => 'اسم الصفحه :',
@@ -1562,7 +1544,7 @@ $1",
 'reuploaddesc' => 'إلغى التحميل وارجع لاستمارة التحميل',
 'upload-tryagain' => 'نفذ وصف الملف المتعدل',
 'uploadnologin' => 'ما سجلتش الدخول',
-'uploadnologintext' => 'لازم تكون [[Special:UserLogin|مسجل الدخول]] علشان تقدر تحمل الملفات.',
+'uploadnologintext' => 'لازم تكون  $1 علشان تقدر تحمل الملفات.',
 'upload_directory_missing' => 'مجلد التحميل($1) ضايع السيرفير وماقدرش يعمل واحد تاني.',
 'upload_directory_read_only' => 'مجلد التحميل ($1) مش ممكن الكتابة عليه بواسطة سيرڨر الويب.',
 'uploaderror' => 'غلطه فى التحميل',
@@ -1854,12 +1836,6 @@ PICT # misc.
 'statistics-users-active-desc' => 'اليوزرز اللى نفذو عمليه فى الـ {{PLURAL:$1|يوم|$1 ايام}} اللى فاتو',
 'statistics-mostpopular' => 'اكتر صفحات اتشافت',
 
-'disambiguations' => 'صفحات التوضيح',
-'disambiguationspage' => 'Template:توضيح',
-'disambiguations-text' => "الصفحات دى بتوصل لـ '''صفحة توضيح'''.
-المفروض على العكس انهم يوصلو ل للصفحات المناسبة. <br />
-أى صفحة بتتعامل على انها صفحة توضيح إذا كانت بتستعمل قالب موجود فى [[MediaWiki:Disambiguationspage]]",
-
 'doubleredirects' => 'تحويلات مزدوجه',
 'doubleredirectstext' => 'الصفحة دى فيها لستة الصفحات اللى فيها تحويلة لصفحة تانية فيها تحويلة.
 كل سطر فى اللستة دى  فيه لينك للتحويلة الأولانية والتانية و كمان للصفحة بتاعة التحويلة التانية و اللى غالبا هى الصفحة الاصلية اللى المفروض التحويلة الاولانية توصل ليها.
@@ -2076,7 +2052,6 @@ PICT # misc.
 'unwatchthispage' => 'اتوقف عن المراقبة',
 'notanarticle' => 'دى مش صفحة بتاعة محتوى',
 'notvisiblerev' => 'النسحة اتمسحت',
-'watchnochange' => 'مافيش ولا صفحة اتعدلت فى لستة مراقبتك فى الفترة الزمنية اللى حددتها.',
 'watchlist-details' => '{{PLURAL:$1|$1 صفحه|$1 صفحه}} فى قايمه مراقبتك، بدون عد صفحات المناقشه.',
 'wlheader-enotif' => '*خاصية الاعلام بالايميل متفعلة',
 'wlheader-showupdated' => "الصفحات اللى اتغيرت  بعد زيارتك ليها اخر مرة معروضة بالخط '''العريض'''",
@@ -2313,7 +2288,7 @@ $1',
 'mycontris' => 'تعديلاتى',
 'contribsub2' => 'لليوزر $1 ($2)',
 'nocontribs' => 'مالقيناش   تغييرات تطابق المحددات دي.',
-'uctop' => '(فوق)',
+'uctop' => '(آخر تعديل)',
 'month' => 'من شهر (واللى قبل كده):',
 'year' => 'من سنة (واللى قبل كده):',
 
@@ -2686,7 +2661,7 @@ $1',
 'tooltip-search' => 'دور فى {{SITENAME}}',
 'tooltip-search-go' => 'روح لصفحه بالاسم دا بالظبط لو موجوده',
 'tooltip-search-fulltext' => 'دور فى الصفحات على النَص دا',
-'tooltip-p-logo' => 'الصفحه الرئيسيه',
+'tooltip-p-logo' => 'زور الصفحه الرئيسيه',
 'tooltip-n-mainpage' => 'زور الصفحه الرئيسيه',
 'tooltip-n-mainpage-description' => 'زور الصفحه الرئيسيه',
 'tooltip-n-portal' => 'عن المشروع, ممكن تعمل ايه, و فين تلاقى اللى بتدور عليه',
@@ -3348,7 +3323,6 @@ $5
 'version-other' => 'تانية',
 'version-mediahandlers' => 'متحكمات الميديا',
 'version-hooks' => 'الخطاطيف',
-'version-extension-functions' => 'وظايف الامتداد',
 'version-parser-extensiontags' => 'التاجز بتوع امتداد البريزر',
 'version-parser-function-hooks' => 'خطاطيف دالة المحلل',
 'version-hook-name' => 'اسم الخطاف',

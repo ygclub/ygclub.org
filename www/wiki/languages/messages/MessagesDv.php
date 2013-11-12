@@ -19,21 +19,32 @@ $rtl = true;
 
 $namespaceNames = array(
 	NS_MEDIA            => 'މީޑިއާ',
-	NS_SPECIAL          => 'ހާއްޞަ',
+	NS_SPECIAL          => 'ޚާއްސަ',
 	NS_MAIN             => '',
 	NS_TALK             => 'ޚިޔާލު',
 	NS_USER             => 'މެމްބަރު',
 	NS_USER_TALK        => 'މެމްބަރުގެ_ވާހަކަ',
-	NS_FILE             => 'ފައިލް',
-	NS_FILE_TALK        => 'ފައިލް_ޚިޔާލު',
+	NS_PROJECT_TALK     => '$1ގެ_ވާހަކަ',
+	NS_FILE             => 'ފައިލު',
+	NS_FILE_TALK        => 'ފައިލުގެ_ޚިޔާލު',
 	NS_MEDIAWIKI        => 'މީޑިއާވިކީ',
-	NS_MEDIAWIKI_TALK   => 'މީޑިޔާވިކި_ޚިޔާލު',
+	NS_MEDIAWIKI_TALK   => 'މިޑިއާވިކީ_ޚިޔާލު',
 	NS_TEMPLATE         => 'ފަންވަތް',
-	NS_TEMPLATE_TALK    => 'ފަންވަތް_ޚިޔާލު',
+	NS_TEMPLATE_TALK    => 'ފަންވަތުގެ_ޚިޔާލު',
 	NS_HELP             => 'އެހީ',
-	NS_HELP_TALK        => 'އެހީ_ޚިޔާލު',
+	NS_HELP_TALK        => 'އެހީގެ_ޚިޔާލު',
 	NS_CATEGORY         => 'ޤިސްމު',
-	NS_CATEGORY_TALK    => 'ޤިސްމު_ޚިޔާލު',
+	NS_CATEGORY_TALK    => 'ޤިސްމުގެ_ޚިޔާލު',
+);
+
+$namespaceAliases = array(
+	'ހާއްޞަ'          => NS_SPECIAL,
+	'ފައިލް'           => NS_FILE,
+	'ފައިލް_ޚިޔާލު'    => NS_FILE_TALK,
+	'މީޑިޔާވިކި_ޚިޔާލު' => NS_MEDIAWIKI_TALK,
+	'ފަންވަތް_ޚިޔާލު'  => NS_TEMPLATE_TALK,
+	'އެހީ_ޚިޔާލު'      => NS_HELP_TALK,
+	'ޤިސްމު_ޚިޔާލު'   => NS_CATEGORY_TALK,
 );
 
 $specialPageAliases = array(
@@ -250,7 +261,7 @@ $messages = array(
 $1',
 'pool-errorunknown' => 'ކޮންމެވެސް ކުށެއް',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}}ގެ ތަޢާރަފު',
 'aboutpage' => 'Project:ތަޢާރަފު',
 'copyright' => 'ހުރިހާ މާއްދާއެއް $1 ގެ ދަށުން ލިބެން އެބަހުއްޓެވެ.',
@@ -260,7 +271,6 @@ $1',
 'disclaimers' => 'އިއުލާނުތައް',
 'disclaimerpage' => 'Project:ޢާއްމު ޢިއުލާނުތައް',
 'edithelp' => 'ބަދަލުތައް ގެނައުމަށް އެހީ އެއް',
-'edithelppage' => 'އެހީ: އުނިއިތުރު ގެންނެވުން',
 'helppage' => 'Help:ފިހުރިސްތު',
 'mainpage' => 'މައި ޞަފްޙާ',
 'mainpage-description' => 'މައި ޞަފްޙާ',
@@ -366,7 +376,7 @@ $1',
 'newpassword' => 'އައު ސިއްރުބަސް:',
 'retypenew' => 'އައު ސިއްރުބަސް އަލުންލިޔުއްވާ:',
 'resetpass_submit' => 'ސިއްރުބަސް ހަމަޖައްސަވާފައި ވަދެވަޑައިގަންނަވާ',
-'resetpass_success' => 'ތިބެފުޅާގެ ސިއްރުބަސް ބަދަލުކުރެވިއްޖެ. 
+'changepassword-success' => 'ތިބެފުޅާގެ ސިއްރުބަސް ބަދަލުކުރެވިއްޖެ. 
 މިހާރު ވަދެވަޑައިގަންނަވަނީ...',
 'resetpass_forbidden' => 'ސިއްރުބަސް ބަދަލެއް ނުކުރެވޭނެއެވެ',
 'resetpass-submit-loggedin' => 'ސިއްރުބަސް ބަދަލުކުރައްވާ',
@@ -488,7 +498,6 @@ $1',
 'shown-title' => 'ދައްކަވާނީ ޞަފްޙާއަކަށް $1 {{PLURAL:$1|ނަތީޖާ|ނަތީޖާ }}',
 'viewprevnext' => 'ބައްލަވާ($1 {{int:pipe-separator}} $2) ($3).',
 'searchmenu-new' => "''' މި ވިކީގައި \"[[:\$1]]\" ފަށްޓަވައިދެއްވާ! '''",
-'searchhelp-url' => 'Help:ފިހުރިސްތު',
 'searchprofile-articles' => 'މަޒުމޫނު ޞަފްޙާތައް',
 'searchprofile-project' => 'އެހީ ޞަފްޙާތަކާއި މަޝްރޫޢު ޞަފްޙާތައް',
 'searchprofile-images' => 'މަލްޓިމީޑިއާ',

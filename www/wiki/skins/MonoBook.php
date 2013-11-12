@@ -79,8 +79,8 @@ class MonoBookTemplate extends BaseTemplate {
 	<?php if ( $this->data['sitenotice'] ) { ?><div id="siteNotice"><?php $this->html( 'sitenotice' ) ?></div><?php } ?>
 
 	<h1 id="firstHeading" class="firstHeading" lang="<?php
-		$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getCode();
-		$this->html( 'pageLanguage' );
+		$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getHtmlCode();
+		$this->text( 'pageLanguage' );
 	?>"><span dir="auto"><?php $this->html( 'title' ) ?></span></h1>
 	<div id="bodyContent" class="mw-body">
 		<div id="siteSub"><?php $this->msg( 'tagline' ) ?></div>
@@ -89,9 +89,9 @@ class MonoBookTemplate extends BaseTemplate {
 		<div id="contentSub2"><?php $this->html( 'undelete' ) ?></div>
 <?php } ?><?php if ( $this->data['newtalk'] ) { ?>
 		<div class="usermessage"><?php $this->html( 'newtalk' ) ?></div>
-<?php } ?><?php if ( $this->data['showjumplinks'] ) { ?>
-		<div id="jump-to-nav" class="mw-jump"><?php $this->msg( 'jumpto' ) ?> <a href="#column-one"><?php $this->msg( 'jumptonavigation' ) ?></a><?php $this->msg( 'comma-separator' ) ?><a href="#searchInput"><?php $this->msg( 'jumptosearch' ) ?></a></div>
 <?php } ?>
+		<div id="jump-to-nav" class="mw-jump"><?php $this->msg( 'jumpto' ) ?> <a href="#column-one"><?php $this->msg( 'jumptonavigation' ) ?></a><?php $this->msg( 'comma-separator' ) ?><a href="#searchInput"><?php $this->msg( 'jumptosearch' ) ?></a></div>
+
 		<!-- start content -->
 <?php $this->html( 'bodytext' ) ?>
 		<?php if ( $this->data['catlinks'] ) { $this->html( 'catlinks' ); } ?>

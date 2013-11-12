@@ -74,7 +74,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Antaal fon do beooboachtjende Benutsere anwiese',
 'tog-oldsig' => 'Aktuälle Signatuur:',
 'tog-fancysig' => 'Unnerskrift as Wikitext behonnelje (sunner automatiske Ferlinkenge)',
-'tog-showjumplinks' => '"Wikselje tou"-Links muugelk moakje',
 'tog-uselivepreview' => 'Live-Foarbekiek nutsje (JavaScript) (experimentell)',
 'tog-forceeditsummary' => 'Woarskauje, wan bie dät Spiekerjen ju Touhoopefoatenge failt',
 'tog-watchlisthideown' => 'Oaine Biedraage in ju Beooboachtengslieste ferbierge',
@@ -272,7 +271,7 @@ $1',
 'pool-queuefull' => 'Pooltäiweslange is ful',
 'pool-errorunknown' => 'Uunbekoanden Failer',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Uur {{SITENAME}}',
 'aboutpage' => 'Project:Uur_{{SITENAME}}',
 'copyright' => 'Inhoold is ferföichboar unner de $1.',
@@ -354,15 +353,6 @@ Aal ferföichboare Spezioalsieden sunt in ju [[Special:SpecialPages|Lieste fon d
 # General errors
 'error' => 'Failer',
 'databaseerror' => 'Failer in ju Doatenboank',
-'dberrortext' => 'Der is n Doatenboankfailer aptreeden.
-Die Gruund kon n Programmierfailer weese.
-Ju lääste Doatenboankoufroage lutte:
-<blockquote><tt>$1</tt></blockquote>
-uut de Funktion "<tt>$2</tt>".
-Die Doatenboank mäldede dän Failer "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'Dät roate n Syntaxfailer in ju Doatenboankoufroage.
-Ju lääste Doatenboankoufroage lutte: „$1“ uut ju Funktion „<tt>$2</tt>“.
-Die Doatenboank mäldede dän Failer: „<tt>$3: $4</tt>“.',
 'laggedslavemode' => 'Woarskauenge: Ju anwiesde Siede kon unner Umstande do jungste Beoarbaidengen noch nit be-ienhoolde.',
 'readonly' => 'Doatenboank is speerd',
 'enterlockreason' => 'Reek n Gruund ien, wieruum ju Doatenboank speerd wäide skuul un ne Ouskätsenge uur ju Duur fon ju Speerenge',
@@ -413,7 +403,6 @@ Oufroage: $2',
 'editinginterface' => "'''Woarskauenge:''' Du beoarbaidest ne Siede ju der bruukt wäd, Interface-Text foar ju Software tou lääwerjen.
 Annerengen ap disse Siede wirkje sik uut ap ju Benutseruurfläche foar uur Bruukere.
 Foar Uursättengen koast du fielicht beeter [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net] bruuke, dät is dät MediaWiki Lokalisierengsprojekt.",
-'sqlhidden' => '(SQL-Oufroage ferbierged)',
 'cascadeprotected' => 'Disse Siede is tou Beoarbaidenge speerd. Ju is in do {{PLURAL:$1|foulgjende Siede|foulgjende Sieden}} ienbuunen, do der middels ju Kaskadenspeeroption skutsed {{PLURAL:$1|is|sunt}}:
 $2',
 'namespaceprotected' => "Du hääst neen Begjuchtigenge, ju Siede in dän '''$1'''-Noomensruum tou beoarbaidjen.",
@@ -444,7 +433,6 @@ Beoachtje, dät eenige Sieden noch anwiese konnen, dät du oumälded bäst, solo
 'yourpassword' => 'Paaswoud:',
 'yourpasswordagain' => 'Paaswoud wierhoalje:',
 'remembermypassword' => 'Ap dissen Computer duurhaft ounmälded blieuwe (Maximoal foar $1 {{PLURAL:$1|Dai|Deege}})',
-'securelogin-stick-https' => 'Ätter dät Anmäldjen mäd HTTOS ferbuunen blieuwe',
 'yourdomainname' => 'Dien Domain:',
 'externaldberror' => 'Äntweeder deer lait n Failer bie ju externe Authentifizierenge foar, of du duurst din extern Benutzerkonto nit aktualisierje.',
 'login' => 'Anmäldje',
@@ -536,7 +524,7 @@ Täif, eer du fon näien fersäkst.',
 'newpassword' => 'Näi Paaswoud:',
 'retypenew' => 'Näi Paaswoud (nochmoal):',
 'resetpass_submit' => 'Paaswoud ienbrange un anmäldje',
-'resetpass_success' => 'Dien Paaswoud wuude mäd Ärfoulch annerd. Nu foulget ju Anmäldenge...',
+'changepassword-success' => 'Dien Paaswoud wuude mäd Ärfoulch annerd. Nu foulget ju Anmäldenge...',
 'resetpass_forbidden' => 'Dät Paaswoud kon nit annerd wäide.',
 'resetpass-no-info' => 'Du moast die anmäldje, uum ap disse Siede direkt toutougriepen.',
 'resetpass-submit-loggedin' => 'Paaswoud annerje',
@@ -1044,7 +1032,6 @@ Staal deertruch sicher, dät ju Versionsgeskichte fon n Artikkel historisk akroa
 'resetprefs' => 'Nit spiekerde Annerengen fersmiete',
 'restoreprefs' => 'Aal Standoard-Ienstaalengen wier häärstaale',
 'prefs-editing' => 'Beoarbaidje',
-'prefs-edit-boxsize' => 'Grööte fon dät Beoarbaidengsfinster:',
 'rows' => 'Riegen',
 'columns' => 'Spalten',
 'searchresultshead' => 'Säike (010)',
@@ -1055,9 +1042,6 @@ Staal deertruch sicher, dät ju Versionsgeskichte fon n Artikkel historisk akroa
 'recentchangesdays-max' => '(Maximoal $1 {{PLURAL:$1|Dai|Deege}})',
 'recentchangescount' => 'Antaal fon do standoardmäitich anwiesde Beoarbaidengen:',
 'prefs-help-recentchangescount' => 'Dit uumfoatet ju Lieste fon do lääste Annerengen, ju Versionsgeskichte un do Logbouke.',
-'prefs-help-watchlist-token' => 'Dät Uutfällen fon dit Fäild mäd ne stilkene Koaie generiert n RSS-Feed foar dien Beooboachtengslieste.
-Älk, die disse Koaie koant, kon dien Beooboachtengslieste iensjo. Wääl also n sicheren Wäid.
-Hier n toufällich generierden Wäid, dän du ferweende koast: $1',
 'savedprefs' => 'Dien Ienstaalengen wuuden spiekerd.',
 'timezonelegend' => 'Tiedzone:',
 'localtime' => 'Tied bie Jou:',
@@ -1088,7 +1072,6 @@ Hier n toufällich generierden Wäid, dän du ferweende koast: $1',
 'prefs-reset-intro' => 'Du koast disse Siede bruuke, uum do Ienstaalengen ap do Standoarde touräächtousätten.
 Dät kon nit moor tourääch troald wäide.',
 'prefs-emailconfirm-label' => 'E-Mail-Bestäätigenge:',
-'prefs-textboxsize' => 'Grööte fon dät Beoarbaidengsfinster',
 'youremail' => 'E-Mail-Adrässe:',
 'username' => 'Benutsernoome:',
 'uid' => 'Benutser-ID:',
@@ -1321,7 +1304,6 @@ Ju duur maximoal $1 {{PLURAL:$1|Teeken|Teekene}} loang weese.',
 'recentchangeslinked-feed' => 'Annerengen an ferlinkede Sieden',
 'recentchangeslinked-toolbox' => 'Annerengen an ferlinkede Sieden',
 'recentchangeslinked-title' => 'Annerengen an Sieden, do der fon „$1“ ferbuunden sunt',
-'recentchangeslinked-noresult' => 'In dän uutwäälde Tiedruum wuuden an do ferbuundene Sieden neen Annerengen foarnuumen.',
 'recentchangeslinked-summary' => "Disse Spezioalsiede liestet do lääste Annerengen fon ferbuundene Sieden ap (blw. bie Kategorien an do Meegliedere fon disse Kategorie). Sieden ap dien [[Special:Watchlist|Beooboachtengslieste]] sunt '''fat''' skrieuwen.",
 'recentchangeslinked-page' => 'Siede:',
 'recentchangeslinked-to' => 'Wies Annerengen ap Sieden, do hierhäär ferlinkje',
@@ -1648,12 +1630,6 @@ Ne [[Special:WhatLinksHere/$2|fulständige Lieste]] is ferföigboar.',
 'statistics-users-active-desc' => 'Benutsere mäd Beoarbaidengen {{PLURAL:$1|in do lääste 24 Uuren|in do fergeene $1 Deege}}',
 'statistics-mostpopular' => 'Maast besoachte Sieden',
 
-'disambiguations' => 'Sieden do der ap Begriepskläärengssieden ferlinkje',
-'disambiguationspage' => 'Template:Begriepskläärenge',
-'disambiguations-text' => "Do foulgjende Sieden ferlinkje ap ne Siede tou ju '''Begriepskläärenge'''.
-Jie skuulen insteede deerfon ap ju eegentelk meende Siede ferlinkje.<br />
-Ne Siede wäd as Begriepskläärengssiede behonneld, wan [[MediaWiki:Disambiguationspage]] ap ju ferlinket.",
-
 'doubleredirects' => 'Dubbelde Fäärelaitengen',
 'doubleredirectstext' => 'Disse Lieste änthoalt Fääreleedengen, do der ap wiedere Fääreleedengen ferlinkje.
 Älke Riege änthoalt Links tou ju eerste un twäide Fääreleedenge as uk dät Siel fon ju twäide Fääreleedenge, wät foar gewöönelk ju wonskede Sielsiede is, ap ju al ju eerste Fääreleedenge wiese skuul.
@@ -1888,7 +1864,6 @@ Wan du die Artikkel wier fon ju Foulgelieste ou hoalje moatest, klik ap ju Siede
 'unwatchthispage' => 'Nit moor beooboachtje',
 'notanarticle' => 'Naan Artikkel',
 'notvisiblerev' => 'Version wuude läsked',
-'watchnochange' => 'Neen fon do Sieden, do du beooboachtest, wuude in dän läästen Tiedruum beoarbaided.',
 'watchlist-details' => 'Jie beooboachtje {{PLURAL:$1|1 Siede|$1 Sieden}} (Diskussionssieden wuuden hier nit meetäld).',
 'wlheader-enotif' => 'E-Mail-Beskeed is aktivierd.',
 'wlheader-showupdated' => "Sieden, do ätter dien lääste Besäik annerd wuuden sunt, wäide '''fat''' deerstoald.",
@@ -3151,7 +3126,6 @@ Du koast dien Beooboachtengslieste uk in dät [[Special:EditWatchlist/raw|Lieste
 'version-other' => 'Uurswät',
 'version-mediahandlers' => 'Medien-Handlere',
 'version-hooks' => "Snitsteeden ''(Hooks)''",
-'version-extension-functions' => 'Funktionsaproupe',
 'version-parser-extensiontags' => "Parser-Ärwiederengen ''(tags)''",
 'version-parser-function-hooks' => 'Parser-Funktione',
 'version-hook-name' => 'Snitsteedennoome',

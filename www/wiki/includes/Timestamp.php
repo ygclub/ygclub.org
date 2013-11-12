@@ -114,7 +114,7 @@ class MWTimestamp {
 			# asctime
 			$strtime = $ts;
 		} else {
-			throw new TimestampException( __METHOD__ . " : Invalid timestamp - $ts" );
+			throw new TimestampException( __METHOD__ . ": Invalid timestamp - $ts" );
 		}
 
 		if ( !$strtime ) {
@@ -126,11 +126,11 @@ class MWTimestamp {
 		try {
 			$final = new DateTime( $strtime, new DateTimeZone( 'GMT' ) );
 		} catch ( Exception $e ) {
-			throw new TimestampException( __METHOD__ . ' Invalid timestamp format.' );
+			throw new TimestampException( __METHOD__ . ': Invalid timestamp format.', $e->getCode(), $e );
 		}
 
 		if ( $final === false ) {
-			throw new TimestampException( __METHOD__ . ' Invalid timestamp format.' );
+			throw new TimestampException( __METHOD__ . ': Invalid timestamp format.' );
 		}
 		$this->timestamp = $final;
 	}
@@ -149,7 +149,7 @@ class MWTimestamp {
 	 */
 	public function getTimestamp( $style = TS_UNIX ) {
 		if ( !isset( self::$formats[$style] ) ) {
-			throw new TimestampException( __METHOD__ . ' : Illegal timestamp output type.' );
+			throw new TimestampException( __METHOD__ . ': Illegal timestamp output type.' );
 		}
 
 		$output = $this->timestamp->format( self::$formats[$style] );
@@ -252,7 +252,7 @@ class MWTimestamp {
 			if ( count( $data ) >= 2 ) {
 				// Combination hours and minutes.
 				$diff = abs( (int)$data[0] ) * 60 + (int)$data[1];
-				if ( (int) $data[0] < 0 ) {
+				if ( (int)$data[0] < 0 ) {
 					$diff *= -1;
 				}
 			} else {
@@ -268,6 +268,44 @@ class MWTimestamp {
 
 		$this->timestamp->add( $interval );
 		return $interval;
+	}
+
+	/**
+	 * Generate a purely relative timestamp, i.e., represent the time elapsed between
+	 * the given base timestamp and this object.
+	 *
+	 * @param MWTimestamp $relativeTo Relative base timestamp (defaults to now)
+	 * @param User $user Use to use offset for
+	 * @param Language $lang Language to use
+	 * @param array $chosenIntervals Intervals to use to represent it
+	 * @return string Relative timestamp
+	 */
+	public function getRelativeTimestamp(
+		MWTimestamp $relativeTo = null,
+		User $user = null,
+		Language $lang = null,
+		array $chosenIntervals = array()
+	) {
+		if ( $relativeTo === null ) {
+			$relativeTo = new self;
+		}
+		if ( $user === null ) {
+			$user = RequestContext::getMain()->getUser();
+		}
+		if ( $lang === null ) {
+			$lang = RequestContext::getMain()->getLanguage();
+		}
+
+		$ts = '';
+		$diff = $this->diff( $relativeTo );
+		if ( wfRunHooks( 'GetRelativeTimestamp', array( &$ts, &$diff, $this, $relativeTo, $user, $lang ) ) ) {
+			$seconds = ( ( ( $diff->days * 24 + $diff->h ) * 60 + $diff->i ) * 60 + $diff->s );
+			$ts = wfMessage( 'ago', $lang->formatDuration( $seconds, $chosenIntervals ) )
+				->inLanguage( $lang )
+				->text();
+		}
+
+		return $ts;
 	}
 
 	/**
@@ -288,6 +326,67 @@ class MWTimestamp {
 	 */
 	public function diff( MWTimestamp $relativeTo ) {
 		return $this->timestamp->diff( $relativeTo->timestamp );
+	}
+
+	/**
+	 * Set the timezone of this timestamp to the specified timezone.
+	 *
+	 * @since 1.22
+	 * @param String $timezone Timezone to set
+	 * @throws TimestampException
+	 */
+	public function setTimezone( $timezone ) {
+		try {
+			$this->timestamp->setTimezone( new DateTimeZone( $timezone ) );
+		} catch ( Exception $e ) {
+			throw new TimestampException( __METHOD__ . ': Invalid timezone.', $e->getCode(), $e );
+		}
+	}
+
+	/**
+	 * Get the timezone of this timestamp.
+	 *
+	 * @since 1.22
+	 * @return DateTimeZone The timezone
+	 */
+	public function getTimezone() {
+		return $this->timestamp->getTimezone();
+	}
+
+	/**
+	 * Format the timestamp in a given format.
+	 *
+	 * @since 1.22
+	 * @param string $format Pattern to format in
+	 * @return string The formatted timestamp
+	 */
+	public function format( $format ) {
+		return $this->timestamp->format( $format );
+	}
+
+	/**
+	 * Get a timestamp instance in the server local timezone ($wgLocaltimezone)
+	 *
+	 * @since 1.22
+	 * @param bool|string $ts Timestamp to set, or false for current time
+	 * @return MWTimestamp the local instance
+	 */
+	public static function getLocalInstance( $ts = false ) {
+		global $wgLocaltimezone;
+		$timestamp = new self( $ts );
+		$timestamp->setTimezone( $wgLocaltimezone );
+		return $timestamp;
+	}
+
+	/**
+	 * Get a timestamp instance in GMT
+	 *
+	 * @since 1.22
+	 * @param bool|string $ts Timestamp to set, or false for current time
+	 * @return MWTimestamp the instance
+	 */
+	public static function getInstance( $ts = false ) {
+		return new self( $ts );
 	}
 }
 

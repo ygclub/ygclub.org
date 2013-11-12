@@ -73,18 +73,18 @@ class MakeStaticLoader extends Maintenance {
 
 		// Path to /modules/
 		$vePath = $this->getOption( 've-path',
-			$target === 'demo'
+			$target === 'demo' ?
 			// From /demos/ve/index.php
-			? '../../modules'
+			'../../modules' :
 			// From /modules/ve/test/index.html
-			: '../..'
+			'../..'
 		);
 
 		$wgResourceModules['Dependencies'] = array(
 			'scripts' => array(
 				'jquery/jquery.js',
 				'jquery/jquery.client.js',
-				'oojs/oo.js',
+				'oojs/oojs.js',
 				'rangy/rangy-core-1.3.js',
 				'rangy/rangy-position-1.3.js',
 				'unicodejs/unicodejs.js',
@@ -114,10 +114,14 @@ class MakeStaticLoader extends Maintenance {
 	) {
 		document.write(
 			\'<link rel="stylesheet" \' +
+				\'href="' . $vePath . '/oojs-ui/styles/OO.ui.Icons-vector.css">\' +
+			\'<link rel="stylesheet" \' +
 				\'href="' . $vePath . '/ve/ui/styles/ve.ui.Icons-vector.css">\'
 		);
 	} else {
 		document.write(
+			\'<link rel="stylesheet" \' +
+				\'href="' . $vePath . '/oojs-ui/styles/OO.ui.Icons-raster.css">\' +
 			\'<link rel="stylesheet" \' +
 				\'href="' . $vePath . '/ve/ui/styles/ve.ui.Icons-raster.css">\'
 		);
@@ -141,20 +145,25 @@ class MakeStaticLoader extends Maintenance {
 			've/init/sa/ve.init.sa.Target.js',
 		) );
 
-		$self = isset( $_SERVER['PHP_SELF'] ) ? $_SERVER['PHP_SELF'] :  ( lcfirst( __CLASS__ ) . '.php' );
+		$self = isset( $_SERVER['PHP_SELF'] ) ? $_SERVER['PHP_SELF'] : ( lcfirst( __CLASS__ ) . '.php' );
 
 		$head = $body = '';
 
 		$modules = array(
 			'Dependencies',
+			'oojs-ui',
 			'ext.visualEditor.base#standalone-init',
 			'ext.visualEditor.core',
-			'ext.visualEditor.experimental',
+			'jquery.uls.grid',
+			'jquery.uls.data',
+			'jquery.uls.compact',
+			'jquery.uls',
+			'ext.visualEditor.language',
 		);
 
 		foreach ( $modules as $module ) {
 			if ( !isset( $wgResourceModules[$module] ) ) {
-				echo "\nError: File group $module\n not found!\n";
+				echo "\nError: Module $module\n not found!\n";
 				exit( 1 );
 			}
 			$registry = $wgResourceModules[$module];
@@ -162,7 +171,7 @@ class MakeStaticLoader extends Maintenance {
 			$headAdd = $bodyAdd = '';
 
 			if ( isset( $registry['styles'] ) && $target !== 'test' ){
-				foreach ( $registry['styles'] as $path ) {
+				foreach ( (array)$registry['styles'] as $path ) {
 					if ( strpos( $path, 've-mw/' ) === 0 ) {
 						continue;
 					}
@@ -173,7 +182,7 @@ class MakeStaticLoader extends Maintenance {
 				}
 			}
 			if ( isset( $registry['scripts'] ) ) {
-				foreach ( $registry['scripts'] as $path ) {
+				foreach ( (array)$registry['scripts'] as $path ) {
 					if ( strpos( $path, 've-mw/' ) === 0 ) {
 						continue;
 					}
@@ -181,7 +190,7 @@ class MakeStaticLoader extends Maintenance {
 				}
 			}
 			if ( isset( $registry['debugScripts'] ) ) {
-				foreach ( $registry['debugScripts'] as $path ) {
+				foreach ( (array)$registry['debugScripts'] as $path ) {
 					if ( strpos( $path, 've-mw/' ) === 0 ) {
 						continue;
 					}

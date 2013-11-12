@@ -105,7 +105,7 @@ $messages = array(
 'category-article-count' => '{{PLURAL:$2|Itymā kategorejā ir vīn dūtuo puslopa.|{{PLURAL:$1|Paruodeita $1 puslopa|Paruodeitys $1 puslopys}} nu $2.}}',
 'listingcontinuesabbrev' => '(tuoļuojums)',
 
-'linkprefix' => '/^(.*?)([a-zA-Z\\x80-\\xff]+)$/sD',
+'linkprefix' => '/^((?>.*(?<![a-zA-Z\\x80-\\xff])))(.+)$/sD',
 
 'about' => 'Aproksts',
 'article' => 'Rakstīņs',
@@ -182,7 +182,7 @@ $messages = array(
 'jumptonavigation' => 'navigaceja',
 'jumptosearch' => 'meklēt',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Ap {{grammar:akuzativs|{{SITENAME}}}}',
 'aboutpage' => 'Project:Ap',
 'copyright' => 'Turīņs ir daīmams pa $1.',
@@ -210,7 +210,6 @@ $messages = array(
 'newmessageslink' => 'jaunus viestejumus',
 'newmessagesdifflink' => 'pādejā pataise',
 'editsection' => 'pataiseit',
-'editsection-brackets' => '[$1]',
 'editold' => 'pataiseit',
 'editlink' => 'pataiseit',
 'viewsourcelink' => 'Apsavērt suokūtnejū kodu',

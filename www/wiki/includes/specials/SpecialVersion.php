@@ -113,10 +113,12 @@ class SpecialVersion extends SpecialPage {
 		global $wgLang;
 
 		if ( defined( 'MEDIAWIKI_INSTALL' ) ) {
-			$othersLink = '[http://www.mediawiki.org/wiki/Special:Version/Credits ' . wfMessage( 'version-poweredby-others' )->text() . ']';
+			$othersLink = '[//www.mediawiki.org/wiki/Special:Version/Credits ' . wfMessage( 'version-poweredby-others' )->text() . ']';
 		} else {
 			$othersLink = '[[Special:Version/Credits|' . wfMessage( 'version-poweredby-others' )->text() . ']]';
 		}
+
+		$translatorsLink = '[//translatewiki.net/wiki/Translating:MediaWiki/Credits ' . wfMessage( 'version-poweredby-translators' )->text() . ']';
 
 		$authorList = array(
 			'Magnus Manske', 'Brion Vibber', 'Lee Daniel Crocker',
@@ -126,10 +128,11 @@ class SpecialVersion extends SpecialPage {
 			'Alexandre Emsenhuber', 'Siebrand Mazeland', 'Chad Horohoe',
 			'Roan Kattouw', 'Trevor Parscal', 'Bryan Tong Minh', 'Sam Reed',
 			'Victor Vasiliev', 'Rotem Liss', 'Platonides', 'Antoine Musso',
-			'Timo Tijhof', 'Daniel Kinzler', 'Jeroen De Dauw', $othersLink
+			'Timo Tijhof', 'Daniel Kinzler', 'Jeroen De Dauw', $othersLink,
+			$translatorsLink
 		);
 
-		return wfMessage( 'version-poweredby-credits', date( 'Y' ),
+		return wfMessage( 'version-poweredby-credits', MWTimestamp::getLocalInstance()->format( 'Y' ),
 			$wgLang->listToText( $authorList ) )->text();
 	}
 
@@ -389,11 +392,6 @@ class SpecialVersion extends SpecialPage {
 
 		// We want the 'other' type to be last in the list.
 		$out .= $this->getExtensionCategory( 'other', $extensionTypes['other'] );
-
-		if ( count( $wgExtensionFunctions ) ) {
-			$out .= $this->openExtType( $this->msg( 'version-extension-functions' )->text(), 'extension-functions' );
-			$out .= '<tr><td colspan="4">' . $this->listToText( $wgExtensionFunctions ) . "</td></tr>\n";
-		}
 
 		$tags = $wgParser->getTags();
 		$cnt = count( $tags );

@@ -34,11 +34,65 @@
 				profile: {
 					name: 'msie',
 					layout: 'trident',
-					layoutVersion: 'unknown', // should be able to report 6?
+					layoutVersion: 6,
 					platform: 'win',
 					version: '10.0',
 					versionBase: '10',
 					versionNumber: 10
+				},
+				wikiEditor: {
+					ltr: true,
+					rtl: true
+				}
+			},
+			// Internet Explorer 11
+			'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv 11.0) like Gecko': {
+				title: 'Internet Explorer 11',
+				platform: 'Win32',
+				profile: {
+					name: 'msie',
+					layout: 'trident',
+					layoutVersion: 7,
+					platform: 'win',
+					version: '11.0',
+					versionBase: '11',
+					versionNumber: 11
+				},
+				wikiEditor: {
+					ltr: true,
+					rtl: true
+				}
+			},
+			// Internet Explorer 11 - Windows 8.1 x64 Modern UI
+			'Mozilla/5.0 (Windows NT 6.3; Win64; x64; Trident/7.0; rv:11.0) like Gecko': {
+				title: 'Internet Explorer 11',
+				platform: 'Win64',
+				profile: {
+					name: 'msie',
+					layout: 'trident',
+					layoutVersion: 7,
+					platform: 'win',
+					version: '11.0',
+					versionBase: '11',
+					versionNumber: 11
+				},
+				wikiEditor: {
+					ltr: true,
+					rtl: true
+				}
+			},
+			// Internet Explorer 11 - Windows 8.1 x64 desktop UI
+			'Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko': {
+				title: 'Internet Explorer 11',
+				platform: 'WOW64',
+				profile: {
+					name: 'msie',
+					layout: 'trident',
+					layoutVersion: 7,
+					platform: 'win',
+					version: '11.0',
+					versionBase: '11',
+					versionNumber: 11
 				},
 				wikiEditor: {
 					ltr: true,
@@ -258,6 +312,24 @@
 					version: '12.11',
 					versionBase: '12',
 					versionNumber: 12.11
+				},
+				wikiEditor: {
+					ltr: true,
+					rtl: true
+				}
+			},
+			// Opera 15 (WebKit-based)
+			'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36 OPR/15.0.1147.130': {
+				title: 'Opera 15',
+				platform: 'Win32',
+				profile: {
+					name: 'opera',
+					layout: 'webkit',
+					layoutVersion: 537,
+					platform: 'win',
+					version: '15.0.1147.130',
+					versionBase: '15',
+					versionNumber: 15
 				},
 				wikiEditor: {
 					ltr: true,

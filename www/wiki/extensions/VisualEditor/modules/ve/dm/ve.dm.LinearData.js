@@ -20,6 +20,62 @@ ve.dm.LinearData = function VeDmLinearData( store, data ) {
 	this.data = data || [];
 };
 
+/* Static Methods */
+
+ve.dm.LinearData.static = {};
+
+/**
+ * Get the type of an element
+ *
+ * This will return the same string for close and open elements.
+ *
+ * @method
+ * @param {Object} item Element item
+ * @returns {string} Type of the element
+ */
+ve.dm.LinearData.static.getType = function ( item ) {
+	return this.isCloseElementData( item ) ? item.type.substr( 1 ) : item.type;
+};
+
+/**
+ * Check if data item is an element.
+ *
+ * This method assumes that any value that has a type property that's a string is an element object.
+ *
+ * Element data:
+ *
+ *      <heading> a </heading> <paragraph> b c <img></img> </paragraph>
+ *     ^         . ^          ^           . . ^     ^     ^            .
+ *
+ * @method
+ * @param {Object|Array|string} item Linear data item
+ * @returns {boolean} Item is an element
+ */
+ve.dm.LinearData.static.isElementData = function ( item ) {
+	// Data exists and appears to be an element
+	return item !== undefined && typeof item.type === 'string';
+};
+
+/**
+ * Checks if data item is an open element.
+ * @method
+ * @param {Object} item Element item
+ * @returns {boolean} Item is an open element
+ */
+ve.dm.LinearData.static.isOpenElementData = function ( item ) {
+	return this.isElementData( item ) && item.type.charAt( 0 ) !== '/';
+};
+
+/**
+ * Checks if data item is a close element.
+ * @method
+ * @param {Object} item Element item
+ * @returns {boolean} Item is a close element
+ */
+ve.dm.LinearData.static.isCloseElementData = function ( item ) {
+	return this.isElementData( item ) && item.type.charAt( 0 ) === '/';
+};
+
 /* Methods */
 
 /**
@@ -42,6 +98,17 @@ ve.dm.LinearData.prototype.getData = function ( offset ) {
  */
 ve.dm.LinearData.prototype.setData = function ( offset, value ) {
 	this.data[offset] = value;
+};
+
+/**
+ * Push data to the end of the array
+ *
+ * @method
+ * @param {Object|string} value Value to store
+ * @returns {number} The new length of the linear data
+ */
+ve.dm.LinearData.prototype.push = function ( value ) {
+	return this.data.push( value );
 };
 
 /**
@@ -162,5 +229,5 @@ ve.dm.LinearData.prototype.getDataSlice = function ( range, deep ) {
 	// IE work-around: arr.slice( 0, undefined ) returns [] while arr.slice( 0 ) behaves correctly
 	data = end === undefined ? this.slice( start ) : this.slice( start, end );
 	// Return either the slice or a deep copy of the slice
-	return deep ? ve.copyArray( data ) : data;
+	return deep ? ve.copy( data ) : data;
 };

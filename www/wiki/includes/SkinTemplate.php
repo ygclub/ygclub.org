@@ -131,6 +131,7 @@ class SkinTemplate extends Skin {
 	public function getLanguages() {
 		global $wgHideInterlanguageLinks;
 		$out = $this->getOutput();
+		$userLang = $this->getLanguage();
 
 		# Language links
 		$language_urls = array();
@@ -151,18 +152,63 @@ class SkinTemplate extends Skin {
 						$ilLangName = $this->formatLanguageName( $ilLangName );
 					}
 
+					// CLDR extension or similar is required to localize the language name;
+					// otherwise we'll end up with the autonym again.
+					$ilLangLocalName = Language::fetchLanguageName( $ilInterwikiCode, $userLang->getCode() );
+
 					$language_urls[] = array(
 						'href' => $languageLinkTitle->getFullURL(),
 						'text' => $ilLangName,
-						'title' => $languageLinkTitle->getText(),
+						'title' => wfMessage( 'tooltip-iwiki', $languageLinkTitle->getText(), $ilLangLocalName )->escaped(),
 						'class' => $class,
-						'lang' => $ilInterwikiCode,
-						'hreflang' => $ilInterwikiCode
+						'lang' => wfBCP47( $ilInterwikiCode ),
+						'hreflang' => wfBCP47( $ilInterwikiCode ),
 					);
 				}
 			}
 		}
 		return $language_urls;
+	}
+
+	protected function setupTemplateForOutput() {
+		wfProfileIn( __METHOD__ );
+
+		$request = $this->getRequest();
+		$user = $this->getUser();
+		$title = $this->getTitle();
+
+		wfProfileIn( __METHOD__ . '-init' );
+		$tpl = $this->setupTemplate( $this->template, 'skins' );
+		wfProfileOut( __METHOD__ . '-init' );
+
+		wfProfileIn( __METHOD__ . '-stuff' );
+		$this->thispage = $title->getPrefixedDBkey();
+		$this->titletxt = $title->getPrefixedText();
+		$this->userpage = $user->getUserPage()->getPrefixedText();
+		$query = array();
+		if ( !$request->wasPosted() ) {
+			$query = $request->getValues();
+			unset( $query['title'] );
+			unset( $query['returnto'] );
+			unset( $query['returntoquery'] );
+		}
+		$this->thisquery = wfArrayToCgi( $query );
+		$this->loggedin = $user->isLoggedIn();
+		$this->username = $user->getName();
+
+		if ( $this->loggedin || $this->showIPinHeader() ) {
+			$this->userpageUrlDetails = self::makeUrlDetails( $this->userpage );
+		} else {
+			# This won't be used in the standard skins, but we define it to preserve the interface
+			# To save time, we check for existence
+			$this->userpageUrlDetails = self::makeKnownUrlDetails( $this->userpage );
+		}
+
+		wfProfileOut( __METHOD__ . '-stuff' );
+
+		wfProfileOut( __METHOD__ );
+
+		return $tpl;
 	}
 
 	/**
@@ -197,34 +243,9 @@ class SkinTemplate extends Skin {
 
 		wfProfileIn( __METHOD__ . '-init' );
 		$this->initPage( $out );
-
-		$tpl = $this->setupTemplate( $this->template, 'skins' );
 		wfProfileOut( __METHOD__ . '-init' );
 
-		wfProfileIn( __METHOD__ . '-stuff' );
-		$this->thispage = $title->getPrefixedDBkey();
-		$this->titletxt = $title->getPrefixedText();
-		$this->userpage = $user->getUserPage()->getPrefixedText();
-		$query = array();
-		if ( !$request->wasPosted() ) {
-			$query = $request->getValues();
-			unset( $query['title'] );
-			unset( $query['returnto'] );
-			unset( $query['returntoquery'] );
-		}
-		$this->thisquery = wfArrayToCgi( $query );
-		$this->loggedin = $user->isLoggedIn();
-		$this->username = $user->getName();
-
-		if ( $this->loggedin || $this->showIPinHeader() ) {
-			$this->userpageUrlDetails = self::makeUrlDetails( $this->userpage );
-		} else {
-			# This won't be used in the standard skins, but we define it to preserve the interface
-			# To save time, we check for existence
-			$this->userpageUrlDetails = self::makeKnownUrlDetails( $this->userpage );
-		}
-
-		wfProfileOut( __METHOD__ . '-stuff' );
+		$tpl = $this->setupTemplateForOutput();
 
 		wfProfileIn( __METHOD__ . '-stuff-head' );
 		if ( !$this->useHeadElement ) {
@@ -276,6 +297,7 @@ class SkinTemplate extends Skin {
 			$feeds = array();
 			foreach ( $out->getSyndicationLinks() as $format => $link ) {
 				$feeds[$format] = array(
+					// Messages: feed-atom, feed-rss
 					'text' => $this->msg( "feed-$format" )->text(),
 					'href' => $link
 				);
@@ -323,7 +345,7 @@ class SkinTemplate extends Skin {
 		$tpl->set( 'rtl', $userLang->isRTL() );
 
 		$tpl->set( 'capitalizeallnouns', $userLang->capitalizeAllNouns() ? ' capitalize-all-nouns' : '' );
-		$tpl->set( 'showjumplinks', $user->getOption( 'showjumplinks' ) );
+		$tpl->set( 'showjumplinks', true ); // showjumplinks preference has been removed
 		$tpl->set( 'username', $this->loggedin ? $this->username : null );
 		$tpl->setRef( 'userpage', $this->userpage );
 		$tpl->setRef( 'userpageurl', $this->userpageUrlDetails['href'] );
@@ -516,6 +538,20 @@ class SkinTemplate extends Skin {
 	}
 
 	/**
+	 * Get the HTML for the p-personal list
+	 * @return string
+	 */
+	public function getPersonalToolsList() {
+		$tpl = $this->setupTemplateForOutput();
+		$tpl->set( 'personal_urls', $this->buildPersonalUrls() );
+		$html = '';
+		foreach ( $tpl->getPersonalTools() as $key => $item ) {
+			$html .= $tpl->makeListItem( $key, $item );
+		}
+		return $html;
+	}
+
+	/**
 	 * Format language name for use in sidebar interlanguage links list.
 	 * By default it is capitalized.
 	 *
@@ -558,8 +594,6 @@ class SkinTemplate extends Skin {
 	 * @return array
 	 */
 	protected function buildPersonalUrls() {
-		global $wgSecureLogin;
-
 		$title = $this->getTitle();
 		$request = $this->getRequest();
 		$pageurl = $title->getLocalURL();
@@ -587,10 +621,6 @@ class SkinTemplate extends Skin {
 			}
 		}
 
-		if ( $wgSecureLogin && $request->detectProtocol() === 'https' ) {
-			$a['wpStickHTTPS'] = true;
-		}
-
 		$returnto = wfArrayToCgi( $a );
 		if ( $this->loggedin ) {
 			$personal_urls['userpage'] = array(
@@ -613,12 +643,15 @@ class SkinTemplate extends Skin {
 				'href' => $href,
 				'active' => ( $href == $pageurl )
 			);
-			$href = self::makeSpecialUrl( 'Watchlist' );
-			$personal_urls['watchlist'] = array(
-				'text' => $this->msg( 'mywatchlist' )->text(),
-				'href' => $href,
-				'active' => ( $href == $pageurl )
-			);
+
+			if ( $this->getUser()->isAllowed( 'viewmywatchlist' ) ) {
+				$href = self::makeSpecialUrl( 'Watchlist' );
+				$personal_urls['watchlist'] = array(
+					'text' => $this->msg( 'mywatchlist' )->text(),
+					'href' => $href,
+					'active' => ( $href == $pageurl )
+				);
+			}
 
 			# We need to do an explicit check for Special:Contributions, as we
 			# have to match both the title, and the target, which could come
@@ -655,22 +688,16 @@ class SkinTemplate extends Skin {
 				: 'login';
 			$is_signup = $request->getText( 'type' ) == 'signup';
 
-			# anonlogin & login are the same
-			$proto = $wgSecureLogin ? PROTO_HTTPS : null;
-
 			$login_id = $this->showIPinHeader() ? 'anonlogin' : 'login';
 			$login_url = array(
 				'text' => $this->msg( $loginlink )->text(),
 				'href' => '/bbs/member.php?mod=logging&action=login',
 				'active' => $title->isSpecial( 'Userlogin' ) && ( $loginlink == 'nav-login-createaccount' || !$is_signup ),
-				'class' => $wgSecureLogin ? 'link-https' : ''
 			);
 			$createaccount_url = array(
 				'text' => $this->msg( 'createaccount' )->text(),
-			#	'href' => self::makeSpecialUrl( 'Userlogin', "$returnto&type=signup", $proto ),
 				'href' => 'http://www.ygclub.org/bbs/thread-4734-1-1.html',
 				'active' => $title->isSpecial( 'Userlogin' ) && $is_signup,
-				'class' => $wgSecureLogin ? 'link-https' : ''
 			);
 
 			if ( $this->showIPinHeader() ) {
@@ -989,7 +1016,7 @@ class SkinTemplate extends Skin {
 				wfProfileOut( __METHOD__ . '-live' );
 
 				// Checks if the user is logged in
-				if ( $this->loggedin ) {
+				if ( $this->loggedin && $user->isAllowedAll( 'viewmywatchlist', 'editmywatchlist' ) ) {
 					/**
 					 * The following actions use messages which, if made particular to
 					 * the any specific skins, would break the Ajax code which makes this
@@ -1037,8 +1064,8 @@ class SkinTemplate extends Skin {
 							'class' => ( $code == $preferred ) ? 'selected' : false,
 							'text' => $varname,
 							'href' => $title->getLocalURL( array( 'variant' => $code ) + $params ),
-							'lang' => $code,
-							'hreflang' => $code
+							'lang' => wfBCP47( $code ),
+							'hreflang' => wfBCP47( $code ),
 						);
 					}
 				}
@@ -1184,15 +1211,15 @@ class SkinTemplate extends Skin {
 
 		// A print stylesheet is attached to all pages, but nobody ever
 		// figures that out. :)  Add a link...
-		if ( $out->isArticle() ) {
-			if ( !$out->isPrintable() ) {
-				$nav_urls['print'] = array(
-					'text' => $this->msg( 'printableversion' )->text(),
-					'href' => $this->getTitle()->getLocalURL(
-						$request->appendQueryValue( 'printable', 'yes', true ) )
-				);
-			}
+		if ( !$out->isPrintable() && ( $out->isArticle() || $this->getTitle()->isSpecialPage() ) ) {
+			$nav_urls['print'] = array(
+				'text' => $this->msg( 'printableversion' )->text(),
+				'href' => $this->getTitle()->getLocalURL(
+					$request->appendQueryValue( 'printable', 'yes', true ) )
+			);
+		}
 
+		if ( $out->isArticle() ) {
 			// Also add a "permalink" while we're at it
 			$revid = $this->getRevisionId();
 			if ( $revid ) {
@@ -1249,12 +1276,14 @@ class SkinTemplate extends Skin {
 				);
 			}
 
-			$sur = new UserrightsPage;
-			$sur->setContext( $this->getContext() );
-			if ( $sur->userCanExecute( $this->getUser() ) ) {
-				$nav_urls['userrights'] = array(
-					'href' => self::makeSpecialUrlSubpage( 'Userrights', $rootUser )
-				);
+			if ( !$user->isAnon() ) {
+				$sur = new UserrightsPage;
+				$sur->setContext( $this->getContext() );
+				if ( $sur->userCanExecute( $this->getUser() ) ) {
+					$nav_urls['userrights'] = array(
+						'href' => self::makeSpecialUrlSubpage( 'Userrights', $rootUser )
+					);
+				}
 			}
 		}
 
@@ -1269,10 +1298,6 @@ class SkinTemplate extends Skin {
 	 */
 	function getNameSpaceKey() {
 		return $this->getTitle()->getNamespaceKey();
-	}
-
-	public function commonPrintStylesheet() {
-		return false;
 	}
 }
 
@@ -1297,6 +1322,21 @@ abstract class QuickTemplate {
 	 */
 	public function set( $name, $value ) {
 		$this->data[$name] = $value;
+	}
+
+	/**
+	 * Gets the template data requested
+	 * @since 1.22
+	 * @param string $name Key for the data
+	 * @param mixed $default Optional default (or null)
+	 * @return mixed The value of the data requested or the deafult
+	 */
+	public function get( $name, $default = null ) {
+		if ( isset( $this->data[$name] ) ) {
+			return $this->data[$name];
+		} else {
+			return $default;
+		}
 	}
 
 	/**
@@ -1501,7 +1541,7 @@ abstract class BaseTemplate extends QuickTemplate {
 	 */
 	function getPersonalTools() {
 		$personal_tools = array();
-		foreach ( $this->data['personal_urls'] as $key => $plink ) {
+		foreach ( $this->get( 'personal_urls' ) as $key => $plink ) {
 			# The class on a personal_urls item is meant to go on the <a> instead
 			# of the <li> so we have to use a single item "links" array instead
 			# of using most of the personal_url's keys directly.
@@ -1818,7 +1858,7 @@ abstract class BaseTemplate extends QuickTemplate {
 			'type' => 'search',
 			'name' => 'search',
 			'placeholder' => wfMessage( 'searchsuggest-search' )->text(),
-			'value' => isset( $this->data['search'] ) ? $this->data['search'] : '',
+			'value' => $this->get( 'search', '' ),
 		);
 		$realAttrs = array_merge( $realAttrs, Linker::tooltipAndAccesskeyAttribs( 'search' ), $attrs );
 		return Html::element( 'input', $realAttrs );
@@ -1877,7 +1917,7 @@ abstract class BaseTemplate extends QuickTemplate {
 	 * @return array|mixed
 	 */
 	function getFooterLinks( $option = null ) {
-		$footerlinks = $this->data['footerlinks'];
+		$footerlinks = $this->get( 'footerlinks' );
 
 		// Reduce footer links down to only those which are being used
 		$validFooterLinks = array();
@@ -1917,7 +1957,7 @@ abstract class BaseTemplate extends QuickTemplate {
 	 */
 	function getFooterIcons( $option = null ) {
 		// Generate additional footer icons
-		$footericons = $this->data['footericons'];
+		$footericons = $this->get( 'footericons' );
 
 		if ( $option == 'icononly' ) {
 			// Unset any icons which don't have an image

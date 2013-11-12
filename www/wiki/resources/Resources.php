@@ -92,8 +92,18 @@ return array(
 			'common/commonElements.css' => array( 'media' => 'screen' ),
 			'common/commonContent.css' => array( 'media' => 'screen' ),
 			'common/commonInterface.css' => array( 'media' => 'screen' ),
-			'vector/screen.css' => array( 'media' => 'screen' ),
-			'vector/screen-hd.css' => array( 'media' => 'screen and (min-width: 982px)' ),
+			'vector/styles.less',
+		),
+		'remoteBasePath' => $GLOBALS['wgStylePath'],
+		'localBasePath' => $GLOBALS['wgStyleDirectory'],
+	),
+	'skins.vector.beta' => array(
+		// Keep in sync with skins.vector
+		'styles' => array(
+			'common/commonElements.css' => array( 'media' => 'screen' ),
+			'common/commonContent.css' => array( 'media' => 'screen' ),
+			'common/commonInterface.css' => array( 'media' => 'screen' ),
+			'vector/styles-beta.less' => array( 'media' => 'screen' ),
 		),
 		'remoteBasePath' => $GLOBALS['wgStylePath'],
 		'localBasePath' => $GLOBALS['wgStyleDirectory'],
@@ -107,6 +117,22 @@ return array(
 		'dependencies' => 'jquery.delayedBind',
 		'remoteBasePath' => $GLOBALS['wgStylePath'],
 		'localBasePath' => $GLOBALS['wgStyleDirectory'],
+	),
+	'skins.vector.collapsibleNav' => array(
+		'scripts' => array(
+			'vector/collapsibleNav.js',
+		),
+		'messages' => array(
+			'vector-collapsiblenav-more',
+		),
+		'dependencies' => array(
+			'jquery.client',
+			'jquery.cookie',
+			'jquery.tabIndex',
+		),
+		'remoteBasePath' => $GLOBALS['wgStylePath'],
+		'localBasePath' => $GLOBALS['wgStyleDirectory'],
+		'position' => 'bottom',
 	),
 
 	/* jQuery */
@@ -140,6 +166,7 @@ return array(
 	),
 	'jquery.byteLength' => array(
 		'scripts' => 'resources/jquery/jquery.byteLength.js',
+		'targets' => array( 'desktop', 'mobile' ),
 	),
 	'jquery.byteLimit' => array(
 		'scripts' => 'resources/jquery/jquery.byteLimit.js',
@@ -261,7 +288,10 @@ return array(
 		'scripts' => 'resources/jquery/jquery.tablesorter.js',
 		'styles' => 'resources/jquery/jquery.tablesorter.css',
 		'messages' => array( 'sort-descending', 'sort-ascending' ),
-		'dependencies' => 'jquery.mwExtension',
+		'dependencies' => array(
+			'jquery.mwExtension',
+			'mediawiki.language.months',
+		),
 	),
 	'jquery.textSelection' => array(
 		'scripts' => 'resources/jquery/jquery.textSelection.js',
@@ -623,6 +653,11 @@ return array(
 		// must be loaded on the bottom
 		'position' => 'bottom',
 	),
+	'mediawiki.inspect' => array(
+		'scripts' => 'resources/mediawiki/mediawiki.inspect.js',
+		'dependencies' => 'jquery.byteLength',
+		'targets' => array( 'desktop', 'mobile' ),
+	),
 	'mediawiki.feedback' => array(
 		'scripts' => 'resources/mediawiki/mediawiki.feedback.js',
 		'styles' => 'resources/mediawiki/mediawiki.feedback.css',
@@ -687,7 +722,10 @@ return array(
 	),
 	'mediawiki.Title' => array(
 		'scripts' => 'resources/mediawiki/mediawiki.Title.js',
-		'dependencies' => 'mediawiki.util',
+		'dependencies' => array(
+			'jquery.byteLength',
+			'mediawiki.util',
+		),
 	),
 	'mediawiki.Uri' => array(
 		'scripts' => 'resources/mediawiki/mediawiki.Uri.js',
@@ -719,16 +757,30 @@ return array(
 	'mediawiki.action.edit' => array(
 		'scripts' => 'resources/mediawiki.action/mediawiki.action.edit.js',
 		'dependencies' => array(
+			'mediawiki.action.edit.styles',
 			'jquery.textSelection',
 			'jquery.byteLimit',
 		),
 		'position' => 'top',
+	),
+	'mediawiki.action.edit.styles' => array(
+		'styles' => 'resources/mediawiki.action/mediawiki.action.edit.styles.css',
+		'position' => 'top',
+	),
+	'mediawiki.action.edit.collapsibleFooter' => array(
+		'scripts' => 'resources/mediawiki.action/mediawiki.action.edit.collapsibleFooter.js',
+		'styles' => 'resources/mediawiki.action/mediawiki.action.edit.collapsibleFooter.css',
+		'dependencies' => array(
+			'jquery.makeCollapsible',
+			'mediawiki.icon',
+		),
 	),
 	'mediawiki.action.edit.preview' => array(
 		'scripts' => 'resources/mediawiki.action/mediawiki.action.edit.preview.js',
 		'dependencies' => array(
 			'jquery.form',
 			'jquery.spinner',
+			'mediawiki.action.history.diff',
 		),
 	),
 	'mediawiki.action.history' => array(
@@ -834,6 +886,16 @@ return array(
 		'targets' => array( 'desktop', 'mobile' ),
 	),
 
+	'mediawiki.language.months' => array(
+		'scripts' => 'resources/mediawiki.language/mediawiki.language.months.js',
+		'dependencies' => 'mediawiki.language',
+		'messages' => array_merge(
+			Language::$mMonthMsgs,
+			Language::$mMonthGenMsgs,
+			Language::$mMonthAbbrevMsgs
+		)
+	),
+
 	/* MediaWiki Libs */
 
 	'mediawiki.libs.jpegmeta' => array(
@@ -842,6 +904,9 @@ return array(
 
 	/* MediaWiki Page */
 
+	'mediawiki.page.gallery' => array(
+		'scripts' => 'resources/mediawiki.page/mediawiki.page.gallery.js',
+	),
 	'mediawiki.page.ready' => array(
 		'scripts' => 'resources/mediawiki.page/mediawiki.page.ready.js',
 		'dependencies' => array(
@@ -898,6 +963,10 @@ return array(
 			'watcherrortext',
 		),
 	),
+	'mediawiki.page.image.pagination' => array(
+		'scripts' => 'resources/mediawiki.page/mediawiki.page.image.pagination.js',
+		'dependencies' => array( 'jquery.spinner' )
+	),
 
 	/* MediaWiki Special pages */
 
@@ -924,11 +993,16 @@ return array(
 	),
 	'mediawiki.special.changeslist' => array(
 		'styles' => 'resources/mediawiki.special/mediawiki.special.changeslist.css',
-		'dependencies' => array( 'jquery.makeCollapsible', 'mediawiki.icon' ),
+	),
+	'mediawiki.special.changeslist.enhanced' => array(
+		'styles' => 'resources/mediawiki.special/mediawiki.special.changeslist.enhanced.css',
 	),
 	'mediawiki.special.movePage' => array(
 		'scripts' => 'resources/mediawiki.special/mediawiki.special.movePage.js',
 		'dependencies' => 'jquery.byteLimit',
+	),
+	'mediawiki.special.pagesWithProp' => array(
+		'styles' => 'resources/mediawiki.special/mediawiki.special.pagesWithProp.css',
 	),
 	'mediawiki.special.preferences' => array(
 		'scripts' => 'resources/mediawiki.special/mediawiki.special.preferences.js',
@@ -982,6 +1056,7 @@ return array(
 		'scripts' => 'resources/mediawiki.special/mediawiki.special.createAccount.js',
 		'messages' => array(
 			'createacct-captcha',
+			'createacct-emailrequired',
 			'createacct-imgcaptcha-ph'
 		),
 		'dependencies' => 'mediawiki.jqueryMsg',
@@ -1068,6 +1143,8 @@ return array(
 		'remoteBasePath' => $GLOBALS['wgStylePath'],
 		'localBasePath' => $GLOBALS['wgStyleDirectory'],
 		'dependencies' => array(
+			'mediawiki.api',
+			'mediawiki.Title',
 			'mediawiki.legacy.wikibits',
 			'mediawiki.util',
 		),
@@ -1080,11 +1157,6 @@ return array(
 			'mediawiki.util',
 		),
 		'position' => 'top',
-	),
-	'mediawiki.legacy.wikiprintable' => array(
-		'styles' => array( 'common/wikiprintable.css' => array( 'media' => 'print' ) ),
-		'remoteBasePath' => $GLOBALS['wgStylePath'],
-		'localBasePath' => $GLOBALS['wgStyleDirectory'],
 	),
 	'mediawiki.ui' => array(
 		'skinStyles' => array(
