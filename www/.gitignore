@@ -28,6 +28,7 @@ wiki/images/*
 wiki/extensions/DataValues
 wiki/baidu.xml
 wiki/.htaccess
+wiki/maintenance/*.sql
 
 pm/tmp/*
 pm/module/ucenter/config.php
