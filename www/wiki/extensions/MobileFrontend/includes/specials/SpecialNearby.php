@@ -16,14 +16,20 @@ class SpecialNearby extends MobileSpecialPage {
 		// set config
 		$output->addJsConfigVars( 'wgMFNearbyRange', $wgMFNearbyRange );
 
+		$skin = $this->getSkin();
+		if ( method_exists( $skin, 'setTemplateVariable' ) ) {
+			// remove the Echo button to make way for a refresh button
+			$this->getSkin()->setTemplateVariable( 'secondaryButton', '' );
+		}
+
 		// add previews to mobile only
 		$ctx = MobileContext::singleton();
 		if ( $ctx->shouldDisplayMobileView() && $ctx->isBetaGroupMember() ) {
-			$output->addModules( 'mobile.nearby.previews' );
-			if ( $ctx->isAlphaGroupMember() ) {
-				$output->addModules( 'mobile.nearby.watchstar' );
-			}
-		};
+			$output->addModules( 'mobile.nearby.beta' );
+		} else {
+			// Only the Minerva skin loads this module so make sure we load it for desktop
+			$output->addModuleStyles( 'mobile.pagelist.styles' );
+		}
 
 		$output->setPageTitle( wfMessage( 'mobile-frontend-nearby-title' )->escaped() );
 

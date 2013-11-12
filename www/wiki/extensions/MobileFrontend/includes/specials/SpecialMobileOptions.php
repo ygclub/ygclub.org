@@ -9,6 +9,7 @@ class SpecialMobileOptions extends MobileSpecialPage {
 	private $options = array(
 		'Language' => array( 'get' => 'chooseLanguage' ),
 	);
+	protected $unstyledContent = false;
 
 	public function __construct() {
 		parent::__construct( 'MobileOptions' );
@@ -17,6 +18,7 @@ class SpecialMobileOptions extends MobileSpecialPage {
 	public function execute( $par = '' ) {
 		$context = MobileContext::singleton();
 
+		wfIncrStats( 'mobile.options.views' );
 		$this->returnToTitle = Title::newFromText( $this->getRequest()->getText( 'returnto' ) );
 		if ( !$this->returnToTitle ) {
 			$this->returnToTitle = Title::newMainPage();
@@ -71,7 +73,7 @@ class SpecialMobileOptions extends MobileSpecialPage {
 			$this->msg( 'mobile-frontend-off' )->escaped() .'</span>';
 		$action = $this->getTitle()->getLocalURL();
 		$html = Html::openElement( 'form',
-			array( 'class' => 'mw-mf-settings content', 'method' => 'POST', 'action' => $action )
+			array( 'class' => 'mw-mf-settings', 'method' => 'POST', 'action' => $action )
 		);
 		$aboutMessage = $this->msg( 'mobile-frontend-settings-description' )->parse();
 		$token = Html::hidden( 'token', $context->getMobileToken() );
@@ -84,7 +86,7 @@ class SpecialMobileOptions extends MobileSpecialPage {
 		$betaSetting = <<<HTML
 		<li>
 			{$betaEnableMsg}
-			<div class="mw-mf-checkbox-css3">
+			<div class="mw-mf-checkbox-css3" id="enable-beta-toggle">
 				<input type="checkbox" name="enableBeta"
 				{$imagesBeta}>{$onoff}
 			</div>
@@ -103,7 +105,7 @@ HTML;
 			$alphaSetting .= <<<HTML
 			<li>
 				{$alphaEnableMsg}
-				<div class="mw-mf-checkbox-css3">
+				<div class="mw-mf-checkbox-css3" id="enable-alpha-toggle">
 					<input type="checkbox" name="enableAlpha"
 					{$alphaChecked}>{$onoff}
 				</div>
@@ -121,7 +123,7 @@ HTML;
 	<ul>
 		<li>
 			{$disableMsg}
-			<span class="mw-mf-checkbox-css3">
+			<span class="mw-mf-checkbox-css3" id="enable-images-toggle">
 				<input type="checkbox" name="enableImages"
 				{$imagesChecked}>{$onoff}
 			</span>
@@ -191,9 +193,16 @@ HTML;
 		$request = $this->getRequest();
 
 		if ( $request->getVal( 'token' ) != $context->getMobileToken() ) {
-			wfDebug( __METHOD__ . "(): token mismatch\n" );
-			//return; // Display something here?
+			wfIncrStats( 'mobile.options.errors' );
+			wfDebugLog( 'mobile', __METHOD__ . "(): token mismatch" );
+			$this->getOutput()->addHTML( '<div class="error">'
+				. $this->msg( "mobile-frontend-save-error" )->parse()
+				. '</div>'
+			);
+			$this->getSettingsForm();
+			return;
 		}
+		wfIncrStats( 'mobile.options.saves' );
 		if ( $request->getBool( 'enableAlpha' ) ) {
 			$group = 'alpha';
 		} elseif ( $request->getBool( 'enableBeta' ) ) {

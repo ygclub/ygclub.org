@@ -120,24 +120,11 @@ class MobileContext extends ContextSource {
 	}
 
 	public function isMobileDevice() {
- /*
 		global $wgMFAutodetectMobileView;
 
 		return ( $wgMFAutodetectMobileView && $this->getDevice()->isMobileDevice() )
 			|| $this->getAMF();
-  */
-		$detect = new Mobile_Detect;
-
-		if ($detect->isTablet()) {
-			return false;
-		}
-		
-		if ($detect->isMobile()) {
-			return true;
-		}
-
-    return false;
-  }
+	}
 
 	/**
 	 * Check for mobile device when using Apache Mobile Filter (AMF)
@@ -205,20 +192,8 @@ class MobileContext extends ContextSource {
 			if ( $mobileAction === 'alpha' || $mobileAction === 'beta' ) {
 				$this->mobileMode = $mobileAction;
 			} else {
-				// First check old cookie
-				// @todo: Remove in September when old cookies expire
 				$req = $this->getRequest();
-				$alpha = $req->getCookie( 'mf_alpha', '' );
-				if ( $alpha == 1 ) {
-					$req->response()->setcookie( 'mf_alpha', '', 0, '' );
-					$this->setMobileMode( 'alpha' );
-				} else {
-					$this->mobileMode = $this->getRequest()->getCookie( 'optin', '' );
-					// Old cookie format - handle it but no point in overwriting the cookie
-					if ( $this->mobileMode == '1' ) {
-						$this->mobileMode = 'beta';
-					}
-				}
+				$this->mobileMode = $req->getCookie( 'optin', '' );
 			}
 		}
 		return $this->mobileMode;
@@ -304,8 +279,7 @@ class MobileContext extends ContextSource {
 	 */
 	private function redirectMobileEnabledPages() {
 		$redirectUrl = null;
-		if ( $this->getRequest()->getText( 'diff' ) ||
-				$this->getRequest()->getText( 'oldid' ) ) {
+		if ( $this->getRequest()->getCheck( 'diff' ) ) {
 			$redirectUrl = SpecialMobileDiff::getMobileUrlFromDesktop();
 		}
 
@@ -619,7 +593,7 @@ class MobileContext extends ContextSource {
 
 		if ( $this->shouldDisplayMobileView() ) {
 			$subdomainTokenReplacement = null;
-			if ( wfRunHooks( 'GetMobileUrl', array( &$subdomainTokenReplacement ) ) ) {
+			if ( wfRunHooks( 'GetMobileUrl', array( &$subdomainTokenReplacement, $this ) ) ) {
 				if ( !empty( $subdomainTokenReplacement ) ) {
 					global $wgMobileUrlTemplate;
 					$mobileUrlHostTemplate = $this->parseMobileUrlTemplate( 'host' );

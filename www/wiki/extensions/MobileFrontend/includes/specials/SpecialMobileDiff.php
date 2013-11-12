@@ -69,16 +69,8 @@ class SpecialMobileDiff extends MobileSpecialPage {
 		$this->setHeaders();
 		$output = $this->getOutput();
 		if ( $ctx->isBetaGroupMember() ) {
+			$output->addModules( 'mobile.mobilediff.scripts.beta.head' );
 			$output->addModules( 'mobile.mobilediff.scripts.beta' );
-			// If the Echo and Thanks extensions are installed and the user is
-			// logged in, show a 'Thank' link.
-			if ( class_exists( 'EchoNotifier' )
-				&& class_exists( 'ApiThank' )
-				&& $this->getUser()->isLoggedIn()
-			) {
-				$this->useThanks = true;
-				$output->addModules( 'mobile.thanks' );
-			}
 		}
 
 		// @FIXME add full support for git-style notation (eg ...123, 123...)
@@ -97,6 +89,9 @@ class SpecialMobileDiff extends MobileSpecialPage {
 		$output->setPageTitle( $this->msg( 'mobile-frontend-diffview-title', $this->targetTitle->getPrefixedText() ) );
 
 		$output->addModules( 'mobile.watchlist' );
+
+		// Allow other extensions to load more stuff here
+		wfRunHooks( 'BeforeSpecialMobileDiffDisplay', array( &$output, $ctx ) );
 
 		$output->addHtml( '<div id="mw-mf-diffview"><div id="mw-mf-diffarea">' );
 
@@ -138,8 +133,8 @@ class SpecialMobileDiff extends MobileSpecialPage {
 					$title->getPrefixedText()
 				).
 				Html::closeElement( 'h2' ) .
-				Html::element( 'span', array( 'class' => $sizeClass ), $this->msg( $changeMsg, $bytesChanged )->text() ) .
-				', ' .
+				Html::element( 'span', array( 'class' => $sizeClass ), $this->msg( $changeMsg )->numParams( $bytesChanged )->text() ) .
+				$this->msg( 'comma-separator' )->text() .
 				Html::element( 'span', array( 'class' => 'mw-mf-diff-date' ), $ts->getHumanTimestamp() ) .
 			Html::closeElement( 'div' ) .
 			Html::element( 'div', array( 'id' => 'mw-mf-diff-comment' ), $this->rev->getComment() )
@@ -164,7 +159,7 @@ class SpecialMobileDiff extends MobileSpecialPage {
 		);
 		$prev = $this->rev->getPrevious();
 		$next = $this->rev->getNext();
-		if ( $ctx->isAlphaGroupMember() && (  $prev || $next ) ) {
+		if ( $ctx->isBetaGroupMember() && (  $prev || $next ) ) {
 			$history = Html::openElement( 'ul', array( 'class' => 'hlist revision-history-links' ) );
 			if ( $prev ) {
 				$history .= Html::openElement( 'li' ) .
@@ -224,10 +219,12 @@ class SpecialMobileDiff extends MobileSpecialPage {
 				'data-user-name' => $user->getName(),
 				'data-user-gender' => $user->getOption( 'gender' ),
 			);
+			$inBeta = MobileContext::singleton()->isBetaGroupMember();
+			$userLink = $inBeta ? SpecialPage::getTitleFor( 'UserProfile', $user->getName() ) : $user->getUserPage();
 			$output->addHtml(
 				Html::openElement( 'div', $attrs ) .
 				Linker::link(
-					$user->getUserPage(),
+					$userLink,
 					htmlspecialchars( $user->getName() ),
 					array( 'class' => 'mw-mf-user-link' )
 				) .

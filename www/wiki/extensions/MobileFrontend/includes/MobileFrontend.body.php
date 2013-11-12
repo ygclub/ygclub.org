@@ -9,9 +9,14 @@ class ExtMobileFrontend extends ContextSource {
 	public static function DOMParse( OutputPage $out ) {
 		// Debug logging: we need a list of Accept: headers to make some WAP detection decisions
 		// Done here to make sure that only mobile view requests are logged
-		if ( mt_rand( 0, 10000 ) == 0 ) {
+		if ( mt_rand( 0, 100 ) == 0 ) {
 			$req = $out->getRequest();
-			wfDebugLog( 'mobile', "User-agent: '{$req->getHeader( 'User-agent' )}', Accept: '{$req->getHeader( 'Accept' )}'" );
+			$ua = $req->getHeader( 'User-Agent' );
+			$accept = $req->getHeader( 'Accept' );
+			$wap = $req->getHeader( 'X-WAP' );
+			$subdomain = $req->getHeader( 'X-Subdomain' );
+			$cs = $req->getHeader( 'X-CS' );
+			wfDebugLog( 'wap', "User-agent: '$ua', Accept: '$accept', X-WAP: '$wap', X-Subdomain: '$subdomain', X-CS: '$cs'" );
 		}
 
 		wfProfileIn( __METHOD__ );

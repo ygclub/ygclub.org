@@ -7,11 +7,10 @@ html {
 }
 
 @bodyLineHeight: ( @baseFontSize / 3 ) * 4; /* = 16pt */
-@headingLineHeight: 22pt;
+@headingLineHeight: 1.3;
 
 body {
 	font-family: @fontFamily;
-	font-size: @baseFontSize;
 	line-height: @bodyLineHeight;
 	color: #252525;
 }
@@ -21,22 +20,38 @@ h1 {
 	font-family: @fontFamilyHeading;
 }
 
+// h1#section_0 is not inside .content...
+#section_0 {
+	line-height: @headingLineHeight;
+}
+
 .content {
-	h2, h3, h4, h5, h6 {
+	margin: .8em @contentMarginRight 0 @contentMarginLeft;
+
+	h1, h2, h3, h4, h5, h6 {
+		line-height: @headingLineHeight;
 		font-family: @fontFamilyHeading;
 		padding: @headingMargin 0;
 	}
 
 	p {
-		margin-bottom: 8pt;
+		margin-bottom: .7em;
 	}
-}
 
-ol,
-ul {
+	.thumb {
+		margin: 15px 0 15px 0;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		background: #f9f9f9;
+		text-align: center;
+	}
+
 	ol,
 	ul {
-		margin-left: 1em;
+		ol,
+		ul {
+			margin-left: 1em;
+		}
 	}
 }
 
@@ -47,22 +62,17 @@ dl {
 	}
 }
 
-@2xBaseFontSize: ( @baseFontSize * 2 );
 h1 {
 	font-size: @baseFontSize * 1.833;
-	line-height: @headingLineHeight;
 }
 
 h2 {
 	font-size: ( @baseFontSize / 2 ) * 3; /* 18pt */
-	line-height: @headingLineHeight;
 }
 
 h3 {
 	font-size: ( @baseFontSize / 6 ) * 7; /* 14pt */
-	line-height: @headingLineHeight;
 	font-weight: bold;
-	margin-bottom: 8pt;
 }
 
 h4 {
@@ -82,83 +92,31 @@ sup {
 	font-size: ( 3 * @baseFontSize / 4 );
 }
 
-.content {
-	margin: @headingMargin @contentMarginRight 0 @contentMarginLeft;
-}
-
-// FIXME: This is included on all pages but only used by certain special pages.
-body.no-margins {
-	#content_wrapper > .content {
-		margin: 0;
-	}
-}
-
-#content_wrapper {
-	position: relative;
-	// make sure that the spinner is visible on lazy loading
-	// (room for spinner + margins)
-	min-height: 100px;
-
-	.section {
-		h3:first-child {
-			margin-top: 0;
-		}
-		&:last-child {
-			border-bottom: none;
-		}
-	}
-
-	.thumb {
-		border: 1px solid #cccccc;
-		border-radius: 5px;
-		background: #f9f9f9;
-		text-align: center;
-	}
-}
-
-#content {
-	.thumb {
-		margin: 15px 0 15px 0;
-	}
-}
-
-input.search {
-	font-family: @fontFamily;
-}
-
-@media all and (max-width: 280px) {
+@media all and (max-width: @wgMFDeviceWidthMobileSmall) {
 	body {
-		font-size: @baseFontSize * 0.8;
+		font-size: .8em;
 	}
 
-	#content_wrapper {
+	.content {
 		margin: 0 12px;
 	}
 }
 
 blockquote {
-	quotes:"\201C" "\201D";
-	padding-left: 10px;
-	padding-bottom: 30px;
-	padding-right: 0;
-	margin-top: 20px;
-	margin-right: 0;
+	quotes: "\201C" "\201D";
+	padding: 1em 0 1em 10px;
 	position: relative;
-	width: 90%;
 
 	&:before {
 		content: open-quote;
-		font-size: @baseFontSize * 3;
-		font-weight: bold;
+		font-size: 3em;
 	}
 
 	&:after{
-		font-size: @baseFontSize * 3;
+		font-size: 3em;
 		content: close-quote;
-		font-weight: bold;
-		float: right;
 		position: absolute;
-		right: -10px;
+		right: 0;
 		bottom: 0;
 	}
 }

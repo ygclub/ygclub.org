@@ -59,6 +59,10 @@
 			margin: 0 26px 16px;
 		}
 
+		&.slide-image {
+			padding-top: 146px;
+		}
+
 		// FIXME: Make page-1 and page-2 more generic and reusable?
 		&.page-1 {
 			background-image: url(images/uploads/SplashScreen1.png);
@@ -71,6 +75,8 @@
 }
 
 .ctaUploadPhoto {
+	// FIXME: should not be required
+	margin: 0;
 	padding: 8px;
 	background-color: #F3F3F3;
 	border-bottom: 1px solid #E2E2E2;
@@ -102,8 +108,7 @@
 
 }
 
-.animations .beta,
-.animations .alpha {
+.animations {
 	.slideable {
 		.slider {
 			left: 0;
@@ -121,8 +126,6 @@
 }
 
 ul.mobileUserGallery {
-	// FIXME: this shouldn't be needed with reset.css
-	list-style: none;
 	margin: 20px @contentMarginRight 0 @contentMarginLeft;
 
 	li {

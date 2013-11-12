@@ -4,7 +4,7 @@ class ApiMobileView extends ApiBase {
 	/**
 	 * Increment this when changing the format of cached data
 	 */
-	const CACHE_VERSION = 4;
+	const CACHE_VERSION = 5;
 
 	private $followRedirects, $noHeadings, $mainPage, $noTransform, $variant, $offset, $maxlen;
 
@@ -17,6 +17,9 @@ class ApiMobileView extends ApiBase {
 		parent::__construct( $main, $action );
 	}
 
+	/**
+	 * FIXME: Write some unit tests for API results
+	 */
 	public function execute() {
 		wfProfileIn( __METHOD__ );
 
@@ -107,6 +110,13 @@ class ApiMobileView extends ApiBase {
 				$result[] = $section;
 			}
 		}
+		// https://bugzilla.wikimedia.org/show_bug.cgi?id=51586
+		// Inform ppl if the page is infested with LiquidThreads but that's the only thing we support about it.
+		if ( class_exists( 'LqtDispatch' ) && LqtDispatch::isLqtPage( $title ) ) {
+			$this->getResult()->addValue( null, $this->getModuleName(),
+				array( 'liquidthreads' => '' )
+			);
+		}
 		if ( count( $missingSections ) && isset( $prop['text'] ) ) {
 			$this->setWarning( 'Section(s) ' . implode( ', ', $missingSections ) . ' not found' );
 		}
@@ -181,6 +191,11 @@ class ApiMobileView extends ApiBase {
 			}
 		}
 		$latest = $wp->getLatest();
+		if ( !$latest ) {
+			// https://bugzilla.wikimedia.org/show_bug.cgi?id=53378
+			// Title::exists() above doesn't seem to always catch recently deleted pages
+			$this->dieUsageMsg( array( 'notanarticle', $title->getPrefixedText() ) );
+		}
 		if ( $this->file ) {
 			$key = wfMemcKey( 'mf', 'mobileview', self::CACHE_VERSION, $noImages,
 				$latest, $this->noTransform, $this->file->getSha1(), $this->variant );
@@ -199,8 +214,11 @@ class ApiMobileView extends ApiBase {
 			$html = $this->getFilePage( $title );
 		} else {
 			wfProfileIn( __METHOD__ . '-parserOutput' );
+			$time = microtime( true );
 			$parserOutput = $wp->getParserOutput( $parserOptions );
+			$time = microtime( true ) - $time;
 			if ( !$parserOutput ) {
+				wfDebugLog( 'mobile', "Empty parser output on '{$title->getPrefixedText()}': rev $latest, time $time, cache key $key" );
 				throw new MWException( __METHOD__ . ": PoolCounter didn't return parser output" );
 			}
 			$html = $parserOutput->getText();
@@ -211,7 +229,7 @@ class ApiMobileView extends ApiBase {
 		wfProfileIn( __METHOD__ . '-MobileFormatter' );
 		if ( !$this->noTransform ) {
 			$mf = new MobileFormatterHTML( MobileFormatter::wrapHTML( $html ), $title );
-			$mf->removeImages( $noImages );
+			$mf->setRemoveMedia( $noImages );
 			$mf->filterContent();
 			$mf->setIsMainPage( $this->mainPage );
 			$html = $mf->getText();
@@ -234,7 +252,7 @@ class ApiMobileView extends ApiBase {
 			}
 			$chunks = preg_split( '/<h(?=[1-6]\b)/i', $html );
 			if ( count( $chunks ) != count( $data['sections'] ) + 1 ) {
-				wfDebug( __METHOD__ . "(): mismatching number of sections from parser and split. oldid=$latest\n" );
+				wfDebugLog( 'mobile', __METHOD__ . "(): mismatching number of sections from parser and split on page {$title->getPrefixedText()}, oldid=$latest" );
 				// We can't be sure about anything here, return all page HTML as one big section
 				$chunks = array( $html );
 				$data['sections'] = array();
@@ -254,6 +272,7 @@ class ApiMobileView extends ApiBase {
 				$data['text'][] = $chunk;
 			}
 			$data['lastmodified'] = $wp->getTimestamp();
+
 			wfProfileOut( __METHOD__ . '-sections' );
 		}
 		// Don't store small pages to decrease cache size requirements

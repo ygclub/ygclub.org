@@ -95,10 +95,12 @@ var
 				insertBefore( this.$list );
 		},
 		prependPhoto: function( photoData ) {
-			new PhotoItem( photoData ).prependTo( this.$list );
+			var photoItem = new PhotoItem( photoData ).prependTo( this.$list );
+			M.emit( 'photo-loaded', photoItem.$el );
 		},
 		appendPhoto: function( photoData ) {
-			new PhotoItem( photoData ).appendTo( this.$list );
+			var photoItem = new PhotoItem( photoData ).appendTo( this.$list );
+			M.emit( 'photo-loaded', photoItem.$el );
 		},
 		_isEndNear: function() {
 			var scrollBottom = $( window ).scrollTop() + $( window ).height();
@@ -160,7 +162,7 @@ var
 	function init() {
 		var $container, userGallery, emptyHandler;
 
-		userGallery = new PhotoList().appendTo( '#content' );
+		userGallery = new PhotoList().appendTo( '#content_wrapper' );
 		if ( currentUserName === userName ) {
 			emptyHandler = function() {
 				new CarouselOverlay( {
@@ -168,20 +170,20 @@ var
 						{
 							caption: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-1-header' ),
 							text: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-1' ),
-							className: 'page-1', id: 1
+							className: 'page-1 slide-image', id: 1
 						},
 						{
 							caption: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-2-header' ),
 							text: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-2' ),
-							className: 'page-2', id: 2
+							className: 'page-2 slide-image', id: 2
 						},
 						{
 							caption: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-3-header' ),
 							cancel: mw.msg( 'mobile-frontend-first-upload-wizard-new-page-3-ok' ),
-							className: 'slide-image', id: 3
+							className: 'photo-upload slide-image', id: 3
 						}
 					]
-				} );
+				} ).show();
 			};
 		} else {
 			emptyHandler = function() {

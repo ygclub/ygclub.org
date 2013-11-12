@@ -30,6 +30,11 @@ class UserLoginMobileTemplate extends UserLoginAndCreateTemplate {
 		if ( isset( $actionQuery['returntoquery'] ) ) {
 			$query['returntoquery'] = $actionQuery['returntoquery'];
 		}
+		// For Extension:Campaigns
+		$campaign = $this->getSkin()->getRequest()->getText( 'campaign' );
+		if ( $campaign ) {
+			$query['campaign'] = $campaign;
+		}
 
 		$signupLink = Linker::link( SpecialPage::getTitleFor( 'Userlogin' ),
 			wfMessage( 'mobile-frontend-main-menu-account-create' )->text(),
@@ -64,7 +69,7 @@ class UserLoginMobileTemplate extends UserLoginAndCreateTemplate {
 					'method' => 'post',
 					'action' => $action ) ) .
 			Html::openElement( 'div', array(
-				'class' => 'wpInputs',
+				'class' => 'inputs-box',
 			) ) .
 			Html::input( 'wpName', $username, 'text',
 				array( 'class' => 'loginText',

@@ -4,6 +4,17 @@
  * Converts HTML into a mobile-friendly version
  */
 abstract class MobileFormatter extends HtmlFormatter {
+	/*
+		String prefixes to be applied at start and end of output from Parser
+	*/
+	protected $pageTransformStart = '';
+	protected $pageTransformEnd = '';
+	/*
+		String prefixes to be applied before and after section content.
+	*/
+	protected $headingTransformStart = '';
+	protected $headingTransformEnd = '';
+
 	/**
 	 * @var Title
 	 */
@@ -12,14 +23,9 @@ abstract class MobileFormatter extends HtmlFormatter {
 	protected $expandableSections = false;
 	protected $mainPage = false;
 	protected $backToTopLink = true;
+	protected $flattenRedLinks = true;
 
 	protected $headings = 0;
-
-	private $defaultItemsToRemove = array(
-		'.toc',
-		'div.magnify',
-		'.nomobile',
-	);
 
 	/**
 	 * Constructor
@@ -31,7 +37,6 @@ abstract class MobileFormatter extends HtmlFormatter {
 		parent::__construct( $html );
 
 		$this->title = $title;
-		$this->flattenRedLinks();
 	}
 
 	/**
@@ -57,16 +62,15 @@ abstract class MobileFormatter extends HtmlFormatter {
 		} else {
 			$formatter = new MobileFormatterHTML( $html, $title );
 			$formatter->enableExpandableSections( !$isMainPage && !$isSpecialPage );
+			$formatter->flattenRedLinks( !$context->isAlphaGroupMember() );
 		}
 
 		if ( $context->isBetaGroupMember() ) {
 			$formatter->disableBackToTop();
 		}
-		if ( !$context->isAlphaGroupMember() ) {
-			$formatter->setIsMainPage( $isMainPage );
-		}
+		$formatter->setIsMainPage( $isMainPage );
 		if ( $context->getContentTransformations() && !$isFilePage ) {
-			$formatter->removeImages( $context->imagesDisabled() );
+			$formatter->setRemoveMedia( $context->imagesDisabled() );
 		}
 
 		wfProfileOut( __METHOD__ );
@@ -98,17 +102,82 @@ abstract class MobileFormatter extends HtmlFormatter {
 	}
 
 	/**
+	 * Sets whether red links should be flattened
+	 * @param bool $flag
+	 */
+	public function flattenRedLinks( $flag = true ) {
+		$this->flattenRedLinks = $flag;
+	}
+
+	/**
 	 * Removes content inappropriate for mobile devices
-	 * @param bool $removeDefaults: Whether default settings at self::$defaultItemsToRemove should be used
+	 * @param bool $removeDefaults: Whether default settings at $wgMFRemovableClasses should be used
 	 */
 	public function filterContent( $removeDefaults = true ) {
 		global $wgMFRemovableClasses;
 
 		if ( $removeDefaults ) {
-			$this->remove( $this->getDefaultItemsToRemove() );
-			$this->remove( $wgMFRemovableClasses );
+			$this->remove( $wgMFRemovableClasses['base'] );
+			$this->remove( $wgMFRemovableClasses[$this->getFormat()] );
+		}
+
+		if ( $this->removeMedia ) {
+			$this->doRemoveImages();
 		}
 		parent::filterContent();
+
+		// Handle red links with action equal to edit
+		if ( $this->flattenRedLinks ) {
+			$this->doFlattenRedLinks();
+		}
+	}
+
+	/**
+	 * Replaces images with [annotations from alt]
+	 */
+	private function doRemoveImages() {
+		$doc = $this->getDoc();
+		$domElemsToReplace = array();
+		foreach( $doc->getElementsByTagName( 'img' ) as $element ) {
+			$domElemsToReplace[] = $element;
+		}
+		/** @var $element DOMElement */
+		foreach ( $domElemsToReplace as $element ) {
+			$alt = $element->getAttribute( 'alt' );
+			if ( $alt === '' ) {
+				$alt = '[' . wfMessage( 'mobile-frontend-missing-image' )->inContentLanguage() . ']';
+			} else {
+				$alt = '[' . $alt . ']';
+			}
+			$replacement = $doc->createElement( 'span', htmlspecialchars( $alt ) );
+			$replacement->setAttribute( 'class', 'mw-mf-image-replacement' );
+			$element->parentNode->replaceChild( $replacement, $element );
+		}
+	}
+
+	/**
+	 * Replaces red links with plain text
+	 */
+	private function doFlattenRedLinks() {
+		$doc = $this->getDoc();
+		$xpath = new DOMXpath( $doc );
+		$redLinks = $xpath->query( '//a[@class="new"]' );
+		/** @var $redLink DOMElement */
+		foreach ( $redLinks as $redLink ) {
+			// PHP Bug #36795 — Inappropriate "unterminated entity reference"
+			$spanNode = $doc->createElement( "span", str_replace( "&", "&amp;", $redLink->nodeValue ) );
+
+			if ( $redLink->hasAttributes() ) {
+				$attributes = $redLink->attributes;
+				foreach ( $attributes as $attribute ) {
+					if ( $attribute->name != 'href' ) {
+						$spanNode->setAttribute( $attribute->name, $attribute->value );
+					}
+				}
+			}
+
+			$redLink->parentNode->replaceChild( $spanNode, $redLink );
+		}
 	}
 
 	/**
@@ -125,80 +194,6 @@ abstract class MobileFormatter extends HtmlFormatter {
 		$html = parent::getText( $element );
 		wfProfileOut( __METHOD__ );
 		return $html;
-	}
-
-	/**
-	 * Getter for $this->defaultItemsToRemove
-	 * @return array
-	 */
-	public function getDefaultItemsToRemove() {
-		return $this->defaultItemsToRemove;
-	}
-
-	/**
-	 * Setter for $this->defaultItemsToRemove
-	 * @param array $defaultItemsToRemove: Indexed array of HTML elements to be stripped during mobile formatting
-	 * @throws MWException
-	 * @return array
-	 */
-	public function setDefaultItemsToRemove( $defaultItemsToRemove ) {
-		if ( !is_array( $defaultItemsToRemove ) ) {
-			throw new MWException( __METHOD__ . '(): defaultItemsToRemove must be an array.' );
-		}
-		$this->defaultItemsToRemove = $defaultItemsToRemove;
-	}
-
-	/**
-	 * Callback for headingTransform()
-	 * @param array $matches
-	 * @return string
-	 */
-	protected abstract function headingTransformCallback( $matches );
-
-	/**
-	 * generates a back top link for a given section number
-	 * @param int $headingNumber: The number corresponding to the section heading
-	 * @return string
-	 */
-	protected function backToTopLink( $headingNumber ) {
-		return Html::rawElement( 'a',
-				array( 'id' => 'anchor_' . $headingNumber,
-					'href' => '#section_' . $headingNumber,
-					'class' => 'section_anchors' ),
-				'&#8593;' . $this->msg( 'mobile-frontend-back-to-top-of-section' ) );
-	}
-
-	/**
-	 * Prepares headings in WML mode, makes sections expandable in HTML mode
-	 * @param string $s
-	 * @return string
-	 */
-	protected function headingTransform( $s ) {
-		wfProfileIn( __METHOD__ );
-
-		// Closures are a PHP 5.3 feature.
-		// MediaWiki currently requires PHP 5.2.3 or higher.
-		// So, using old style for now.
-		$s = '<div id="content_0" class="content_block openSection">'
-			. preg_replace_callback(
-				'%<h2(.*)<span class="mw-headline" [^>]*>(.+)</span>[\s\r\n]*</h2>%sU',
-				array( $this, 'headingTransformCallback' ),
-				$s
-			);
-
-		// if we had any, make sure to close the whole thing!
-		if ( $this->headings > 0 ) {
-			if ( $this->backToTopLink ) {
-				$bt = $this->backToTopLink( intval( $this->headings ) );
-			} else {
-				$bt = '';
-			}
-			$s .= '</div>' // <div class="content_block">
-				. $bt;
-		}
-		$s .= "\n</div>";
-		wfProfileOut( __METHOD__ );
-		return $s;
 	}
 
 	/**
@@ -265,5 +260,20 @@ abstract class MobileFormatter extends HtmlFormatter {
 
 		wfProfileOut( __METHOD__ );
 		return $content;
+	}
+
+	/**
+	 * Prepares headings in WML mode, makes sections expandable in HTML mode
+	 * @param string $s
+	 * @return string
+	 */
+	protected function headingTransform( $s, $tagName = 'h2' ) {
+		wfProfileIn( __METHOD__ );
+		$tagRegEx = '<' . $tagName . '.*</' . $tagName . '>';
+		$s = $this->pageTransformStart .
+			preg_replace( '%(' . $tagRegEx . ')%sU', $this->headingTransformStart . '\1' . $this->headingTransformEnd, $s ) .
+			$this->pageTransformEnd;
+		wfProfileOut( __METHOD__ );
+		return $s;
 	}
 }

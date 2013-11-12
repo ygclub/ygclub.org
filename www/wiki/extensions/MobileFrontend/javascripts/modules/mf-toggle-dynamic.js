@@ -1,36 +1,21 @@
 ( function( M, $ ) {
-	var
-		toggle = M.require( 'toggle' ),
-		currentPage;
+	var currentPage;
 
-	M.on( 'section-toggle', function( section_id ) {
+	M.on( 'section-toggle', function( $heading ) {
 		var
-			$content = $( '#content_' + section_id ),
-			loaded = $content.data( 'loaded' ), section;
+			$content = $heading.next( '.content_block' ),
+			loaded = $content.data( 'loaded' ), section,
+			// FIXME: see JavaScript for Page.js
+			id = $heading.data( 'id' );
 
-		if ( !loaded && currentPage ) {
-			section = currentPage.getSectionFromAnchor( 'section_' + section_id );
+		if ( !loaded && currentPage && id ) {
+			section = currentPage.getSubSection( id );
 			if ( section ) {
-				$content.html( section.content ).data( 'loaded', true );
+				$content.html( section.text ).data( 'loaded', true );
 			}
 			M.emit( 'section-rendered', $content );
 		}
 	} );
-
-	function checkHash() {
-		var hash = window.location.hash, el, section;
-		if ( hash ) {
-			section = currentPage.getSectionFromAnchor( hash.slice( 1 ) );
-			if ( section ) {
-				toggle.wm_toggle_section( section.index );
-			}
-			// force scroll if not scrolled (e.g. after subsection is loaded)
-			el = $( hash );
-			if ( el.length ) {
-				el[ 0 ].scrollIntoView( true );
-			}
-		}
-	}
 
 	function refresh( page ) {
 		var references = page.getReferenceSection();
@@ -39,7 +24,6 @@
 			$( '#content_' + references.index ).html( references.content ).data( 'loaded', true );
 			M.emit( 'references-loaded' );
 		}
-		checkHash();
 	}
 
 	M.on( 'page-loaded', refresh );

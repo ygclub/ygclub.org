@@ -1,6 +1,6 @@
 @import "../mixins.less";
 
-.section_heading {
+.content {
 	.edit-page {
 		position: absolute;
 		background: url(../common/images/pagemenu/edit.png) 100% @headingMargin no-repeat;
@@ -11,11 +11,13 @@
 		top: 0;
 		bottom: 0;
 		right: 0;
-		display: none;
 	}
 
-	&.openSection .edit-page {
-		display: block;
+	h1.openSection,
+	h2.openSection {
+		.edit-page {
+			display: block;
+		}
 	}
 }
 
@@ -25,10 +27,6 @@
 }
 
 .editor-overlay {
-	.spinner {
-		height: 100px;
-	}
-
 	textarea {
 		width: 100%;
 		min-height: 50%;
@@ -65,19 +63,33 @@
 	}
 
 	.buttonBar {
-		box-shadow: 0 -10px 10px 0 #fff;
-	}
-
-	.initial-bar p {
-		display: inline-block;
-		text-align: center;
-		padding-top: 0;
-		margin: 0 0 .7em;
-		border-bottom: 1px solid #ccc;
-	}
-
-	.save-bar, .saving-bar {
+		// hide button bars by default
 		display: none;
+		box-shadow: 0 -10px 10px 0 #fff;
+
+		.message {
+			margin: 0 0 .7em;
+			padding: 0 0 .3em;
+			border-bottom: 1px solid #ccc;
+			color: #707070;
+
+			p {
+				display: inline-block;
+				text-align: center;
+				padding-top: 0;
+			}
+		}
+	}
+
+	.initial-bar {
+		display: block;
+	}
+}
+
+.abusefilter-overlay {
+	// FIXME: enwiki only?
+	.mbox-image {
+		min-width: 30px;
 	}
 }
 

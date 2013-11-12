@@ -8,11 +8,12 @@ class HomePage
   page_url url
 
   a(:about_link, text: 'About')
-  a(:content_link, text: 'CC BY-SA 3.0')
+  a(:content_link, href: '//creativecommons.org/licenses/by-sa/3.0/')
   a(:contrib_link, text: 'contributors')
+  a(:desktop_link, text: 'Desktop')
   a(:disclaimer_link, text: 'Disclaimers')
   a(:login_button, href: /Special:UserLogin/)
-  a(:login_watchlist, href: '/wiki/Special:UserLogin?returnto=Main_Page&returntoquery=article_action%3Dwatch')
+  a(:login_watchlist, href: /returntoquery=article_action%3Dwatch/)
   div(:main_page, id: 'mainpage')
   a(:mainmenu_button, id: 'mw-mf-main-menu-button')
   span(:mobile_select, text: 'Mobile')
@@ -31,10 +32,21 @@ class HomePage
   a(:search_result) do |page|
     page.search_results_element.a
   end
-  a(:sign_up_watchlist, href: '/wiki/Special:UserLogin?returnto=Main_Page&returntoquery=article_action%3Dwatch&type=signup')
+  a(:sign_up_watchlist, href: /returntoquery=article_action%3Dwatch&type=signup/)
   a(:terms_link, text: 'Terms of Use')
   a(:watch_link, class: 'watch-this-article')
   div(:watch_note, text: 'Added San Francisco Chronicle to your watchlist')
   div(:watch_note_removed, text: 'Removed San Francisco Chronicle from your watchlist')
   a(:watched_link, class: 'watch-this-article watched')
+  a(:create_account, class: 'mw-mf-create-account')
+  button(:language_button, text: 'Read in another language')
+  li(:edit_icon, id:'ca-edit')
+  li(:upload_icon, id:'ca-upload')
+  div(:fe_notification, class:'drawer position-fixed visible')
+  div(:rl_notification, id:'notifications')
+  a(:edit_history_link, id:'mw-mf-last-modified')
+  a(:notification_button, id:'secondary-button')
+  a(:notifications_archive_link, id:'notifications-archive-link')
+  a(:edit_icon_enabled, text:'Edit')
+  li(:mobile_view, id:'footer-places-mobileview')
 end

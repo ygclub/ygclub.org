@@ -24,10 +24,11 @@ table.geography td {
 }
 
 img.tex,
+#file img, // FIXME: [File Page] dream of wiki standardisation
 .image img, // Dream of Wiki standardisation (Wikimedia Commons)
 .thumb img {
 	max-width: 100% !important;
-	width: auto !important;
+	// Ensure the image doesn't get squished if the suggested width is more than 100%
 	height: auto !important;
 }
 
@@ -54,6 +55,22 @@ img.tex,
 	clear: both !important;
 }
 
+/* Hide some on-wiki defined classes */
+#content {
+	// Hide article badges, clean-up notices, stub notices, and navigation boxes
+	.navbox, .vertical-navbox, .topicon, .metadata {
+		display: none;
+	}
+}
+/* Revert to showing nav boxes on tablet/desktop */
+@media all and (min-width: @wgMFDeviceWidthTablet) {
+	#content {
+		.navbox, .vertical-navbox {
+			display: inherit;
+		}
+	}
+}
+
 /* Galleries */
 /* See https://www.mediawiki.org/wiki/Help:Images#Rendering_a_gallery_of_images */
 
@@ -74,7 +91,9 @@ ul.gallery {
 	}
 }
 
-// FIXME: [ParserOutput] This hides the default edit link (see bug 49208)
+// FIXME: Remove when filetoc is stripped from file pages a la table of contents (toc)
+#filetoc,
+// FIXME: remove when SkinMobile::doEditSectionLink present in cached pages
 .editsection,
 .mw-editsection {
 	display: none;

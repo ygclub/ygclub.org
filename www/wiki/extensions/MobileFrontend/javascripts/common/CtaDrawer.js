@@ -1,3 +1,8 @@
+/**
+ * This creates the drawer at the bottom of the screen that appears when an anonymous
+ * user tries to perform an action that requires being logged in. It presents the user
+ * with options to log in or sign up for a new account.
+ */
 ( function( M, $ ) {
 var Drawer = M.require( 'Drawer' ),
 	CtaDrawer = Drawer.extend( {
@@ -9,14 +14,13 @@ var Drawer = M.require( 'Drawer' ),
 		template: M.template.get( 'ctaDrawer' ),
 
 		preRender: function( options ) {
-			var params = {
+			var params = $.extend( {
 				// use wgPageName as this includes the namespace if outside Main
-				returnto: mw.config.get( 'wgPageName' ),
-				returntoquery: options.returnToQuery
-			};
+				returnto: options.returnTo || mw.config.get( 'wgPageName' )
+			}, options.queryParams );
 
-			options.loginUrl = M.history.getArticleUrl( 'Special:UserLogin', params );
-			options.signupUrl = M.history.getArticleUrl( 'Special:UserLogin', $.extend( params, { type: 'signup' } ) );
+			options.loginUrl = mw.util.wikiGetlink( 'Special:UserLogin', params );
+			options.signupUrl = mw.util.wikiGetlink( 'Special:UserLogin', $.extend( params, { type: 'signup' } ) );
 		}
 	} );
 

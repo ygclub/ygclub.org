@@ -7,7 +7,10 @@ var api = M.require( 'api' ), w = ( function() {
 		CtaDrawer = M.require( 'CtaDrawer' ),
 		drawer = new CtaDrawer( {
 			content: mw.msg( 'mobile-frontend-watchlist-cta' ),
-			returnToQuery: 'article_action=watch'
+			queryParams: {
+				campaign: 'mobile_watchPageActionCta',
+				returntoquery: 'article_action=watch'
+			}
 		} );
 
 	// FIXME: this should live in a separate module and make use of MobileFrontend events
@@ -101,14 +104,14 @@ var api = M.require( 'api' ), w = ( function() {
 		}
 
 		// FIXME change when micro.tap.js in stable
-		$( watchBtn ).on( mw.config.get( 'wgMFMode' ) === 'alpha' ? 'tap' : 'click', function( ev ) {
+		$( watchBtn ).on( M.tapEvent( 'click' ), function( ev ) {
 			var isWatched = $( watchBtn ).hasClass( 'watched' );
 			if( prevent ) {
 				ev.preventDefault();
 			}
 			prevent = true;
 			$( watchBtn ).addClass( 'disabled loading' );
-			M.emit( 'watch', isWatched );
+			M.emit( 'watched', isWatched );
 			toggleWatchStatus( isWatched );
 		} );
 
@@ -169,7 +172,7 @@ var api = M.require( 'api' ), w = ( function() {
 			} );
 		} else {
 			// FIXME change when micro.tap.js in stable
-			$( createButton( container ) ).on( mw.config.get( 'wgMFMode' ) === 'alpha' ? 'tap' : 'click', function() {
+			$( createButton( container ) ).on( M.tapEvent( 'click' ), function() {
 				if ( !drawer.isVisible() ) {
 					// log if enabled
 					logWatchEvent( 2 );
@@ -219,15 +222,10 @@ var api = M.require( 'api' ), w = ( function() {
 		} );
 	}
 
-	// FIXME: Here for backwards compatability in stable. Removed when echo goes to stable
-	if ( !$( '#ca-watch' ).length ) {
-		$( '<li id="ca-watch">' ).appendTo( '#mw-mf-menu-page' );
-	}
 	function init( page ) {
-		var isSpecialPage = mw.config.get( 'wgNamespaceNumber' ) === mw.config.get( 'wgNamespaceIds' ).special,
-			$container = $container || $( '#ca-watch' ).removeClass( 'watched watch-this-article' ).empty();
+		var $container = $container || $( '#ca-watch' ).removeClass( 'watched watch-this-article' ).empty();
 		// initialise on current page
-		if ( !isSpecialPage ) {
+		if ( !M.inNamespace( 'special' ) ) {
 			initWatchListIcon( $container, page.title );
 		}
 		upgradeUI();
@@ -235,8 +233,8 @@ var api = M.require( 'api' ), w = ( function() {
 
 	// bind to future page loads
 	M.on( 'page-loaded', init );
-
-	init( { title: mw.config.get( 'wgPageName' ) } );
+	// wgPageName contains _ instead of spaces. Clean these up for readability here. (see bug 53078)
+	init( { title: mw.config.get( 'wgPageName' ).replace( /_/gi, ' ' ) } );
 
 	return {
 		initWatchListIcon: initWatchListIcon,

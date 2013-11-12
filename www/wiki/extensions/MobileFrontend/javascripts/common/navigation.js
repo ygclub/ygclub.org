@@ -1,39 +1,36 @@
-(function( M ) {
+( function( M, $ ) {
 
-var m = ( function( $ ) {
 	var
-		menu,
-		inAlpha = mw.config.get( 'wgMFMode' ) === 'alpha',
-		inBeta = mw.config.get( 'wgMFMode' ) === 'beta';
+		// FIXME: remove when header-loaded is in all cached pages
+		initialized = false,
+		inAlpha = mw.config.get( 'wgMFMode' ) === 'alpha';
 
-	function openNavigation() {
-		$( 'body' ).addClass( 'navigation-enabled' );
-	}
-
-	function closeNavigation() {
-		$( 'body' ).removeClass( 'navigation-enabled' );
-	}
-
-	$( function() {
+	function initialize() {
 		var
 			moved = false,
-			search = document.getElementById(  'searchInput' );
+			$body = $( 'body' );
+
+		// FIXME: remove when header-loaded is in all cached pages
+		if ( initialized ) {
+			return;
+		}
+		initialized = true;
+
+		function isOpen() {
+			return $body.hasClass( 'navigation-enabled' );
+		}
+
+		function closeNavigation() {
+			$body.removeClass( 'navigation-enabled' );
+		}
+
+		function toggleNavigation() {
+			$body.toggleClass( 'navigation-enabled' );
+		}
 
 		$( '#mw-mf-page-left a' ).click( function() {
 			toggleNavigation(); // close before following link so that certain browsers on back don't show menu open
 		} );
-
-		function isOpen() {
-			return $( 'body' ).hasClass( 'navigation-enabled' );
-		}
-
-		function toggleNavigation() {
-			if( !isOpen() ) {
-				openNavigation();
-			} else {
-				closeNavigation();
-			}
-		}
 
 		// FIXME change when micro.tap.js in stable
 		if ( inAlpha ) {
@@ -72,34 +69,10 @@ var m = ( function( $ ) {
 				on( 'touchstart', function() { moved = false; } ).
 				on( 'touchmove', function() { moved = true; } );
 		}
+	}
 
+	M.on( 'header-loaded', initialize );
+	// FIXME: remove when header-loaded is in all cached pages
+	$( initialize );
 
-
-		if( window.location.hash === '#mw-mf-page-left' ) {
-			openNavigation();
-			$( 'body' ).addClass( 'noTransitions' );
-			window.setTimeout( function() {
-				$( 'body' ).removeClass( 'noTransitions' );
-			}, 1000 );
-		}
-
-		$( search ).bind( 'focus', function() {
-			if ( !inBeta || $( window ).width() < 700 ) {
-				closeNavigation();
-			}
-		} );
-	} );
-
-	menu = {
-		close: closeNavigation,
-		open: openNavigation
-	};
-
-	return {
-		getMenu: menu
-	};
-}( jQuery ));
-
-M.define( 'navigation', m );
-
-}( mw.mobileFrontend ));
+}( mw.mobileFrontend, jQuery ));
