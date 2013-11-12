@@ -20,9 +20,11 @@ ve.ui.ListAction = function VeUiListAction( surface ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.ListAction, ve.ui.Action );
+OO.inheritClass( ve.ui.ListAction, ve.ui.Action );
 
 /* Static Properties */
+
+ve.ui.ListAction.static.name = 'list';
 
 /**
  * List of allowed methods for the action.
@@ -30,7 +32,7 @@ ve.inheritClass( ve.ui.ListAction, ve.ui.Action );
  * @static
  * @property
  */
-ve.ui.ListAction.static.methods = ['wrap', 'unwrap'];
+ve.ui.ListAction.static.methods = [ 'wrap', 'unwrap' ];
 
 /* Methods */
 
@@ -143,4 +145,4 @@ ve.ui.ListAction.prototype.unwrap = function () {
 
 /* Registration */
 
-ve.ui.actionFactory.register( 'list', ve.ui.ListAction );
+ve.ui.actionFactory.register( ve.ui.ListAction );

@@ -42,6 +42,7 @@ class SpecialPagesWithProp extends QueryPage {
 	function execute( $par ) {
 		$this->setHeaders();
 		$this->outputHeader();
+		$this->getOutput()->addModuleStyles( 'mediawiki.special.pagesWithProp' );
 
 		$request = $this->getRequest();
 		$propname = $request->getVal( 'propname', $par );
@@ -54,6 +55,7 @@ class SpecialPagesWithProp extends QueryPage {
 			__METHOD__,
 			array( 'DISTINCT', 'ORDER BY' => 'pp_propname' )
 		);
+		$propnames = array();
 		foreach ( $res as $row ) {
 			$propnames[$row->pp_propname] = $row->pp_propname;
 		}
@@ -127,9 +129,22 @@ class SpecialPagesWithProp extends QueryPage {
 		$title = Title::newFromRow( $result );
 		$ret = Linker::link( $title, null, array(), array(), array( 'known' ) );
 		if ( $result->pp_value !== '' ) {
-			$propValue = Html::element( 'span', array( 'class' => 'prop-value' ), $result->pp_value );
-			$value = $this->msg( 'parentheses' )->rawParams( $propValue )->escaped();
-			$ret .= " $value";
+			// Do not show very long or binary values on the special page
+			$valueLength = strlen( $result->pp_value );
+			$isBinary = strpos( $result->pp_value, "\0" ) !== false;
+			$isTooLong = $valueLength > 1024;
+
+			if ( $isBinary || $isTooLong ) {
+				$message = $this
+					->msg( $isBinary ? 'pageswithprop-prophidden-binary' : 'pageswithprop-prophidden-long' )
+					->params( $this->getLanguage()->formatSize( $valueLength ) );
+
+				$propValue = Html::element( 'span', array( 'class' => 'prop-value-hidden' ), $message->text() );
+			} else {
+				$propValue = Html::element( 'span', array( 'class' => 'prop-value' ), $result->pp_value );
+			}
+
+			$ret .= $this->msg( 'colon-separator' )->escaped() . $propValue;
 		}
 
 		return $ret;

@@ -20,7 +20,7 @@ ve.dm.AlienMetaItem = function VeDmAlienMetaItem( element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.AlienMetaItem, ve.dm.MetaItem );
+OO.inheritClass( ve.dm.AlienMetaItem, ve.dm.MetaItem );
 
 /* Static Properties */
 
@@ -34,7 +34,7 @@ ve.dm.AlienMetaItem.static.toDataElement = function ( domElements ) {
 	return {
 		'type': this.name,
 		'attributes': {
-			'domElements': ve.copyArray( domElements )
+			'domElements': ve.copy( domElements )
 		}
 	};
 };

@@ -11,7 +11,7 @@
  * @class
  * @abstract
  * @extends ve.dm.Model
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  * @param {Object} element Reference to element in meta-linmod
@@ -20,7 +20,7 @@ ve.dm.MetaItem = function VeDmMetaItem( element ) {
 	// Parent constructor
 	ve.dm.Model.call( this, element );
 	// Mixin
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
 	this.list = null;
@@ -31,9 +31,9 @@ ve.dm.MetaItem = function VeDmMetaItem( element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.MetaItem, ve.dm.Model );
+OO.inheritClass( ve.dm.MetaItem, ve.dm.Model );
 
-ve.mixinClass( ve.dm.MetaItem, ve.EventEmitter );
+OO.mixinClass( ve.dm.MetaItem, OO.EventEmitter );
 
 /* Static members */
 
@@ -129,39 +129,6 @@ ve.dm.MetaItem.prototype.setIndex = function ( index ) {
 };
 
 /**
- * Queue up a change to the item's offset and index.
- * @param {number} offset New offset
- * @param {number} index New index
- */
-ve.dm.MetaItem.prototype.setMove = function ( offset, index ) {
-	this.move = {
-		'offset': offset,
-		'index': index
-	};
-};
-
-/**
- * Whether or not a move is pending.
- * @returns {boolean} A move is pending
- */
-ve.dm.MetaItem.prototype.isMovePending = function () {
-	return this.move !== null;
-};
-
-/**
- * Apply the pending move and clear it.
- * @throws No move pending
- */
-ve.dm.MetaItem.prototype.applyMove = function () {
-	if ( this.move === null ) {
-		throw new Error( 'No move pending' );
-	}
-	this.setOffset( this.move.offset );
-	this.setIndex( this.move.index );
-	this.move = null;
-};
-
-/**
  * Attach this item to a MetaList.
  * @param {ve.dm.MetaList} list Parent list to attach to
  * @param {number} offset Offset of this item in the parent list's document
@@ -186,4 +153,12 @@ ve.dm.MetaItem.prototype.detach = function ( list ) {
 		this.offset = null;
 		this.index = null;
 	}
+};
+
+/**
+ * Check whether this item is attached to a MetaList.
+ * @returns {boolean} Whether item is attached
+ */
+ve.dm.MetaItem.prototype.isAttached = function () {
+	return this.list !== null;
 };

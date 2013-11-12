@@ -9,37 +9,6 @@ QUnit.module( 've' );
 
 /* Tests */
 
-// ve.createObject: Tested upstream (JavaScript)
-
-// ve.inheritClass: Tested upstream (OOJS)
-
-// ve.mixinClass: Tested upstream (OOJS)
-
-QUnit.test( 'isMixedIn', 11, function ( assert ) {
-	function Foo () {}
-	function Bar () {}
-	function Quux () {}
-
-	ve.inheritClass( Quux, Foo );
-	ve.mixinClass( Quux, Bar );
-
-	var b = new Bar(),
-		q = new Quux();
-
-	assert.strictEqual( ve.isMixedIn( Foo, Function ), false, 'Direct native inheritance is not considered' );
-	assert.strictEqual( ve.isMixedIn( Foo, Object ), false, 'Indirect native inheritance is not considered' );
-	assert.strictEqual( ve.isMixedIn( Quux, Foo ), false, 've.inheritClass does not affect mixin status' );
-	assert.strictEqual( ve.isMixedIn( Foo, Foo ), false, 'Foo does not mixin Foo' );
-	assert.strictEqual( ve.isMixedIn( Bar, Foo ), false, 'Bar does not mixin Foo' );
-	assert.strictEqual( ve.isMixedIn( Quux, Bar ), true, 'Quux has Bar mixed in' );
-	assert.strictEqual( ve.isMixedIn( Bar, Quux ), false, 'Bar does not mixin Quux' );
-
-	assert.strictEqual( ve.isMixedIn( q, Foo ), false, 've.inheritClass does not affect mixin status' );
-	assert.strictEqual( ve.isMixedIn( b, Foo ), false, 'b does not mixin Foo' );
-	assert.strictEqual( ve.isMixedIn( q, Bar ), true, 'q has Bar mixed in' );
-	assert.strictEqual( ve.isMixedIn( b, Quux ), false, 'b does not mixin Quux' );
-} );
-
 // ve.cloneObject: Tested upstream (OOJS)
 
 // ve.getObjectValues: Tested upstream (OOJS)
@@ -48,9 +17,7 @@ QUnit.test( 'isMixedIn', 11, function ( assert ) {
 
 // ve.compare: Tested upstream (OOJS)
 
-// ve.copyArray: Tested upstream (OOJS)
-
-// ve.copyObject: Tested upstream (OOJS)
+// ve.copy: Tested upstream (OOJS)
 
 // ve.isPlainObject: Tested upstream (jQuery)
 
@@ -63,160 +30,6 @@ QUnit.test( 'isMixedIn', 11, function ( assert ) {
 // ve.indexOf: Tested upstream (jQuery)
 
 // ve.extendObject: Tested upstream (jQuery)
-
-QUnit.test( 'getHash: Basic usage', 7, function ( assert ) {
-	var tmp,
-		cases = {},
-		hash = '{"a":1,"b":1,"c":1}',
-		customHash = '{"first":1,"last":1}';
-
-	cases['a-z literal'] = {
-		object: {
-			a: 1,
-			b: 1,
-			c: 1
-		},
-		hash: hash
-	};
-
-	cases['z-a literal'] = {
-		object: {
-			c: 1,
-			b: 1,
-			a: 1
-		},
-		hash: hash
-	};
-
-	tmp = {};
-	cases['a-z augmented'] = {
-		object: tmp,
-		hash: hash
-	};
-	tmp.a = 1;
-	tmp.b = 1;
-	tmp.c = 1;
-
-	tmp = {};
-	cases['z-a augmented'] = {
-		object: tmp,
-		hash: hash
-	};
-	tmp.c = 1;
-	tmp.b = 1;
-	tmp.a = 1;
-
-	cases['custom hash'] = {
-		object: {
-			getHashObject: function () {
-				return {
-					'first': 1,
-					'last': 1
-				};
-			}
-		},
-		hash: customHash
-	};
-
-	cases['custom hash reversed'] = {
-		object: {
-			getHashObject: function () {
-				return {
-					'last': 1,
-					'first': 1
-				};
-			}
-		},
-		hash: customHash
-	};
-
-	$.each( cases, function ( key, val ) {
-		assert.equal(
-			ve.getHash( val.object ),
-			val.hash,
-			key + ': object has expected hash, regardless of "property order"'
-		);
-	} );
-
-	// .. and that something completely different is in face different
-	// (just incase getHash is broken and always returns the same)
-	assert.notEqual(
-		ve.getHash( { a: 2, b: 2 } ),
-		hash,
-		'A different object has a different hash'
-	);
-} );
-
-QUnit.test( 'getHash: Complex usage', 3, function ( assert ) {
-	var obj, hash, frame;
-
-	obj = {
-		a: 1,
-		b: 1,
-		c: 1,
-		// Nested array
-		d: ['x', 'y', 'z'],
-		e: {
-			a: 2,
-			b: 2,
-			c: 2
-		}
-	};
-
-	assert.equal(
-		ve.getHash( obj ),
-		'{"a":1,"b":1,"c":1,"d":["x","y","z"],"e":{"a":2,"b":2,"c":2}}',
-		'Object with nested array and nested object'
-	);
-
-	// Include a circular reference
-	/*
-	 * PhantomJS hangs when calling JSON.stringify with an object containing a
-	 * circular reference (https://github.com/ariya/phantomjs/issues/11206).
-	 * We know latest Chrome/Firefox and IE8+ support this. So, for the sake of
-	 * having qunit/phantomjs work, lets disable this for now.
-	obj.f = obj;
-
-	assert.throws( function () {
-		ve.getHash( obj );
-	}, 'Throw exceptions for objects with cirular refences ' );
-	*/
-
-	function Foo() {
-		this.a = 1;
-		this.c = 3;
-		this.b = 2;
-	}
-
-	hash = '{"a":1,"b":2,"c":3}';
-
-	assert.equal(
-		ve.getHash( new Foo() ),
-		hash,
-		// This was previously broken when we used .constructor === Object
-		// ve.getHash.keySortReplacer, because although instances of Foo
-		// do inherit from Object (( new Foo() ) instanceof Object === true),
-		// direct comparison would return false.
-		'Treat objects constructed by a function as well'
-	);
-
-	frame = document.createElement( 'frame' );
-	frame.src = 'about:blank';
-	$( '#qunit-fixture' ).append( frame );
-	obj = new frame.contentWindow.Object();
-	obj.c = 3;
-	obj.b = 2;
-	obj.a = 1;
-
-	assert.equal(
-		ve.getHash( obj ),
-		hash,
-		// This was previously broken when we used comparison with "Object" in
-		// ve.getHash.keySortReplacer, because they are an instance of the other
-		// window's "Object".
-		'Treat objects constructed by a another window as well'
-	);
-} );
 
 QUnit.test( 'getDomAttributes', 1, function ( assert ) {
 	assert.deepEqual(
@@ -444,5 +257,55 @@ QUnit.test( 'createDocumentFromHtml', function ( assert ) {
 		expectedBody = $( '<body>' ).html( cases[key].body ).get( 0 );
 		assert.equalDomElement( $( 'head', doc ).get( 0 ), expectedHead, cases[key].msg + ' (head)' );
 		assert.equalDomElement( $( 'body', doc ).get( 0 ), expectedBody, cases[key].msg + ' (body)' );
+	}
+} );
+
+// ve.splitClusters: Tested upstream (UnicodeJS)
+
+// TODO: ve.isUnattachedCombiningMark
+
+// TODO: ve.getByteOffset
+
+// TODO: ve.getCharacterOffset
+
+QUnit.test( 'graphemeSafeSubstring', function ( assert ) {
+	var i, text = '12\ud860\udee245\ud860\udee2789\ud860\udee2bc', cases = [
+			{
+				'msg': 'start and end inside multibyte',
+				'start': 3,
+				'end': 12,
+				'expected': [ '\ud860\udee245\ud860\udee2789\ud860\udee2', '45\ud860\udee2789' ]
+			},
+			{
+				'msg': 'start and end next to multibyte',
+				'start': 4,
+				'end': 11,
+				'expected': [ '45\ud860\udee2789', '45\ud860\udee2789' ]
+			},
+			{
+				'msg': 'complete string',
+				'start': 0,
+				'end': text.length,
+				'expected': [ text, text ]
+			},
+			{
+				'msg': 'collapsed selection inside multibyte',
+				'start': 3,
+				'end': 3,
+				'expected': [ '\ud860\udee2', '' ]
+			}
+		];
+	QUnit.expect( cases.length * 2 );
+	for ( i = 0; i < cases.length; i++ ) {
+		assert.equal(
+			ve.graphemeSafeSubstring( text, cases[i].start, cases[i].end, true ),
+			cases[i].expected[0],
+			cases[i].msg + ' (outer)'
+		);
+		assert.equal(
+			ve.graphemeSafeSubstring( text, cases[i].start, cases[i].end, false ),
+			cases[i].expected[1],
+			cases[i].msg + ' (inner)'
+		);
 	}
 } );

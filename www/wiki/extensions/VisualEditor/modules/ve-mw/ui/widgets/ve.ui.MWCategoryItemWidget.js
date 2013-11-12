@@ -10,10 +10,10 @@
  *
  * @class
  * @abstract
- * @extends ve.ui.Widget
+ * @extends OO.ui.Widget
  *
  * @constructor
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  * @cfg {Object} [item] Category item
  */
 ve.ui.MWCategoryItemWidget = function VeUiMWCategoryItemWidget( config ) {
@@ -21,7 +21,7 @@ ve.ui.MWCategoryItemWidget = function VeUiMWCategoryItemWidget( config ) {
 	config = config || {};
 
 	// Parent constructor
-	ve.ui.Widget.call( this, config );
+	OO.ui.Widget.call( this, config );
 
 	// Properties
 	this.name = config.item.name;
@@ -29,9 +29,9 @@ ve.ui.MWCategoryItemWidget = function VeUiMWCategoryItemWidget( config ) {
 	this.sortKey = config.item.sortKey || '';
 	this.metaItem = config.item.metaItem;
 	this.menuOpen = false;
-	this.$label = this.$$( '<span>' );
-	this.$arrow = this.$$( '<div>' );
-	this.$categoryItem = this.$$( '<div>' );
+	this.$label = this.$( '<span>' );
+	this.$arrow = this.$( '<div>' );
+	this.$categoryItem = this.$( '<div>' );
 
 	// Events
 	this.$categoryItem.on( {
@@ -41,18 +41,18 @@ ve.ui.MWCategoryItemWidget = function VeUiMWCategoryItemWidget( config ) {
 
 	// Initialization
 	this.$label.text( this.value );
-	this.$arrow.addClass( 've-ui-mwCategoryListItemControl ve-ui-icon-down' );
+	this.$arrow.addClass( 've-ui-mwCategoryItemControl oo-ui-icon-down' );
 	this.$categoryItem
-		.addClass( 've-ui-mwCategoryListItemButton' )
-		.append( this.$label, this.$arrow, this.$$( '<div>' ).css( 'clear', 'both' ) );
-	this.$
-		.addClass( 've-ui-mwCategoryListItemWidget' )
+		.addClass( 've-ui-mwCategoryItemButton' )
+		.append( this.$label, this.$arrow, this.$( '<div>' ).css( 'clear', 'both' ) );
+	this.$element
+		.addClass( 've-ui-mwCategoryItemWidget' )
 		.append( this.$categoryItem );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWCategoryItemWidget, ve.ui.Widget );
+OO.inheritClass( ve.ui.MWCategoryItemWidget, OO.ui.Widget );
 
 /* Events */
 
@@ -72,7 +72,7 @@ ve.inheritClass( ve.ui.MWCategoryItemWidget, ve.ui.Widget );
  *
  * @method
  * @param {jQuery.Event} e Mouse down event
- * @emits savePopupState on mousedown.
+ * @fires savePopupState on mousedown.
  */
 ve.ui.MWCategoryItemWidget.prototype.onMouseDown = function () {
 	this.emit( 'savePopupState' );
@@ -83,7 +83,7 @@ ve.ui.MWCategoryItemWidget.prototype.onMouseDown = function () {
  *
  * @method
  * @param {jQuery.Event} e Mouse click event
- * @emits togglePopupMenu on mousedown.
+ * @fires togglePopupMenu on mousedown.
  */
 ve.ui.MWCategoryItemWidget.prototype.onClick = function () {
 	this.emit( 'togglePopupMenu', this );

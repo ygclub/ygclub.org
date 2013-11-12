@@ -5,27 +5,6 @@
  * @license The MIT License (MIT); see LICENSE.txt
  */
 
-
-/* ve.ui.MWReferenceEditDialog & ve.ui.MWReferenceListDialog */
-
-.ve-ui-mwReferenceEditDialog-body,
-.ve-ui-mwReferenceListDialog-body {
-	padding: 2em;
-	overflow-y: auto;
-}
-
-.ve-ui-mwReferenceEditDialog-toolbar {
-	font-size: 1.25em;
-}
-
-.ve-ui-mwReferenceEditDialog-toolbar .ve-ui-toolbar-bar {
-	border: solid 1px #ddd;
-	border-radius: 0.25em;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-width: 0;
-}
-
 /* ve.ui.MWTransclusionDialog */
 
 .ve-ui-mwTransclusionDialog-input {
@@ -36,11 +15,11 @@
 	height: 10em;
 }
 
-.ve-ui-mwTransclusionDialog-addTemplateFieldset .ve-ui-widget {
+.ve-ui-mwTransclusionDialog-addTemplateFieldset .oo-ui-widget {
 	display: inline-block;
 }
 
-.ve-ui-mwTransclusionDialog-addTemplateFieldset .ve-ui-buttonWidget {
+.ve-ui-mwTransclusionDialog-addTemplateFieldset .oo-ui-pushButtonWidget {
 	margin-left: 0.5em;
 }
 
@@ -55,7 +34,7 @@
 	margin-bottom: 1em;
 }
 
-.ve-ui-mwTransclusionDialog-addParameterFieldset .ve-ui-searchWidget-results {
+.ve-ui-mwTransclusionDialog-addParameterFieldset .oo-ui-searchWidget-results {
 	position: relative;
 	padding-bottom: 5em;
 }
@@ -93,6 +72,13 @@
 	background: #F8F8F8;
 }
 
+/* ve.ui.MWBetaWelcomeDialog */
+
+.ve-ui-mwBetaWelcomeDialog-content {
+	line-height: 1.5em;
+	font-size: 1.1em;
+}
+
 /* ve.ui.MWMediaInsertDialog */
 
 .ve-ui-mwMediaInsertDialog-select {
@@ -103,21 +89,94 @@
 	right: 0;
 }
 
-/* ve.ui.MWMediaEditDialog */
+/* ve.ui.MWSaveDialog */
 
-.ve-ui-mwMediaEditDialog-body {
-	padding: 2em;
-	overflow-y: auto;
+.ve-ui-mwSaveDialog-panel {
+	margin: 1.25em;
 }
 
-.ve-ui-mwMediaEditDialog-toolbar {
-	font-size: 1.25em;
+.ve-ui-mwSaveDialog-summaryLabel {
+	padding: 0.25em 0;
 }
 
-.ve-ui-mwMediaEditDialog-toolbar .ve-ui-toolbar-bar {
-	border: solid 1px #ddd;
-	border-radius: 0.25em;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-width: 0;
+.ve-ui-mwSaveDialog-summary {
+	width: 100%;
+	background-color: #fff;
+	border: solid 1px #ccc;
+	padding: 0.5em;
+	border-radius: 0.25em 0.25em 0 0;
+}
+
+.ve-ui-mwSaveDialog-summary textarea {
+	margin: 0;
+	padding: 0;
+	resize: none;
+	height: 80px;
+	border: none;
+	box-shadow: none;
+	background-color: transparent;
+}
+
+.ve-ui-mwSaveDialog-summary textarea:focus,
+.ve-ui-mwSaveDialog-summary textarea:active {
+	box-shadow: none;
+}
+
+.ve-ui-mwSaveDialog-foot {
+	margin: 0.5em;
+}
+
+.ve-ui-mwSaveDialog-options {
+	position: relative;
+	background-color: #f7f7f7;
+	border: solid 1px #ccc;
+	border-top: none;
+	border-radius: 0 0 0.25em 0.25em;
+	min-height: 3em;
+}
+
+.ve-ui-mwSaveDialog-checkboxes {
+	margin-right: 3.25em; /* Hack to prevent overlap on edit summary count */
+	line-height: 3em;
+	padding: 0 0.75em;
+}
+
+.ve-ui-mwSaveDialog-checkboxes label {
+	padding-right: 0.75em;
+	vertical-align: middle;
+}
+
+.ve-ui-mwSaveDialog-checkboxes input {
+	vertical-align: middle;
+}
+
+.ve-ui-mwSaveDialog-editSummary-count {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	border-left: solid 1px #eee;
+	line-height: 3em;
+	padding: 0 1em;
+	color: #aaa;
+}
+
+.ve-ui-mwSaveDialog-working {
+	display: none;
+	float: right;
+	height: 2.5em;
+	width: 128px;
+	margin-right: 1em;
+	background-position: right center;
+	background-repeat: no-repeat;
+}
+
+.ve-ui-mwSaveDialog-license,
+.ve-ui-mwSaveDialog-dirtymsg,
+.ve-ui-mwSaveDialog-report-notice {
+	font-size: 0.85em;
+	line-height: 1.25em;
+	padding: 0;
+	margin: 0;
+	color: #999;
 }

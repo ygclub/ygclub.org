@@ -12,7 +12,7 @@
  * @extends ve.ce.LeafNode
  * @constructor
  * @param {ve.dm.TextNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.TextNode = function VeCeTextNode( model, config ) {
 	// Parent constructor
@@ -21,7 +21,7 @@ ve.ce.TextNode = function VeCeTextNode( model, config ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.TextNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.TextNode, ve.ce.LeafNode );
 
 /* Static Properties */
 

@@ -249,20 +249,10 @@ class LogPager extends ReverseChronologicalPager {
 				# no duplicate log rows. Otherwise, we need to remove the duplicates.
 				$options[] = 'DISTINCT';
 			}
-		# Avoid usage of the wrong index by limiting
-		# the choices of available indexes. This mainly
-		# avoids site-breaking filesorts.
-		} elseif ( $this->title || $this->pattern || $this->performer ) {
-			$index['logging'] = array( 'page_time', 'user_time' );
-			if ( count( $this->types ) == 1 ) {
-				$index['logging'][] = 'log_user_type_time';
-			}
-		} elseif ( count( $this->types ) == 1 ) {
-			$index['logging'] = 'type_time';
-		} else {
-			$index['logging'] = 'times';
 		}
-		$options['USE INDEX'] = $index;
+		if ( count( $index ) ) {
+			$options['USE INDEX'] = $index;
+		}
 		# Don't show duplicate rows when using log_search
 		$joins['log_search'] = array( 'INNER JOIN', 'ls_log_id=log_id' );
 

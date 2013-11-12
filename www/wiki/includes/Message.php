@@ -234,7 +234,13 @@ class Message {
 	 * @return string
 	 */
 	public function getKey() {
-		return $this->key;
+		if ( is_array( $this->key ) ) {
+			// May happen if some kind of fallback is applied.
+			// For now, just use the first key. We really need a better solution.
+			return $this->key[0];
+		} else {
+			return $this->key;
+		}
 	}
 
 	/**
@@ -417,7 +423,7 @@ class Message {
 	 * @since 1.20
 	 */
 	public function setInterfaceMessageFlag( $value ) {
-		$this->interface = (bool) $value;
+		$this->interface = (bool)$value;
 		return $this;
 	}
 
@@ -428,7 +434,7 @@ class Message {
 	 * @return Message: $this
 	 */
 	public function useDatabase( $value ) {
-		$this->useDatabase = (bool) $value;
+		$this->useDatabase = (bool)$value;
 		return $this;
 	}
 

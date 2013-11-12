@@ -11,24 +11,24 @@
  * Creates an ve.ui.MWMediaSearchWidget object.
  *
  * @class
- * @extends ve.ui.SearchWidget
+ * @extends OO.ui.SearchWidget
  *
  * @constructor
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  * @param {number} [size] Vertical size of thumbnails
  */
 ve.ui.MWMediaSearchWidget = function VeUiMWMediaSearchWidget( config ) {
 	// Configuration intialization
-	config = ve.extendObject( {}, config, {
+	config = ve.extendObject( {
 		'placeholder': ve.msg( 'visualeditor-media-input-placeholder' ),
 		'value': mw.config.get( 'wgTitle' )
-	} );
+	}, config );
 
 	// Parent constructor
-	ve.ui.SearchWidget.call( this, config );
+	OO.ui.SearchWidget.call( this, config );
 
 	// Properties
-	this.sources = ve.copyArray( ve.init.platform.getMediaSources() );
+	this.sources = ve.copy( ve.init.platform.getMediaSources() );
 	this.size = config.size || 150;
 	this.queryTimeout = null;
 	this.titles = {};
@@ -38,13 +38,13 @@ ve.ui.MWMediaSearchWidget = function VeUiMWMediaSearchWidget( config ) {
 	this.$results.on( 'scroll', ve.bind( this.onResultsScroll, this ) );
 
 	// Initialization
-	this.$.addClass( 've-ui-mwMediaSearchWidget' );
+	this.$element.addClass( 've-ui-mwMediaSearchWidget' );
 	this.queryMediaSources();
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWMediaSearchWidget, ve.ui.SearchWidget );
+OO.inheritClass( ve.ui.MWMediaSearchWidget, OO.ui.SearchWidget );
 
 /* Methods */
 
@@ -57,7 +57,7 @@ ve.ui.MWMediaSearchWidget.prototype.onQueryChange = function () {
 	var i, len;
 
 	// Parent method
-	ve.ui.SearchWidget.prototype.onQueryChange.call( this );
+	OO.ui.SearchWidget.prototype.onQueryChange.call( this );
 
 	// Reset
 	this.titles = {};
@@ -77,7 +77,7 @@ ve.ui.MWMediaSearchWidget.prototype.onQueryChange = function () {
  */
 ve.ui.MWMediaSearchWidget.prototype.onResultsScroll = function () {
 	var position = this.$results.scrollTop() + this.$results.outerHeight(),
-		threshold = this.results.$.outerHeight() - this.size;
+		threshold = this.results.$element.outerHeight() - this.size;
 	if ( !this.query.isPending() && position > threshold ) {
 		this.queryMediaSources();
 	}
@@ -177,7 +177,7 @@ ve.ui.MWMediaSearchWidget.prototype.onMediaQueryDone = function ( source, data )
 			items.push(
 				new ve.ui.MWMediaResultWidget(
 					pages[page],
-					{ '$$': this.$$, 'size': this.size }
+					{ '$': this.$, 'size': this.size }
 				)
 			);
 		}

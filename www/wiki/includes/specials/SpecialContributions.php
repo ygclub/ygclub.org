@@ -267,19 +267,7 @@ class SpecialContributions extends SpecialPage {
 			}
 		}
 
-		// Old message 'contribsub' had one parameter, but that doesn't work for
-		// languages that want to put the "for" bit right after $user but before
-		// $links.  If 'contribsub' is around, use it for reverse compatibility,
-		// otherwise use 'contribsub2'.
-		// @todo Should this be removed at some point?
-		$oldMsg = $this->msg( 'contribsub' );
-		if ( $oldMsg->exists() ) {
-			$linksWithParentheses = $this->msg( 'parentheses' )->rawParams( $links )->escaped();
-
-			return $oldMsg->rawParams( "$user $linksWithParentheses" );
-		}
-
-		return $this->msg( 'contribsub2' )->rawParams( $user, $links );
+		return $this->msg( 'contribsub2' )->rawParams( $user, $links )->params( $userObj->getName() );
 	}
 
 	/**
@@ -298,7 +286,7 @@ class SpecialContributions extends SpecialPage {
 
 		if ( ( $id !== null ) || ( $id === null && IP::isIPAddress( $username ) ) ) {
 			if ( $this->getUser()->isAllowed( 'block' ) ) { # Block / Change block / Unblock links
-				if ( $target->isBlocked() ) {
+				if ( $target->isBlocked() && $target->getBlock()->getType() != Block::TYPE_AUTO ) {
 					$tools[] = Linker::linkKnown( # Change block link
 						SpecialPage::getTitleFor( 'Block', $username ),
 						$this->msg( 'change-blocklink' )->escaped()
@@ -567,7 +555,7 @@ class SpecialContributions extends SpecialPage {
 
 		$dateSelectionAndSubmit = Xml::tags( 'td', array( 'colspan' => 2 ),
 			Xml::dateMenu(
-				$this->opts['year'] === '' ? gmdate( 'Y' ) : $this->opts['year'],
+				$this->opts['year'] === '' ? MWTimestamp::getInstance()->format( 'Y' ) : $this->opts['year'],
 				$this->opts['month']
 			) . ' ' .
 				Xml::submitButton(

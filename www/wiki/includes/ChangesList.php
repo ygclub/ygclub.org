@@ -122,7 +122,7 @@ class ChangesList extends ContextSource {
 	private function preCacheMessages() {
 		if ( !isset( $this->message ) ) {
 			foreach ( array(
-				'cur', 'diff', 'hist', 'last', 'blocklink', 'history',
+				'cur', 'diff', 'hist', 'enhancedrc-history', 'last', 'blocklink', 'history',
 				'semicolon-separator', 'pipe-separator' ) as $msg
 			) {
 				$this->message[$msg] = $this->msg( $msg )->escaped();
@@ -136,9 +136,10 @@ class ChangesList extends ContextSource {
 	 * @param string $nothing to use for empty space
 	 * @return String
 	 */
-	protected function recentChangesFlags( $flags, $nothing = '&#160;' ) {
+	public function recentChangesFlags( $flags, $nothing = '&#160;' ) {
+		global $wgRecentChangesFlags;
 		$f = '';
-		foreach ( array( 'newpage', 'minor', 'bot', 'unpatrolled' ) as $flag ) {
+		foreach ( array_keys( $wgRecentChangesFlags ) as $flag ) {
 			$f .= isset( $flags[$flag] ) && $flags[$flag]
 				? self::flag( $flag )
 				: $nothing;
@@ -152,36 +153,35 @@ class ChangesList extends ContextSource {
 	 * unpatrolled edit.  By default in English it will contain "N", "m", "b",
 	 * "!" respectively, plus it will have an appropriate title and class.
 	 *
-	 * @param string $flag 'newpage', 'unpatrolled', 'minor', or 'bot'
+	 * @param string $flag One key of $wgRecentChangesFlags
 	 * @return String: Raw HTML
 	 */
 	public static function flag( $flag ) {
-		static $messages = null;
-		if ( is_null( $messages ) ) {
-			$messages = array(
-				'newpage' => array( 'newpageletter', 'recentchanges-label-newpage' ),
-				'minoredit' => array( 'minoreditletter', 'recentchanges-label-minor' ),
-				'botedit' => array( 'boteditletter', 'recentchanges-label-bot' ),
-				'unpatrolled' => array( 'unpatrolledletter', 'recentchanges-label-unpatrolled' ),
-			);
-			foreach ( $messages as &$value ) {
-				$value[0] = wfMessage( $value[0] )->escaped();
-				$value[1] = wfMessage( $value[1] )->escaped();
+		static $flagInfos = null;
+		if ( is_null( $flagInfos ) ) {
+			global $wgRecentChangesFlags;
+			$flagInfos = array();
+			foreach ( $wgRecentChangesFlags as $key => $value ) {
+				$flagInfos[$key]['letter'] = wfMessage( $value['letter'] )->escaped();
+				$flagInfos[$key]['title'] = wfMessage( $value['title'] )->escaped();
+				// Allow customized class name, fall back to flag name
+				$flagInfos[$key]['class'] = Sanitizer::escapeClass(
+					isset( $value['class'] ) ? $value['class'] : $key );
 			}
 		}
 
-		# Inconsistent naming, bleh
+		// Inconsistent naming, bleh, kepted for b/c
 		$map = array(
-			'newpage' => 'newpage',
-			'minor' => 'minoredit',
-			'bot' => 'botedit',
-			'unpatrolled' => 'unpatrolled',
-			'minoredit' => 'minoredit',
-			'botedit' => 'botedit',
+			'minoredit' => 'minor',
+			'botedit' => 'bot',
 		);
-		$flag = $map[$flag];
+		if ( isset( $map[$flag] ) ) {
+			$flag = $map[$flag];
+		}
 
-		return "<abbr class='$flag' title='" . $messages[$flag][1] . "'>" . $messages[$flag][0] . '</abbr>';
+		return "<abbr class='" . $flagInfos[$flag]['class'] . "' title='" . $flagInfos[$flag]['title'] . "'>" .
+			$flagInfos[$flag]['letter'] .
+			'</abbr>';
 	}
 
 	/**
@@ -194,7 +194,7 @@ class ChangesList extends ContextSource {
 		$this->rcCacheIndex = 0;
 		$this->lastdate = '';
 		$this->rclistOpen = false;
-		$this->getOutput()->addModules( 'mediawiki.special.changeslist' );
+		$this->getOutput()->addModuleStyles( 'mediawiki.special.changeslist' );
 		return '';
 	}
 
@@ -362,8 +362,6 @@ class ChangesList extends ContextSource {
 	 * @param $watched
 	 */
 	public function insertArticleLink( &$s, &$rc, $unpatrolled, $watched ) {
-		global $wgUseRCPatrol;
-
 		$params = array();
 
 		$articlelink = Linker::linkKnown(
@@ -456,10 +454,15 @@ class ChangesList extends ContextSource {
 
 	/**
 	 * Check whether to enable recent changes patrol features
+	 *
+	 * @deprecated since 1.22
 	 * @return Boolean
 	 */
 	public static function usePatrol() {
 		global $wgUser;
+
+		wfDeprecated( __METHOD__, '1.22' );
+
 		return $wgUser->useRCPatrol();
 	}
 
@@ -703,7 +706,14 @@ class EnhancedChangesList extends ChangesList {
 		$this->rcCacheIndex = 0;
 		$this->lastdate = '';
 		$this->rclistOpen = false;
-		$this->getOutput()->addModules( 'mediawiki.special.changeslist' );
+		$this->getOutput()->addModuleStyles( array(
+			'mediawiki.special.changeslist',
+			'mediawiki.special.changeslist.enhanced',
+		) );
+		$this->getOutput()->addModules( array(
+			'jquery.makeCollapsible',
+			'mediawiki.icon',
+		) );
 		return '';
 	}
 	/**
@@ -966,12 +976,30 @@ class EnhancedChangesList extends ChangesList {
 		$r .= $this->getLanguage()->getDirMark();
 
 		$queryParams['curid'] = $curId;
+
 		# Changes message
-		$n = count( $block );
 		static $nchanges = array();
+		static $sinceLastVisitMsg = array();
+
+		$n = count( $block );
 		if ( !isset( $nchanges[$n] ) ) {
 			$nchanges[$n] = $this->msg( 'nchanges' )->numParams( $n )->escaped();
 		}
+
+		$sinceLast = 0;
+		$unvisitedOldid = null;
+		foreach ( $block as $rcObj ) {
+			// Same logic as below inside main foreach
+			if ( $rcObj->watched && $rcObj->mAttribs['rc_timestamp'] >= $rcObj->watched ) {
+				$sinceLast++;
+				$unvisitedOldid = $rcObj->mAttribs['rc_last_oldid'];
+			}
+		}
+		if ( !isset( $sinceLastVisitMsg[$sinceLast] ) ) {
+			$sinceLastVisitMsg[$sinceLast] =
+				$this->msg( 'enhancedrc-since-last-visit' )->numParams( $sinceLast )->escaped();
+		}
+
 		# Total change link
 		$r .= ' ';
 		$logtext = '';
@@ -981,17 +1009,28 @@ class EnhancedChangesList extends ChangesList {
 			} elseif ( $isnew ) {
 				$logtext .= $nchanges[$n];
 			} else {
-				$params = $queryParams;
-				$params['diff'] = $currentRevision;
-				$params['oldid'] = $oldid;
-
 				$logtext .= Linker::link(
 					$block[0]->getTitle(),
 					$nchanges[$n],
 					array(),
-					$params,
+					$queryParams + array(
+						'diff' => $currentRevision,
+						'oldid' => $oldid,
+					),
 					array( 'known', 'noclasses' )
 				);
+				if ( $sinceLast > 0 && $sinceLast < $n ) {
+					$logtext .= $this->message['pipe-separator'] . Linker::link(
+						$block[0]->getTitle(),
+						$sinceLastVisitMsg[$sinceLast],
+						array(),
+						$queryParams + array(
+							'diff' => $currentRevision,
+							'oldid' => $unvisitedOldid,
+						),
+						array( 'known', 'noclasses' )
+					);
+				}
 			}
 		}
 
@@ -999,7 +1038,7 @@ class EnhancedChangesList extends ChangesList {
 		if ( $allLogs ) {
 			// don't show history link for logs
 		} elseif ( $namehidden || !$block[0]->getTitle()->exists() ) {
-			$logtext .= $this->message['pipe-separator'] . $this->message['hist'];
+			$logtext .= $this->message['pipe-separator'] . $this->message['enhancedrc-history'];
 		} else {
 			$params = $queryParams;
 			$params['action'] = 'history';
@@ -1007,7 +1046,7 @@ class EnhancedChangesList extends ChangesList {
 			$logtext .= $this->message['pipe-separator'] .
 				Linker::linkKnown(
 					$block[0]->getTitle(),
-					$this->message['hist'],
+					$this->message['enhancedrc-history'],
 					array(),
 					$params
 				);
@@ -1198,7 +1237,7 @@ class EnhancedChangesList extends ChangesList {
 		$r .= '<td class="mw-enhanced-rc"><span class="mw-enhancedchanges-arrow-space"></span>';
 		# Flag and Timestamp
 		if ( $type == RC_MOVE || $type == RC_MOVE_OVER_REDIRECT ) {
-			$r .= '&#160;&#160;&#160;&#160;'; // 4 flags -> 4 spaces
+			$r .= $this->recentChangesFlags( array() ); // no flags, but need the placeholders
 		} else {
 			$r .= $this->recentChangesFlags( array(
 				'newpage' => $type == RC_NEW,

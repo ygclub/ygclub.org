@@ -124,8 +124,12 @@ class User {
 		'edit',
 		'editinterface',
 		'editprotected',
+		'editmyoptions',
+		'editmyprivateinfo',
 		'editmyusercss',
 		'editmyuserjs',
+		'editmywatchlist',
+		'editsemiprotected',
 		'editusercssjs', #deprecated
 		'editusercss',
 		'edituserjs',
@@ -166,6 +170,8 @@ class User {
 		'upload_by_url',
 		'userrights',
 		'userrights-interwiki',
+		'viewmyprivateinfo',
+		'viewmywatchlist',
 		'writeapi',
 	);
 	/**
@@ -1156,16 +1162,20 @@ class User {
 	 * @see $wgAutopromoteOnce
 	 */
 	public function addAutopromoteOnceGroups( $event ) {
-		global $wgAutopromoteOnceLogInRC;
+		global $wgAutopromoteOnceLogInRC, $wgAuth;
 
 		$toPromote = array();
 		if ( $this->getId() ) {
 			$toPromote = Autopromote::getAutopromoteOnceGroups( $this, $event );
 			if ( count( $toPromote ) ) {
 				$oldGroups = $this->getGroups(); // previous groups
+
 				foreach ( $toPromote as $group ) {
 					$this->addGroup( $group );
 				}
+				// update groups in external authentication database
+				$wgAuth->updateExternalDBGroups( $this, $toPromote );
+
 				$newGroups = array_merge( $oldGroups, $toPromote ); // all groups
 
 				$logEntry = new ManualLogEntry( 'rights', 'autopromote' );
@@ -1230,7 +1240,10 @@ class User {
 
 		$defOpt = $wgDefaultUserOptions;
 		// Default language setting
-		$defOpt['language'] = $defOpt['variant'] = $wgContLang->getCode();
+		$defOpt['language'] = $wgContLang->getCode();
+		foreach ( LanguageConverter::$languagesWithVariants as $langCode ) {
+			$defOpt[$langCode == $wgContLang->getCode() ? 'variant' : "variant-$langCode"] = $langCode;
+		}
 		foreach ( SearchEngine::searchableNamespaces() as $nsnum => $nsname ) {
 			$defOpt['searchNs' . $nsnum] = !empty( $wgNamespacesToBeSearchedDefault[$nsnum] );
 		}
@@ -1476,12 +1489,13 @@ class User {
 	 * last-hit counters will be shared across wikis.
 	 *
 	 * @param string $action Action to enforce; 'edit' if unspecified
+	 * @param integer $incrBy Positive amount to increment counter by [defaults to 1]
 	 * @return bool True if a rate limiter was tripped
 	 */
-	public function pingLimiter( $action = 'edit' ) {
+	public function pingLimiter( $action = 'edit', $incrBy = 1 ) {
 		// Call the 'PingLimiter' hook
 		$result = false;
-		if ( !wfRunHooks( 'PingLimiter', array( &$this, $action, &$result ) ) ) {
+		if ( !wfRunHooks( 'PingLimiter', array( &$this, $action, &$result, $incrBy ) ) ) {
 			return $result;
 		}
 
@@ -1570,9 +1584,13 @@ class User {
 				}
 			} else {
 				wfDebug( __METHOD__ . ": adding record for $key $summary\n" );
-				$wgMemc->add( $key, 0, intval( $period ) ); // first ping
+				if ( $incrBy > 0 ) {
+					$wgMemc->add( $key, 0, intval( $period ) ); // first ping
+				}
 			}
-			$wgMemc->incr( $key );
+			if ( $incrBy > 0 ) {
+				$wgMemc->incr( $key, $incrBy );
+			}
 		}
 
 		wfProfileOut( __METHOD__ );
@@ -1687,6 +1705,7 @@ class User {
 			return $this->mLocked;
 		}
 		global $wgAuth;
+		StubObject::unstub( $wgAuth );
 		$authUser = $wgAuth->getUserInstance( $this );
 		$this->mLocked = (bool)$authUser->isLocked();
 		return $this->mLocked;
@@ -1704,6 +1723,7 @@ class User {
 		$this->getBlockedStatus();
 		if ( !$this->mHideName ) {
 			global $wgAuth;
+			StubObject::unstub( $wgAuth );
 			$authUser = $wgAuth->getUserInstance( $this );
 			$this->mHideName = (bool)$authUser->isHidden();
 		}
@@ -1818,8 +1838,14 @@ class User {
 	}
 
 	/**
-	 * Return the revision and link for the oldest new talk page message for
-	 * this user.
+	 * Return the data needed to construct links for new talk page message
+	 * alerts. If there are new messages, this will return an associative array
+	 * with the following data:
+	 *     wiki: The database name of the wiki
+	 *     link: Root-relative link to the user's talk page
+	 *     rev: The last talk page revision that the user has seen or null. This
+	 *         is useful for building diff links.
+	 * If there are no new messages, it returns an empty array.
 	 * @note This function was designed to accomodate multiple talk pages, but
 	 * currently only returns a single link and revision.
 	 * @return Array
@@ -1843,8 +1869,9 @@ class User {
 	}
 
 	/**
-	 * Get the revision ID for the oldest new talk page message for this user
-	 * @return int|null Revision id or null if there are no new messages
+	 * Get the revision ID for the last talk page revision viewed by the talk
+	 * page owner.
+	 * @return int|null Revision ID or null
 	 */
 	public function getNewMessageRevisionId() {
 		$newMessageRevisionId = null;
@@ -2282,7 +2309,7 @@ class User {
 		# set it, and then it was disabled removing their ability to change it).  But
 		# we don't want to erase the preferences in the database in case the preference
 		# is re-enabled again.  So don't touch $mOptions, just override the returned value
-		if ( in_array( $oname, $wgHiddenPrefs ) && !$ignoreHidden ) {
+		if ( !$ignoreHidden && in_array( $oname, $wgHiddenPrefs ) ) {
 			return self::getDefaultOption( $oname );
 		}
 
@@ -2330,7 +2357,7 @@ class User {
 	}
 
 	/**
-	 * Get the user's current setting for a given option, as a boolean value.
+	 * Get the user's current setting for a given option, as an integer value.
 	 *
 	 * @param string $oname The option to check
 	 * @param int $defaultOverride A default value returned if the option does not exist
@@ -2360,6 +2387,49 @@ class User {
 		}
 
 		$this->mOptions[$oname] = $val;
+	}
+
+	/**
+	 * Get a token stored in the preferences (like the watchlist one),
+	 * resetting it if it's empty (and saving changes).
+	 *
+	 * @param string $oname The option name to retrieve the token from
+	 * @return string|bool User's current value for the option, or false if this option is disabled.
+	 * @see resetTokenFromOption()
+	 * @see getOption()
+	 */
+	public function getTokenFromOption( $oname ) {
+		global $wgHiddenPrefs;
+		if ( in_array( $oname, $wgHiddenPrefs ) ) {
+			return false;
+		}
+
+		$token = $this->getOption( $oname );
+		if ( !$token ) {
+			$token = $this->resetTokenFromOption( $oname );
+			$this->saveSettings();
+		}
+		return $token;
+	}
+
+	/**
+	 * Reset a token stored in the preferences (like the watchlist one).
+	 * *Does not* save user's preferences (similarly to setOption()).
+	 *
+	 * @param string $oname The option name to reset the token in
+	 * @return string|bool New token value, or false if this option is disabled.
+	 * @see getTokenFromOption()
+	 * @see setOption()
+	 */
+	public function resetTokenFromOption( $oname ) {
+		global $wgHiddenPrefs;
+		if ( in_array( $oname, $wgHiddenPrefs ) ) {
+			return false;
+		}
+
+		$token = MWCryptRand::generateHex( 40 );
+		$this->setOption( $oname, $token );
+		return $token;
 	}
 
 	/**
@@ -2537,6 +2607,26 @@ class User {
 	}
 
 	/**
+	 * Determine based on the wiki configuration and the user's options,
+	 * whether this user must be over HTTPS no matter what.
+	 *
+	 * @return bool
+	 */
+	public function requiresHTTPS() {
+		global $wgSecureLogin;
+		if ( !$wgSecureLogin ) {
+			return false;
+		} else {
+			$https = $this->getBoolOption( 'prefershttps' );
+			wfRunHooks( 'UserRequiresHTTPS', array( $this, &$https ) );
+			if ( $https ) {
+				$https = wfCanIPUseHTTPS( $this->getRequest()->getIP() );
+			}
+			return $https;
+		}
+	}
+
+	/**
 	 * Get the user preferred stub threshold
 	 *
 	 * @return int
@@ -2655,7 +2745,7 @@ class User {
 
 	/**
 	 * Get the user's edit count.
-	 * @return int
+	 * @return int, null for anonymous users
 	 */
 	public function getEditCount() {
 		if ( !$this->getId() ) {
@@ -2677,10 +2767,10 @@ class User {
 				// it has not been initialized. do so.
 				$count = $this->initEditCount();
 			}
-			$this->mEditCount = intval( $count );
+			$this->mEditCount = $count;
 			wfProfileOut( __METHOD__ );
 		}
-		return $this->mEditCount;
+		return (int)$this->mEditCount;
 	}
 
 	/**
@@ -2706,7 +2796,11 @@ class User {
 		// In case loadGroups was not called before, we now have the right twice.
 		// Get rid of the duplicate.
 		$this->mGroups = array_unique( $this->mGroups );
-		$this->mRights = User::getGroupPermissions( $this->getEffectiveGroups( true ) );
+
+		// Refresh the groups caches, and clear the rights cache so it will be
+		// refreshed on the next call to $this->getRights().
+		$this->getEffectiveGroups( true );
+		$this->mRights = null;
 
 		$this->invalidateCache();
 	}
@@ -2736,7 +2830,11 @@ class User {
 		}
 		$this->loadGroups();
 		$this->mGroups = array_diff( $this->mGroups, array( $group ) );
-		$this->mRights = User::getGroupPermissions( $this->getEffectiveGroups( true ) );
+
+		// Refresh the groups caches, and clear the rights cache so it will be
+		// refreshed on the next call to $this->getRights().
+		$this->getEffectiveGroups( true );
+		$this->mRights = null;
 
 		$this->invalidateCache();
 	}
@@ -2860,11 +2958,14 @@ class User {
 	/**
 	 * Get a WatchedItem for this user and $title.
 	 *
+	 * @since 1.22 $checkRights parameter added
 	 * @param $title Title
+	 * @param $checkRights int Whether to check 'viewmywatchlist'/'editmywatchlist' rights.
+	 *     Pass WatchedItem::CHECK_USER_RIGHTS or WatchedItem::IGNORE_USER_RIGHTS.
 	 * @return WatchedItem
 	 */
-	public function getWatchedItem( $title ) {
-		$key = $title->getNamespace() . ':' . $title->getDBkey();
+	public function getWatchedItem( $title, $checkRights = WatchedItem::CHECK_USER_RIGHTS ) {
+		$key = $checkRights . ':' . $title->getNamespace() . ':' . $title->getDBkey();
 
 		if ( isset( $this->mWatchedItems[$key] ) ) {
 			return $this->mWatchedItems[$key];
@@ -2874,34 +2975,43 @@ class User {
 			$this->mWatchedItems = array();
 		}
 
-		$this->mWatchedItems[$key] = WatchedItem::fromUserTitle( $this, $title );
+		$this->mWatchedItems[$key] = WatchedItem::fromUserTitle( $this, $title, $checkRights );
 		return $this->mWatchedItems[$key];
 	}
 
 	/**
 	 * Check the watched status of an article.
+	 * @since 1.22 $checkRights parameter added
 	 * @param $title Title of the article to look at
+	 * @param $checkRights int Whether to check 'viewmywatchlist'/'editmywatchlist' rights.
+	 *     Pass WatchedItem::CHECK_USER_RIGHTS or WatchedItem::IGNORE_USER_RIGHTS.
 	 * @return bool
 	 */
-	public function isWatched( $title ) {
-		return $this->getWatchedItem( $title )->isWatched();
+	public function isWatched( $title, $checkRights = WatchedItem::CHECK_USER_RIGHTS ) {
+		return $this->getWatchedItem( $title, $checkRights )->isWatched();
 	}
 
 	/**
 	 * Watch an article.
+	 * @since 1.22 $checkRights parameter added
 	 * @param $title Title of the article to look at
+	 * @param $checkRights int Whether to check 'viewmywatchlist'/'editmywatchlist' rights.
+	 *     Pass WatchedItem::CHECK_USER_RIGHTS or WatchedItem::IGNORE_USER_RIGHTS.
 	 */
-	public function addWatch( $title ) {
-		$this->getWatchedItem( $title )->addWatch();
+	public function addWatch( $title, $checkRights = WatchedItem::CHECK_USER_RIGHTS ) {
+		$this->getWatchedItem( $title, $checkRights )->addWatch();
 		$this->invalidateCache();
 	}
 
 	/**
 	 * Stop watching an article.
+	 * @since 1.22 $checkRights parameter added
 	 * @param $title Title of the article to look at
+	 * @param $checkRights int Whether to check 'viewmywatchlist'/'editmywatchlist' rights.
+	 *     Pass WatchedItem::CHECK_USER_RIGHTS or WatchedItem::IGNORE_USER_RIGHTS.
 	 */
-	public function removeWatch( $title ) {
-		$this->getWatchedItem( $title )->removeWatch();
+	public function removeWatch( $title, $checkRights = WatchedItem::CHECK_USER_RIGHTS ) {
+		$this->getWatchedItem( $title, $checkRights )->removeWatch();
 		$this->invalidateCache();
 	}
 
@@ -2909,6 +3019,7 @@ class User {
 	 * Clear the user's notification timestamp for the given title.
 	 * If e-notif e-mails are on, they will receive notification mails on
 	 * the next change of the page if it's watched etc.
+	 * @note If the user doesn't have 'editmywatchlist', this will do nothing.
 	 * @param $title Title of the article to look at
 	 */
 	public function clearNotification( &$title ) {
@@ -2916,6 +3027,11 @@ class User {
 
 		// Do nothing if the database is locked to writes
 		if ( wfReadOnly() ) {
+			return;
+		}
+
+		// Do nothing if not allowed to edit the watchlist
+		if ( !$this->isAllowed( 'editmywatchlist' ) ) {
 			return;
 		}
 
@@ -2954,9 +3070,15 @@ class User {
 	 * Resets all of the given user's page-change notification timestamps.
 	 * If e-notif e-mails are on, they will receive notification mails on
 	 * the next change of any watched page.
+	 * @note If the user doesn't have 'editmywatchlist', this will do nothing.
 	 */
 	public function clearAllNotifications() {
 		if ( wfReadOnly() ) {
+			return;
+		}
+
+		// Do nothing if not allowed to edit the watchlist
+		if ( !$this->isAllowed( 'editmywatchlist' ) ) {
 			return;
 		}
 
@@ -3019,17 +3141,24 @@ class User {
 	 *  true: Force setting the secure attribute when setting the cookie
 	 *  false: Force NOT setting the secure attribute when setting the cookie
 	 *  null (default): Use the default ($wgCookieSecure) to set the secure attribute
+	 * @param array $params Array of options sent passed to WebResponse::setcookie()
 	 */
-	protected function setCookie( $name, $value, $exp = 0, $secure = null ) {
-		$this->getRequest()->response()->setcookie( $name, $value, $exp, null, null, $secure );
+	protected function setCookie( $name, $value, $exp = 0, $secure = null, $params = array() ) {
+		$params['secure'] = $secure;
+		$this->getRequest()->response()->setcookie( $name, $value, $exp, $params );
 	}
 
 	/**
 	 * Clear a cookie on the user's client
 	 * @param string $name Name of the cookie to clear
+	 * @param bool $secure
+	 *  true: Force setting the secure attribute when setting the cookie
+	 *  false: Force NOT setting the secure attribute when setting the cookie
+	 *  null (default): Use the default ($wgCookieSecure) to set the secure attribute
+	 * @param array $params Array of options sent passed to WebResponse::setcookie()
 	 */
-	protected function clearCookie( $name ) {
-		$this->setCookie( $name, '', time() - 86400 );
+	protected function clearCookie( $name, $secure = null, $params = array() ) {
+		$this->setCookie( $name, '', time() - 86400, $secure, $params );
 	}
 
 	/**
@@ -3087,10 +3216,22 @@ class User {
 		/**
 		 * If wpStickHTTPS was selected, also set an insecure cookie that
 		 * will cause the site to redirect the user to HTTPS, if they access
-		 * it over HTTP. Bug 29898.
+		 * it over HTTP. Bug 29898. Use an un-prefixed cookie, so it's the same
+		 * as the one set by centralauth (bug 53538). Also set it to session, or
+		 * standard time setting, based on if rememberme was set.
 		 */
-		if ( $request->getCheck( 'wpStickHTTPS' ) ) {
-			$this->setCookie( 'forceHTTPS', 'true', time() + 2592000, false ); //30 days
+		if ( $request->getCheck( 'wpStickHTTPS' ) || $this->requiresHTTPS() ) {
+			$time = null;
+			if ( ( 1 == $this->getOption( 'rememberpassword' ) ) ) {
+				$time = 0; // set to $wgCookieExpiration
+			}
+			$this->setCookie(
+				'forceHTTPS',
+				'true',
+				$time,
+				false,
+				array( 'prefix' => '' ) // no prefix
+			);
 		}
 	}
 
@@ -3114,10 +3255,10 @@ class User {
 
 		$this->clearCookie( 'UserID' );
 		$this->clearCookie( 'Token' );
-		$this->clearCookie( 'forceHTTPS' );
+		$this->clearCookie( 'forceHTTPS', false, array( 'prefix' => '' ) );
 
 		// Remember when user logged out, to prevent seeing cached pages
-		$this->setCookie( 'LoggedOut', wfTimestampNow(), time() + 86400 );
+		$this->setCookie( 'LoggedOut', time(), time() + 86400 );
 	}
 
 	/**
@@ -3272,6 +3413,7 @@ class User {
 		$this->mTouched = self::newTouchedTimestamp();
 
 		$dbw = wfGetDB( DB_MASTER );
+		$inWrite = $dbw->writesOrCallbacksPending();
 		$seqVal = $dbw->nextSequenceValue( 'user_user_id_seq' );
 		$dbw->insert( 'user',
 			array(
@@ -3291,6 +3433,12 @@ class User {
 			array( 'IGNORE' )
 		);
 		if ( !$dbw->affectedRows() ) {
+			if ( !$inWrite ) {
+				// XXX: Get out of REPEATABLE-READ so the SELECT below works.
+				// Often this case happens early in views before any writes.
+				// This shows up at least with CentralAuth.
+				$dbw->commit( __METHOD__, 'flush' );
+			}
 			$this->mId = $dbw->selectField( 'user', 'user_id',
 				array( 'user_name' => $this->mName ), __METHOD__ );
 			$loaded = false;
@@ -3635,6 +3783,7 @@ class User {
 		} elseif ( $type === true ) {
 			$message = 'confirmemail_body_changed';
 		} else {
+			// Messages: confirmemail_body_changed, confirmemail_body_set
 			$message = 'confirmemail_body_' . $type;
 		}
 
@@ -3925,6 +4074,10 @@ class User {
 	/**
 	 * Check, if the given group has the given permission
 	 *
+	 * If you're wanting to check whether all users have a permission, use
+	 * User::isEveryoneAllowed() instead. That properly checks if it's revoked
+	 * from anyone.
+	 *
 	 * @since 1.21
 	 * @param string $group Group to check
 	 * @param string $role Role to check
@@ -3934,6 +4087,46 @@ class User {
 		global $wgGroupPermissions, $wgRevokePermissions;
 		return isset( $wgGroupPermissions[$group][$role] ) && $wgGroupPermissions[$group][$role]
 			&& !( isset( $wgRevokePermissions[$group][$role] ) && $wgRevokePermissions[$group][$role] );
+	}
+
+	/**
+	 * Check if all users have the given permission
+	 *
+	 * @since 1.22
+	 * @param string $right Right to check
+	 * @return bool
+	 */
+	public static function isEveryoneAllowed( $right ) {
+		global $wgGroupPermissions, $wgRevokePermissions;
+		static $cache = array();
+
+		// Use the cached results, except in unit tests which rely on
+		// being able change the permission mid-request
+		if ( isset( $cache[$right] ) && !defined( 'MW_PHPUNIT_TEST' ) ) {
+			return $cache[$right];
+		}
+
+		if ( !isset( $wgGroupPermissions['*'][$right] ) || !$wgGroupPermissions['*'][$right] ) {
+			$cache[$right] = false;
+			return false;
+		}
+
+		// If it's revoked anywhere, then everyone doesn't have it
+		foreach ( $wgRevokePermissions as $rights ) {
+			if ( isset( $rights[$right] ) && $rights[$right] ) {
+				$cache[$right] = false;
+				return false;
+			}
+		}
+
+		// Allow extensions (e.g. OAuth) to say false
+		if ( !wfRunHooks( 'UserIsEveryoneAllowed', array( $right ) ) ) {
+			$cache[$right] = false;
+			return false;
+		}
+
+		$cache[$right] = true;
+		return true;
 	}
 
 	/**
@@ -4213,7 +4406,7 @@ class User {
 		// Pull from a slave to be less cruel to servers
 		// Accuracy isn't the point anyway here
 		$dbr = wfGetDB( DB_SLAVE );
-		$count = (int) $dbr->selectField(
+		$count = (int)$dbr->selectField(
 			'revision',
 			'COUNT(rev_user)',
 			array( 'rev_user' => $this->getId() ),
@@ -4579,5 +4772,27 @@ class User {
 			'user_registration',
 			'user_editcount',
 		);
+	}
+
+	/**
+	 * Factory function for fatal permission-denied errors
+	 *
+	 * @since 1.22
+	 * @param string $permission User right required
+	 * @return Status
+	 */
+	static function newFatalPermissionDeniedStatus( $permission ) {
+		global $wgLang;
+
+		$groups = array_map(
+			array( 'User', 'makeGroupLinkWiki' ),
+			User::getGroupsWithPermission( $permission )
+		);
+
+		if ( $groups ) {
+			return Status::newFatal( 'badaccess-groups', $wgLang->commaList( $groups ), count( $groups ) );
+		} else {
+			return Status::newFatal( 'badaccess-group0' );
+		}
 	}
 }

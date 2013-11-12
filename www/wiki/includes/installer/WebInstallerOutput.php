@@ -185,6 +185,7 @@ class WebInstallerOutput {
 	 */
 	public function getDir() {
 		global $wgLang;
+
 		return is_object( $wgLang ) ? $wgLang->getDir() : 'ltr';
 	}
 
@@ -193,6 +194,7 @@ class WebInstallerOutput {
 	 */
 	public function getLanguageCode() {
 		global $wgLang;
+
 		return is_object( $wgLang ) ? $wgLang->getCode() : 'en';
 	}
 
@@ -216,22 +218,23 @@ class WebInstallerOutput {
 
 	public function outputHeader() {
 		$this->headerDone = true;
-		$dbTypes = $this->parent->getDBTypes();
-
 		$this->parent->request->response()->header( 'Content-Type: text/html; charset=utf-8' );
+
 		if ( !$this->allowFrames ) {
 			$this->parent->request->response()->header( 'X-Frame-Options: DENY' );
 		}
+
 		if ( $this->redirectTarget ) {
 			$this->parent->request->response()->header( 'Location: ' . $this->redirectTarget );
+
 			return;
 		}
 
 		if ( $this->useShortHeader ) {
 			$this->outputShortHeader();
+
 			return;
 		}
-
 ?>
 <?php echo Html::htmlHeader( $this->getHeadAttribs() ); ?>
 <head>
@@ -239,7 +242,6 @@ class WebInstallerOutput {
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title><?php $this->outputTitle(); ?></title>
 	<?php echo $this->getCssUrl() . "\n"; ?>
-	<?php echo Html::inlineScript( "var dbTypes = " . Xml::encodeJsVar( $dbTypes ) ) . "\n"; ?>
 	<?php echo $this->getJQuery() . "\n"; ?>
 	<?php echo Html::linkedScript( '../skins/common/config.js' ) . "\n"; ?>
 </head>

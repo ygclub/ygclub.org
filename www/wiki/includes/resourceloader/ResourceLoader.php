@@ -47,6 +47,9 @@ class ResourceLoader {
 	/** array( 'source-id' => array( 'loadScript' => 'http://.../load.php' ) ) **/
 	protected $sources = array();
 
+	/** @var bool */
+	protected $hasErrors = false;
+
 	/* Protected Methods */
 
 	/**
@@ -150,6 +153,7 @@ class ResourceLoader {
 		$cache = wfGetCache( CACHE_ANYTHING );
 		$cacheEntry = $cache->get( $key );
 		if ( is_string( $cacheEntry ) ) {
+			wfIncrStats( "rl-$filter-cache-hits" );
 			wfProfileOut( __METHOD__ );
 			return $cacheEntry;
 		}
@@ -157,6 +161,7 @@ class ResourceLoader {
 		$result = '';
 		// Run the filter - we've already verified one of these will work
 		try {
+			wfIncrStats( "rl-$filter-cache-misses" );
 			switch ( $filter ) {
 				case 'minify-js':
 					$result = JavaScriptMinifier::minify( $data,
@@ -173,11 +178,12 @@ class ResourceLoader {
 
 			// Save filtered text to Memcached
 			$cache->set( $key, $result );
-		} catch ( Exception $exception ) {
+		} catch ( Exception $e ) {
+			MWExceptionHandler::logException( $e );
 			wfDebugLog( 'resourceloader', __METHOD__ . ": minification failed: $e" );
 			$this->hasErrors = true;
 			// Return exception as a comment
-			$result = $this->makeComment( $exception->__toString() );
+			$result = self::formatException( $e );
 		}
 
 		wfProfileOut( __METHOD__ );
@@ -277,7 +283,7 @@ class ResourceLoader {
 		global $IP, $wgEnableJavaScriptTest;
 
 		if ( $wgEnableJavaScriptTest !== true ) {
-			throw new MWException( 'Attempt to register JavaScript test modules but <tt>$wgEnableJavaScriptTest</tt> is false. Edit your <tt>LocalSettings.php</tt> to enable it.' );
+			throw new MWException( 'Attempt to register JavaScript test modules but <code>$wgEnableJavaScriptTest</code> is false. Edit your <code>LocalSettings.php</code> to enable it.' );
 		}
 
 		wfProfileIn( __METHOD__ );
@@ -389,6 +395,7 @@ class ResourceLoader {
 			}
 			// Construct the requested object
 			$info = $this->moduleInfos[$name];
+			/** @var ResourceLoaderModule $object */
 			if ( isset( $info['object'] ) ) {
 				// Object given in info array
 				$object = $info['object'];
@@ -443,7 +450,6 @@ class ResourceLoader {
 
 		wfProfileIn( __METHOD__ );
 		$errors = '';
-		$this->hasErrors = false;
 
 		// Split requested modules into two groups, modules and missing
 		$modules = array();
@@ -454,10 +460,10 @@ class ResourceLoader {
 				// Do not allow private modules to be loaded from the web.
 				// This is a security issue, see bug 34907.
 				if ( $module->getGroup() === 'private' ) {
-					wfDebugLog( 'resourceloader', __METHOD__ . ": request for private module denied: $e" );
+					wfDebugLog( 'resourceloader', __METHOD__ . ": request for private module '$name' denied" );
 					$this->hasErrors = true;
 					// Add exception to the output as a comment
-					$errors .= $this->makeComment( "Cannot show private module \"$name\"" );
+					$errors .= self::makeComment( "Cannot show private module \"$name\"" );
 
 					continue;
 				}
@@ -471,10 +477,11 @@ class ResourceLoader {
 		try {
 			$this->preloadModuleInfo( array_keys( $modules ), $context );
 		} catch ( Exception $e ) {
+			MWExceptionHandler::logException( $e );
 			wfDebugLog( 'resourceloader', __METHOD__ . ": preloading module info failed: $e" );
 			$this->hasErrors = true;
 			// Add exception to the output as a comment
-			$errors .= $this->makeComment( $e->__toString() );
+			$errors .= self::formatException( $e );
 		}
 
 		wfProfileIn( __METHOD__ . '-getModifiedTime' );
@@ -490,10 +497,11 @@ class ResourceLoader {
 				// Calculate maximum modified time
 				$mtime = max( $mtime, $module->getModifiedTime( $context ) );
 			} catch ( Exception $e ) {
+				MWExceptionHandler::logException( $e );
 				wfDebugLog( 'resourceloader', __METHOD__ . ": calculating maximum modified time failed: $e" );
 				$this->hasErrors = true;
 				// Add exception to the output as a comment
-				$errors .= $this->makeComment( $e->__toString() );
+				$errors .= self::formatException( $e );
 			}
 		}
 
@@ -514,7 +522,7 @@ class ResourceLoader {
 		// Capture any PHP warnings from the output buffer and append them to the
 		// response in a comment if we're in debug mode.
 		if ( $context->getDebug() && strlen( $warnings = ob_get_contents() ) ) {
-			$response = $this->makeComment( $warnings ) . $response;
+			$response = self::makeComment( $warnings ) . $response;
 			$this->hasErrors = true;
 		}
 
@@ -544,7 +552,7 @@ class ResourceLoader {
 	 * Send content type and last modified headers to the client.
 	 * @param $context ResourceLoaderContext
 	 * @param string $mtime TS_MW timestamp to use for last-modified
-	 * @param bool $error Whether there are commented-out errors in the response
+	 * @param bool $errors Whether there are commented-out errors in the response
 	 * @return void
 	 */
 	protected function sendResponseHeaders( ResourceLoaderContext $context, $mtime, $errors ) {
@@ -604,15 +612,7 @@ class ResourceLoader {
 				// See also http://bugs.php.net/bug.php?id=51579
 				// To work around this, we tear down all output buffering before
 				// sending the 304.
-				// On some setups, ob_get_level() doesn't seem to go down to zero
-				// no matter how often we call ob_get_clean(), so instead of doing
-				// the more intuitive while ( ob_get_level() > 0 ) ob_get_clean();
-				// we have to be safe here and avoid an infinite loop.
-				// Caching the level is not an option, need to allow it to
-				// shorten the loop on-the-fly (bug 46836)
-				for ( $i = 0; $i < ob_get_level(); $i++ ) {
-					ob_end_clean();
-				}
+				wfResetOutputBuffers( /* $resetGzipEncoding = */ true );
 
 				header( 'HTTP/1.0 304 Not Modified' );
 				header( 'Status: 304 Not Modified' );
@@ -673,9 +673,32 @@ class ResourceLoader {
 		return false; // cache miss
 	}
 
-	protected function makeComment( $text ) {
+	/**
+	 * Generate a CSS or JS comment block. Only use this for public data,
+	 * not error message details.
+	 *
+	 * @param $text string
+	 * @return string
+	 */
+	public static function makeComment( $text ) {
 		$encText = str_replace( '*/', '* /', $text );
 		return "/*\n$encText\n*/\n";
+	}
+
+	/**
+	 * Handle exception display
+	 *
+	 * @param Exception $e to be shown to the user
+	 * @return string sanitized text that can be returned to the user
+	 */
+	public static function formatException( $e ) {
+		global $wgShowExceptionDetails;
+
+		if ( $wgShowExceptionDetails ) {
+			return self::makeComment( $e->__toString() );
+		} else {
+			return self::makeComment( wfMessage( 'internalerror' )->text() );
+		}
 	}
 
 	/**
@@ -701,10 +724,11 @@ class ResourceLoader {
 			try {
 				$blobs = MessageBlobStore::get( $this, $modules, $context->getLanguage() );
 			} catch ( Exception $e ) {
+				MWExceptionHandler::logException( $e );
 				wfDebugLog( 'resourceloader', __METHOD__ . ": pre-fetching blobs from MessageBlobStore failed: $e" );
 				$this->hasErrors = true;
 				// Add exception to the output as a comment
-				$exceptions .= $this->makeComment( $e->__toString() );
+				$exceptions .= self::formatException( $e );
 			}
 		} else {
 			$blobs = array();
@@ -808,10 +832,11 @@ class ResourceLoader {
 						break;
 				}
 			} catch ( Exception $e ) {
+				MWExceptionHandler::logException( $e );
 				wfDebugLog( 'resourceloader', __METHOD__ . ": generating module package failed: $e" );
 				$this->hasErrors = true;
 				// Add exception to the output as a comment
-				$exceptions .= $this->makeComment( $e->__toString() );
+				$exceptions .= self::formatException( $e );
 
 				// Register module as missing
 				$missing[] = $name;
@@ -1132,6 +1157,18 @@ class ResourceLoader {
 	/**
 	 * Build a query array (array representation of query string) for load.php. Helper
 	 * function for makeLoaderURL().
+	 *
+	 * @param array $modules
+	 * @param string $lang
+	 * @param string $skin
+	 * @param string $user
+	 * @param string $version
+	 * @param bool $debug
+	 * @param string $only
+	 * @param bool $printable
+	 * @param bool $handheld
+	 * @param array $extraQuery
+	 *
 	 * @return array
 	 */
 	public static function makeLoaderQuery( $modules, $lang, $skin, $user = null, $version = null, $debug = false, $only = null,
@@ -1175,5 +1212,42 @@ class ResourceLoader {
 	 */
 	public static function isValidModuleName( $moduleName ) {
 		return !preg_match( '/[|,!]/', $moduleName ) && strlen( $moduleName ) <= 255;
+	}
+
+	/**
+	 * Returns LESS compiler set up for use with MediaWiki
+	 *
+	 * @since 1.22
+	 * @return lessc
+	 */
+	public static function getLessCompiler() {
+		global $wgResourceLoaderLESSFunctions, $wgResourceLoaderLESSImportPaths;
+
+		$less = new lessc();
+		$less->setPreserveComments( true );
+		$less->setVariables( self::getLESSVars() );
+		$less->setImportDir( $wgResourceLoaderLESSImportPaths );
+		foreach ( $wgResourceLoaderLESSFunctions as $name => $func ) {
+			$less->registerFunction( $name, $func );
+		}
+		return $less;
+	}
+
+	/**
+	 * Get global LESS variables.
+	 *
+	 * $since 1.22
+	 * @return array: Map of variable names to string CSS values.
+	 */
+	public static function getLESSVars() {
+		global $wgResourceLoaderLESSVars;
+
+		static $lessVars = null;
+		if ( $lessVars === null ) {
+			$lessVars = $wgResourceLoaderLESSVars;
+			// Sort by key to ensure consistent hashing for cache lookups.
+			ksort( $lessVars );
+		}
+		return $lessVars;
 	}
 }

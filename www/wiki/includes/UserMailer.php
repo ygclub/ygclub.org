@@ -241,7 +241,7 @@ class UserMailer {
 			$headers['Reply-To'] = $replyto->toString();
 		}
 
-		$headers['Date'] = date( 'r' );
+		$headers['Date'] = MWTimestamp::getLocalInstance()->format( 'r' );
 		$headers['Message-ID'] = self::makeMsgId();
 		$headers['X-Mailer'] = 'MediaWiki mailer';
 
@@ -258,6 +258,8 @@ class UserMailer {
 			wfDebug( "Assembling multipart mime email\n" );
 			if ( !stream_resolve_include_path( 'Mail/mime.php' ) ) {
 				wfDebug( "PEAR Mail_Mime package is not installed. Falling back to text email.\n" );
+				// remove the html body for text email fall back
+				$body = $body['text'];
 			}
 			else {
 				require_once 'Mail/mime.php';
@@ -265,7 +267,7 @@ class UserMailer {
 					$body['text'] = str_replace( "\n", "\r\n", $body['text'] );
 					$body['html'] = str_replace( "\n", "\r\n", $body['html'] );
 				}
-				$mime = new Mail_mime( array( 'eol' => $endl ) );
+				$mime = new Mail_mime( array( 'eol' => $endl, 'text_charset' => 'UTF-8', 'html_charset' => 'UTF-8' ) );
 				$mime->setTXTBody( $body['text'] );
 				$mime->setHTMLBody( $body['html'] );
 				$body = $mime->get(); // must call get() before headers()
@@ -749,10 +751,17 @@ class EmailNotification {
 		# Replace this after transforming the message, bug 35019
 		$postTransformKeys['$PAGESUMMARY'] = $this->summary == '' ? ' - ' : $this->summary;
 
-		# Now build message's subject and body
+		// Now build message's subject and body
+
+		// Messages:
+		// enotif_subject_deleted, enotif_subject_created, enotif_subject_moved,
+		// enotif_subject_restored, enotif_subject_changed
 		$this->subject = wfMessage( 'enotif_subject_' . $this->pageStatus )->inContentLanguage()
 			->params( $pageTitle, $keys['$PAGEEDITOR'] )->text();
 
+		// Messages:
+		// enotif_body_intro_deleted, enotif_body_intro_created, enotif_body_intro_moved,
+		// enotif_body_intro_restored, enotif_body_intro_changed
 		$keys['$PAGEINTRO'] = wfMessage( 'enotif_body_intro_' . $this->pageStatus )
 			->inContentLanguage()->params( $pageTitle, $keys['$PAGEEDITOR'], $pageTitleUrl )
 			->text();

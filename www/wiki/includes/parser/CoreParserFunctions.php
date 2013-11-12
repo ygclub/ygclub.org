@@ -377,7 +377,7 @@ class CoreParserFunctions {
 
 		// disallow some styles that could be used to bypass $wgRestrictDisplayTitle
 		if ( $wgRestrictDisplayTitle ) {
-			$htmlTagsCallback = function ( $params ) {
+			$htmlTagsCallback = function ( &$params ) {
 				$decoded = Sanitizer::decodeTagAttributes( $params );
 
 				if ( isset( $decoded['style'] ) ) {
@@ -634,6 +634,7 @@ class CoreParserFunctions {
 	 * @return string
 	 */
 	static function pagesincategory( $parser, $name = '', $arg1 = null, $arg2 = null ) {
+		global $wgContLang;
 		static $magicWords = null;
 		if ( is_null( $magicWords ) ) {
 			$magicWords = new MagicWordArray( array(
@@ -663,6 +664,7 @@ class CoreParserFunctions {
 		if ( !$title ) { # invalid title
 			return self::formatRaw( 0, $raw );
 		}
+		$wgContLang->findVariantLink( $name, $title, true );
 
 		// Normalize name for cache
 		$name = $title->getDBkey();
@@ -717,13 +719,7 @@ class CoreParserFunctions {
 		$page = $title->getPrefixedText();
 
 		$length = 0;
-		if ( $title->equals( $parser->getTitle() )
-			&& $parser->mInputSize !== false
-		) {
-			# We are on current page (and not in PST), so
-			# take length of input to parser.
-			$length = $parser->mInputSize;
-		} elseif ( isset( $cache[$page] ) ) {
+		if ( isset( $cache[$page] ) ) {
 			$length = $cache[$page];
 		} elseif ( $parser->incrementExpensiveFunctionCount() ) {
 			$rev = Revision::newFromTitle( $title, false, Revision::READ_NORMAL );
@@ -862,8 +858,13 @@ class CoreParserFunctions {
 		if ( $old === false || $old == $text || $arg ) {
 			return '';
 		} else {
+			$converter = $parser->getConverterLanguage()->getConverter();
 			return '<span class="error">' .
-				wfMessage( 'duplicate-defaultsort', $old, $text )->inContentLanguage()->escaped() .
+				wfMessage( 'duplicate-defaultsort',
+					// Message should be parsed, but these params should only be escaped.
+					$converter->markNoConversion( wfEscapeWikiText( $old ) ),
+					$converter->markNoConversion( wfEscapeWikiText( $text ) )
+				)->inContentLanguage()->text() .
 				'</span>';
 		}
 	}

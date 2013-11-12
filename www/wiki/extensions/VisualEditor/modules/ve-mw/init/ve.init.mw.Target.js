@@ -20,6 +20,9 @@
  *  revision id here. Defaults to loading the latest version (see #load).
  */
 ve.init.mw.Target = function VeInitMwTarget( $container, pageName, revisionId ) {
+	var i, len, prefName, prefValue, conf = mw.config.get( 'wgVisualEditorConfig' ),
+		extraModules = [ 'experimental'/* , 'language'*//*, 'mwalienextension'*/, 'mwmath'/*, 'mwhiero'*/ ];
+
 	// Parent constructor
 	ve.init.Target.call( this, $container );
 
@@ -32,16 +35,29 @@ ve.init.mw.Target = function VeInitMwTarget( $container, pageName, revisionId ) 
 	this.apiUrl = mw.util.wikiScript( 'api' );
 	this.submitUrl = ( new mw.Uri( mw.util.wikiGetlink( this.pageName ) ) )
 		.extend( { 'action': 'submit' } );
+
 	this.modules = [
-			mw.config.get( 'wgVisualEditorConfig' ).enableExperimentalCode ?
-				'ext.visualEditor.experimental' : 'ext.visualEditor.core',
-			'ext.visualEditor.specialMessages'
+			'ext.visualEditor.core',
+			'ext.visualEditor.data'
 		]
 		.concat(
 			document.createElementNS && document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ).createSVGRect ?
-				['ext.visualEditor.viewPageTarget.icons-vector', 'ext.visualEditor.icons-vector'] :
-				['ext.visualEditor.viewPageTarget.icons-raster', 'ext.visualEditor.icons-raster']
-		);
+				['ext.visualEditor.viewPageTarget.icons-vector', 'ext.visualEditor.icons-vector', 'oojs-ui.icons-vector'] :
+				['ext.visualEditor.viewPageTarget.icons-raster', 'ext.visualEditor.icons-raster', 'oojs-ui.icons-raster']
+		)
+		.concat( conf.pluginModules || [] );
+	for ( i = 0, len = extraModules.length; i < len; i++ ) {
+		prefName = 'visualeditor-enable-' + extraModules[i];
+		prefValue = mw.config.get( 'wgUserName' ) === null ?
+			conf.defaultUserOptions[prefName] :
+			mw.user.options.get( prefName, conf.defaultUserOptions[prefName] );
+		if ( prefValue && prefValue !== '0' ) {
+			this.modules.push( 'ext.visualEditor.' + extraModules[i] );
+		}
+	}
+
+	this.pluginCallbacks = [];
+	this.modulesReady = $.Deferred();
 	this.loading = false;
 	this.saving = false;
 	this.serializing = false;
@@ -50,6 +66,7 @@ ve.init.mw.Target = function VeInitMwTarget( $container, pageName, revisionId ) 
 	this.startTimeStamp = null;
 	this.doc = null;
 	this.editNotices = null;
+	this.checkboxes = null;
 	this.remoteNotices = [];
 	this.localNoticeMessages = [];
 	this.isMobileDevice = (
@@ -89,13 +106,6 @@ ve.init.mw.Target = function VeInitMwTarget( $container, pageName, revisionId ) 
  */
 
 /**
- * @event tokenError
- * @param {jqXHR|null} jqXHR
- * @param {string} status Text status message
- * @param {Mixed|null} error HTTP status text
- */
-
-/**
  * @event saveError
  * @param {jqXHR|null} jqXHR
  * @param {string} status Text status message
@@ -118,9 +128,31 @@ ve.init.mw.Target = function VeInitMwTarget( $container, pageName, revisionId ) 
 
 /* Inheritance */
 
-ve.inheritClass( ve.init.mw.Target, ve.init.Target );
+OO.inheritClass( ve.init.mw.Target, ve.init.Target );
 
 /* Static Methods */
+
+/**
+ * Handle the RL modules for VE and registered plugin modules being loaded.
+ *
+ * This method is called within the context of a target instance. It executes all registered
+ * plugin callbacks, gathers any promises returned and resolves this.modulesReady when all of
+ * the gathered promises are resolved.
+ */
+ve.init.mw.Target.onModulesReady = function () {
+	var i, len, callbackResult, promises = [];
+	for ( i = 0, len = this.pluginCallbacks.length; i < len; i++ ) {
+		callbackResult = this.pluginCallbacks[i]( this );
+		if ( callbackResult && callbackResult.then ) { // duck-type jQuery.Promise using .then
+			promises.push( callbackResult );
+		}
+	}
+	// Dereference the callbacks
+	this.pluginCallbacks = [];
+	// Create a master promise tracking all the promises we got, and wait for it
+	// to be resolved
+	$.when.apply( $, promises ).done( this.modulesReady.resolve ).fail( this.modulesReady.reject );
+};
 
 /**
  * Handle response to a successful load request.
@@ -133,7 +165,7 @@ ve.inheritClass( ve.init.mw.Target, ve.init.Target );
  * @method
  * @param {Object} response XHR Response object
  * @param {string} status Text status message
- * @emits loadError
+ * @fires loadError
  */
 ve.init.mw.Target.onLoad = function ( response ) {
 	var data = response ? response.visualeditor : null;
@@ -143,17 +175,10 @@ ve.init.mw.Target.onLoad = function ( response ) {
 			this, null, 'Invalid response in response from server', null
 		);
 	} else if ( response.error || data.result === 'error' ) {
-		if ( response.error.code === 'badtoken' && !this.retriedToken ) {
-			// Only retry once
-			this.retriedToken = true;
-			// Refresh the edit token and try again
-			this.retryToken();
-		} else {
-			ve.init.mw.Target.onLoadError.call( this, null,
-				response.error.code + ': ' + response.error.info,
-				null
-			);
-		}
+		ve.init.mw.Target.onLoadError.call( this, null,
+			response.error.code + ': ' + response.error.info,
+			null
+		);
 	} else if ( typeof data.content !== 'string' ) {
 		ve.init.mw.Target.onLoadError.call(
 			this, null, 'No HTML content in response from server', null
@@ -163,12 +188,13 @@ ve.init.mw.Target.onLoad = function ( response ) {
 		this.doc = ve.createDocumentFromHtml( this.originalHtml );
 
 		this.remoteNotices = ve.getObjectValues( data.notices );
+		this.checkboxes = data.checkboxes;
 
 		this.baseTimeStamp = data.basetimestamp;
 		this.startTimeStamp = data.starttimestamp;
 		this.revid = data.oldid;
-		// Everything worked, the page was loaded, continue as soon as the module is ready
-		mw.loader.using( this.modules, ve.bind( ve.init.mw.Target.onReady, this ) );
+		// Everything worked, the page was loaded, continue as soon as the modules are loaded
+		this.modulesReady.done( ve.bind( ve.init.mw.Target.onReady, this ) );
 	}
 };
 
@@ -207,7 +233,6 @@ ve.init.mw.Target.onNoticesReady = function () {
 
 	for ( i = 0, len = noticeHtmls.length; i < len; i++ ) {
 		el = $( '<div>' )
-			.addClass( 've-init-mw-viewPageTarget-toolbar-editNotices-notice' )
 			.html( noticeHtmls[i] )
 			.get( 0 );
 
@@ -221,44 +246,13 @@ ve.init.mw.Target.onNoticesReady = function () {
 };
 
 /**
- * Handle response to a successful edit token refresh request.
- *
- * This method is called within the context of a target instance. If successful the token will
- * be stored and load() will be called.
- *
- * @static
- * @method
- * @param {Object} response XHR Response object
- * @param {string} status Text status message
- * @emits tokenError
- */
-ve.init.mw.Target.onToken = function ( response ) {
-	var token = response && response.tokens && response.tokens.edittoken;
-	if ( token ) {
-		this.editToken = token;
-		mw.user.tokens.set( 'editToken', token );
-		this.loading = false; // Otherwise this.load() doesn't do anything
-		this.load();
-	} else if ( !response.error ) {
-		ve.init.mw.Target.onTokenError.call(
-			this, null, 'Invalid response in response from server', null
-		);
-	} else {
-		ve.init.mw.Target.onTokenError.call( this, null,
-			response.error.code + ': ' + response.error.info,
-			null
-		);
-	}
-};
-
-/**
  * Handle both DOM and modules being loaded and ready.
  *
  * This method is called within the context of a target instance.
  *
  * @static
  * @method
- * @emits load
+ * @fires load
  */
 ve.init.mw.Target.onReady = function () {
 	// We need to wait until onReady as local notices may require special messages
@@ -278,26 +272,11 @@ ve.init.mw.Target.onReady = function () {
  * @param {Object} jqXHR
  * @param {string} status Text status message
  * @param {Mixed} error HTTP status text
- * @emits loadError
+ * @fires loadError
  */
 ve.init.mw.Target.onLoadError = function ( jqXHR, status, error ) {
 	this.loading = false;
 	this.emit( 'loadError', jqXHR, status, error );
-};
-
-/**
- * Handle an unsuccessful token refresh request.
- *
- * This method is called within the context of a target instance.
- *
- * @param {Object} jqXHR
- * @param {string} status Text status message
- * @param {Mixed} error HTTP status text
- * @emits tokenError
- */
-ve.init.mw.Target.onTokenError = function ( jqXHR, status, error ) {
-	this.loading = false;
-	this.emit( 'tokenError', jqXHR, status, error );
 };
 
 /**
@@ -309,8 +288,8 @@ ve.init.mw.Target.onTokenError = function ( jqXHR, status, error ) {
  * @method
  * @param {Object} response Response data
  * @param {string} status Text status message
- * @emits editConflict
- * @emits save
+ * @fires editConflict
+ * @fires save
  */
 ve.init.mw.Target.onSave = function ( response ) {
 	this.saving = false;
@@ -347,7 +326,7 @@ ve.init.mw.Target.onSave = function ( response ) {
  * @param {Object} jqXHR
  * @param {string} status Text status message
  * @param {Object|null} data API response data
- * @emits saveError
+ * @fires saveError
  */
 ve.init.mw.Target.onSaveError = function ( jqXHR, status, data ) {
 	this.saving = false;
@@ -362,8 +341,8 @@ ve.init.mw.Target.onSaveError = function ( jqXHR, status, data ) {
  * @method
  * @param {Object} response API response data
  * @param {string} status Text status message
- * @emits showChanges
- * @emits noChanges
+ * @fires showChanges
+ * @fires noChanges
  */
 ve.init.mw.Target.onShowChanges = function ( response ) {
 	var data = response.visualeditor;
@@ -395,7 +374,7 @@ ve.init.mw.Target.onShowChanges = function ( response ) {
  * @param {Object} jqXHR
  * @param {string} status Text status message
  * @param {Mixed} error HTTP status text
- * @emits showChangesError
+ * @fires showChangesError
  */
 ve.init.mw.Target.onShowChangesError = function ( jqXHR, status, error ) {
 	this.saving = false;
@@ -445,7 +424,7 @@ ve.init.mw.Target.onSerialize = function ( response ) {
  * @param {jqXHR|null} jqXHR
  * @param {string} status Text status message
  * @param {Mixed|null} error HTTP status text
- * @emits serializeError
+ * @fires serializeError
  */
 ve.init.mw.Target.onSerializeError = function ( jqXHR, status, error ) {
 	this.serializing = false;
@@ -453,6 +432,32 @@ ve.init.mw.Target.onSerializeError = function ( jqXHR, status, error ) {
 };
 
 /* Methods */
+
+/**
+ * Add a plugin module or callback.
+ *
+ * @param {string|Function} plugin Plugin module or callback
+ */
+ve.init.mw.Target.prototype.addPlugin = function ( plugin ) {
+	if ( typeof plugin === 'string' ) {
+		this.modules.push( plugin );
+	} else if ( $.isFunction( plugin ) ) {
+		this.pluginCallbacks.push( plugin );
+	}
+};
+
+/**
+ * Add an array of plugins.
+ *
+ * @see #addPlugin
+ * @param {Array} plugins
+ */
+ve.init.mw.Target.prototype.addPlugins = function ( plugins ) {
+	var i, len;
+	for ( i = 0, len = plugins.length; i < len; i++ ) {
+		this.addPlugin( plugins[i] );
+	}
+};
 
 /**
  * Get HTML to send to Parsoid. This takes a document generated by the converter and
@@ -494,13 +499,17 @@ ve.init.mw.Target.prototype.getHtml = function ( newDoc ) {
  * @returns {boolean} Loading has been started
 */
 ve.init.mw.Target.prototype.load = function () {
-	var data;
+	var data, start;
 	// Prevent duplicate requests
 	if ( this.loading ) {
 		return false;
 	}
 	// Start loading the module immediately
-	mw.loader.load( this.modules );
+	mw.loader.using(
+		// Wait for site and user JS before running plugins
+		this.modules.concat( [ 'site', 'user' ] ),
+		ve.bind( ve.init.mw.Target.onModulesReady, this )
+	);
 
 	data = {
 		'action': 'visualeditor',
@@ -518,6 +527,8 @@ ve.init.mw.Target.prototype.load = function () {
 	}
 
 	// Load DOM
+	start = ve.now();
+
 	this.loading = $.ajax( {
 		'url': this.apiUrl,
 		'data': data,
@@ -525,29 +536,21 @@ ve.init.mw.Target.prototype.load = function () {
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
 		'timeout': 100000,
-		'cache': 'false',
-		'success': ve.bind( ve.init.mw.Target.onLoad, this ),
-		'error': ve.bind( ve.init.mw.Target.onLoadError, this )
-	} );
-	return true;
-};
+		'cache': 'false'
+	} )
+		.then( function ( data, status, jqxhr ) {
+			ve.track( 'performance.system.domLoad', {
+				'bytes': $.byteLength( jqxhr.responseText ),
+				'duration': ve.now() - start,
+				'cacheHit': /hit/i.test( jqxhr.getResponseHeader( 'X-Cache' ) ),
+				'parsoid': jqxhr.getResponseHeader( 'X-Parsoid-Performance' )
+			} );
+			return jqxhr;
+		} )
+		.done( ve.bind( ve.init.mw.Target.onLoad, this ) )
+		.fail( ve.bind( ve.init.mw.Target.onLoadError, this ) );
 
-/**
- * Refresh the edit token, then call load()
- */
-ve.init.mw.Target.prototype.retryToken = function () {
-	$.ajax( {
-		'url': this.apiUrl,
-		'data': {
-			'action': 'tokens',
-			'format': 'json'
-		},
-		'dataType': 'json',
-		'type': 'GET',
-		'cache': 'false',
-		'success': ve.bind( ve.init.mw.Target.onToken, this ),
-		'error': ve.bind( ve.init.mw.Target.onTokenError, this )
-	} );
+	return true;
 };
 
 /**
@@ -559,19 +562,20 @@ ve.init.mw.Target.prototype.retryToken = function () {
  *
  * @method
  * @param {HTMLDocument} doc Document to save
- * @param {Object} options Saving options
+ * @param {Object} options Saving options. All keys are passed through, including unrecognized ones.
  *  - {string} summary Edit summary
  *  - {boolean} minor Edit is a minor edit
  *  - {boolean} watch Watch the page
  * @returns {boolean} Saving has been started
 */
 ve.init.mw.Target.prototype.save = function ( doc, options ) {
+	var data, start;
 	// Prevent duplicate requests
 	if ( this.saving ) {
 		return false;
 	}
 
-	var data = {
+	data = $.extend( {}, options, {
 		'format': 'json',
 		'action': 'visualeditoredit',
 		'page': this.pageName,
@@ -579,38 +583,31 @@ ve.init.mw.Target.prototype.save = function ( doc, options ) {
 		'basetimestamp': this.baseTimeStamp,
 		'starttimestamp': this.startTimeStamp,
 		'html': this.getHtml( doc ),
-		'token': this.editToken,
-		'summary': options.summary
-	};
-
-	if ( options.minor ) {
-		data.minor = 1;
-	}
-	if ( options.watch ) {
-		data.watch = 1;
-	}
-	if ( options.needcheck ) {
-		data.needcheck = 1;
-	}
-	if ( options.captchaid ) {
-		data.captchaid = options.captchaid;
-	}
-	if ( options.captchaword ) {
-		data.captchaword = options.captchaword;
-	}
+		'token': this.editToken
+	} );
 
 	// Save DOM
-	this.saving = true;
-	$.ajax( {
+	start = ve.now();
+
+	this.saving = $.ajax( {
 		'url': this.apiUrl,
 		'data': data,
 		'dataType': 'json',
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
-		'timeout': 100000,
-		'success': ve.bind( ve.init.mw.Target.onSave, this ),
-		'error': ve.bind( ve.init.mw.Target.onSaveError, this )
-	} );
+		'timeout': 100000
+	} )
+		.then( function ( data, status, jqxhr ) {
+			ve.track( 'performance.system.domSave', {
+				'bytes': $.byteLength( jqxhr.responseText ),
+				'duration': ve.now() - start,
+				'parsoid': jqxhr.getResponseHeader( 'X-Parsoid-Performance' )
+			} );
+			return jqxhr;
+		} )
+		.done( ve.bind( ve.init.mw.Target.onSave, this ) )
+		.fail( ve.bind( ve.init.mw.Target.onSaveError, this ) );
+
 	return true;
 };
 
@@ -621,6 +618,7 @@ ve.init.mw.Target.prototype.save = function ( doc, options ) {
  * @param {HTMLDocument} doc Document to compare against (via wikitext)
 */
 ve.init.mw.Target.prototype.showChanges = function ( doc ) {
+	var start = ve.now();
 	$.ajax( {
 		'url': this.apiUrl,
 		'data': {
@@ -634,10 +632,18 @@ ve.init.mw.Target.prototype.showChanges = function ( doc ) {
 		'dataType': 'json',
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
-		'timeout': 100000,
-		'success': ve.bind( ve.init.mw.Target.onShowChanges, this ),
-		'error': ve.bind( ve.init.mw.Target.onShowChangesError, this )
-	} );
+		'timeout': 100000
+	} )
+		.then( function ( data, status, jqxhr ) {
+			ve.track( 'performance.system.domDiff', {
+				'bytes': $.byteLength( jqxhr.responseText ),
+				'duration': ve.now() - start,
+				'parsoid': jqxhr.getResponseHeader( 'X-Parsoid-Performance' )
+			} );
+			return jqxhr;
+		} )
+		.done( ve.bind( ve.init.mw.Target.onShowChanges, this ) )
+		.fail( ve.bind( ve.init.mw.Target.onShowChangesError, this ) );
 };
 
 /**
@@ -703,6 +709,7 @@ ve.init.mw.Target.prototype.submit = function ( wikitext, options ) {
  * @returns {boolean} Serializing has beeen started
 */
 ve.init.mw.Target.prototype.serialize = function ( doc, callback ) {
+	var start = ve.now();
 	// Prevent duplicate requests
 	if ( this.serializing ) {
 		return false;
@@ -724,9 +731,26 @@ ve.init.mw.Target.prototype.serialize = function ( doc, callback ) {
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
 		'timeout': 100000,
-		'cache': 'false',
-		'success': ve.bind( ve.init.mw.Target.onSerialize, this ),
-		'error': ve.bind( ve.init.mw.Target.onSerializeError, this )
-	} );
+		'cache': 'false'
+	} )
+		.then( function ( data, status, jqxhr ) {
+			ve.track( 'performance.system.domSerialize', {
+				'bytes': $.byteLength( jqxhr.responseText ),
+				'duration': ve.now() - start,
+				'parsoid': jqxhr.getResponseHeader( 'X-Parsoid-Performance' )
+			} );
+			return jqxhr;
+		} )
+		.done( ve.bind( ve.init.mw.Target.onSerialize, this ) )
+		.fail( ve.bind( ve.init.mw.Target.onSerializeError, this ) );
 	return true;
+};
+
+/**
+ * Get list of edit notices.
+ *
+ * @returns {Object|null} List of edit notices or null if none are loaded
+ */
+ve.init.mw.Target.prototype.getEditNotices = function () {
+	return this.editNotices;
 };

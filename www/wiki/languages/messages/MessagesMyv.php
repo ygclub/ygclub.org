@@ -216,7 +216,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Невтемс зяро теицятнеде, конат аравтызь лопанть эсест ванома лемрисьментень',
 'tog-oldsig' => 'Уликс кедьпутовксось:',
 'tog-fancysig' => 'Лемпутовксось прок викитекст (сонсь теевиця сюлмавома певтеме)',
-'tog-showjumplinks' => 'Меремс "тёкадемс" маласпонгомань сюлмавомапетнес',
 'tog-uselivepreview' => 'Максомс эряй васнянь невтевкс (JavaScript) (Варчамонь)',
 'tog-forceeditsummary' => 'Невтик монень, мезе сёрмадомс витнемадо-петнемадо ёвтамонь вальминентень',
 'tog-watchlisthideown' => 'Кекшить монь теевть витневкстнэнь ванома лемрисьменть эйстэ',
@@ -404,7 +403,7 @@ $messages = array(
 'jumptosearch' => 'вешнэме',
 'pool-errorunknown' => 'Апак содань ильведькс',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} ланга',
 'aboutpage' => 'Project:Эстэдензэ',
 'copyright' => '$1-сто муят мезе тесэ.',
@@ -511,7 +510,6 @@ $messages = array(
 'actionthrottled' => 'Тев тееманть курокксчизэ киртязь',
 'protectedpagetext' => 'Те лопась панжома экшсэ, илязо понго витнемс-петнемс эли лия тевс.',
 'viewsourcetext' => 'Те лопанть лисьмапрясь маштови ваномскак, лангстонзо саемс копияяк:',
-'sqlhidden' => '(SQL вешнемась кекшезь)',
 'namespaceprotected' => "'''$1''' лемпотмосонть арась видечить витнемс-петнемс лопатнесэ.",
 'ns-specialprotected' => '{{ns:special}} лем марто лопатне а витневить-петневить.',
 'titleprotected' => "Те коняксонть ванстызе [[Теиця:$1|$1]], кияк иляссо тее.
@@ -528,7 +526,6 @@ $messages = array(
 'yourpassword' => 'Салава валот:',
 'yourpasswordagain' => 'Омбоцеде сёрмадык кирдицянь леметь:',
 'remembermypassword' => 'Ледстемс совамом те бравзерсэнть (сех кувать $1 {{PLURAL:$1|чи|чить}})',
-'securelogin-stick-https' => 'Кирдемс "HTTPS" сюлмавкс совамодо мейлеяк',
 'yourdomainname' => 'Эсеть доменэть:',
 'password-change-forbidden' => 'Те викисэнть а полавтсак салававалот.',
 'login' => 'Совамо',
@@ -603,7 +600,7 @@ $messages = array(
 'newpassword' => 'Од совамо валот:',
 'retypenew' => 'Сёрмадык омбоцеде совамо валот:',
 'resetpass_submit' => 'Тештик совамо валот ды совак',
-'resetpass_success' => 'Совамо валот полавтовсь теть! Совавтыть эйсэть системас...',
+'changepassword-success' => 'Совамо валот полавтовсь теть! Совавтыть эйсэть системас...',
 'resetpass_forbidden' => 'Совамо валтнэ а полавтовить',
 'resetpass-submit-loggedin' => 'Полавтомс совамо валот',
 'resetpass-submit-cancel' => 'Саемс мекев',
@@ -917,7 +914,6 @@ IP-тешкстэть — $3, саймас совавтоманть ID-сь — 
 'resetprefs' => 'Нардамс апак вансто полавтнемат',
 'restoreprefs' => 'Велявтомс мекев весе ушодкс ладсематнень',
 'prefs-editing' => 'Витнема-петнема',
-'prefs-edit-boxsize' => 'Витнема-петнема вальманть сэрензэ-келензэ.',
 'rows' => 'Валчилькстнэ (строкатне):',
 'columns' => 'Палманть:',
 'searchresultshead' => 'Вешнема',
@@ -946,7 +942,6 @@ IP-тешкстэть — $3, саймас совавтоманть ID-сь — 
 'prefs-namespaces' => 'Лем потмот',
 'default' => 'зярдо лиякс апак йовта',
 'prefs-files' => 'Файлат',
-'prefs-textboxsize' => 'Витнемань-петнемань вальманть покшолмазо',
 'youremail' => 'Е-сёрма:',
 'username' => 'Теицянь леметь:',
 'uid' => 'Теицянь ID:',
@@ -1105,7 +1100,6 @@ IP-тешкстэть — $3, саймас совавтоманть ID-сь — 
 'recentchangeslinked-feed' => 'Сюлмавозь лиякстоматне',
 'recentchangeslinked-toolbox' => 'Сюлмавозь лиякстоматне',
 'recentchangeslinked-title' => 'Полавтнемат-лиякстомтомат конат кандовить теватезэнь "$1"',
-'recentchangeslinked-noresult' => 'Максозь шкастонть кодаткак полавтовомат сюлмавозь лопатнесэ арасельть.',
 'recentchangeslinked-summary' => "Тесэ максозь меельсе шкань витнемат-петнемат, конат теезельть башка максозь лопа вельде (эли категорияс совавтовиця тевнес). Ванома лопасот лопатне максозь '''эчкстэ тештезь'''",
 'recentchangeslinked-page' => 'Лопанть лемезэ:',
 'recentchangeslinked-to' => 'Тень таркас невтить те лопанть марто сюлмазь лопатнесэ полавтнематнень',
@@ -1281,9 +1275,6 @@ IP-тешкстэть — $3, саймас совавтоманть ID-сь — 
 'statistics-views-peredit' => 'Зяроксть ванозь апак витне апак петне',
 'statistics-users-active' => 'Чистэ лисийть-совийть',
 'statistics-mostpopular' => 'Весемеде сеедьстэ ванозь лопат',
-
-'disambiguations' => 'Лопат, конатне сюлмазь чарькодевтемань ламо терминэнь лопас',
-'disambiguationspage' => 'Template:смустень коряс явома',
 
 'doubleredirects' => 'Кавксть ютавтозь',
 'double-redirect-fixer' => 'Печтевтемс витнема-петнема пель',

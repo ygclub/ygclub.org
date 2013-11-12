@@ -37,7 +37,6 @@
 					"ve.dm.ModelRegistry",
 					"ve.dm.Converter",
 					"ve.dm.DataString",
-					"ve.dm.DocumentSlice",
 					"ve.dm.DocumentSynchronizer",
 					"ve.dm.IndexValueStore",
 					"ve.dm.NodeFactory",
@@ -66,7 +65,7 @@
 			},
 			{
 				"name": "Linear data",
-				"classes": ["ve.dm.*LinearData"]
+				"classes": ["ve.dm.*LinearData*"]
 			},
 			{
 				"name": "Models",
@@ -83,7 +82,7 @@
 			},
 			{
 				"name": "MediaWiki integration",
-				"classes": ["ve.init.mw*"]
+				"classes": ["ve.init.mw*", "ve.version"]
 			},
 			{
 				"name": "Stand-alone",
@@ -100,12 +99,12 @@
 					"ve.ui",
 					"ve.ui.Surface",
 					"ve.ui.Context",
-					"ve.ui.Frame",
 					"ve.ui.Toolbar",
-					"ve.ui.Window",
+					"ve.ui.TargetToolbar",
 					"ve.ui.WindowSet",
 					"ve.ui.Action",
-					"ve.ui.Trigger"
+					"ve.ui.Trigger",
+					"ve.ui.Command"
 				]
 			},
 			{
@@ -129,16 +128,8 @@
 				"classes": ["ve.ui.*Inspector"]
 			},
 			{
-				"name": "Elements",
-				"classes": ["ve.ui.*Element"]
-			},
-			{
 				"name": "Widgets",
 				"classes": ["ve.ui.*Widget"]
-			},
-			{
-				"name": "Layouts",
-				"classes": ["ve.ui.*Layout"]
 			},
 			{
 				"name": "Dialogs",
@@ -151,11 +142,9 @@
 		"groups": [
 			{
 				"name": "Utilities",
-				"classes": ["ve", "ve.EventEmitter", "ve.Registry", "ve.Factory", "ve.Range", "ve.Element"]
-			},
-			{
-				"name": "Factories",
-				"classes": ["ve.NamedClassFactory"]
+				"classes": [
+					"ve", "ve.Range", "ve.EventSequencer"
+				]
 			},
 			{
 				"name": "Nodes",
@@ -179,15 +168,61 @@
 		]
 	},
 	{
+		"name": "OOJS UI",
+		"groups": [
+			{
+				"name": "General",
+				"classes": [
+					"OO.ui",
+					"OO.ui.Element",
+					"OO.ui.Frame",
+					"OO.ui.Toolbar",
+					"OO.ui.Window",
+					"OO.ui.WindowSet",
+					"OO.ui.Dialog"
+				]
+			},
+			{
+				"name": "Factories",
+				"classes": ["OO.ui.*Factory"]
+			},
+			{
+				"name": "Tools",
+				"classes": ["OO.ui.*Tool"]
+			},
+			{
+				"name": "Elements",
+				"classes": ["OO.ui.*Element"]
+			},
+			{
+				"name": "Layouts",
+				"classes": ["OO.ui.*Layout"]
+			},
+			{
+				"name": "Tool groups",
+				"classes": ["OO.ui.*ToolGroup"]
+			},
+			{
+				"name": "Widgets",
+				"classes": ["OO.ui.*Widget"]
+			}
+		]
+	},
+	{
+		"name": "OOJS",
+		"groups": [
+			{
+				"name": "General",
+				"classes": [ "OO", "OO.EventEmitter", "OO.Factory", "OO.Registry" ]
+			}
+		]
+	},
+	{
 		"name": "Upstream",
 		"groups": [
 			{
 				"name": "jQuery",
 				"classes": ["jQuery", "jQuery.Event", "jQuery.Promise", "jQuery.Deferred", "jQuery.jqXHR", "QUnit"]
-			},
-			{
-				"name": "OOJS",
-				"classes": ["OO", "OO.*"]
 			},
 			{
 				"name": "JavaScript",

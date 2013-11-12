@@ -216,7 +216,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Цал архайæджы фарсмæ сæ цæст дарынц, уый равдис',
 'tog-oldsig' => 'Ныры къухæрфыст:',
 'tog-fancysig' => 'Сæвæрын къухæрфыст викитекстæй (æнæ хæдæвзæргæ æрвитæнæй)',
-'tog-showjumplinks' => 'Тагъд æрвитæнтæй пайда кæн',
 'tog-uselivepreview' => 'Архайын тагъд разбакастæй (домы JavaScript) (эксперименталон)',
 'tog-forceeditsummary' => 'Фæдзæхсæд иу мæ, кæд ивды афыст афтид уа',
 'tog-watchlisthideown' => 'Айсын мæ ивдтытæ цæстдардæй',
@@ -417,7 +416,7 @@ $1',
 'pool-queuefull' => 'Процессты рад йедзаг у',
 'pool-errorunknown' => 'Æнæбæрæг рæдыд',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{grammar:genitive|{{SITENAME}}}} тыххæй',
 'aboutpage' => 'Project:Афыст',
 'copyright' => 'Мидис у гом {{grammar:allative|$1}} гæсгæ.',
@@ -505,17 +504,6 @@ $1',
 # General errors
 'error' => 'Рæдыд',
 'databaseerror' => 'Рарддоны рæдыд',
-'dberrortext' => 'Рарддонмæ домæны синтаксисы разындис рæдыд.
-Уый гæнæн ис нысан кæны рæдыд софты куысты.
-Фæстаг домæн рарддонмæ уыдис:
-<blockquote><code>$1</code></blockquote>
-сæвзæрдис "<code>$2</code>" функцийæ.
-Рарддон раздæхта ахæм рæдыд: "<samp>$3: $4</samp>".',
-'dberrortextcl' => 'Рарддонмæ домæны синтаксисы разындис рæдыд.
-Фæстаг домæн рарддонмæ уыдис:
-"$1"
-сæвзæрдис "$2" функцийæ.
-Рарддон раздæхта ахæм рæдыд: "$3: $4"',
 'laggedslavemode' => "'''Сындæг:''' Фарсы гæнæн ис нæй фæстаг нæуæггæндтæ.",
 'readonly' => 'Рарддон æхгæд у',
 'enterlockreason' => 'Ныффысс æхгæныны бындур æмæ йæ æмгъуыд',
@@ -572,7 +560,6 @@ $1',
 'editinginterface' => "'''Сындæг:''' Ды ивыс ахæм фарс, кæм ис софты интерфейсы текст.
 Ацы фарсы фæивд фæзындзæн ацы викийы алы архайæджы интерфейсыл дæр.
 Алы викийы тæлмæцтæ ивынæн, дæ хорзæхæй, архай [//translatewiki.net/ translatewiki.net-æй], кæцы у MediaWiki-йы локализацигæнæн проект.",
-'sqlhidden' => '(SQL домæн æмбæхст у)',
 'cascadeprotected' => 'Ацы фарс ивынæй æхгæд у уымæн æмæ у æфтыд бындæр цы "каскадон" хъахъхъонд {{PLURAL:$1|фарс ис, уырдæм|фæрстæ сты, уыдонмæ}}:
 $2',
 'namespaceprotected' => "Дæуæн нæй бар ивын фæрстæ '''$1''' номдоны.",
@@ -615,7 +602,6 @@ $2',
 'remembermypassword' => 'Бахъуыды мæ кæнæд ацы браузеры (максимум $1 {{PLURAL:$1|бонмæ}})',
 'userlogin-remembermypassword' => 'Системæйы мæ дар',
 'userlogin-signwithsecure' => 'Æдас бастдзинадæй',
-'securelogin-stick-https' => 'Дарддæр дæр HTTPS-ы уылты, бахизыны фæстæ',
 'yourdomainname' => 'Дæ домен:',
 'password-change-forbidden' => 'Дæ бон нæу пароль фæивын ацы викийы.',
 'externaldberror' => 'Кæнæ аутентификацийы рарддоны рæдыд æрцыдис, кæнæ та дæуæн нæй бар снæуæг кæнын дæ æддаг аккаунт.',
@@ -741,7 +727,7 @@ $2',
 'newpassword' => 'Нæуæг пароль:',
 'retypenew' => 'Ног пароль ногæй бафысс:',
 'resetpass_submit' => 'Пароль сæвæрын æмæ системæмæ бахизын',
-'resetpass_success' => 'Дæ пароль ивд æрцыд!
+'changepassword-success' => 'Дæ пароль ивд æрцыд!
 Ныр ды хизыс системæмæ...',
 'resetpass_forbidden' => 'Паролæн баивæн нæй',
 'resetpass-no-info' => 'Ды хъуамæ системæмæ хызт уай, цæмæй ацы фарсмæ комкоммæ бавналай.',
@@ -1252,7 +1238,6 @@ $3',
 'recentchangeslinked-feed' => 'Баст ивдтытæ',
 'recentchangeslinked-toolbox' => 'Баст ивдтытæ',
 'recentchangeslinked-title' => '"{{grammar:comitative|$1}}" баст ивдтытæ',
-'recentchangeslinked-noresult' => 'Нæй баст фæрсты ивдтытæ амынд рæстæджы',
 'recentchangeslinked-summary' => "Адон сты фæстаг рæстæджы ивдтытæ ахæм уацты, кæдонмæ æрвиты амынд фарс (кæнæ амынд категорийы уæнгтæ). [[Special:Watchlist|Дæ цæстдард фæрстæ]] сты '''бæзджынæй''' нысангонд.",
 'recentchangeslinked-page' => 'Фарсы ном:',
 'recentchangeslinked-to' => 'Уый бæсты равдисæт амынд фарсмæ æрвитгæ фæрсты ивдтытæ',
@@ -1339,8 +1324,6 @@ $3',
 'statistics-header-users' => 'Архайджыты статистикæ',
 'statistics-header-hooks' => 'Æндæр статистикæтæ',
 'statistics-articles' => 'Мидисы фæрстæ',
-
-'disambiguationspage' => 'Template:бирæнысанон',
 
 'double-redirect-fixer' => 'Рарвыст растгæнæн',
 
@@ -1445,7 +1428,6 @@ $3',
 'watch' => 'Цæст æрдарын',
 'watchthispage' => 'Цæст дарын ацы фарсмæ',
 'unwatch' => 'Нал дарын цæст',
-'watchnochange' => 'Дæ цæстдард уацтæй иу дæр ивд не ’рцыдис.',
 'watchlist-details' => '{{PLURAL:$1|$1 фарсмæ|$1 фарсмæ}} дæ цæст дарыс, тæрхоны фæрстæ нæ нымайгæйæ.',
 'watchlistcontains' => 'Дæ цæст $1 {{PLURAL:$1|фарсмæ|фарсмæ}} дарыс.',
 'wlnote' => "Дæлæ афæстаг '''$2 сахаты дæргъы''' цы $1 {{PLURAL:$1|ивддзинад|ивддзинады}} æрцыди.",

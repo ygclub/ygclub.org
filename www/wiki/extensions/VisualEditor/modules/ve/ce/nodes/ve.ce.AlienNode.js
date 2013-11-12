@@ -16,7 +16,7 @@
  *
  * @constructor
  * @param {ve.dm.AlienNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.AlienNode = function VeCeAlienNode( model, config ) {
 	// Parent constructor
@@ -26,17 +26,17 @@ ve.ce.AlienNode = function VeCeAlienNode( model, config ) {
 	ve.ce.ProtectedNode.call( this );
 	ve.ce.GeneratedContentNode.call( this );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-alienNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-alienNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.AlienNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.AlienNode, ve.ce.LeafNode );
 
-ve.mixinClass( ve.ce.AlienNode, ve.ce.ProtectedNode );
+OO.mixinClass( ve.ce.AlienNode, ve.ce.ProtectedNode );
 
-ve.mixinClass( ve.ce.AlienNode, ve.ce.GeneratedContentNode );
+OO.mixinClass( ve.ce.AlienNode, ve.ce.GeneratedContentNode );
 
 /* Static Properties */
 
@@ -48,14 +48,10 @@ ve.ce.AlienNode.static.$phantomTemplate = ve.ce.AlienNode.static.$phantomTemplat
 
 /* Methods */
 
-/**
- * Handle update events.
- *
- * @method
- */
-ve.ce.AlienNode.prototype.onUpdate = function () {
-	// TODO use GeneratedContentNode the way it was meant to be used
-	this.$.html( ve.copyDomElements( this.model.getAttribute( 'domElements' ) || [], this.getElementDocument() ) );
+ve.ce.AlienNode.prototype.generateContents = function ( config )  {
+	var deferred = $.Deferred();
+	deferred.resolve( ( config && config.domElements ) || this.model.getAttribute( 'domElements' ) || [] );
+	return deferred.promise();
 };
 
 /* Concrete subclasses */
@@ -72,13 +68,13 @@ ve.ce.AlienBlockNode = function VeCeAlienBlockNode( model ) {
 	// Parent constructor
 	ve.ce.AlienNode.call( this, model );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-alienBlockNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-alienBlockNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.AlienBlockNode, ve.ce.AlienNode );
+OO.inheritClass( ve.ce.AlienBlockNode, ve.ce.AlienNode );
 
 /* Static Properties */
 
@@ -96,13 +92,13 @@ ve.ce.AlienInlineNode = function VeCeAlienInlineNode( model ) {
 	// Parent constructor
 	ve.ce.AlienNode.call( this, model );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-alienInlineNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-alienInlineNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.AlienInlineNode, ve.ce.AlienNode );
+OO.inheritClass( ve.ce.AlienInlineNode, ve.ce.AlienNode );
 
 /* Static Properties */
 

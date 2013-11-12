@@ -9,17 +9,17 @@
  * DataModel node factory.
  *
  * @class
- * @extends ve.NamedClassFactory
+ * @extends OO.Factory
  * @constructor
  */
 ve.dm.NodeFactory = function VeDmNodeFactory() {
 	// Parent constructor
-	ve.NamedClassFactory.call( this );
+	OO.Factory.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.NodeFactory, ve.NamedClassFactory );
+OO.inheritClass( ve.dm.NodeFactory, OO.Factory );
 
 /* Methods */
 
@@ -37,7 +37,7 @@ ve.dm.NodeFactory.prototype.getDataElement = function ( type, attributes ) {
 	if ( type in this.registry ) {
 		attributes = ve.extendObject( {}, this.registry[type].static.defaultAttributes, attributes );
 		if ( !ve.isEmptyObject( attributes ) ) {
-			element.attributes = ve.copyObject( attributes );
+			element.attributes = ve.copy( attributes );
 		}
 		return element;
 	}
@@ -154,6 +154,31 @@ ve.dm.NodeFactory.prototype.canNodeContainContent = function ( type ) {
 	throw new Error( 'Unknown node type: ' + type );
 };
 
+
+/**
+ * Check if node can take annotations of a specific type.
+ *
+ * @method
+ * @param {string} type Node type
+ * @param {ve.dm.Annotation} annotation Annotation to test
+ * @returns {boolean} Node can take annotations of this type
+ * @throws {Error} Unknown node type
+ */
+ve.dm.NodeFactory.prototype.canNodeTakeAnnotationType = function ( type, annotation ) {
+	if ( !( type in this.registry ) ) {
+		throw new Error( 'Unknown node type: ' + type );
+	}
+	var i, len,
+		blacklist = this.registry[type].static.blacklistedAnnotationTypes;
+
+	for ( i = 0, len = blacklist.length; i < len; i++ ) {
+		if ( annotation instanceof ve.dm.annotationFactory.create( blacklist[i] ).constructor ) {
+			return false;
+		}
+	}
+	return true;
+};
+
 /**
  * Check if a node is content.
  *
@@ -212,21 +237,6 @@ ve.dm.NodeFactory.prototype.doesNodeHandleOwnChildren = function ( type ) {
 ve.dm.NodeFactory.prototype.isNodeInternal = function ( type ) {
 	if ( type in this.registry ) {
 		return this.registry[type].static.isInternal;
-	}
-	throw new Error( 'Unknown node type: ' + type );
-};
-
-/**
- * Check if the node is focusable.
- *
- * @method
- * @param {string} type Node type
- * @returns {boolean} Whether the node is focusable
- * @throws {Error} Unknown node type
- */
-ve.dm.NodeFactory.prototype.isNodeFocusable = function ( type ) {
-	if ( ve.dm.nodeFactory.lookup( type ) ) {
-		return ve.isMixedIn( ve.ce.nodeFactory.registry[type], ve.ce.FocusableNode );
 	}
 	throw new Error( 'Unknown node type: ' + type );
 };

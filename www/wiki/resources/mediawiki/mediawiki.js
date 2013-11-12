@@ -15,10 +15,38 @@ var mw = ( function ( $, undefined ) {
 	/**
 	 * Creates an object that can be read from or written to from prototype functions
 	 * that allow both single and multiple variables at once.
+	 *
+	 *     @example
+	 *
+	 *     var addies, wanted, results;
+	 *
+	 *     // Create your address book
+	 *     addies = new mw.Map();
+	 *
+	 *     // This data could be coming from an external source (eg. API/AJAX)
+	 *     addies.set( {
+	 *         'John Doe' : '10 Wall Street, New York, USA',
+	 *         'Jane Jackson' : '21 Oxford St, London, UK',
+	 *         'Dominique van Halen' : 'Kalverstraat 7, Amsterdam, NL'
+	 *     } );
+	 *
+	 *     wanted = ['Dominique van Halen', 'George Johnson', 'Jane Jackson'];
+	 *
+	 *     // You can detect missing keys first
+	 *     if ( !addies.exists( wanted ) ) {
+	 *         // One or more are missing (in this case: "George Johnson")
+	 *         mw.log( 'One or more names were not found in your address book' );
+	 *     }
+	 *
+	 *     // Or just let it give you what it can
+	 *     results = addies.get( wanted, 'Middle of Nowhere, Alaska, US' );
+	 *     mw.log( results['Jane Jackson'] ); // "21 Oxford St, London, UK"
+	 *     mw.log( results['George Johnson'] ); // "Middle of Nowhere, Alaska, US"
+	 *
 	 * @class mw.Map
 	 *
 	 * @constructor
-	 * @param {boolean} global Whether to store the values in the global window
+	 * @param {boolean} [global=false] Whether to store the values in the global window
 	 *  object or a exclusively in the object property 'values'.
 	 */
 	function Map( global ) {
@@ -115,8 +143,12 @@ var mw = ( function ( $, undefined ) {
 	};
 
 	/**
-	 * Object constructor for messages,
-	 * similar to the Message class in MediaWiki PHP.
+	 * Object constructor for messages.
+	 *
+	 * Similar to the Message class in MediaWiki PHP.
+	 *
+	 * Format defaults to 'text'.
+	 *
 	 * @class mw.Message
 	 *
 	 * @constructor
@@ -259,6 +291,8 @@ var mw = ( function ( $, undefined ) {
 	};
 
 	/**
+	 * Base library for MediaWiki.
+	 *
 	 * @class mw
 	 * @alternateClassName mediaWiki
 	 * @singleton
@@ -286,13 +320,17 @@ var mw = ( function ( $, undefined ) {
 		Message: Message,
 
 		/**
-		 * List of configuration values
+		 * Map of configuration values
 		 *
-		 * Dummy placeholder. Initiated in startUp module as a new instance of mw.Map().
-		 * If `$wgLegacyJavaScriptGlobals` is true, this Map will have its values
-		 * in the global window object.
-		 * @property
+		 * Check out [the complete list of configuration values](https://www.mediawiki.org/wiki/Manual:Interface/JavaScript#mw.config)
+		 * on MediaWiki.org.
+		 *
+		 * If `$wgLegacyJavaScriptGlobals` is true, this Map will put its values in the
+		 * global window object.
+		 *
+		 * @property {mw.Map} config
 		 */
+		// Dummy placeholder. Re-assigned in ResourceLoaderStartupModule with an instance of `mw.Map`.
 		config: null,
 
 		/**
@@ -302,6 +340,14 @@ var mw = ( function ( $, undefined ) {
 		libs: {},
 
 		/**
+		 * Access container for deprecated functionality that can be moved from
+		 * from their legacy location and attached to this object (e.g. a global
+		 * function that is deprecated and as stop-gap can be exposed through here).
+		 *
+		 * This was reserved for future use but never ended up being used.
+		 *
+		 * @deprecated since 1.22: Let deprecated identifiers keep their original name
+		 * and use mw.log#deprecate to create an access container for tracking.
 		 * @property
 		 */
 		legacy: {},
@@ -315,7 +361,9 @@ var mw = ( function ( $, undefined ) {
 		/* Public Methods */
 
 		/**
-		 * Gets a message object, similar to wfMessage().
+		 * Get a message object.
+		 *
+		 * Similar to wfMessage() in MediaWiki PHP.
 		 *
 		 * @param {string} key Key of message to get
 		 * @param {Mixed...} parameters Parameters for the $N replacements in messages.
@@ -328,14 +376,16 @@ var mw = ( function ( $, undefined ) {
 		},
 
 		/**
-		 * Gets a message string, similar to wfMessage()
+		 * Get a message string using 'text' format.
 		 *
-		 * @see mw.Message#toString
+		 * Similar to wfMsg() in MediaWiki PHP.
+		 *
+		 * @see mw.Message
 		 * @param {string} key Key of message to get
 		 * @param {Mixed...} parameters Parameters for the $N replacements in messages.
 		 * @return {string}
 		 */
-		msg: function ( /* key, parameters... */ ) {
+		msg: function () {
 			return mw.message.apply( mw.message, arguments ).toString();
 		},
 
@@ -424,11 +474,11 @@ var mw = ( function ( $, undefined ) {
 			 *
 			 * @private
 			 * @param {string} text CSS text
-			 * @param {Mixed} [nextnode] An Element or jQuery object for an element where
-			 * the style tag should be inserted before. Otherwise appended to the `<head>`.
-			 * @return {HTMLElement} Node reference to the created `<style>` tag.
+			 * @param {HTMLElement|jQuery} [nextnode=document.head] The element where the style tag should be
+			 *  inserted before. Otherwise it will be appended to `<head>`.
+			 * @return {HTMLElement} Reference to the created `<style>` element.
 			 */
-			function addStyleTag( text, nextnode ) {
+			function newStyleTag( text, nextnode ) {
 				var s = document.createElement( 'style' );
 				// Insert into document before setting cssText (bug 33305)
 				if ( nextnode ) {
@@ -474,8 +524,13 @@ var mw = ( function ( $, undefined ) {
 			}
 
 			/**
+			 * Add a bit of CSS text to the current browser page.
+			 *
+			 * The CSS will be appended to an existing ResourceLoader-created `<style>` tag
+			 * or create a new one based on whether the given `cssText` is safe for extension.
+			 *
 			 * @param {string} [cssText=cssBuffer] If called without cssText,
-			 * the internal buffer will be inserted instead.
+			 *  the internal buffer will be inserted instead.
 			 * @param {Function} [callback]
 			 */
 			function addEmbeddedCSS( cssText, callback ) {
@@ -547,7 +602,7 @@ var mw = ( function ( $, undefined ) {
 					}
 				}
 
-				$( addStyleTag( cssText, getMarker() ) ).data( 'ResourceLoaderDynamicStyleTag', true );
+				$( newStyleTag( cssText, getMarker() ) ).data( 'ResourceLoaderDynamicStyleTag', true );
 
 				cssCallbacks.fire().empty();
 			}
@@ -820,8 +875,7 @@ var mw = ( function ( $, undefined ) {
 			 */
 			function addScript( src, callback, async ) {
 				/*jshint evil:true */
-				var script, head,
-					done = false;
+				var script, head, done;
 
 				// Using isReady directly instead of storing it locally from
 				// a $.fn.ready callback (bug 31895).
@@ -833,6 +887,7 @@ var mw = ( function ( $, undefined ) {
 
 					// IE-safe way of getting the <head>. document.head isn't supported
 					// in old IE, and doesn't work when in the <head>.
+					done = false;
 					head = document.getElementsByTagName( 'head' )[0] || document.body;
 
 					script = document.createElement( 'script' );
@@ -852,12 +907,12 @@ var mw = ( function ( $, undefined ) {
 								// Handle memory leak in IE
 								script.onload = script.onreadystatechange = null;
 
-								// Remove the script
+								// Detach the element from the document
 								if ( script.parentNode ) {
 									script.parentNode.removeChild( script );
 								}
 
-								// Dereference the script
+								// Dereference the element from javascript
 								script = undefined;
 
 								callback();
@@ -971,30 +1026,37 @@ var mw = ( function ( $, undefined ) {
 					mw.messages.set( registry[module].messages );
 				}
 
-				// Make sure we don't run the scripts until all (potentially asynchronous)
-				// stylesheet insertions have completed.
-				( function () {
-					var pending = 0;
-					checkCssHandles = function () {
-						// cssHandlesRegistered ensures we don't take off too soon, e.g. when
-						// one of the cssHandles is fired while we're still creating more handles.
-						if ( cssHandlesRegistered && pending === 0 && runScript ) {
-							runScript();
-							runScript = undefined; // Revoke
-						}
-					};
-					cssHandle = function () {
-						var check = checkCssHandles;
-						pending++;
-						return function () {
-							if (check) {
-								pending--;
-								check();
-								check = undefined; // Revoke
+				if ( $.isReady || registry[module].async ) {
+					// Make sure we don't run the scripts until all (potentially asynchronous)
+					// stylesheet insertions have completed.
+					( function () {
+						var pending = 0;
+						checkCssHandles = function () {
+							// cssHandlesRegistered ensures we don't take off too soon, e.g. when
+							// one of the cssHandles is fired while we're still creating more handles.
+							if ( cssHandlesRegistered && pending === 0 && runScript ) {
+								runScript();
+								runScript = undefined; // Revoke
 							}
 						};
-					};
-				}() );
+						cssHandle = function () {
+							var check = checkCssHandles;
+							pending++;
+							return function () {
+								if (check) {
+									pending--;
+									check();
+									check = undefined; // Revoke
+								}
+							};
+						};
+					}() );
+				} else {
+					// We are in blocking mode, and so we can't afford to wait for CSS
+					cssHandle = function () {};
+					// Run immediately
+					checkCssHandles = runScript;
+				}
 
 				// Process styles (see also mw.loader.implement)
 				// * back-compat: { <media>: css }
@@ -1135,7 +1197,7 @@ var mw = ( function ( $, undefined ) {
 			 * @param {Object} moduleMap Module map, see #buildModulesString
 			 * @param {Object} currReqBase Object with other parameters (other than 'modules') to use in the request
 			 * @param {string} sourceLoadScript URL of load.php
-			 * @param {boolean} async If true, use an asynchrounous request even if document ready has not yet occurred
+			 * @param {boolean} async If true, use an asynchronous request even if document ready has not yet occurred
 			 */
 			function doRequest( moduleMap, currReqBase, sourceLoadScript, async ) {
 				var request = $.extend(
@@ -1150,10 +1212,24 @@ var mw = ( function ( $, undefined ) {
 
 			/* Public Methods */
 			return {
-				addStyleTag: addStyleTag,
+				/**
+				 * The module registry is exposed as an aid for debugging and inspecting page
+				 * state; it is not a public interface for modifying the registry.
+				 *
+				 * @see #registry
+				 * @property
+				 * @private
+				 */
+				moduleRegistry: registry,
 
 				/**
-				 * Requests dependencies from server, loading and executing when things when ready.
+				 * @inheritdoc #newStyleTag
+				 * @method
+				 */
+				addStyleTag: newStyleTag,
+
+				/**
+				 * Batch-request queued dependencies from the server.
 				 */
 				work: function () {
 					var	reqBase, splits, maxQueryLength, q, b, bSource, bGroup, bSourceGroup,
@@ -1315,7 +1391,7 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Registers a module, letting the system know about it and its
+				 * Register a module, letting the system know about it and its
 				 * properties. Startup modules contain calls to this function.
 				 *
 				 * @param {string} module Module name
@@ -1366,9 +1442,10 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Implements a module, giving the system a course of action to take
-				 * upon loading. Results of a request for one or more modules contain
-				 * calls to this function.
+				 * Implement a module given the components that make up the module.
+				 *
+				 * When #load or #using requests one or more modules, the server
+				 * response contain calls to this function.
 				 *
 				 * All arguments are required.
 				 *
@@ -1423,7 +1500,7 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Executes a function as soon as one or more required modules are ready
+				 * Execute a function as soon as one or more required modules are ready.
 				 *
 				 * @param {string|Array} dependencies Module name or array of modules names the callback
 				 *  dependends on to be ready before executing
@@ -1460,7 +1537,7 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Loads an external script or one or more modules for future use
+				 * Load an external script or one or more modules.
 				 *
 				 * @param {string|Array} modules Either the name of a module, array of modules,
 				 *  or a URL of an external script or style
@@ -1540,7 +1617,7 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Changes the state of a module
+				 * Change the state of one or more modules.
 				 *
 				 * @param {string|Object} module module name or object of module name/state pairs
 				 * @param {string} state state name
@@ -1569,9 +1646,9 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Gets the version of a module
+				 * Get the version of a module.
 				 *
-				 * @param {string} module name of module to get version for
+				 * @param {string} module Name of module to get version for
 				 */
 				getVersion: function ( module ) {
 					if ( registry[module] !== undefined && registry[module].version !== undefined ) {
@@ -1581,14 +1658,15 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * @deprecated since 1.18 use mw.loader.getVersion() instead
+				 * @inheritdoc #getVersion
+				 * @deprecated since 1.18 use #getVersion instead
 				 */
 				version: function () {
 					return mw.loader.getVersion.apply( mw.loader, arguments );
 				},
 
 				/**
-				 * Gets the state of a module
+				 * Get the state of a module.
 				 *
 				 * @param {string} module name of module to get state for
 				 */
@@ -1611,16 +1689,45 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * For backwards-compatibility with Squid-cached pages. Loads mw.user
+				 * Load the `mediawiki.user` module.
+				 *
+				 * For backwards-compatibility with cached pages from before 2013 where:
+				 *
+				 * - the `mediawiki.user` module didn't exist yet
+				 * - `mw.user` was still part of mediawiki.js
+				 * - `mw.loader.go` still existed and called after `mw.loader.load()`
 				 */
 				go: function () {
 					mw.loader.load( 'mediawiki.user' );
+				},
+
+				/**
+				 * @inheritdoc mw.inspect#runReports
+				 * @method
+				 */
+				inspect: function () {
+					var args = slice.call( arguments );
+					mw.loader.using( 'mediawiki.inspect', function () {
+						mw.inspect.runReports.apply( mw.inspect, args );
+					} );
 				}
+
 			};
 		}() ),
 
 		/**
 		 * HTML construction helper functions
+		 *
+		 *     @example
+		 *
+		 *     var Html, output;
+		 *
+		 *     Html = mw.html;
+		 *     output = Html.element( 'div', {}, new Html.Raw(
+		 *         Html.element( 'img', { src: '<' } )
+		 *     ) );
+		 *     mw.log( output ); // <div><img src="&lt;"/></div>
+		 *
 		 * @class mw.html
 		 * @singleton
 		 */
@@ -1650,22 +1757,6 @@ var mw = ( function ( $, undefined ) {
 				},
 
 				/**
-				 * Wrapper object for raw HTML passed to mw.html.element().
-				 * @class mw.html.Raw
-				 */
-				Raw: function ( value ) {
-					this.value = value;
-				},
-
-				/**
-				 * Wrapper object for CDATA element contents passed to mw.html.element()
-				 * @class mw.html.Cdata
-				 */
-				Cdata: function ( value ) {
-					this.value = value;
-				},
-
-				/**
 				 * Create an HTML element string, with safe escaping.
 				 *
 				 * @param {string} name The tag name.
@@ -1677,12 +1768,6 @@ var mw = ( function ( $, undefined ) {
 				 *  - this.Cdata: The value attribute is included, and an exception is
 				 *   thrown if it contains an illegal ETAGO delimiter.
 				 *   See http://www.w3.org/TR/1999/REC-html401-19991224/appendix/notes.html#h-B.3.2
-				 *
-				 * Example:
-				 *	var h = mw.html;
-				 *	return h.element( 'div', {},
-				 *		new h.Raw( h.element( 'img', {src: '<'} ) ) );
-				 * Returns <div><img src="&lt;"/></div>
 				 */
 				element: function ( name, attrs, contents ) {
 					var v, attrName, s = '<' + name;
@@ -1731,6 +1816,22 @@ var mw = ( function ( $, undefined ) {
 					}
 					s += '</' + name + '>';
 					return s;
+				},
+
+				/**
+				 * Wrapper object for raw HTML passed to mw.html.element().
+				 * @class mw.html.Raw
+				 */
+				Raw: function ( value ) {
+					this.value = value;
+				},
+
+				/**
+				 * Wrapper object for CDATA element contents passed to mw.html.element()
+				 * @class mw.html.Cdata
+				 */
+				Cdata: function ( value ) {
+					this.value = value;
 				}
 			};
 		}() ),
@@ -1775,12 +1876,17 @@ var mw = ( function ( $, undefined ) {
 		 *     var h = mw.hook( 'bar.ready' );
 		 *     new mw.Foo( .. ).fetch( { callback: h.fire } );
 		 *
+		 * Note: Events are documented with an underscore instead of a dot in the event
+		 * name due to jsduck not supporting dots in that position.
+		 *
 		 * @class mw.hook
 		 */
 		hook: ( function () {
 			var lists = {};
 
 			/**
+			 * Create an instance of mw.hook.
+			 *
 			 * @method hook
 			 * @member mw
 			 * @param {string} name Name of hook.

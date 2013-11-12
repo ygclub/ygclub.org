@@ -9,6 +9,7 @@
  * DataModel MediaWiki external link annotation.
  *
  * Example HTML sources:
+ *
  *     <a rel="mw:ExtLink">
  *     <a rel="mw:ExtLink/Numbered">
  *
@@ -26,16 +27,13 @@ ve.dm.MWExternalLinkAnnotation = function VeDmMWExternalLinkAnnotation( element 
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.MWExternalLinkAnnotation, ve.dm.LinkAnnotation );
+OO.inheritClass( ve.dm.MWExternalLinkAnnotation, ve.dm.LinkAnnotation );
 
 /* Static Properties */
 
 ve.dm.MWExternalLinkAnnotation.static.name = 'link/mwExternal';
 
-ve.dm.MWExternalLinkAnnotation.static.matchRdfaTypes = [
-	'mw:ExtLink',
-	'mw:ExtLink/Numbered'
-];
+ve.dm.MWExternalLinkAnnotation.static.matchRdfaTypes = [ 'mw:ExtLink' ];
 
 ve.dm.MWExternalLinkAnnotation.static.toDataElement = function ( domElements ) {
 	var parentResult = ve.dm.LinkAnnotation.static.toDataElement.apply( this, arguments );
@@ -52,6 +50,9 @@ ve.dm.MWExternalLinkAnnotation.static.toDomElements = function ( dataElement ) {
 
 /* Methods */
 
+/**
+ * @returns {Object}
+ */
 ve.dm.MWExternalLinkAnnotation.prototype.getComparableObject = function () {
 	return {
 		'type': this.getType(),

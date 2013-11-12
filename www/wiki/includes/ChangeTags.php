@@ -34,7 +34,7 @@ class ChangeTags {
 	 *            - classes: Array of strings: CSS classes used in the generated html, one class for each tag
 	 *
 	 */
-	static function formatSummaryRow( $tags, $page ) {
+	public static function formatSummaryRow( $tags, $page ) {
 		global $wgLang;
 
 		if ( !$tags ) {
@@ -54,7 +54,10 @@ class ChangeTags {
 			);
 			$classes[] = Sanitizer::escapeClass( "mw-tag-$tag" );
 		}
-		$markers = wfMessage( 'parentheses' )->rawParams( $wgLang->commaList( $displayTags ) )->text();
+		$markers = wfMessage( 'tag-list-wrapper' )
+			->numParams( count( $displayTags ) )
+			->rawParams( $wgLang->commaList( $displayTags ) )
+			->parse();
 		$markers = Xml::tags( 'span', array( 'class' => 'mw-tag-markers' ), $markers );
 
 		return array( $markers, $classes );
@@ -68,7 +71,7 @@ class ChangeTags {
 	 * @return String: Short description of the tag from "mediawiki:tag-$tag" if this message exists,
 	 *                 html-escaped version of $tag otherwise
 	 */
-	static function tagDescription( $tag ) {
+	public static function tagDescription( $tag ) {
 		$msg = wfMessage( "tag-$tag" );
 		return $msg->exists() ? $msg->parse() : htmlspecialchars( $tag );
 	}
@@ -87,7 +90,7 @@ class ChangeTags {
 	 *
 	 * @exception MWException when $rc_id, $rev_id and $log_id are all null
 	 */
-	static function addTags( $tags, $rc_id = null, $rev_id = null, $log_id = null, $params = null ) {
+	public static function addTags( $tags, $rc_id = null, $rev_id = null, $log_id = null, $params = null ) {
 		if ( !is_array( $tags ) ) {
 			$tags = array( $tags );
 		}
@@ -95,7 +98,8 @@ class ChangeTags {
 		$tags = array_filter( $tags ); // Make sure we're submitting all tags...
 
 		if ( !$rc_id && !$rev_id && !$log_id ) {
-			throw new MWException( "At least one of: RCID, revision ID, and log ID MUST be specified when adding a tag to a change!" );
+			throw new MWException( 'At least one of: RCID, revision ID, and log ID MUST be ' .
+				'specified when adding a tag to a change!' );
 		}
 
 		$dbr = wfGetDB( DB_SLAVE );
@@ -170,7 +174,7 @@ class ChangeTags {
 	 *
 	 * @throws MWException When unable to determine appropriate JOIN condition for tagging
 	 */
-	static function modifyDisplayQuery( &$tables, &$fields, &$conds,
+	public static function modifyDisplayQuery( &$tables, &$fields, &$conds,
 										&$join_conds, &$options, $filter_tag = false ) {
 		global $wgRequest, $wgUseTagFilter;
 
@@ -199,9 +203,7 @@ class ChangeTags {
 			// Add an INNER JOIN on change_tag
 
 			// FORCE INDEX -- change_tags will almost ALWAYS be the correct query plan.
-			global $wgOldChangeTagsIndex;
-			$index = $wgOldChangeTagsIndex ? 'ct_tag' : 'change_tag_tag_id';
-			$options['USE INDEX'] = array( 'change_tag' => $index );
+			$options['USE INDEX'] = array( 'change_tag' => 'change_tag_tag_id' );
 			unset( $options['FORCE INDEX'] );
 			$tables[] = 'change_tag';
 			$join_conds['change_tag'] = array( 'INNER JOIN', "ct_$join_cond=$join_cond" );
@@ -253,7 +255,7 @@ class ChangeTags {
 	 *
 	 * @return Array of strings: tags
 	 */
-	static function listDefinedTags() {
+	public static function listDefinedTags() {
 		// Caching...
 		global $wgMemc;
 		$key = wfMemcKey( 'valid-tags' );
@@ -278,5 +280,35 @@ class ChangeTags {
 		// Short-term caching.
 		$wgMemc->set( $key, $emptyTags, 300 );
 		return $emptyTags;
+	}
+
+	/**
+	 * Returns a map of any tags used on the wiki to number of edits
+	 * tagged with them, ordered descending by the hitcount.
+	 *
+	 * @return array Array of string => int
+	 */
+	public static function tagUsageStatistics() {
+		$out = array();
+
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select(
+			'change_tag',
+			array( 'ct_tag', 'hitcount' => 'count(*)' ),
+			array(),
+			__METHOD__,
+			array( 'GROUP BY' => 'ct_tag', 'ORDER BY' => 'hitcount DESC' )
+		);
+
+		foreach ( $res as $row ) {
+			$out[$row->ct_tag] = $row->hitcount;
+		}
+		foreach ( self::listDefinedTags() as $tag ) {
+			if ( !isset( $out[$tag] ) ) {
+				$out[$tag] = 0;
+			}
+		}
+
+		return $out;
 	}
 }

@@ -115,7 +115,7 @@ class HistoryAction extends FormlessAction {
 
 		// Setup page variables.
 		$out->setFeedAppendQuery( 'action=history' );
-		$out->addModules( array( 'mediawiki.legacy.history', 'mediawiki.action.history' ) );
+		$out->addModules( 'mediawiki.action.history' );
 
 		// Handle atom/RSS feeds.
 		$feedType = $request->getVal( 'feed' );
@@ -178,7 +178,7 @@ class HistoryAction extends FormlessAction {
 			) .
 			Html::hidden( 'title', $this->getTitle()->getPrefixedDBkey() ) . "\n" .
 			Html::hidden( 'action', 'history' ) . "\n" .
-			Xml::dateMenu( ( $year == null ? date( "Y" ) : $year ), $month ) . '&#160;' .
+			Xml::dateMenu( ( $year == null ? MWTimestamp::getLocalInstance()->format( 'Y' ) : $year ), $month ) . '&#160;' .
 			( $tagSelector ? ( implode( '&#160;', $tagSelector ) . '&#160;' ) : '' ) .
 			$checkDeleted .
 			Xml::submitButton( $this->msg( 'allpagessubmit' )->text() ) . "\n" .
@@ -262,9 +262,8 @@ class HistoryAction extends FormlessAction {
 		// Get a limit on number of feed entries. Provide a sane default
 		// of 10 if none is defined (but limit to $wgFeedLimit max)
 		$limit = $request->getInt( 'limit', 10 );
-		if ( $limit > $wgFeedLimit || $limit < 1 ) {
-			$limit = 10;
-		}
+		$limit = min( max( $limit, 1 ), $wgFeedLimit );
+
 		$items = $this->fetchRevisions( $limit, 0, HistoryPage::DIR_NEXT );
 
 		// Generate feed elements enclosed between header and footer.
@@ -373,9 +372,7 @@ class HistoryPager extends ReverseChronologicalPager {
 				array( 'rev_page' => $this->getWikiPage()->getId() ),
 				$this->conds ),
 			'options' => array( 'USE INDEX' => array( 'revision' => 'page_timestamp' ) ),
-			'join_conds' => array(
-				'user' => Revision::userJoinCond(),
-				'tag_summary' => array( 'LEFT JOIN', 'ts_rev_id=rev_id' ) ),
+			'join_conds' => array( 'user' => Revision::userJoinCond() ),
 		);
 		ChangeTags::modifyDisplayQuery(
 			$queryInfo['tables'],

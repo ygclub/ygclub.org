@@ -37,7 +37,7 @@ class NewParserTest extends MediaWikiTestCase {
 	}
 
 	protected function setUp() {
-		global $wgNamespaceAliases;
+		global $wgNamespaceAliases, $wgContLang;
 		global $wgHooks, $IP;
 
 		parent::setUp();
@@ -105,11 +105,14 @@ class NewParserTest extends MediaWikiTestCase {
 		) );
 		$tmpGlobals['wgNamespaceProtection'] = array( NS_MEDIAWIKI => 'editinterface' );
 
-		$tmpGlobals['wgParser'] = new StubObject( 'wgParser', $GLOBALS['wgParserConf']['class'], array( $GLOBALS['wgParserConf'] ) );
+		$tmpGlobals['wgParser'] = new StubObject(
+			'wgParser', $GLOBALS['wgParserConf']['class'],
+			array( $GLOBALS['wgParserConf'] ) );
 
 		$tmpGlobals['wgFileExtensions'][] = 'svg';
 		$tmpGlobals['wgSVGConverter'] = 'rsvg';
-		$tmpGlobals['wgSVGConverters']['rsvg'] = '$path/rsvg-convert -w $width -h $height $input -o $output';
+		$tmpGlobals['wgSVGConverters']['rsvg'] =
+			'$path/rsvg-convert -w $width -h $height $input -o $output';
 
 		if ( $GLOBALS['wgStyleDirectory'] === false ) {
 			$tmpGlobals['wgStyleDirectory'] = "$IP/skins";
@@ -129,6 +132,9 @@ class NewParserTest extends MediaWikiTestCase {
 		$tmpHooks['ParserTestParser'][] = 'ParserTestParserHook::setup';
 		$tmpHooks['ParserGetVariableValueTs'][] = 'ParserTest::getFakeTimestamp';
 		$tmpGlobals['wgHooks'] = $tmpHooks;
+		# add a namespace shadowing a interwiki link, to test
+		# proper precedence when resolving links. (bug 51680)
+		$tmpGlobals['wgExtraNamespaces'] = array( 100 => 'MemoryAlpha' );
 
 		$this->setMwGlobals( $tmpGlobals );
 
@@ -137,10 +143,13 @@ class NewParserTest extends MediaWikiTestCase {
 
 		$wgNamespaceAliases['Image'] = NS_FILE;
 		$wgNamespaceAliases['Image_talk'] = NS_FILE_TALK;
+
+		MWNamespace::getCanonicalNamespaces( true ); # reset namespace cache
+		$wgContLang->resetNamespaces(); # reset namespace cache
 	}
 
 	protected function tearDown() {
-		global $wgNamespaceAliases;
+		global $wgNamespaceAliases, $wgContLang;
 
 		$wgNamespaceAliases['Image'] = $this->savedWeirdGlobals['image_alias'];
 		$wgNamespaceAliases['Image_talk'] = $this->savedWeirdGlobals['image_talk_alias'];
@@ -156,6 +165,14 @@ class NewParserTest extends MediaWikiTestCase {
 		MessageCache::destroyInstance();
 
 		parent::tearDown();
+
+		MWNamespace::getCanonicalNamespaces( true ); # reset namespace cache
+		$wgContLang->resetNamespaces(); # reset namespace cache
+	}
+
+	public static function tearDownAfterClass() {
+		ParserTest::tearDownInterwikis();
+		parent::tearDownAfterClass();
 	}
 
 	function addDBData() {
@@ -317,10 +334,11 @@ class NewParserTest extends MediaWikiTestCase {
 			'wgEnableUploads' => self::getOptionValue( 'wgEnableUploads', $opts, true ),
 			'wgLanguageCode' => $lang,
 			'wgDBprefix' => $this->db->getType() != 'oracle' ? 'unittest_' : 'ut_',
-			'wgRawHtml' => isset( $opts['rawhtml'] ),
+			'wgRawHtml' => self::getOptionValue( 'wgRawHtml', $opts, false ),
 			'wgNamespacesWithSubpages' => array( NS_MAIN => isset( $opts['subpage'] ) ),
+			'wgAllowExternalImages' => self::getOptionValue( 'wgAllowExternalImages', $opts, true ),
 			'wgMaxTocLevel' => $maxtoclevel,
-			'wgUseTeX' => isset( $opts['math'] ),
+			'wgUseTeX' => isset( $opts['math'] ) || isset( $opts['texvc'] ),
 			'wgMathDirectory' => $uploadDir . '/math',
 			'wgDefaultLanguageVariant' => $variant,
 			'wgLinkHolderBatchSize' => $linkHolderBatchSize,
@@ -580,6 +598,20 @@ class NewParserTest extends MediaWikiTestCase {
 
 		$title = Title::newFromText( $titleText );
 
+		# Parser test requiring math. Make sure texvc is executable
+		# or just skip such tests.
+		if ( isset( $opts['math'] ) || isset( $opts['texvc'] ) ) {
+			global $wgTexvc;
+
+			if ( !isset( $wgTexvc ) ) {
+				$this->markTestSkipped( "SKIPPED: \$wgTexvc is not set" );
+			} elseif ( !is_executable( $wgTexvc ) ) {
+				$this->markTestSkipped( "SKIPPED: texvc binary does not exist"
+					. " or is not executable.\n"
+					. "Current configuration is:\n\$wgTexvc = '$wgTexvc'" );
+			}
+		}
+
 		if ( isset( $opts['pst'] ) ) {
 			$out = $parser->preSaveTransform( $input, $title, $user, $options );
 		} elseif ( isset( $opts['msg'] ) ) {
@@ -683,7 +715,9 @@ class NewParserTest extends MediaWikiTestCase {
 			} catch ( Exception $exception ) {
 				$input_dump = sprintf( "string(%d) \"%s\"\n", strlen( $input ), $input );
 
-				$this->assertTrue( false, "Test $id, fuzz seed {$this->fuzzSeed}. \n\nInput: $input_dump\n\nError: {$exception->getMessage()}\n\nBacktrace: {$exception->getTraceAsString()}" );
+				$this->assertTrue( false, "Test $id, fuzz seed {$this->fuzzSeed}. \n\n" .
+					"Input: $input_dump\n\nError: {$exception->getMessage()}\n\n" .
+					"Backtrace: {$exception->getTraceAsString()}" );
 			}
 
 			$this->teardownGlobals();

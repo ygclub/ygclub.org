@@ -322,7 +322,7 @@ $messages = array(
 'jumptonavigation' => 'navigašuvdnii',
 'jumptosearch' => 'ohcamii',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} birra',
 'aboutpage' => 'Project:Dieđut',
 'copyright' => 'Sisdoalu sáhttá geavahit liseanssain $1.',
@@ -397,7 +397,6 @@ $messages = array(
 'viewsource' => 'Geahča gáldu',
 'protectedpagetext' => 'Dát siidu lea suodjaluvvon rievdadusain.',
 'viewsourcetext' => 'Sáhtát geahčat ja kopieret dán siiddu gáldokoda:',
-'sqlhidden' => '(SQL-jearahallan lea čihkojuvvon)',
 
 # Login and logout pages
 'logouttext' => "'''Don leat dál loggen olggos {{GRAMMAR:elative|{{SITENAME}}}}s.'''
@@ -462,7 +461,7 @@ Sáhtát joatkit {{GRAMMAR:genitive|{{SITENAME}}}} geavaheami anonyman dahje log
 'newpassword' => 'Ođđa suollemassátni',
 'retypenew' => 'Ođđa suollemassátni ođđasit',
 'resetpass_submit' => 'Čále suollemassáni ja čálligoađe sisa',
-'resetpass_success' => 'Suollemassáni rievdadeapmim lihkosmuvai.',
+'changepassword-success' => 'Suollemassáni rievdadeapmim lihkosmuvai.',
 'resetpass_forbidden' => 'Suollemassániid rievdan ii lihkosmuva dán wikis.',
 'resetpass-submit-loggedin' => 'Molsso suollemassáni',
 
@@ -891,8 +890,6 @@ $1 {{int:pipe-separator}} $2',
 'statistics-users-active-desc' => 'Geavaheaddjit, geat leat bargan juoidá maŋimus {{PLURAL:$1|beaivvi|$1 beaivvi}} áigge.',
 'statistics-mostpopular' => 'Eanemusta gehčojuvvon siiddut',
 
-'disambiguations' => 'Liŋkkat dárkonsiidduide',
-
 'doubleredirects' => 'Guovttegeardán ođđasitstivremat',
 
 'brokenredirects' => 'Bieđganan ođđasitstivremat',
@@ -1037,7 +1034,6 @@ Also see [[Special:WantedCategories|wanted categories]].',
 'unwatch' => 'Heaite čuovvumis',
 'unwatchthispage' => 'Heaite čuovvumis',
 'notanarticle' => 'Ii leat siidu',
-'watchnochange' => 'Válljejuvvon áigodagas oktage du čuovvunlisttui gullevaš siidu leat rievdaduvvon.',
 'watchlist-details' => 'Du čuovvunlisttus {{PLURAL:$1|lea $1 siidu|leat $1 siiddu}}. Lohkui eai leat váldojuvvon ságastallansiidduid.',
 'wlheader-enotif' => 'E-poastaalmmuhusat leat anus.',
 'wlheader-showupdated' => "Siiddut, mat leat rievdaduvvon du maŋimus geavahangearddi maŋŋá leat merkojuvvon '''buoiddes teavsttain'''",

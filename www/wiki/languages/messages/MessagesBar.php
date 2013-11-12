@@ -9,6 +9,7 @@
  *
  * @author Als-Holder
  * @author Bua333
+ * @author Geitost
  * @author Malafaya
  * @author Man77
  * @author Merlissimo
@@ -88,7 +89,6 @@ $messages = array(
 'tog-shownumberswatching' => "D' Åzoi voh dé beówochterden Benutzer åzoang",
 'tog-oldsig' => 'Existente Unterschrift',
 'tog-fancysig' => 'Unterschrift ois Wikitext bhåndln (óne autómaatische Valinkung)',
-'tog-showjumplinks' => '„Wexeln zu“-Links aktivirn',
 'tog-uselivepreview' => 'Live-Vurschau nutzen (dodafyr braucht ma JavaScript) (experimentoy)',
 'tog-forceeditsummary' => 'Warnen, wånn ban Speichern dé Zåmmerfossung fööd',
 'tog-watchlisthideown' => 'Eigerne Beorweitungen in da Beówochtungslisten ausblenden',
@@ -287,7 +287,7 @@ $1",
 'pool-queuefull' => 'Poolworteschlång is vói',
 'pool-errorunknown' => 'Unbekånnter Feeler',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Iba {{SITENAME}}',
 'aboutpage' => 'Project:Iba',
 'copyright' => 'Da Inhoid is unter da $1 vafiagbor.',
@@ -370,15 +370,6 @@ Olle vafiagborn Speziaalseiten san in da [[Special:SpecialPages|Listen voh dé S
 # General errors
 'error' => 'Feeler',
 'databaseerror' => 'Feeler in da Daatenbånk',
-'dberrortext' => "Es is a Daatenbånkfeeler auftreeden!
-Da Grund kå a Prógrammierfeeler seih.
-D' létzde Daatenbånkobfrog wor:
-<blockquote><tt>$1</tt></blockquote>
-aus da Funkzión „<tt>$2</tt>“.
-Dé Daatenbånk hod an Feeler „<tt>$3: $4</tt>“ gmödt.",
-'dberrortextcl' => "Tschuidigung! Es hod an Syntaxfeeler in da Daatenbånkobfrog geem.
-D' letzte Daatenbånkobfrog hod  „$1“ aus da Funkzion „<tt>$2</tt>“ glautt.
-De Daatenbånk möidt 'n Feeler: „<tt>$3: $4</tt>“.",
 'laggedslavemode' => "'''Ochtung:''' De åzoagte Seiten kunnterd unter Umständ ned d' letzden Beorweitungen enthoiden.",
 'readonly' => 'Daatenbånk gsperrd',
 'enterlockreason' => 'Bittscheh gib an Grund å, warum de Daatenbånk gsperrd wern soi und a Obschätzung ywer de Dauer voh da Sperrung',
@@ -429,7 +420,6 @@ Bittscheh vasuachs in a por Minunten nuamoi.',
 'editinginterface' => "'''Ówocht:''' Dé Seiten do enthoit voh da MediaWiki-Software gnutzden Text. 
 Änderrungen auf derer Seiten wirken sé auf d' Benutzerówerflächen aus.
 Ziag bittscheh im Foi voh Ywersétzungen in Betrocht, dé bei [//translatewiki.net/wiki/Main_Page?setlang=de translatewiki.net], da Lókaalisiarungsblottform fyr MediaWiki, durchzfyrn.",
-'sqlhidden' => '(SQL-Obfrog vastéckt)',
 'cascadeprotected' => "Dé Seiten is zua da Beorweitung gsperrd worn. Sie is in d' {{PLURAL:$1|fóigande Seiten|fóiganden Seiten}} eihbunden, dé mid da Kaskaadensperrópzión gschytzd {{PLURAL:$1|is|san}}:
 $2",
 'namespaceprotected' => "Du host néd d' daforderliche Berechtigung, Seiten im Náumensraum '''$1''' b'orweiden z' kenner.",
@@ -452,7 +442,6 @@ Beochtt ower, daas oanige Seiten noh åzoang kennern, daas du ågmödt bist, só
 'yourpassword' => 'Passwort:',
 'yourpasswordagain' => 'Es Passwort no amoi eigebm',
 'remembermypassword' => 'Mitm Brausa dauahoft ogmejd bleibm (maximoi $1 {{PLURAL:$1|Dog|Dog}})',
-'securelogin-stick-https' => "Noch'm Auhmöden mid HTTPS vabunden bleim",
 'yourdomainname' => 'Eanerne Domain:',
 'externaldberror' => 'Entweder es ligt a Feeler bai da externen Authentifiziarung vur oder du derfst dai externs Benytzerkonto ned aktualisirn.',
 'login' => 'Eilogga',
@@ -463,7 +452,7 @@ Beochtt ower, daas oanige Seiten noh åzoang kennern, daas du ågmödt bist, só
 'logout' => 'Obmöden',
 'userlogout' => 'Auslogga',
 'notloggedin' => 'Ned ågmödt',
-'nologin' => "Du host koa Nutzakonto? '''$1'''.",
+'nologin' => 'Du host koa Nutzakonto? $1.',
 'nologinlink' => 'A neichs Nutzakonto olegn',
 'createaccount' => 'Nutzakonto olegn',
 'gotaccount' => "Hosd scho a Nutzakonto? '''$1'''.",
@@ -738,7 +727,6 @@ Details stehen im [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} 
 'mypreferences' => 'Mei Preferenz',
 'changepassword' => 'Posswort ändern',
 'prefs-editing' => 'Beorweiten',
-'prefs-edit-boxsize' => 'Gress vom Beorweitungsfenster',
 'rows' => 'Zeiln:',
 'columns' => 'Spoiten',
 'searchresultshead' => 'Suachen',
@@ -842,7 +830,6 @@ Stand: $4, $5 Uhr.",
 'recentchangeslinked-feed' => 'Valinkts priaffm',
 'recentchangeslinked-toolbox' => 'Endarunga af valinktn Seitn',
 'recentchangeslinked-title' => 'Endarunga wo vo „$1“ valinkt san',
-'recentchangeslinked-noresult' => 'Im ausgwejtn Zeidraum san an dena valinkdn Seitn koane Endarunga vorgnumma worn.',
 'recentchangeslinked-summary' => "Des is a Listn vo de letztn Endarunga af Seitn, de wo vo ana bstimmtn Seitn valinkt san (bzw. za ana bstimmtn Kategorie ghean).
 Seitn af [[Special:Watchlist|deina Beobochtungslistn]] san '''fett'''.",
 'recentchangeslinked-page' => 'Seitn:',
@@ -971,12 +958,6 @@ A [[Special:WhatLinksHere/$2|voiständige Listn]] gibt's aa.",
 'statistics-edits-average' => 'Beorweitungen pró Seiten im Durchschnit',
 'statistics-views-total' => 'Seitenaufruaff gsåmmt',
 'statistics-mostpopular' => 'Dé am moastbsuachten Seiten',
-
-'disambiguationspage' => 'Template:Begriffsklearung',
-'disambiguations-text' => "D' fóigernden Seiten valinken af a Seiten za ner Begiefsklärung. Du sóiderst stott dém af d' oagerntlich gmoahde Seiten valinken.
-
-A Seiten gijt ois Begriefsklärungsseiten, waunns oane vah dé af [[MediaWiki:Disambiguationspage]] afgfyrde Vurloog(ng) eihbindt.</br>
-Links as Naumensraim wern do néd afglistt.",
 
 'doubleredirects' => 'Doppede Weiderloatungen',
 
@@ -1142,7 +1123,6 @@ Waunnst dé Seiten wieder voh deiner Beówochtungslisten weggerddoah mechst, dru
 'unwatchthispage' => 'Nimmer beówochten',
 'notanarticle' => 'Koah Seiten',
 'notvisiblerev' => 'Versión is gléschd worn',
-'watchnochange' => 'Koahne dé voh dir beówochterden Seiten san wärnd dém auhzoagten Zeidraum beorwatt worn.',
 'watchlist-details' => 'Du beoochst {{PLURAL:$1|$1 Seitn}}, Dischkriaseitn ned mitgrechnad',
 'wlheader-enotif' => 'Da E-Mail-Benoochrichtigungsdeanst is aktivierd.',
 'wlheader-showupdated' => "Seiten mid noh néd gseengne Änderrungen wern '''fett''' dorgstöd.",
@@ -1667,7 +1647,6 @@ Bittscheh d' noraale Vurschau bnutzen.",
 'version-other' => 'Ånders',
 'version-mediahandlers' => 'Meediennutzung',
 'version-hooks' => "Schnidstön ''(Hooks)''",
-'version-extension-functions' => 'Funkziónsaufruaffe',
 'version-parser-extensiontags' => "Parserdaweiterrungen ''(tags)''",
 'version-parser-function-hooks' => 'Parserfunkziónen',
 'version-hook-name' => 'Schnidstönnaum',

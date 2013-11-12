@@ -30,32 +30,14 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 	this.$document = null;
 	this.$spinner = $( '<div class="ve-init-mw-viewPageTarget-loading"></div>' );
 	this.$toolbarTracker = $( '<div class="ve-init-mw-viewPageTarget-toolbarTracker"></div>' );
+	this.toolbarTrackerFloating = null;
+	this.toolbarOffset = null;
 	this.toolbarCancelButton = null;
 	this.toolbarSaveButton = null;
-	this.saveDialogSlideHistory = [];
-	this.saveDialogSaveButton = null;
-	this.saveDialogReviewGoodButton = null;
-
-	this.$toolbarEditNotices = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-toolbar-editNotices' );
-	this.$toolbarEditNoticesTool = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-tool' );
-
-	this.$toolbarFeedbackTool = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-tool' );
-
-	this.$toolbarBetaNotice = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-toolbar-betaNotice' );
-	this.$toolbarBetaNoticeTool = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-tool' );
-
-	this.$toolbarMwMetaButton = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-tool' );
-	this.$saveDialog = $( '<div>' )
-		.addClass( 've-init-mw-viewPageTarget-saveDialog' );
-
+	this.saveDialog = null;
 	this.onBeforeUnloadFallback = null;
 	this.onBeforeUnloadHandler = null;
+	this.timings = {};
 	this.active = false;
 	this.edited = false;
 	this.sanityCheckFinished = false;
@@ -68,8 +50,9 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 	this.actFromPopState = false;
 	this.scrollTop = null;
 	this.currentUri = currentUri;
-	this.messages = {};
 	this.section = currentUri.query.vesection || null;
+	this.sectionPositionRestored = false;
+	this.sectionTitleRestored = false;
 	this.namespaceName = mw.config.get( 'wgCanonicalNamespace' );
 	this.viewUri = new mw.Uri( mw.util.wikiGetlink( this.pageName ) );
 	this.veEditUri = this.viewUri.clone().extend( { 'veaction': 'edit' } );
@@ -90,12 +73,6 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 		'vewhitelist' in currentUri.query ||
 		$.client.test( ve.init.mw.ViewPageTarget.compatibility.whitelist, null, true )
 	);
-
-	if ( mw.config.get( 'wgVisualEditorConfig' ).enableEventLogging ) {
-		this.setUpEventLogging();
-	} else {
-		this.logEvent = $.noop;
-	}
 
 	// Events
 	this.connect( this, {
@@ -122,11 +99,12 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 		// visualeditor-notification-saved
 		// visualeditor-notification-created
 		// visualeditor-notification-restored
-		mw.notify(
-			ve.msg( 'visualeditor-notification-' + currentUri.query.venotify,
-				new mw.Title( this.pageName ).toText()
-			)
-		);
+		mw.hook( 'postEdit' ).fire( {
+			'message':
+				ve.msg( 'visualeditor-notification-' + currentUri.query.venotify,
+					new mw.Title( this.pageName ).toText()
+				)
+		} );
 		if ( window.history.replaceState ) {
 			delete currentUri.query.venotify;
 			window.history.replaceState( null, document.title, currentUri );
@@ -140,7 +118,7 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 
 /* Inheritance */
 
-ve.inheritClass( ve.init.mw.ViewPageTarget, ve.init.mw.Target );
+OO.inheritClass( ve.init.mw.ViewPageTarget, ve.init.mw.Target );
 
 /* Static Properties */
 
@@ -162,74 +140,6 @@ ve.init.mw.ViewPageTarget.compatibility = {
 	}
 };
 
-ve.init.mw.ViewPageTarget.static.toolbarTools = [
-	{ 'items': [ 'undo', 'redo' ] },
-	{ 'items': [ 'mwFormat' ] },
-	{ 'items': [ 'bold', 'italic', 'mwLink', 'clear' ] },
-	{ 'items': [ 'number', 'bullet', 'outdent', 'indent' ] },
-	{ 'items': [ 'mwMediaInsert', 'mwReferenceInsert', 'mwReferenceList', 'mwTransclusion' ] }
-];
-
-ve.init.mw.ViewPageTarget.static.surfaceCommands = [
-	'bold', 'italic', 'mwLink', 'undo', 'redo', 'indent', 'outdent'
-];
-
-// TODO: Accessibility tooltips and logical tab order for prevButton and closeButton.
-ve.init.mw.ViewPageTarget.saveDialogTemplate = '\
-	<div class="ve-init-mw-viewPageTarget-saveDialog-head">\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-prevButton"></div>\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-closeButton"></div>\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-title"></div>\
-	</div>\
-	<div class="ve-init-mw-viewPageTarget-saveDialog-body">\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-slide ve-init-mw-viewPageTarget-saveDialog-slide-save">\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-summary">\
-				<textarea name="editSummary" class="ve-init-mw-viewPageTarget-saveDialog-editSummary"\
-					id="ve-init-mw-viewPageTarget-saveDialog-editSummary" type="text"\
-					rows="4"></textarea>\
-			</div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-options">\
-				<input type="checkbox" name="minorEdit" \
-					id="ve-init-mw-viewPageTarget-saveDialog-minorEdit">\
-				<label class="ve-init-mw-viewPageTarget-saveDialog-minorEdit-label"\
-					for="ve-init-mw-viewPageTarget-saveDialog-minorEdit"></label>\
-				<input type="checkbox" name="watchList"\
-					id="ve-init-mw-viewPageTarget-saveDialog-watchList">\
-				<label class="ve-init-mw-viewPageTarget-saveDialog-watchList-label"\
-					for="ve-init-mw-viewPageTarget-saveDialog-watchList"></label>\
-				<label class="ve-init-mw-viewPageTarget-saveDialog-editSummaryCount"></label>\
-			</div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-messages"></div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-actions">\
-				<div class="ve-init-mw-viewPageTarget-saveDialog-dirtymsg"></div>\
-				<div class="ve-init-mw-viewPageTarget-saveDialog-working"></div>\
-			</div>\
-			<div style="clear: both;"></div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-foot">\
-				<p class="ve-init-mw-viewPageTarget-saveDialog-license"></p>\
-			</div>\
-		</div>\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-slide ve-init-mw-viewPageTarget-saveDialog-slide-review">\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-viewer"></div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-actions">\
-				<div class="ve-init-mw-viewPageTarget-saveDialog-working"></div>\
-			</div>\
-			<div style="clear: both;"></div>\
-		</div>\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-slide ve-init-mw-viewPageTarget-saveDialog-slide-conflict">\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-conflict">\
-			</div>\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-actions">\
-				<div class="ve-init-mw-viewPageTarget-saveDialog-working"></div>\
-			</div>\
-			<div style="clear: both;"></div>\
-		</div>\
-		<div class="ve-init-mw-viewPageTarget-saveDialog-slide ve-init-mw-viewPageTarget-saveDialog-slide-nochanges">\
-			<div class="ve-init-mw-viewPageTarget-saveDialog-nochanges">\
-			</div>\
-		</div>\
-	</div>';
-
 /* Methods */
 
 /**
@@ -240,6 +150,7 @@ ve.init.mw.ViewPageTarget.saveDialogTemplate = '\
 ve.init.mw.ViewPageTarget.prototype.activate = function () {
 	if ( !this.active && !this.activating ) {
 		this.activating = true;
+		this.timings.activationStart = ve.now();
 
 		// User interface changes
 		this.transformPage();
@@ -247,7 +158,9 @@ ve.init.mw.ViewPageTarget.prototype.activate = function () {
 		this.hideTableOfContents();
 		this.mutePageContent();
 		this.mutePageTitle();
+
 		this.saveScrollPosition();
+
 		this.load();
 	}
 };
@@ -268,6 +181,7 @@ ve.init.mw.ViewPageTarget.prototype.deactivate = function ( override ) {
 			// User interface changes
 			this.restorePage();
 			this.hideSpinner();
+			this.showTableOfContents();
 
 			if ( this.toolbarCancelButton ) {
 				// If deactivate is called before a successful load, then
@@ -277,20 +191,26 @@ ve.init.mw.ViewPageTarget.prototype.deactivate = function ( override ) {
 				this.detachToolbarButtons();
 			}
 
-			this.resetSaveDialog();
-			this.hideSaveDialog();
-			this.detachSaveDialog();
+			if ( this.saveDialog ) {
+				// If we got as far as setting up the save dialog, tear it down
+				this.saveDialog.reset();
+				this.saveDialog.close();
+			}
 			// Check we got as far as setting up the surface
 			if ( this.active ) {
+				// If we got as far as setting up the surface, tear that down
 				this.tearDownSurface();
-			} else {
-				this.showPageContent();
 			}
+
+			// Show/restore components that are otherwise handled by tearDownSurface
+			this.showPageContent();
+			this.restorePageTitle();
+
 			// If there is a load in progress, abort it
 			if ( this.loading ) {
 				this.loading.abort();
 			}
-			this.showTableOfContents();
+
 			this.deactivating = false;
 			mw.hook( 've.deactivationComplete' ).fire();
 		}
@@ -305,22 +225,22 @@ ve.init.mw.ViewPageTarget.prototype.deactivate = function ( override ) {
  */
 ve.init.mw.ViewPageTarget.prototype.onLoad = function ( doc ) {
 	if ( this.activating ) {
-		this.logEvent( 'Edit', { action: 'page-edit-impression' } );
 		this.edited = false;
 		this.doc = doc;
 		this.setUpSurface( doc, ve.bind( function() {
 			this.startSanityCheck();
-			this.setupToolbarEditNotices();
-			this.setupToolbarBetaNotice();
 			this.setupToolbarButtons();
 			this.setupSaveDialog();
 			this.attachToolbarButtons();
-			this.attachSaveDialog();
 			this.restoreScrollPosition();
 			this.restoreEditSection();
 			this.setupBeforeUnloadHandler();
 			this.$document[0].focus();
 			this.activating = false;
+			if ( mw.config.get( 'wgVisualEditorConfig' ).showBetaWelcome ) {
+				this.showBetaWelcome();
+			}
+			ve.track( 'performance.system.activation', { 'duration': ve.now() - this.timings.activationStart } );
 			mw.hook( 've.activationComplete' ).fire();
 		}, this ) );
 	}
@@ -371,12 +291,7 @@ ve.init.mw.ViewPageTarget.prototype.onTokenError = function ( response, status )
  * @param {number} [newid] New revision id, undefined if unchanged
  */
 ve.init.mw.ViewPageTarget.prototype.onSave = function ( html, newid ) {
-	this.logEvent( 'Edit', {
-		action: 'page-save-success',
-		latency: this.saveStart ? new Date() - this.saveStart : 0
-	} );
-	delete this.saveStart;
-
+	ve.track( 'performance.user.saveComplete', { 'duration': ve.now() - this.timings.saveDialogSave } );
 	if ( !this.pageExists || this.restoring ) {
 		// This is a page creation or restoration, refresh the page
 		this.tearDownBeforeUnloadHandler();
@@ -389,9 +304,10 @@ ve.init.mw.ViewPageTarget.prototype.onSave = function ( html, newid ) {
 		// Just checking for mw.page.watch is not enough because in Firefox
 		// there is Object.prototype.watch...
 		if ( mw.page.watch && mw.page.watch.updateWatchLink ) {
-			var watchChecked = this.$saveDialog
-				.find( '#ve-init-mw-viewPageTarget-saveDialog-watchList')
-				.prop( 'checked' );
+			var watchChecked = this.saveDialog.$saveOptions
+				.find( '.ve-ui-mwSaveDialog-checkboxes' )
+					.find( '#wpWatchthis' )
+					.prop( 'checked' );
 			mw.page.watch.updateWatchLink(
 				$( '#ca-watch a, #ca-unwatch a' ),
 				watchChecked ? 'unwatch': 'watch'
@@ -408,18 +324,18 @@ ve.init.mw.ViewPageTarget.prototype.onSave = function ( html, newid ) {
 			mw.config.set( 'wgCurRevisionId', newid );
 			this.revid = newid;
 		}
-
-		this.hideSaveDialog();
-		this.resetSaveDialog();
+		this.saveDialog.close();
+		this.saveDialog.reset();
 		this.replacePageContent( html );
 		this.setupSectionEditLinks();
 		this.tearDownBeforeUnloadHandler();
 		this.deactivate( true );
-		mw.util.jsMessage(
-			ve.msg( 'visualeditor-notification-saved',
-				new mw.Title( this.pageName ).toText()
-			)
-		);
+		mw.hook( 'postEdit' ).fire( {
+			'message':
+				ve.msg( 'visualeditor-notification-saved',
+					new mw.Title( this.pageName ).toText()
+				)
+		} );
 	}
 };
 
@@ -432,22 +348,153 @@ ve.init.mw.ViewPageTarget.prototype.onSave = function ( html, newid ) {
  * @param {Object|null} data API response data
   */
 ve.init.mw.ViewPageTarget.prototype.onSaveError = function ( jqXHR, status, data ) {
-	var editApi;
-	this.saveDialogSaveButton.setDisabled( false );
-	this.$saveDialogLoadingIcon.hide();
+	var api, editApi,
+		trackData = {
+			'duration': ve.now() - this.timings.saveDialogSave,
+			'retries': this.timings.saveRetries
+		},
+		viewPage = this;
 
-	this.clearMessage( 'api-save-error' );
+	this.saveDialog.saveButton.setDisabled( false );
+	this.saveDialog.$loadingIcon.hide();
+
+	this.saveDialog.clearMessage( 'api-save-error' );
 
 	// Handle empty response
 	if ( !data ) {
-		this.showMessage(
+		ve.track( 'performance.user.saveError.empty', trackData );
+		this.saveDialog.showMessage(
 			'api-save-error',
 			ve.msg( 'visualeditor-saveerror', 'Empty server response' ),
 			{
 				wrap: 'error'
 			}
 		);
-		this.saveDialogSaveButton.setDisabled( true );
+		this.saveDialog.saveButton.setDisabled( true );
+		return;
+	}
+
+	editApi = data && data.visualeditoredit && data.visualeditoredit.edit;
+
+	// Handle spam blacklist error (either from core or from Extension:SpamBlacklist)
+	if ( editApi && editApi.spamblacklist ) {
+		ve.track( 'performance.user.saveError.spamblacklist', trackData );
+		this.saveDialog.showMessage(
+			'api-save-error',
+			// TODO: Use mediawiki.language equivalant of Language.php::listToText once it exists
+			ve.msg( 'spamprotectiontext' ) + ' ' + ve.msg( 'spamprotectionmatch', editApi.spamblacklist.split( '|' ).join( ', ' ) ),
+			{
+				wrap: 'error'
+			}
+		);
+		this.saveDialog.saveButton.setDisabled( true );
+		return;
+	}
+
+	// Handle warnings/errors from Extension:AbuseFilter
+	// TODO: Move this to a plugin
+	if ( editApi && editApi.info && editApi.info.indexOf( 'Hit AbuseFilter:' ) === 0 && editApi.warning ) {
+		ve.track( 'performance.user.saveError.abusefilter', trackData );
+		this.saveDialog.showMessage(
+			'api-save-error',
+			$.parseHTML( editApi.warning ),
+			{ wrap:  false }
+		);
+		// Don't disable the save button. If the action is not disallowed the user may save the
+		// edit by pressing Save again. The AbuseFilter API currently has no way to distinguish
+		// between filter triggers that are and aren't disallowing the action.
+		return;
+	}
+
+	// Handle token errors
+	if ( data.error && data.error.code === 'badtoken' ) {
+		api = new mw.Api();
+		viewPage.saveDialog.saveButton.setDisabled( true );
+		viewPage.saveDialog.$loadingIcon.show();
+		api.get( {
+			// action=query&meta=userinfo and action=tokens&type=edit can't be combined
+			// but action=query&meta=userinfo and action=query&prop=info can, however
+			// that means we have to give it titles and deal with page ids.
+			'action': 'query',
+			'meta': 'userinfo',
+			'prop': 'info',
+			// Try to send the normalised form so that it is less likely we get extra data like
+			// data.normalised back that we don't need.
+			'titles': new mw.Title( viewPage.pageName ).toText(),
+			'indexpageids': '',
+			'intoken': 'edit'
+		} )
+			.always( function () {
+				viewPage.saveDialog.$loadingIcon.hide();
+			} )
+			.done( function ( data ) {
+				var badTokenText, userMsg,
+					userInfo = data.query && data.query.userinfo,
+					pageInfo = data.query && data.query.pages && data.query.pageids &&
+						data.query.pageids[0] && data.query.pages[ data.query.pageids[0] ],
+					editToken = pageInfo && pageInfo.edittoken;
+
+				if ( userInfo && editToken ) {
+					viewPage.editToken = editToken;
+
+					if (
+						( mw.user.isAnon() && userInfo.anon !== undefined ) ||
+							// Comparing id instead of name to pretect against possible
+							// normalisation and against case where the user got renamed.
+							mw.config.get( 'wgUserId' ) === userInfo.id
+					) {
+						// New session is the same user still
+						this.timings.saveRetries++;
+						viewPage.saveDocument();
+					} else {
+						// The now current session is a different user
+						ve.track( 'performance.user.saveError.badtoken', trackData );
+						viewPage.saveDialog.saveButton.setDisabled( false );
+
+						// Trailing space is to separate from the other message.
+						badTokenText = document.createTextNode( mw.msg( 'visualeditor-savedialog-error-badtoken' ) + ' ' );
+
+						if ( userInfo.anon !== undefined ) {
+							// New session is an anonymous user
+							mw.config.set( {
+								// wgUserId is unset for anonymous users, not set to null
+								'wgUserId': undefined,
+								// wgUserName is explicitly set to null for anonymous users,
+								// functions like mw.user.isAnon rely on this.
+								'wgUserName': null
+							} );
+
+							viewPage.saveDialog.showMessage(
+								'api-save-error',
+								$( badTokenText ).add(
+									$.parseHTML( mw.message( 'visualeditor-savedialog-identify-anon' ).parse() )
+								),
+								{ wrap: 'warning' }
+							);
+						} else {
+							// New session is a different user
+							mw.config.set( { 'wgUserId': userInfo.id, 'wgUserName': userInfo.name } );
+
+							// mediawiki.jqueryMsg has a bug with [[User:$1|$1]] (bug 51388)
+							userMsg = 'visualeditor-savedialog-identify-user---' + userInfo.name;
+							mw.messages.set(
+								userMsg,
+								mw.messages.get( 'visualeditor-savedialog-identify-user' )
+									.replace( /\$1/g, userInfo.name )
+							);
+
+							viewPage.saveDialog.showMessage(
+								'api-save-error',
+								$( badTokenText ).add(
+									$.parseHTML( mw.message( userMsg ).parse() )
+								),
+								{ wrap: 'warning' }
+							);
+						}
+					}
+
+				}
+			} );
 		return;
 	}
 
@@ -459,24 +506,24 @@ ve.init.mw.ViewPageTarget.prototype.onSaveError = function ( jqXHR, status, data
 	// "question" or "fancy" type of captcha. They all expose differently named properties in the
 	// API for different things in the UI. At this point we only support the FancyCaptha which we
 	// very intuitively detect by the presence of a "url" property.
-	editApi = data && data.visualeditoredit && data.visualeditoredit.edit;
 	if ( editApi && editApi.captcha && editApi.captcha.url ) {
+		ve.track( 'performance.user.saveError.captcha', trackData );
 		this.captcha = {
-			input: new ve.ui.TextInputWidget(),
+			input: new OO.ui.TextInputWidget(),
 			id: editApi.captcha.id
 		};
-		this.showMessage(
+		this.saveDialog.showMessage(
 			'api-save-error',
-			$( '<div>').append(
+			$( '<div>' ).append(
 				// msg: simplecaptcha-edit, fancycaptcha-edit, ..
 				$( '<p>' ).append(
 					$( '<strong>' ).text( mw.msg( 'captcha-label' ) ),
 					document.createTextNode( mw.msg( 'colon-separator' ) ),
 					$( $.parseHTML( mw.message( 'fancycaptcha-edit' ).parse() ) )
-						.filter( 'a' ).attr( 'target', '_blank ' ).end()
+						.filter( 'a' ).attr( 'target', '_blank' ).end()
 				),
 				$( '<img>' ).attr( 'src', editApi.captcha.url ),
-				this.captcha.input.$
+				this.captcha.input.$element
 			),
 			{
 				wrap: false
@@ -485,29 +532,22 @@ ve.init.mw.ViewPageTarget.prototype.onSaveError = function ( jqXHR, status, data
 		return;
 	}
 
-	// Handle token errors
-	if ( data.error && data.error.code === 'badtoken' ) {
-		this.showMessage(
-			'api-save-error',
-			document.createTextNode( mw.msg( 'visualeditor-savedialog-error-badtoken' ) ),
-			{
-				wrap: 'error'
-			}
-		);
-		this.saveDialogSaveButton.setDisabled( true );
-		return;
-	}
-
-
 	// Handle (other) unknown and/or unrecoverable errors
-	this.showMessage(
+	ve.track( 'performance.user.saveError.unknown', trackData );
+	this.saveDialog.showMessage(
 		'api-save-error',
-		document.createTextNode( data.error && ( data.error.info || data.error.code ) || 'Invalid error code' ),
+		document.createTextNode(
+			( editApi && editApi.info ) ||
+				( data.error && data.error.info ) ||
+				( editApi && editApi.code ) ||
+				( data.error && data.error.code ) ||
+				'Unknown error'
+		),
 		{
 			wrap: 'error'
 		}
 	);
-	this.saveDialogSaveButton.setDisabled( true );
+	this.saveDialog.saveButton.setDisabled( true );
 };
 
 /**
@@ -517,20 +557,10 @@ ve.init.mw.ViewPageTarget.prototype.onSaveError = function ( jqXHR, status, data
  * @param {string} diffHtml
  */
 ve.init.mw.ViewPageTarget.prototype.onShowChanges = function ( diffHtml ) {
+	ve.track( 'performance.user.reviewComplete', { 'duration': ve.now() - this.timings.saveDialogReview } );
 	// Invalidate the viewer diff on next change
-	this.surface.getModel().connect( this, { 'transact': 'onSurfaceModelTransact' } );
-
-	mw.loader.using( 'mediawiki.action.history.diff', ve.bind( function () {
-		this.$saveDialog
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-viewer' )
-				.empty().append( diffHtml );
-
-		this.$saveDialogLoadingIcon.hide();
-		this.saveDialogReviewGoodButton.setDisabled( false );
-
-	}, this ), ve.bind( function () {
-		this.onSaveError( null, 'Module load failed' );
-	}, this ) );
+	this.surface.getModel().getDocument().connect( this, { 'transact': 'clearSaveDialogDiff' } );
+	this.saveDialog.setDiffAndReview( diffHtml );
 };
 
 /**
@@ -540,15 +570,10 @@ ve.init.mw.ViewPageTarget.prototype.onShowChanges = function ( diffHtml ) {
  * @param {string} wikitext
  */
 ve.init.mw.ViewPageTarget.prototype.onSerialize = function ( wikitext ) {
+	ve.track( 'performance.user.reviewComplete', { 'duration': ve.now() - this.timings.saveDialogReview } );
 	// Invalidate the viewer wikitext on next change
-	this.surface.getModel().connect( this, { 'transact': 'onSurfaceModelTransact' } );
-
-	this.$saveDialog
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-viewer' )
-			.empty().append( $( '<pre>' ).text( wikitext ) );
-
-		this.$saveDialogLoadingIcon.hide();
-		this.saveDialogReviewGoodButton.setDisabled( false );
+	this.surface.getModel().getDocument().connect( this, { 'transact': 'clearSaveDialogDiff' } );
+	this.saveDialog.setDiffAndReview( $( '<pre>' ).text( wikitext ) );
 };
 
 /**
@@ -559,8 +584,9 @@ ve.init.mw.ViewPageTarget.prototype.onSerialize = function ( wikitext ) {
  * @param {string} status Text status message
  */
 ve.init.mw.ViewPageTarget.prototype.onShowChangesError = function ( jqXHR, status ) {
+	ve.track( 'performance.user.reviewError', { 'duration': ve.now() - this.timings.saveDialogReview } );
 	alert( ve.msg( 'visualeditor-differror', status ) );
-	this.$saveDialogLoadingIcon.hide();
+	this.saveDialog.$loadingIcon.hide();
 };
 
 /**
@@ -571,8 +597,13 @@ ve.init.mw.ViewPageTarget.prototype.onShowChangesError = function ( jqXHR, statu
  * @param {string} status Text status message
  */
 ve.init.mw.ViewPageTarget.prototype.onSerializeError = function ( jqXHR, status ) {
+	if ( this.timings.saveDialogOpen ) {
+		// This function can be called by the switch to wikitext button as well, so only log
+		// reviewError if we actually got here from the save dialog
+		ve.track( 'performance.user.reviewError', { 'duration': ve.now() - this.timings.saveDialogReview } );
+	}
 	alert( ve.msg( 'visualeditor-serializeerror', status ) );
-	this.$saveDialogLoadingIcon.hide();
+	this.saveDialog.$loadingIcon.hide();
 };
 
 /**
@@ -581,8 +612,12 @@ ve.init.mw.ViewPageTarget.prototype.onSerializeError = function ( jqXHR, status 
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.onEditConflict = function () {
-	this.$saveDialogLoadingIcon.hide();
-	this.swapSaveDialog( 'conflict' );
+	ve.track( 'performance.user.saveError.editconflict', {
+		'duration': ve.now() - this.timings.saveDialogSave,
+		'retries': this.timings.saveRetries
+	} );
+	this.saveDialog.$loadingIcon.hide();
+	this.saveDialog.swapPanel( 'conflict' );
 };
 
 /**
@@ -591,8 +626,10 @@ ve.init.mw.ViewPageTarget.prototype.onEditConflict = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.onNoChanges = function () {
-	this.$saveDialogLoadingIcon.hide();
-	this.swapSaveDialog( 'nochanges' );
+	ve.track( 'performance.user.reviewComplete', { 'duration': ve.now() - this.timings.saveDialogReview } );
+	this.saveDialog.$loadingIcon.hide();
+	this.saveDialog.swapPanel( 'nochanges' );
+	this.saveDialog.reviewGoodButton.setDisabled( false );
 };
 
 /**
@@ -623,7 +660,6 @@ ve.init.mw.ViewPageTarget.prototype.onViewTabClick = function ( e ) {
  * @param {jQuery.Event} e Mouse click event
  */
 ve.init.mw.ViewPageTarget.prototype.onToolbarSaveButtonClick = function () {
-	this.logEvent( 'Edit', { action: 'page-save-attempt' } );
 	if ( this.edited || this.restoring ) {
 		this.showSaveDialog();
 	}
@@ -645,69 +681,68 @@ ve.init.mw.ViewPageTarget.prototype.onToolbarCancelButtonClick = function () {
  * @method
  * @param {jQuery.Event} e Mouse click event
  */
-ve.init.mw.ViewPageTarget.prototype.onToolbarMwMetaButtonClick = function () {
-	this.surface.getDialogs().open( 'mwMeta' );
-};
-
-
-/**
- * Handle clicks on the edit notices tool in the toolbar.
- *
- * @method
- * @param {jQuery.Event} e Mouse click event
- */
-ve.init.mw.ViewPageTarget.prototype.onToolbarEditNoticesToolClick = function () {
-	this.$toolbarEditNotices.fadeToggle( 'fast' );
-	this.$toolbarBetaNotice.fadeOut( 'fast' );
-	this.$document[0].focus();
+ve.init.mw.ViewPageTarget.prototype.onToolbarMetaButtonClick = function () {
+	this.surface.getDialogs().getWindow( 'meta' ).open();
 };
 
 /**
- * Handle clicks on the beta notices tool in the toolbar.
+ * Clear the diff in the save dialog.
  *
- * @method
- * @param {jQuery.Event} e Mouse click event
- */
-ve.init.mw.ViewPageTarget.prototype.onToolbarBetaNoticeToolClick = function () {
-	this.$toolbarBetaNotice.fadeToggle( 'fast' );
-	this.$toolbarEditNotices.fadeOut( 'fast' );
-	this.$document[0].focus();
-};
-
-/**
- * Handle clicks on the feedback tool in the toolbar.
- *
- * @method
- * @param {jQuery.Event} e Mouse click event
- */
-ve.init.mw.ViewPageTarget.prototype.onToolbarFeedbackToolClick = function () {
-	this.$toolbarEditNotices.fadeOut( 'fast' );
-	if ( !this.feedback ) {
-		// This can't be constructed until the editor has loaded as it uses special messages
-		this.feedback = new mw.Feedback( {
-			'title': new mw.Title( ve.msg( 'visualeditor-feedback-link' ) ),
-			'bugsLink': new mw.Uri( 'https://bugzilla.wikimedia.org/enter_bug.cgi?product=VisualEditor&component=General' ),
-			'bugsListLink': new mw.Uri( 'https://bugzilla.wikimedia.org/buglist.cgi?query_format=advanced&resolution=---&resolution=LATER&resolution=DUPLICATE&product=VisualEditor&list_id=166234' )
-		} );
-	}
-	this.feedback.launch();
-};
-
-/**
- * Handle the first transaction in the surface model.
- *
- * This handler is removed the first time it's used, but added each time the surface is set up.
+ * This method is bound to the 'transact' event on the document model, and unbinds itself the first
+ * time it runs. It's bound when the surface is set up and rebound every time a diff is loaded into
+ * the save dialog.
  *
  * @method
  * @param {ve.dm.Transaction} tx Processed transaction
  */
-ve.init.mw.ViewPageTarget.prototype.onSurfaceModelTransact = function () {
+ve.init.mw.ViewPageTarget.prototype.clearSaveDialogDiff = function () {
 	// Clear the diff
-	this.$saveDialog
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-slide-review .ve-init-mw-viewPageTarget-saveDialog-viewer' )
-			.empty();
+	this.saveDialog.$reviewViewer.empty();
+	this.surface.getModel().getDocument().disconnect( this, { 'transact': 'clearSaveDialogDiff' } );
+};
 
-	this.surface.getModel().disconnect( this, { 'transact': 'onSurfaceModelTransact' } );
+/**
+ * Record the time of the last transaction in response to a 'transact' event on the document.
+ */
+ve.init.mw.ViewPageTarget.prototype.recordLastTransactionTime = function () {
+	this.timings.lastTransaction = ve.now();
+};
+
+/**
+ * Check if the user is entering wikitext, and show a notification if they are.
+ *
+ * This check is fairly simplistic: it checks whether the content branch node the selection is in
+ * looks like wikitext, so it can trigger if the user types in a paragraph that has pre-existing
+ * wikitext-like content.
+ *
+ * This method is bound to the 'documentUpdate' event on the surface model, and unbinds itself when
+ * the wikitext notification is displayed.
+ *
+ * @param {ve.dm.Transaction} transaction
+ */
+ve.init.mw.ViewPageTarget.prototype.checkForWikitextWarning = function () {
+	var text, doc = this.surface.getView().getDocument(),
+		selection = this.surface.getModel().getSelection(),
+		node = doc.getNodeFromOffset( selection.start );
+	if ( !( node instanceof ve.ce.ContentBranchNode ) ) {
+		return;
+	}
+	text = ve.ce.getDomText( node.$element[0] );
+
+	if ( text.match( /\[\[|\{\{|''|<nowiki|<ref|~~~|^==|^\*|^\#/ ) ) {
+		mw.notify(
+			$( $.parseHTML( ve.init.platform.getParsedMessage( 'visualeditor-wikitext-warning' ) ) )
+				.filter( 'a' ).attr( 'target', '_blank' ).end(),
+			{
+				'title': ve.msg( 'visualeditor-wikitext-warning-title' ),
+				'tag': 'visualeditor-wikitext-warning',
+				'autoHide': false
+			}
+		);
+		this.surface.getModel().disconnect(
+			this, { 'documentUpdate': 'checkForWikitextWarning' }
+		);
+	}
 };
 
 /**
@@ -717,7 +752,7 @@ ve.init.mw.ViewPageTarget.prototype.updateToolbarSaveButtonState = function () {
 	this.edited = this.surface.getModel().hasPastState();
 	// Disable the save button if we have no history or if the sanity check is not finished
 	this.toolbarSaveButton.setDisabled( ( !this.edited && !this.restoring ) || !this.sanityCheckFinished );
-	this.toolbarSaveButton.$.toggleClass( 've-init-mw-viewPageTarget-waiting', !this.sanityCheckFinished );
+	this.toolbarSaveButton.$element.toggleClass( 've-init-mw-viewPageTarget-waiting', !this.sanityCheckFinished );
 };
 
 /**
@@ -725,8 +760,33 @@ ve.init.mw.ViewPageTarget.prototype.updateToolbarSaveButtonState = function () {
  *
  * @method
  */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogReviewButtonClick = function () {
-	this.swapSaveDialog( 'review' );
+ve.init.mw.ViewPageTarget.prototype.onSaveDialogReview = function () {
+	var doc = this.surface.getModel().getDocument();
+	this.sanityCheckVerified = true;
+	this.saveDialog.setSanityCheck( this.sanityCheckVerified );
+
+	if ( !this.saveDialog.$reviewViewer.find( 'table, pre' ).length ) {
+		this.timings.saveDialogReview = ve.now();
+		ve.track( 'behavior.saveDialogOpenTillReview', {
+			'duration': this.timings.saveDialogReview - this.timings.saveDialogOpen
+		} );
+
+		this.saveDialog.reviewGoodButton.setDisabled( true );
+		this.saveDialog.$loadingIcon.show();
+		if ( this.pageExists ) {
+			// Has no callback, handled via target.onShowChanges
+			this.showChanges(
+				ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() )
+			);
+		} else {
+			this.serialize(
+				ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() ),
+				ve.bind( this.onSerialize, this )
+			);
+		}
+	} else {
+		this.saveDialog.swapPanel( 'review' );
+	}
 };
 
 /**
@@ -734,32 +794,42 @@ ve.init.mw.ViewPageTarget.prototype.onSaveDialogReviewButtonClick = function () 
  *
  * @method
  */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogSaveButtonClick = function () {
+ve.init.mw.ViewPageTarget.prototype.onSaveDialogSave = function () {
+	this.timings.saveDialogSave = ve.now();
+	this.timings.saveRetries = 0;
+	ve.track( 'behavior.saveDialogOpenTillSave', {
+		'duration': this.timings.saveDialogSave - this.timings.saveDialogOpen
+	} );
+	this.saveDocument();
+};
+
+/**
+ * Try to save the current document.
+ */
+ve.init.mw.ViewPageTarget.prototype.saveDocument = function () {
 	var doc = this.surface.getModel().getDocument(),
 		saveOptions = this.getSaveOptions();
 
-	// Once we've retrieved the save options,
-	// reset save start and any old captcha data
-	this.saveStart = +new Date();
+	// Reset any old captcha data
 	if ( this.captcha ) {
-		this.clearMessage( 'captcha' );
+		this.saveDialog.clearMessage( 'captcha' );
 		delete this.captcha;
 	}
 
 	if (
 		+mw.user.options.get( 'forceeditsummary' ) &&
 		saveOptions.summary === '' &&
-		!this.messages.missingsummary
+		!this.saveDialog.messages.missingsummary
 	) {
-		this.showMessage(
+		this.saveDialog.showMessage(
 			'missingsummary',
 			// Wrap manually since this core message already includes a bold "Warning:" label
 			$( '<p>' ).append( ve.init.platform.getParsedMessage( 'missingsummary' ) ),
 			{ wrap: false }
 		);
 	} else {
-		this.saveDialogSaveButton.setDisabled( true );
-		this.$saveDialogLoadingIcon.show();
+		this.saveDialog.saveButton.setDisabled( true );
+		this.saveDialog.$loadingIcon.show();
 		this.save(
 			ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() ),
 			saveOptions
@@ -768,12 +838,47 @@ ve.init.mw.ViewPageTarget.prototype.onSaveDialogSaveButtonClick = function () {
 };
 
 /**
- * Handle clicks on the review "Good" button in the save dialog.
+ * Switch to edit source mode with the current wikitext
  *
  * @method
  */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogReviewGoodButtonClick = function () {
-	this.swapSaveDialog( 'save' );
+ve.init.mw.ViewPageTarget.prototype.editSource = function () {
+	var doc = this.surface.getModel().getDocument();
+
+	this.$document.css( 'opacity', 0.5 );
+
+	if ( !confirm( ve.msg( 'visualeditor-mweditmodesource-warning' ) ) ) {
+		this.$document.css( 'opacity', 1 );
+		return;
+	}
+	// Get Wikitext from the DOM
+	this.serialize(
+		ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() ),
+		ve.bind( function ( wikitext ) {
+			var $form,
+				options = this.getSaveOptions(),
+				action = new mw.Uri( mw.util.wikiScript() ).extend( { title: this.pageName, action: 'edit' } ).toString();
+
+			this.submitting = true;
+
+			$form = $( '<form method="post" enctype="multipart/form-data" style="display: none;"></form>' )
+				.attr( 'action', action )
+				.append( $( '<textarea name="wpTextbox1"></textarea>' ).val( wikitext ) )
+				.append( $( '<input type="checkbox" name="wpMinoredit" value="1">' ).prop( 'checked', options.minor ) )
+				.append( $( '<input type="checkbox" name="wpWatchthis" value="1">' ).prop( 'checked', options.watch ) )
+				.append( $( '<input type="hidden" name="wpSummary">' ).val( options.summary ) )
+				.append( $( '<input type="hidden" name="wpStarttime">' ).val( this.startTimeStamp ) )
+				.append( $( '<input type="hidden" name="wpEditToken">' ).val( this.editToken ) )
+				.append( $( '<input type="hidden" name="wpDiff" value="1">' ) )
+				.append( $( '<input type="hidden" name="model" value="wikitext">' ) )
+				.append( $( '<input type="hidden" name="format" value="text/x-wiki">' ) )
+				.append( $( '<input type="hidden" name="wpEdittime">' ) )
+			;
+			// Firefox requires the form to be attached
+			$( 'body' ).append( $form );
+			$form.submit();
+		}, this )
+	);
 };
 
 /**
@@ -781,7 +886,7 @@ ve.init.mw.ViewPageTarget.prototype.onSaveDialogReviewGoodButtonClick = function
  *
  * @method
  */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogResolveConflictButtonClick = function () {
+ve.init.mw.ViewPageTarget.prototype.onSaveDialogResolveConflict= function () {
 	var doc = this.surface.getModel().getDocument();
 	// Get Wikitext from the DOM, and set up a submit call when it's done
 	this.serialize(
@@ -799,77 +904,35 @@ ve.init.mw.ViewPageTarget.prototype.onSaveDialogResolveConflictButtonClick = fun
  * @returns {Object} Save options, including summary, minor and watch properties
  */
 ve.init.mw.ViewPageTarget.prototype.getSaveOptions = function () {
-	return {
-		'summary': $( '#ve-init-mw-viewPageTarget-saveDialog-editSummary' ).val(),
-		'minor': $( '#ve-init-mw-viewPageTarget-saveDialog-minorEdit' ).prop( 'checked' ),
-		'watch': $( '#ve-init-mw-viewPageTarget-saveDialog-watchList' ).prop( 'checked' ),
-		'needcheck': this.sanityCheckPromise.state() === 'rejected',
+	var options = {
+		'summary': this.saveDialog.editSummaryInput.$input.val(),
 		'captchaid': this.captcha && this.captcha.id,
 		'captchaword': this.captcha && this.captcha.input.getValue()
 	};
-};
-
-/**
- * Handle clicks on the close button in the save dialog.
- *
- * @method
- * @param {jQuery.Event} e Mouse click event
- */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogCloseButtonClick = function () {
-	this.hideSaveDialog();
-};
-
-/**
- * Handle clicks on the previous view button in the save dialog.
- *
- * @method
- * @param {jQuery.Event} e Mouse click event
- */
-ve.init.mw.ViewPageTarget.prototype.onSaveDialogPrevButtonClick = function () {
-	var history = this.saveDialogSlideHistory;
-	if ( history.length < 2  ) {
-		throw new Error( 'PrevButton was triggered without a history' );
+	if ( this.sanityCheckPromise.state() === 'rejected' ) {
+		options.needcheck = 1;
 	}
-	// Pop off current slide
-	history.pop();
-	// Navigate to last slide
-	this.swapSaveDialog( history[ history.length -1 ], { fromHistory: true } );
-};
-
-/**
- * Set up the list of edit notices.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.setupToolbarEditNotices = function () {
-	var key;
-	this.$toolbarEditNotices.empty();
-	for ( key in this.editNotices ) {
-		this.$toolbarEditNotices.append( this.editNotices[key] );
+	if ( this.saveDialog.$saveOptions.find( '#wpMinoredit' ).prop( 'checked' ) ) {
+		options.minor = 1;
 	}
-};
-
-/**
- * Set up the beta notices panel.
- *
- * @method
- * @returns {string[]} HTML strings for each edit notice
- */
-ve.init.mw.ViewPageTarget.prototype.setupToolbarBetaNotice = function () {
-	this.$toolbarBetaNotice.empty();
-	this.$toolbarBetaNotice
-		.append( $( '<span>' )
-			.text( ve.msg( 'visualeditor-beta-warning' ) )
-		)
-		.append( $( '<div>' )
-			.addClass( 've-init-mw-viewPageTarget-tool' )
-			.append( $( '<span>' )
-				.addClass( 've-init-mw-viewPageTarget-subtool-label' )
-				.append( $( '<a>' )
-					.attr( 'title', ve.msg( 'visualeditor-help-title' ) )
-					.attr( 'href', new mw.Title( ve.msg( 'visualeditor-help-link' ) ).getUrl() )
-					.text( ve.msg( 'visualeditor-help-label' ) )
-		) ) );
+	if ( this.saveDialog.$saveOptions.find( '#wpWatchthis' ).prop( 'checked' ) ) {
+		options.watch = 1;
+	} else {
+		// Firefox has Object.prototype.watch
+		options.watch = undefined;
+	}
+	this.saveDialog.$saveOptions
+		.find( '.ve-ui-mwSaveDialog-checkboxes' )
+		.find( 'input:not(#wpMinoredit, #wpWatchthis)' )
+		.each( function () {
+			var $this = $( this );
+			// We can't just use $this.val() because .val() always returns the value attribute of
+			// a checkbox even when it's unchecked
+			if ( $this.prop( 'type') !== 'checkbox' || $this.prop( 'checked' ) ) {
+				options[$this.prop( 'name' )] = $this.val();
+			}
+		} );
+	return options;
 };
 
 /**
@@ -880,50 +943,61 @@ ve.init.mw.ViewPageTarget.prototype.setupToolbarBetaNotice = function () {
  * @param {Function} [callback] Callback to call when done
  */
 ve.init.mw.ViewPageTarget.prototype.setUpSurface = function ( doc, callback ) {
-	setTimeout( ve.bind( function () {
+	var target = this;
+	setTimeout( function () {
 		// Build linmod
 		var store = new ve.dm.IndexValueStore(),
 			internalList = new ve.dm.InternalList(),
 			data = ve.dm.converter.getDataFromDom( doc, store, internalList );
-		setTimeout( ve.bind( function () {
+		setTimeout( function () {
 			// Build DM tree
-			var dmDoc = new ve.dm.Document( data, undefined, internalList );
-			setTimeout( ve.bind( function () {
+			var dmDoc = new ve.dm.Document( data, doc, undefined, internalList );
+			setTimeout( function () {
 				// Create ui.Surface (also creates ce.Surface and dm.Surface and builds CE tree)
-				this.surface = new ve.ui.Surface( dmDoc, this.surfaceOptions );
-				this.surface.$.addClass( 've-init-mw-viewPageTarget-surface' );
-				setTimeout( ve.bind( function () {
+				target.surface = new ve.ui.Surface( dmDoc, target.surfaceOptions );
+				target.surface.$element.addClass( 've-init-mw-viewPageTarget-surface' );
+				setTimeout( function () {
 					// Initialize surface
-					this.surface.connect( this, { 'toolbarPosition': 'onSurfaceToolbarPosition' } );
-					this.surface.getContext().hide();
-					this.$document = this.surface.$.find( '.ve-ce-documentNode' );
-					this.surface.getModel().connect( this, { 'transact': 'onSurfaceModelTransact' } );
-					this.surface.getModel().connect( this, { 'history': 'updateToolbarSaveButtonState' } );
-					this.$.append( this.surface.$ );
-					this.setUpToolbar();
-					this.transformPageTitle();
-					this.changeDocumentTitle();
+					target.surface.getContext().hide();
+					target.$document = target.surface.$element.find( '.ve-ce-documentNode' );
+					target.surface.getModel().getDocument().connect( target, {
+						'transact': 'clearSaveDialogDiff'
+					} );
+					target.surface.getModel().getDocument().connect( target, {
+						'transact': 'recordLastTransactionTime'
+					} );
+					target.surface.getModel().connect( target, {
+						'documentUpdate': 'checkForWikitextWarning',
+						'history': 'updateToolbarSaveButtonState'
+					} );
+					target.$element.append( target.surface.$element );
+					target.setUpToolbar();
+					target.transformPageTitle();
+					target.changeDocumentTitle();
 
 					// Update UI
-					this.hidePageContent();
-					this.hideSpinner();
-					this.active = true;
-					this.$document.attr( {
+					target.hidePageContent();
+					target.hideSpinner();
+					target.active = true;
+					target.$document.attr( {
 						'lang': mw.config.get( 'wgVisualEditor' ).pageLanguageCode,
 						'dir': mw.config.get( 'wgVisualEditor' ).pageLanguageDir
 					} );
 
 					// Add appropriately mw-content-ltr or mw-content-rtl class
-					this.surface.view.$.addClass(
+					target.surface.view.$element.addClass(
 						'mw-content-' + mw.config.get( 'wgVisualEditor' ).pageLanguageDir
 					);
-					this.surface.initialize();
+
+					// Now that the surface is attached to the document and ready,
+					// let it initialize itself
+					target.surface.initialize();
 
 					setTimeout( callback );
-				}, this ) );
-			}, this ) );
-		}, this ) );
-	}, this ) );
+				} );
+			} );
+		} );
+	} );
 };
 
 /**
@@ -933,11 +1007,11 @@ ve.init.mw.ViewPageTarget.prototype.setUpSurface = function ( doc, callback ) {
  * (it's asynchronous, so it may still be pending when you check).
  */
 ve.init.mw.ViewPageTarget.prototype.startSanityCheck = function () {
-	// We have to get the converted DOM now, before we unlock the surface and let the user edit,
-	// but we can defer the actual comparison
+	// We have to get a copy of the data now, before we unlock the surface and let the user edit,
+	// but we can defer the actual conversion and comparison
 	var viewPage = this,
 		doc = viewPage.surface.getModel().getDocument(),
-		data = ve.copyArray( doc.getFullData() ),
+		data = new ve.dm.FlatLinearData( doc.getStore().clone(), ve.copy( doc.getFullData() ) ),
 		oldDom = viewPage.doc,
 		d = $.Deferred();
 
@@ -950,7 +1024,8 @@ ve.init.mw.ViewPageTarget.prototype.startSanityCheck = function () {
 		// <body> were ignored in the conversion. So compare each child separately.
 		var i,
 			len = oldDom.body.childNodes.length,
-			newDom = ve.dm.converter.getDomFromData( data, doc.getStore(), doc.getInternalList() );
+			newDoc = new ve.dm.Document( data, oldDom, undefined, doc.getInternalList() ),
+			newDom = ve.dm.converter.getDomFromData( newDoc.getFullData(), newDoc.getStore(), newDoc.getInternalList() );
 
 		// Explicitly unlink our full copy of the original version of the document data
 		data = undefined;
@@ -982,90 +1057,47 @@ ve.init.mw.ViewPageTarget.prototype.startSanityCheck = function () {
 };
 
 /**
- * The toolbar has updated its position.
+ * @see ve.ui.Toolbar#position
  * @param {jQuery} $bar
+ * @param {Object} update
  */
-ve.init.mw.ViewPageTarget.prototype.onSurfaceToolbarPosition = function ( $bar ) {
-	var css, offset, startProp, startOffset,
-		dir = mw.config.get( 'wgVisualEditor' ).pageLanguageDir,
-		type = $bar.css( 'position' );
-
-	// HACK: If the toolbar is floating, also apply a floating class to the toolbar tracker
-	if ( $bar.parent().hasClass( 've-ui-toolbar-floating' ) ) {
-		this.$toolbarTracker.addClass( 've-init-mw-viewPageTarget-toolbarTracker-floating' );
-	} else {
-		this.$toolbarTracker.removeClass( 've-init-mw-viewPageTarget-toolbarTracker-floating' );
-	}
-
-	// It's important that the toolbar tracker has 0 height. Else it will block events on the
-	// toolbar (e.g. clicking "Save page") as it would overlap that space. The save dialog
+ve.init.mw.ViewPageTarget.prototype.onToolbarPosition = function ( $bar, update ) {
+	// It's important that the toolbar tracker always has 0 height, otherwise it will block events
+	// on the toolbar (e.g. clicking "Save page") as it would overlap that space. The save dialog
 	// will remain visible for the same reason elsewhere: As long as we don't have overflow:hidden,
 	// the save dialog will stick out of the tracker in the right place without the tracker itself
 	// blocking the toolbar.
 
-	if ( type === 'relative' ) {
-		offset = $bar.offset();
-
-		css = {
-			'position': 'absolute',
-			'top': offset.top
-		};
-
-		if ( dir === 'ltr' ) {
-			startProp = 'left';
-			startOffset = offset.left;
-		} else {
-			startProp = 'right';
-			startOffset = $( window ).width() - ( offset.left + $bar.outerWidth() );
-
-		}
-
-		css[ startProp ] = startOffset;
-
-	} else if ( type === 'absolute' || type === 'fixed' ) {
-		css = {
-			'position': type,
-			'top': $bar.css( 'top' ),
-			'left': $bar.css( 'left' )
-		};
-	} else {
-		return;
+	if ( !this.toolbarTrackerFloating && update.floating === true ) {
+		// When switching to floating, undo the 'top' position set earlier
+		this.$toolbarTracker.css( 'top', '' );
 	}
-	this.$toolbarTracker.css( css );
-};
 
-/**
- * Set up the logging of analytic edit events using EventLogging.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.setUpEventLogging = function () {
-	mw.loader.using( 'schema.Edit', function () {
-		mw.eventLog.setDefaults( 'Edit', {
-			version: 0,
-			editor: 'visualeditor',
-			pageId: mw.config.get( 'wgArticleId' ),
-			pageNs: mw.config.get( 'wgNamespaceNumber' ),
-			pageName: mw.config.get( 'wgPageName' ),
-			pageViewSessionId: mw.user.generateRandomSessionId(),
-			revId: function () {
-				return mw.config.get( 'wgCurRevisionId' );
-			},
-			userId: +mw.config.get( 'wgUserId' )
+	if ( update.offset ) {
+		this.toolbarOffset = update.offset;
+	}
+
+	if ( typeof update.floating === 'boolean' ) {
+		this.$toolbarTracker.toggleClass(
+			've-init-mw-viewPageTarget-toolbarTracker-floating',
+			update.floating
+		);
+		this.toolbarTrackerFloating = update.floating;
+	}
+
+	// Switching to non-floating or offset update when already in non-floating
+	if ( update.floating === false || this.toolbarTrackerFloating === false && update.offset ) {
+		// Don't use update.css in this case since the toolbar is now in its non-floating
+		// position (static, in-flow). So make the tracker absolutely postioned matching the
+		// offset of the toolbar.
+		this.$toolbarTracker.css( {
+			'top': this.toolbarOffset.top,
+			'left': this.toolbarOffset.left,
+			'right': this.toolbarOffset.right
 		} );
-	} );
-};
-
-/**
- * Thin wrapper around EventLogging's 'logEvent' method which ensures the
- * relevant schema module has been loaded.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.logEvent = function ( schemaName, event ) {
-	mw.loader.using( 'schema.' + schemaName, function () {
-		mw.eventLog.logEvent( schemaName, event );
-	} );
+	} else if ( update.css ) {
+		this.$toolbarTracker.css( update.css );
+	}
 };
 
 /**
@@ -1080,11 +1112,7 @@ ve.init.mw.ViewPageTarget.prototype.tearDownSurface = function () {
 		this.$document = null;
 	}
 	this.tearDownToolbar();
-	this.hideSpinner();
-	this.showPageContent();
-	this.restorePageTitle();
 	this.restoreDocumentTitle();
-	this.showTableOfContents();
 	// Destroy surface
 	if ( this.surface ) {
 		this.surface.destroy();
@@ -1122,64 +1150,20 @@ ve.init.mw.ViewPageTarget.prototype.setupSectionEditLinks = null;
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.setupToolbarButtons = function () {
-	var editNoticeCount = ve.getObjectKeys( this.editNotices ).length;
-
-	this.toolbarCancelButton = new ve.ui.ButtonWidget( { 'label': ve.msg( 'visualeditor-toolbar-cancel' ) } );
-	this.toolbarCancelButton.$.addClass( 've-ui-toolbar-cancelButton' );
-	this.toolbarSaveButton = new ve.ui.ButtonWidget( {
+	this.toolbarCancelButton = new OO.ui.PushButtonWidget( { 'label': ve.msg( 'visualeditor-toolbar-cancel' ) } );
+	this.toolbarCancelButton.$element.addClass( 've-ui-toolbar-cancelButton' );
+	this.toolbarSaveButton = new OO.ui.PushButtonWidget( {
 		'label': ve.msg( 'visualeditor-toolbar-savedialog' ),
 		'flags': ['constructive'],
 		'disabled': !this.restoring
 	} );
 	// TODO (mattflaschen, 2013-06-27): it would be useful to do this in a more general way, such
 	// as in the ButtonWidget constructor.
-	this.toolbarSaveButton.$.addClass( 've-ui-toolbar-saveButton' );
+	this.toolbarSaveButton.$element.addClass( 've-ui-toolbar-saveButton' );
 	this.updateToolbarSaveButtonState();
 
 	this.toolbarCancelButton.connect( this, { 'click': 'onToolbarCancelButtonClick' } );
 	this.toolbarSaveButton.connect( this, { 'click': 'onToolbarSaveButtonClick' } );
-
-	this.$toolbarMwMetaButton
-		.addClass( 've-ui-icon-settings' )
-		.append(
-			$( '<span>' )
-				.addClass( 've-init-mw-viewPageTarget-tool-label' )
-				.text( ve.msg( 'visualeditor-meta-tool' ) )
-		)
-		.click( ve.bind( this.onToolbarMwMetaButtonClick, this ) );
-
-
-	if ( editNoticeCount ) {
-		this.$toolbarEditNoticesTool
-			.addClass( 've-ui-icon-alert' )
-			.append(
-				$( '<span>' )
-					.addClass( 've-init-mw-viewPageTarget-tool-label' )
-					.text( ve.msg( 'visualeditor-editnotices-tool', editNoticeCount ) )
-			)
-			.append( this.$toolbarEditNotices )
-			.click( ve.bind( this.onToolbarEditNoticesToolClick, this ) );
-		this.$toolbarEditNotices.fadeIn( 'fast' );
-	}
-
-	this.$toolbarBetaNoticeTool
-		.addClass( 've-ui-icon-help' )
-		.append(
-			$( '<span>' )
-				.addClass( 've-init-mw-viewPageTarget-tool-label ve-init-mw-viewPageTarget-tool-beta-label' )
-				.text( ve.msg( 'visualeditor-beta-label' ) )
-		)
-		.append( this.$toolbarBetaNotice )
-		.click( ve.bind( this.onToolbarBetaNoticeToolClick, this ) );
-
-	this.$toolbarFeedbackTool
-		.addClass( 've-ui-icon-comment' )
-		.append(
-			$( '<span>' )
-				.addClass( 've-init-mw-viewPageTarget-tool-label' )
-				.text( ve.msg( 'visualeditor-feedback-tool' ) )
-		)
-		.click( ve.bind( this.onToolbarFeedbackToolClick, this ) );
 };
 
 /**
@@ -1190,10 +1174,6 @@ ve.init.mw.ViewPageTarget.prototype.setupToolbarButtons = function () {
 ve.init.mw.ViewPageTarget.prototype.tearDownToolbarButtons = function () {
 	this.toolbarCancelButton.disconnect( this );
 	this.toolbarSaveButton.disconnect( this );
-	this.$toolbarMwMetaButton.empty().off( 'click' );
-	this.$toolbarEditNoticesTool.empty().off( 'click' );
-	this.$toolbarBetaNoticeTool.empty().off( 'click' );
-	this.$toolbarFeedbackTool.empty().off( 'click' );
 };
 
 /**
@@ -1202,18 +1182,30 @@ ve.init.mw.ViewPageTarget.prototype.tearDownToolbarButtons = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.attachToolbarButtons = function () {
-	var $target = this.toolbar.$actions;
-	$target.append( this.$toolbarBetaNoticeTool );
-	this.$toolbarBetaNotice.append( this.$toolbarFeedbackTool );
+	var $actionTools = $( '<div>' ),
+		$pushButtons = $( '<div>' ),
+		actions = new ve.ui.TargetToolbar( this, this.surface );
 
-	if ( !ve.isEmptyObject( this.editNotices ) ) {
-		$target.append( this.$toolbarEditNoticesTool );
-	}
-	$target.append(
-		this.$toolbarMwMetaButton,
-		this.toolbarCancelButton.$,
-		this.toolbarSaveButton.$
-	);
+	actions.setup( [
+		{ 'include': [ 'help', 'notices' ] },
+		{
+			'type': 'list',
+			'icon': 'menu',
+			'include': [ 'meta', 'categories', 'languages', 'editModeSource' ] }
+	] );
+
+	$actionTools
+		.addClass( 've-init-mw-viewPageTarget-toolbar-utilites' )
+		.append( actions.$element );
+
+	$pushButtons
+		.addClass( 've-init-mw-viewPageTarget-toolbar-actions' )
+		.append(
+			this.toolbarCancelButton.$element,
+			this.toolbarSaveButton.$element
+		);
+
+	this.toolbar.$actions.append( $actionTools, $pushButtons );
 };
 
 /**
@@ -1222,55 +1214,9 @@ ve.init.mw.ViewPageTarget.prototype.attachToolbarButtons = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.detachToolbarButtons = function () {
-	this.toolbarCancelButton.$.detach();
-	this.toolbarSaveButton.$.detach();
-	this.$toolbarMwMetaButton.detach();
-	this.$toolbarEditNoticesTool.detach();
-	this.$toolbarFeedbackTool.detach();
-	this.$toolbarBetaNoticeTool.detach();
-};
-
-/**
- * Get a template for the save dialog.
- *
- * The result of this function depends on an API call, so the result it provided asynchronously.
- * The template will be wrapped in a plain `<div>` jQuery collection.
- *
- * @method
- * @param {Function} callback
- */
-ve.init.mw.ViewPageTarget.prototype.getSaveDialogHtml = function ( callback ) {
-	var viewPage = this,
-		$wrap = $( '<div>' ).html( this.constructor.saveDialogTemplate );
-
-	// Based on EditPage::getCheckboxes and EditPage::initialiseForm
-
-	mw.user.getRights( function ( rights ) {
-		// MediaWiki only allows usage of minor flag when editing an existing page
-		// and the user has the right to use the feature.
-		// If either is not the case, remove it from the form.
-		if ( !viewPage.pageExists || ve.indexOf( 'minoredit', rights ) === -1 ) {
-			$wrap
-				.find( '.ve-init-mw-viewPageTarget-saveDialog-minorEdit-label, #ve-init-mw-viewPageTarget-saveDialog-minorEdit' )
-				.remove();
-		}
-
-		if ( mw.user.isAnon() ) {
-			$wrap
-				.find( '.ve-init-mw-viewPageTarget-saveDialog-watchList-label, #ve-init-mw-viewPageTarget-saveDialog-watchList' )
-				.remove();
-		} else if (
-			mw.user.options.get( 'watchdefault' ) ||
-			( mw.user.options.get( 'watchcreations' ) && !viewPage.pageExists ) ||
-			mw.config.get( 'wgVisualEditor' ).isPageWatched
-		) {
-			$wrap
-				.find( '#ve-init-mw-viewPageTarget-saveDialog-watchList' )
-				.prop( 'checked', true );
-		}
-
-		callback( $wrap );
-	} );
+	this.toolbarCancelButton.$element.detach();
+	this.toolbarSaveButton.$element.detach();
+	this.toolbar.$actions.empty();
 };
 
 /**
@@ -1279,141 +1225,28 @@ ve.init.mw.ViewPageTarget.prototype.getSaveDialogHtml = function ( callback ) {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.setupSaveDialog = function () {
-	var viewPage = this;
+	var sectionTitle = '', viewPage = this;
 
-	// Save button on "save" slide
-	this.saveDialogSaveButton = new ve.ui.ButtonWidget( {
-		'label': ve.msg(
-			 // visualeditor-savedialog-label-restore, visualeditor-savedialog-label-save
-			'visualeditor-savedialog-label-' + ( viewPage.restoring ? 'restore' : 'save' )
-		),
-		'flags': ['constructive']
+	viewPage.saveDialog = this.surface.getDialogs().getWindow( 'mwSave' );
+
+	if ( viewPage.section ) {
+		sectionTitle = viewPage.$document.find( 'h1, h2, h3, h4, h5, h6' ).eq( viewPage.section - 1 ).text();
+		sectionTitle = '/* ' + ve.graphemeSafeSubstring( sectionTitle, 0, 244 ) + ' */ ';
+		viewPage.saveDialog.editSummaryInput.$input.val( sectionTitle );
+		viewPage.sectionTitleRestored = true;
+		if ( viewPage.sectionPositionRestored ) {
+			viewPage.onSectionRestored();
+		}
+	}
+	// Connect to save dialog
+	viewPage.saveDialog.connect( this, {
+		'save': 'onSaveDialogSave',
+		'review': 'onSaveDialogReview',
+		'resolve': 'onSaveDialogResolveConflict',
+		'close': 'onSaveDialogClose'
 	} );
-	this.saveDialogSaveButton.connect( this, { 'click': 'onSaveDialogSaveButtonClick' } );
-
-	// Review button on "save" slide
-	this.saveDialogReviewButton = new ve.ui.ButtonWidget( {
-		'label': ve.msg(
-			'visualeditor-savedialog-label-review'
-		)
-	} );
-	this.saveDialogReviewButton.connect( this, { 'click': 'onSaveDialogReviewButtonClick' } );
-
-	this.saveDialogReviewGoodButton = new ve.ui.ButtonWidget( {
-		'label': ve.msg( 'visualeditor-savedialog-label-review-good' ),
-		'flags': ['constructive']
-	} );
-	this.saveDialogReviewGoodButton.connect(
-		this, { 'click': 'onSaveDialogReviewGoodButtonClick' }
-	);
-
-	this.saveDialogResolveConflictButton = new ve.ui.ButtonWidget( {
-		'label': ve.msg( 'visualeditor-savedialog-label-resolve-conflict' ),
-		'flags': ['constructive']
-	} );
-	this.saveDialogResolveConflictButton.connect( this, { 'click': 'onSaveDialogResolveConflictButtonClick' } );
-
-	this.getSaveDialogHtml( function ( $wrap ) {
-		viewPage.$saveDialog
-			// Must not use replaceWith because that can't be used on fragement roots,
-			// plus, we want to preserve the reference and class names of the wrapper.
-			.empty().append( $wrap.contents() )
-			// Attach buttons
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-slide-save' )
-				.find( '.ve-init-mw-viewPageTarget-saveDialog-actions' )
-					.prepend( viewPage.saveDialogSaveButton.$, viewPage.saveDialogReviewButton.$ )
-					.end()
-			.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-slide-review' )
-				.find( '.ve-init-mw-viewPageTarget-saveDialog-actions' )
-					.prepend( viewPage.saveDialogReviewGoodButton.$ )
-					.end()
-			.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-slide-conflict' )
-				.find( '.ve-init-mw-viewPageTarget-saveDialog-actions' )
-					.prepend( viewPage.saveDialogResolveConflictButton.$ )
-					.end()
-			.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-closeButton' )
-				.click( ve.bind( viewPage.onSaveDialogCloseButtonClick, viewPage ) )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-prevButton' )
-				.click( ve.bind( viewPage.onSaveDialogPrevButtonClick, viewPage ) )
-				.end()
-			// Attach contents
-			.find( '#ve-init-mw-viewPageTarget-saveDialog-editSummary' )
-				.attr( {
-					'placeholder': ve.msg( 'visualeditor-editsummary' )
-				} )
-				.placeholder()
-				.byteLimit( viewPage.editSummaryByteLimit )
-				.on( {
-					'focus': function () {
-						$( this ).parent().addClass(
-							've-init-mw-viewPageTarget-saveDialog-summary-focused'
-						);
-					},
-					'blur': function () {
-						$( this ).parent().removeClass(
-							've-init-mw-viewPageTarget-saveDialog-summary-focused'
-						);
-					},
-					'keyup keydown mouseup cut paste change focus blur': function () {
-						var $textarea = $( this ),
-							$editSummaryCount = $textarea
-								.closest( '.ve-init-mw-viewPageTarget-saveDialog-slide-save' )
-									.find( '.ve-init-mw-viewPageTarget-saveDialog-editSummaryCount' );
-						// TODO: This looks a bit weird, there is no unit in the UI, just numbers
-						// Users likely assume characters but then it seems to count down quicker
-						// than expected. Facing users with the word "byte" is bad? (bug 40035)
-						setTimeout( function () {
-							$editSummaryCount.text(
-								viewPage.editSummaryByteLimit - $.byteLength( $textarea.val() )
-							);
-						} );
-					}
-				} )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-editSummaryCount' )
-				.text( viewPage.editSummaryByteLimit )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-minorEdit-label' )
-				.html( ve.init.platform.getParsedMessage( 'minoredit' ) )
-				.find( 'a' )
-					.attr( 'target', '_blank' )
-					.end()
-				.end()
-			.find( '#ve-init-mw-viewPageTarget-saveDialog-minorEdit' )
-				.prop( 'checked', +mw.user.options.get( 'minordefault' ) )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-watchList-label' )
-				.html( ve.init.platform.getParsedMessage( 'watchthis' ) )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-license' )
-				.html( ve.init.platform.getParsedMessage( 'copyrightwarning' ) )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-conflict' )
-				.html( ve.init.platform.getParsedMessage( 'visualeditor-editconflict' ) )
-				.end()
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-nochanges' )
-				.html( ve.init.platform.getParsedMessage( 'visualeditor-diff-nochanges' ) )
-		;
-
-		// Get reference to loading icon
-		viewPage.$saveDialogLoadingIcon = viewPage.$saveDialog
-			.find( '.ve-init-mw-viewPageTarget-saveDialog-working' );
-	} );
-	// Hook onto the 'watch' event on by mediawiki.page.watch.ajax.js
-	// Triggered when mw.page.watch.updateWatchLink(link, action) is called
-	$( '#ca-watch, #ca-unwatch' )
-		.on(
-			'watchpage.mw',
-			function ( e, action ) {
-				viewPage.$saveDialog
-					.find( '#ve-init-mw-viewPageTarget-saveDialog-watchList' )
-					.prop( 'checked', ( action === 'watch' ) );
-			}
-		);
+	// Setup checkboxes
+	viewPage.saveDialog.setupCheckboxes( ve.getObjectValues( viewPage.checkboxes ).join( '\n' ) );
 };
 
 /**
@@ -1422,203 +1255,21 @@ ve.init.mw.ViewPageTarget.prototype.setupSaveDialog = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.showSaveDialog = function () {
-	var viewPage = this;
-
-	viewPage.surface.disable();
-	viewPage.$document.css( 'opacity', 0.5 );
-
-	viewPage.$toolbarBetaNotice.fadeOut( 'fast' );
-	viewPage.$toolbarEditNotices.fadeOut( 'fast' );
-
-	viewPage.swapSaveDialog( 'save' );
-
-	viewPage.$saveDialog.fadeIn( 'fast', function () {
-		// Initial size
-		viewPage.onResizeSaveDialog();
+	this.saveDialog.setSanityCheck( this.sanityCheckVerified );
+	this.saveDialog.swapPanel( 'save' );
+	this.surface.getDialogs().getWindow( 'mwSave' ).open();
+	this.timings.saveDialogOpen = ve.now();
+	ve.track( 'behavior.lastTransactionTillSaveDialogOpen', {
+		'duration': this.timings.saveDialogOpen - this.timings.lastTransaction
 	} );
-
-	$( document ).on( 'keydown.ve-savedialog', function ( e ) {
-		// Escape
-		if ( e.which === ve.Keys.ESCAPE ) {
-			viewPage.onSaveDialogCloseButtonClick();
-		}
-	} );
-
-	$( window ).on( 'resize.ve-savedialog', ve.bind( viewPage.onResizeSaveDialog, viewPage ) );
 };
 
-/**
- * Update window-size related aspects of the save dialog
- *
- * @method
+ /**
+ * Respond to the save dialog being closed.
  */
-ve.init.mw.ViewPageTarget.prototype.onResizeSaveDialog = function () {
-	var $d = this.$saveDialog, $w = $( window );
-
-	// Available space for css-height is window height,
-	// without the space between the dialog and the window top,
-	// without the space above/below between css-height and outerHeight.
-	$d.css( 'max-height',
-		$w.height() -
-			( $d.offset().top - $w.scrollTop() ) -
-			( $d.outerHeight( true ) - $d.height() ) -
-			20 // shadow
-	);
-};
-
-/**
- * Hide the save dialog
- */
-ve.init.mw.ViewPageTarget.prototype.hideSaveDialog = function () {
-	// Reset history on close (bug 49481)
-	this.saveDialogSlideHistory.length = 0;
-	this.$saveDialog.fadeOut( 'fast' );
-	if ( this.$document ) {
-		this.$document.focus();
-	}
-	$( document ).off( 'keydown.ve-savedialog' );
-	$( window ).off( 'resize', this.onResizeSaveDialog );
-
-	if ( this.surface ) {
-		this.surface.enable();
-		this.$document.css( 'opacity', '' );
-	}
-};
-
-/**
- * Reset the fields of the save dialog.
- *
- * TODO: Maybe call this more cleverly only when the document changes, so that closing and
- * re-opening the saveDialog doesn't remove the user input and the diff cache.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.resetSaveDialog = function () {
-	this.$saveDialog
-		.find( '#ve-init-mw-viewPageTarget-saveDialog-editSummary' )
-			.val( '' )
-			.end()
-		.find( '#ve-init-mw-viewPageTarget-saveDialog-minorEdit' )
-			.prop( 'checked', false )
-			.end()
-		// Clear the diff
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-viewer' )
-			.empty();
-};
-
-/**
- * Swap state in the save dialog.
- *
- * @method
- * @param {string} slide One of 'save', 'review', 'conflict' or 'nochanges'
- * @param {Object} [options]
- * @param {boolean} [options.fromHistory] Whether this swap was triggered from interaction
- *  with the slide history (e.g. surpresses pushing of target slide in the history again).
- * @returns {jQuery} The now active slide.
- * @throws {Error} Unknown saveDialog slide
- */
-ve.init.mw.ViewPageTarget.prototype.swapSaveDialog = function ( slide, options ) {
-	var $slide, $viewer,
-		doc = this.surface.getModel().getDocument();
-
-	if ( ve.indexOf( slide, [ 'save', 'review', 'conflict', 'nochanges' ] ) === -1 ) {
-		throw new Error( 'Unknown saveDialog slide: ' + slide );
-	}
-
-	options = options || {};
-
-	if ( !options.fromHistory ) {
-		this.saveDialogSlideHistory.push( slide );
-	}
-
-	$slide = this.$saveDialog.find( '.ve-init-mw-viewPageTarget-saveDialog-slide-' + slide );
-
-	this.$saveDialog
-		// Hide "prev" button when (back) on the first slide
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-prevButton' )
-			.toggle( this.saveDialogSlideHistory.length >= 2 )
-			.end()
-		// Update title to one of:
-		// - visualeditor-savedialog-title-save
-		// - visualeditor-savedialog-title-review
-		// - visualeditor-savedialog-title-conflict
-		// - visualeditor-savedialog-title-nochanges
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-title' )
-			.text( ve.msg( 'visualeditor-savedialog-title-' + slide ) )
-			.end()
-		// Hide other slides
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-slide' )
-			.not( $slide )
-				.hide();
-
-	// Old messages should not persist after slide changes
-	this.clearAllMessages();
-	// Reset save button if we disabled it for e.g. unrecoverable spam error
-	this.saveDialogSaveButton.setDisabled( false );
-
-	if ( slide === 'save' ) {
-		if ( !this.sanityCheckVerified ) {
-			this.showMessage( 'dirtywarning', mw.msg( 'visualeditor-savedialog-warning-dirty' ) );
-		}
-	}
-
-	if ( slide === 'review' ) {
-		this.sanityCheckVerified = true;
-		$viewer = $slide.find( '.ve-init-mw-viewPageTarget-saveDialog-viewer' );
-		if ( !$viewer.find( 'table, pre' ).length ) {
-			this.saveDialogReviewGoodButton.setDisabled( true );
-			this.$saveDialogLoadingIcon.show();
-			if ( this.pageExists ) {
-				// Has no callback, handled via target.onShowChanges
-				this.showChanges(
-					ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() )
-				);
-			} else {
-				this.serialize(
-					ve.dm.converter.getDomFromData( doc.getFullData(), doc.getStore(), doc.getInternalList() ),
-					ve.bind( this.onSerialize, this )
-				);
-			}
-		}
-		this.$saveDialog.css( 'width', '100%' );
-	} else {
-		this.$saveDialog.css( 'width', '' );
-	}
-
-	// Show the target slide
-	$slide.show();
-
-	mw.hook( 've.saveDialog.stateChanged' ).fire();
-
-	if ( slide === 'save' ) {
-		setTimeout( function () {
-			$slide.find( 'textarea' ).eq( 0 ).focus();
-		} );
-	}
-
-	return $slide;
-};
-
-/**
- * Add the save dialog to the user interface.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.attachSaveDialog = function () {
-	this.surface.$globalOverlay.append(
-		this.$toolbarTracker.append(
-			this.$saveDialog
-		)
-	);
-};
-
-/**
- * Remove the save dialog from the user interface.
- *
- * @method
- */
-ve.init.mw.ViewPageTarget.prototype.detachSaveDialog = function () {
-	this.$saveDialog.detach();
+ve.init.mw.ViewPageTarget.prototype.onSaveDialogClose = function () {
+	ve.track( 'behavior.saveDialogClose', { 'duration': ve.now() - this.timings.saveDialogOpen } );
+	this.timings.saveDialogOpen = null;
 };
 
 /**
@@ -1730,24 +1381,22 @@ ve.init.mw.ViewPageTarget.prototype.hideTableOfContents = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.setUpToolbar = function () {
-	this.toolbar = new ve.ui.Toolbar( this.surface, { 'shadow': true, 'actions': true } );
-	this.toolbar.addTools( this.constructor.static.toolbarTools );
+	this.toolbar = new ve.ui.TargetToolbar( this, this.surface, { 'shadow': true, 'actions': true } );
+	this.toolbar.connect( this, { 'position': 'onToolbarPosition' } );
+	this.toolbar.setup( this.constructor.static.toolbarGroups );
 	this.surface.addCommands( this.constructor.static.surfaceCommands );
 	if ( !this.isMobileDevice ) {
-		this.toolbar.enableFloating();
+		this.toolbar.enableFloatable();
 	}
-	this.toolbar.$
+	this.toolbar.$element
 		.addClass( 've-init-mw-viewPageTarget-toolbar' )
 		.insertBefore( '#firstHeading' );
 	this.toolbar.$bar.slideDown( 'fast', ve.bind( function () {
 		// Check the surface wasn't torn down while the toolbar was animating
 		if ( this.surface ) {
+			this.toolbar.initialize();
+			this.surface.emit( 'position' );
 			this.surface.getContext().update();
-
-			// Emit event for initial position. Must be done here after the
-			// slide down instead of in ve.ui.Toolbar#constructor because
-			// back there it'll still be out of view.
-			this.surface.emit( 'toolbarPosition', this.toolbar.$bar );
 		}
 	}, this ) );
 };
@@ -1779,7 +1428,10 @@ ve.init.mw.ViewPageTarget.prototype.transformPageTitle = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.mutePageTitle = function () {
-	$( '#firstHeading, #siteSub:visible, #contentSub:visible' ).fadeTo( 'fast', 0.6 );
+	$( '#firstHeading, #siteSub' )
+		.addClass( 've-init-mw-viewPageTarget-transform ve-init-mw-viewPageTarget-transform-muted' );
+	$( '#contentSub' )
+		.addClass( 've-init-mw-viewPageTarget-transform ve-init-mw-viewPageTarget-transform-hidden' );
 };
 
 /**
@@ -1788,8 +1440,11 @@ ve.init.mw.ViewPageTarget.prototype.mutePageTitle = function () {
  * @method
  */
 ve.init.mw.ViewPageTarget.prototype.restorePageTitle = function () {
-	$( '#firstHeading, #siteSub:visible, #contentSub:visible' ).fadeTo( 'fast', 1 );
+	var $els = $( '#firstHeading, #siteSub, #contentSub' )
+		.removeClass( 've-init-mw-viewPageTarget-transform-muted ve-init-mw-viewPageTarget-transform-hidden' );
+
 	setTimeout( function () {
+		$els.removeClass( 've-init-mw-viewPageTarget-transform' );
 		$( '#firstHeading' ).removeClass( 've-init-mw-viewPageTarget-pageTitle' );
 	}, 1000 );
 };
@@ -1826,7 +1481,7 @@ ve.init.mw.ViewPageTarget.prototype.transformPage = function () {
 	// Put skin tabs in "edit" mode
 	$( $( '#p-views' ).length ? '#p-views' : '#p-cactions' )
 		.find( 'li.selected' ).removeClass( 'selected' );
-	$( this.tabLayout === 'add' ? '#ca-ve-edit' : '#ca-edit' )
+	$( '#ca-ve-edit' )
 		.addClass( 'selected' );
 
 	// Hide site notice (if present)
@@ -1905,7 +1560,8 @@ ve.init.mw.ViewPageTarget.prototype.onWindowPopState = function () {
  * @param {HTMLElement} html Rendered HTML from server
  */
 ve.init.mw.ViewPageTarget.prototype.replacePageContent = function ( html ) {
-	$( '#mw-content-text' ).html( html );
+	var $content = $( $.parseHTML( html ) );
+	mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ).empty().append( $content ) );
 };
 
 /**
@@ -1927,7 +1583,7 @@ ve.init.mw.ViewPageTarget.prototype.getEditSection = function ( heading ) {
 };
 
 /**
- * Get the numeric index of a section in the page.
+ * Store the section for which the edit link has been triggered.
  *
  * @method
  * @param {HTMLElement} heading Heading element of section
@@ -1968,73 +1624,29 @@ ve.init.mw.ViewPageTarget.prototype.restoreEditSection = function () {
 				offset = surfaceModel.getDocument().data.getNearestContentOffset(
 					offsetNode.getModel().getOffset(), 1
 				);
-				surfaceModel.change( null, new ve.Range( offset ) );
+				surfaceModel.setSelection( new ve.Range( offset ) );
 				// Scroll to heading:
 				// Wait for toolbar to animate in so we can account for its height
 				setTimeout( function () {
-					var $window = $( ve.Element.getWindow( target.$ ) );
-					$window.scrollTop( headingNode.$.offset().top - target.toolbar.$.height() );
+					var $window = $( OO.ui.Element.getWindow( target.$element ) );
+					$window.scrollTop( headingNode.$element.offset().top - target.toolbar.$element.height() );
 				}, 200 );
 			}
 		} );
-		this.section = null;
-	}
-};
-
-/**
- * Show a message in the save dialog.
- *
- * @param {string} name Message's unique name
- * @param {string|jQuery} message Message content (string of HTML or jQuery object)
- * @param {Object} [options]
- * @param {boolean} [options.wrap="warning"] Whether to wrap the message in a paragraph and if
- *  so, how. One of "warning", "error" or false.
- */
-ve.init.mw.ViewPageTarget.prototype.showMessage = function ( name, message, options ) {
-	var $message;
-	if ( !this.messages[name] ) {
-		options = options || {};
-		if ( options.wrap === undefined ) {
-			options.wrap = 'warning';
+		this.sectionPositionRestored = true;
+		if ( this.sectionTitleRestored ) {
+			this.onSectionRestored();
 		}
-		$message = $( '<div class="ve-init-mw-viewPageTarget-saveDialog-message"></div>' );
-		if ( options.wrap !== false ) {
-			$message.append( $( '<p>').append(
-				 // visualeditor-savedialog-label-error
-				 // visualeditor-savedialog-label-warning
-				$( '<strong>' ).text( mw.msg( 'visualeditor-savedialog-label-' + options.wrap ) ),
-				document.createTextNode( mw.msg( 'colon-separator' ) ),
-				message
-			) );
-		} else {
-			$message.append( message );
-		}
-		this.$saveDialog.find( '.ve-init-mw-viewPageTarget-saveDialog-messages' )
-			.append( $message );
-
-		this.messages[name] = $message;
 	}
 };
 
 /**
- * Remove a message from the save dialog.
- * @param {string} name Message's unique name
+ * Handle restoration of section editing position and title
  */
-ve.init.mw.ViewPageTarget.prototype.clearMessage = function ( name ) {
-	if ( this.messages[name] ) {
-		this.messages[name].remove();
-		delete this.messages[name];
-	}
-};
-
-/**
- * Remove all messages from the save dialog.
- */
-ve.init.mw.ViewPageTarget.prototype.clearAllMessages = function () {
-	this.$saveDialog
-		.find( '.ve-init-mw-viewPageTarget-saveDialog-messages' )
-			.empty();
-	this.messages = {};
+ve.init.mw.ViewPageTarget.prototype.onSectionRestored = function () {
+	this.section = null;
+	this.sectionPositionRestored = false;
+	this.sectionTitleRestored = false;
 };
 
 /**
@@ -2063,6 +1675,16 @@ ve.init.mw.ViewPageTarget.prototype.setupBeforeUnloadHandler = function () {
 ve.init.mw.ViewPageTarget.prototype.tearDownBeforeUnloadHandler = function () {
 	// Restore whatever previous onbeforeload hook existed
 	window.onbeforeunload = this.onBeforeUnloadFallback;
+};
+
+/**
+ * Show beta welcome dialog if first load.
+ */
+ve.init.mw.ViewPageTarget.prototype.showBetaWelcome = function () {
+	if ( $.cookie( 've-beta-welcome-dialog' ) === null ) {
+		this.surface.getDialogs().getWindow( 'betaWelcome' ).open();
+	}
+	$.cookie( 've-beta-welcome-dialog', 1, { 'path': '/', 'expires': 30 } );
 };
 
 /**

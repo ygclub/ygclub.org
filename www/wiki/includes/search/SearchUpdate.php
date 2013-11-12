@@ -29,20 +29,34 @@
  * @ingroup Search
  */
 class SearchUpdate implements DeferrableUpdate {
+	/**
+	 * Page id being updated
+	 * @var int
+	 */
+	private $id = 0;
 
-	private $mId = 0, $mNamespace, $mTitle, $mText;
-	private $mTitleWords;
+	/**
+	 * Title we're updating
+	 * @var Title
+	 */
+	private $title;
+
+	/**
+	 * Content of the page (not text)
+	 * @var Content|false
+	 */
+	private $content;
 
 	/**
 	 * Constructor
 	 *
 	 * @param int $id Page id to update
 	 * @param Title|string $title Title of page to update
-	 * @param Content|string|false $content Content of the page to update.
+	 * @param Content|string|false $c Content of the page to update.
 	 *  If a Content object, text will be gotten from it. String is for back-compat.
 	 *  Passing false tells the backend to just update the title, not the content
 	 */
-	public function __construct( $id, $title, $content = false ) {
+	public function __construct( $id, $title, $c = false ) {
 		if ( is_string( $title ) ) {
 			$nt = Title::newFromText( $title );
 		} else {
@@ -50,57 +64,67 @@ class SearchUpdate implements DeferrableUpdate {
 		}
 
 		if ( $nt ) {
-			$this->mId = $id;
-			// @todo This isn't ideal, we'd really like to have content-specific
-			// handling here. See similar content in SearchEngine::initText().
-			if( is_string( $content ) ) {
-				// b/c for ApprovedRevs
-				$this->mText = $content;
+			$this->id = $id;
+			// is_string() check is back-compat for ApprovedRevs
+			if ( is_string( $c ) ) {
+				$this->content = new TextContent( $c );
 			} else {
-				$this->mText = $content ? $content->getTextForSearchIndex() : false;
+				$this->content = $c ?: false;
 			}
-
-			$this->mNamespace = $nt->getNamespace();
-			$this->mTitle = $nt->getText(); # Discard namespace
-
-			$this->mTitleWords = $this->mTextWords = array();
+			$this->title = $nt;
 		} else {
 			wfDebug( "SearchUpdate object created with invalid title '$title'\n" );
 		}
 	}
 
+	/**
+	 * Perform actual update for the entry
+	 */
 	public function doUpdate() {
 		global $wgDisableSearchUpdate;
 
-		if ( $wgDisableSearchUpdate || !$this->mId ) {
+		if ( $wgDisableSearchUpdate || !$this->id ) {
 			return;
 		}
 
 		wfProfileIn( __METHOD__ );
 
-		$search = SearchEngine::create();
-		$normalTitle = $search->normalizeText( Title::indexTitle( $this->mNamespace, $this->mTitle ) );
+		$page = WikiPage::newFromId( $this->id, WikiPage::READ_LATEST );
+		$indexTitle = Title::indexTitle( $this->title->getNamespace(), $this->title->getText() );
 
-		if ( WikiPage::newFromId( $this->mId ) === null ) {
-			$search->delete( $this->mId, $normalTitle );
-			wfProfileOut( __METHOD__ );
-			return;
-		} elseif ( $this->mText === false ) {
-			$search->updateTitle( $this->mId, $normalTitle );
-			wfProfileOut( __METHOD__ );
-			return;
+		foreach ( SearchEngine::getSearchTypes() as $type ) {
+			$search = SearchEngine::create( $type );
+			if ( !$search->supports( 'search-update' ) ) {
+				continue;
+			}
+
+			$normalTitle = $search->normalizeText( $indexTitle );
+
+			if ( $page === null ) {
+				$search->delete( $this->id, $normalTitle );
+				continue;
+			} elseif ( $this->content === false ) {
+				$search->updateTitle( $this->id, $normalTitle );
+				continue;
+			}
+
+			$text = $search->getTextFromContent( $this->title, $this->content );
+			if ( !$search->textAlreadyUpdatedForIndex() ) {
+				$text = self::updateText( $text );
+			}
+
+			# Perform the actual update
+			$search->update( $this->id, $normalTitle, $search->normalizeText( $text ) );
 		}
-
-		$text = self::updateText( $this->mText );
-
-		wfRunHooks( 'SearchUpdate', array( $this->mId, $this->mNamespace, $this->mTitle, &$text ) );
-
-		# Perform the actual update
-		$search->update( $this->mId, $normalTitle, $search->normalizeText( $text ) );
 
 		wfProfileOut( __METHOD__ );
 	}
 
+	/**
+	 * Clean text for indexing. Only really suitable for indexing in databases.
+	 * If you're using a real search engine, you'll probably want to override
+	 * this behavior and do something nicer with the original wikitext.
+	 */
 	public static function updateText( $text ) {
 		global $wgContLang;
 

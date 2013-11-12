@@ -14,7 +14,7 @@
  *
  * @constructor
  * @param {ve.dm.Node} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.Node = function VeCeNode( model, config ) {
 	// Parent constructor
@@ -25,16 +25,13 @@ ve.ce.Node = function VeCeNode( model, config ) {
 
 	// Properties
 	this.parent = null;
-
-	// Events
-	this.model.connect( this, { 'attributeChange': 'onAttributeChange' } );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.Node, ve.ce.View );
+OO.inheritClass( ve.ce.Node, ve.ce.View );
 
-ve.mixinClass( ve.ce.Node, ve.Node );
+OO.mixinClass( ve.ce.Node, ve.Node );
 
 /* Static Members */
 
@@ -50,21 +47,20 @@ ve.mixinClass( ve.ce.Node, ve.Node );
  */
 ve.ce.Node.static.canBeSplit = false;
 
-/* Methods */
-
 /**
- * Handle attribute change events.
+ * Whether this node type can be focused.
  *
- * Whitelisted attributes will be added or removed in sync with the DOM. They are initially set in
- * the constructor.
+ * If this is set to true on a node, it should implement:
+ *     setFocused( boolean val )
+ *     boolean isFocused()
  *
- * @method
- * @param {string} key Attribute key
- * @param {string} from Old value
- * @param {string} to New value
+ * @static
+ * @property static.isFocusable
+ * @inheritable
  */
-ve.ce.Node.prototype.onAttributeChange = function () {
-};
+ve.ce.Node.static.isFocusable = false;
+
+/* Methods */
 
 /**
  * Get allowed child node types.
@@ -148,6 +144,16 @@ ve.ce.Node.prototype.canContainContent = function () {
  */
 ve.ce.Node.prototype.isContent = function () {
 	return this.model.isContent();
+};
+
+/**
+ * Check if the node is focusable
+ *
+ * @see #static.isFocusable
+ * @returns {boolean} Node is focusable
+ */
+ve.ce.Node.prototype.isFocusable = function () {
+	return this.constructor.static.isFocusable;
 };
 
 /**
@@ -248,4 +254,9 @@ ve.ce.Node.getSplitableNode = function ( node ) {
 ve.ce.Node.prototype.destroy = function () {
 	this.parent = null;
 	this.model.disconnect( this );
+};
+
+/** */
+ve.ce.Node.prototype.getModelHtmlDocument = function () {
+	return this.model.getDocument() && this.model.getDocument().getHtmlDocument();
 };

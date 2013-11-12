@@ -9,17 +9,17 @@
  * DataModel meta item factory.
  *
  * @class
- * @extends ve.NamedClassFactory
+ * @extends OO.Factory
  * @constructor
  */
 ve.dm.MetaItemFactory = function VeDmMetaItemFactory() {
 	// Parent constructor
-	ve.NamedClassFactory.call( this );
+	OO.Factory.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.MetaItemFactory, ve.NamedClassFactory );
+OO.inheritClass( ve.dm.MetaItemFactory, OO.Factory );
 
 /* Methods */
 

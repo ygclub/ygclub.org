@@ -42,6 +42,9 @@ class SpecialSearch extends SpecialPage {
 	/// Search engine
 	protected $searchEngine;
 
+	/// Search engine type, if not default
+	protected $searchEngineType;
+
 	/// For links
 	protected $extraParams = array();
 
@@ -97,6 +100,8 @@ class SpecialSearch extends SpecialPage {
 		$search = str_replace( "\n", " ", $request->getText( 'search', $titleParam ) );
 
 		$this->load();
+
+		$this->searchEngineType = $request->getVal( 'srbackend' );
 
 		if ( $request->getVal( 'fulltext' )
 			|| !is_null( $request->getVal( 'offset' ) )
@@ -875,6 +880,8 @@ class SpecialSearch extends SpecialPage {
 	 * @return String: HTML form
 	 */
 	protected function powerSearchBox( $term, $opts ) {
+		global $wgContLang;
+
 		// Groups namespaces into rows according to subject
 		$rows = array();
 		foreach ( SearchEngine::searchableNamespaces() as $namespace => $name ) {
@@ -882,10 +889,12 @@ class SpecialSearch extends SpecialPage {
 			if ( !array_key_exists( $subject, $rows ) ) {
 				$rows[$subject] = "";
 			}
-			$name = str_replace( '_', ' ', $name );
+
+			$name = $wgContLang->getConverter()->convertNamespace( $namespace );
 			if ( $name == '' ) {
 				$name = $this->msg( 'blanknamespace' )->text();
 			}
+
 			$rows[$subject] .=
 				Xml::openElement(
 					'td', array( 'style' => 'white-space: nowrap' )
@@ -898,6 +907,7 @@ class SpecialSearch extends SpecialPage {
 				) .
 				Xml::closeElement( 'td' );
 		}
+
 		$rows = array_values( $rows );
 		$numRows = count( $rows );
 
@@ -909,9 +919,11 @@ class SpecialSearch extends SpecialPage {
 				'table',
 				array( 'cellpadding' => 0, 'cellspacing' => 0 )
 			);
+
 			for ( $j = $i; $j < $i + 4 && $j < $numRows; $j++ ) {
 				$namespaceTables .= Xml::tags( 'tr', null, $rows[$j] );
 			}
+
 			$namespaceTables .= Xml::closeElement( 'table' );
 		}
 
@@ -1164,7 +1176,8 @@ class SpecialSearch extends SpecialPage {
 	 */
 	public function getSearchEngine() {
 		if ( $this->searchEngine === null ) {
-			$this->searchEngine = SearchEngine::create();
+			$this->searchEngine = $this->searchEngineType ?
+				SearchEngine::create( $this->searchEngineType ) : SearchEngine::create();
 		}
 		return $this->searchEngine;
 	}
@@ -1183,6 +1196,6 @@ class SpecialSearch extends SpecialPage {
 	}
 
 	protected function getGroupName() {
-		return 'redirects';
+		return 'pages';
 	}
 }

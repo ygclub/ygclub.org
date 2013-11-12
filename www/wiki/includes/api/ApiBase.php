@@ -823,7 +823,7 @@ abstract class ApiBase extends ContextSource {
 	 */
 	protected function getWatchlistValue( $watchlist, $titleObj, $userOption = null ) {
 
-		$userWatching = $this->getUser()->isWatched( $titleObj );
+		$userWatching = $this->getUser()->isWatched( $titleObj, WatchedItem::IGNORE_USER_RIGHTS );
 
 		switch ( $watchlist ) {
 			case 'watch':
@@ -865,12 +865,7 @@ abstract class ApiBase extends ContextSource {
 			return;
 		}
 
-		$user = $this->getUser();
-		if ( $value ) {
-			WatchAction::doWatch( $titleObj, $user );
-		} else {
-			WatchAction::doUnwatch( $titleObj, $user );
-		}
+		WatchAction::doWatchOrUnwatch( $value, $titleObj, $this->getUser() );
 	}
 
 	/**
@@ -1222,6 +1217,44 @@ abstract class ApiBase extends ContextSource {
 	}
 
 	/**
+	 * Throw a UsageException based on the errors in the Status object.
+	 *
+	 * @since 1.22
+	 * @param Status $status Status object
+	 * @throws UsageException
+	 */
+	public function dieStatus( $status ) {
+		if ( $status->isGood() ) {
+			throw new MWException( 'Successful status passed to ApiBase::dieStatus' );
+		}
+
+		$errors = $status->getErrorsArray();
+		if ( !$errors ) {
+			// No errors? Assume the warnings should be treated as errors
+			$errors = $status->getWarningsArray();
+		}
+		if ( !$errors ) {
+			// Still no errors? Punt
+			$errors = array( array( 'unknownerror-nocode' ) );
+		}
+
+		// Cannot use dieUsageMsg() because extensions might return custom
+		// error messages.
+		if ( $errors[0] instanceof Message ) {
+			$msg = $errors[0];
+			$code = $msg->getKey();
+		} else {
+			$code = array_shift( $errors[0] );
+			$msg = wfMessage( $code, $errors[0] );
+		}
+		if ( isset( ApiBase::$messageMap[$code] ) ) {
+			// Translate message to code, for backwards compatability
+			$code = ApiBase::$messageMap[$code]['code'];
+		}
+		$this->dieUsage( $msg->inLanguage( 'en' )->useDatabase( false )->plain(), $code );
+	}
+
+	/**
 	 * Array that maps message keys to error messages. $1 and friends are replaced.
 	 */
 	public static $messageMap = array(
@@ -1371,6 +1404,7 @@ abstract class ApiBase extends ContextSource {
 		'uploaddisabled' => array( 'code' => 'uploaddisabled', 'info' => 'Uploads are not enabled. Make sure $wgEnableUploads is set to true in LocalSettings.php and the PHP ini setting file_uploads is true' ),
 		'copyuploaddisabled' => array( 'code' => 'copyuploaddisabled', 'info' => 'Uploads by URL is not enabled. Make sure $wgAllowCopyUploads is set to true in LocalSettings.php.' ),
 		'copyuploadbaddomain' => array( 'code' => 'copyuploadbaddomain', 'info' => 'Uploads by URL are not allowed from this domain.' ),
+		'copyuploadbadurl' => array( 'code' => 'copyuploadbadurl', 'info' => 'Upload not allowed from this URL.' ),
 
 		'filename-tooshort' => array( 'code' => 'filename-tooshort', 'info' => 'The filename is too short' ),
 		'filename-toolong' => array( 'code' => 'filename-toolong', 'info' => 'The filename is too long' ),
@@ -1469,7 +1503,7 @@ abstract class ApiBase extends ContextSource {
 	 * @param string $message Error message
 	 */
 	protected static function dieDebug( $method, $message ) {
-		wfDebugDieBacktrace( "Internal error in $method: $message" );
+		throw new MWException( "Internal error in $method: $message" );
 	}
 
 	/**
@@ -1544,6 +1578,9 @@ abstract class ApiBase extends ContextSource {
 		} else {
 			if ( !$this->getUser()->isLoggedIn() ) {
 				$this->dieUsage( 'You must be logged-in to have a watchlist', 'notloggedin' );
+			}
+			if ( !$this->getUser()->isAllowed( 'viewmywatchlist' ) ) {
+				$this->dieUsage( 'You don\'t have permission to view your watchlist', 'permissiondenied' );
 			}
 			$user = $this->getUser();
 		}

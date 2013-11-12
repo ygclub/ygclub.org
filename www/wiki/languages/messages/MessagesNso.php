@@ -225,7 +225,7 @@ $messages = array(
 'jumptosearch' => 'fetleka',
 'pool-errorunknown' => 'Phošo yago setsebege',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Mabapi le {{SITENAME}}',
 'aboutpage' => 'Project:Mabapi',
 'copyright' => 'Mateng a hwetšagala tlase ga $1.',
@@ -383,7 +383,7 @@ Ga wa dumelwa go tlhoma tše dingwe.',
 'oldpassword' => 'Ditlhaka-tša-siphiri tša kgale:',
 'newpassword' => 'Ditlhaka-tša-siphiri tše mpsha:',
 'retypenew' => 'Tlanya ditlhaka tše mphsa tša siphiri gape:',
-'resetpass_success' => 'Ditlhaka tša siphiri di fetotšwe ka katlego! Bjale o kgona go tsena...',
+'changepassword-success' => 'Ditlhaka tša siphiri di fetotšwe ka katlego! Bjale o kgona go tsena...',
 
 # Edit page toolbar
 'bold_sample' => "Mongwalo wa '''Bold'''",
@@ -689,7 +689,6 @@ Ga re fane ka e-poso ya gago go bašumiši ba bangwe ge ba polela le wena ka yon
 'recentchangeslinked-feed' => 'Diphetogo tša go tswalana',
 'recentchangeslinked-toolbox' => 'Diphetogo tša go tswalana',
 'recentchangeslinked-title' => 'Diphetogo tša go tswalana le "$1"',
-'recentchangeslinked-noresult' => 'Gago na diphetogo go matlakala a hlomaganya ka sebaka/sekga seo o se kgethilego.',
 'recentchangeslinked-summary' => "Letlakala le le laetša diphetogo tša bjale matlakaleng a go hlomaganya.
 Matlakala ago ba [[Special:Watchlist|lenanong la gago la matlakala ditlhapetšo]]  a '''ngwadilwe ka bogolo'''.",
 'recentchangeslinked-page' => 'Leina la letlakala:',
@@ -776,9 +775,6 @@ Matlakala ago ba [[Special:Watchlist|lenanong la gago la matlakala ditlhapetšo]
 # Statistics
 'statistics' => 'Dipalopalo',
 'statistics-header-users' => 'Dipalopalo tša mošomiši',
-
-'disambiguations' => "Matlakala a ''Disambiguation''",
-'disambiguationspage' => 'Template:"disambig"',
 
 'doubleredirects' => "Di''redirect'' goya go ''redirect''",
 

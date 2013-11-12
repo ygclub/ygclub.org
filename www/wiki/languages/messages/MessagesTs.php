@@ -214,7 +214,7 @@ $messages = array(
 'jumptosearch' => 'Lava',
 'pool-errorunknown' => 'xiphiqo xoka xingativeki',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'ta {{SITENAME}}',
 'aboutpage' => 'Project:ta',
 'copyright' => 'Matsalwa makumeka ehansi ka $1.',
@@ -297,17 +297,6 @@ Vona nxaxamelo wa ma tluka yo hlawuleka e [[Special:SpecialPages|{{int:specialpa
 # General errors
 'error' => 'Xihoxo',
 'databaseerror' => 'Xihoxo xo Database',
-'dberrortext' => 'A database query syntax error has occurred.
-This may indicate a bug in the software.
-The last attempted database query was:
-<blockquote><tt>$1</tt></blockquote>
-from within function "<tt>$2</tt>".
-MySQL returned error "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'A database query syntax error has occurred.
-The last attempted database query was:
-"$1"
-from within function "$2".
-MySQL returned error "$3: $4"',
 'laggedslavemode' => 'Warning: Page may not contain recent updates.',
 'readonly' => 'Database locked',
 'enterlockreason' => 'Enter a reason for the lock, including an estimate of when the lock will be released',
@@ -608,7 +597,6 @@ Adiresi ya wena ya e-mail yitunberile loko van'wana va bula na wena.",
 'recentchangeslinked-feed' => 'Kuncica loku yelanaka',
 'recentchangeslinked-toolbox' => 'Kuncica loku yelanaka',
 'recentchangeslinked-title' => 'Kucinca loku yelanaka na "$1"',
-'recentchangeslinked-noresult' => 'Kuhava mindzulamiso eka matluka lawa eka nkarhi lowu langiweke',
 'recentchangeslinked-summary' => "Lowu inxaxamelo wa kucinca kasweswinyana loku endliweke eka matluka la ma khwekelaka eka tluka leri u rilavaka (kumbe yinw'ana ya mitlawa leyi yelanaka).Matluka lawa [[Special:Watchlist|umalanguteke]] ma '''bumburisiwile'''.",
 'recentchangeslinked-page' => 'Vito ratluka:',
 'recentchangeslinked-to' => 'Komba kucinca eka matluka lama khwekelaka eka tluka leri ntsena',
@@ -653,8 +641,6 @@ Nhlamuselo ya yona leyi nge ndzeni ka [$2 tluka ro hlamusela] hi yona leyi kombi
 
 # Statistics
 'statistics' => 'Mintsengo',
-
-'disambiguationspage' => 'Template:Hambanisa marito',
 
 # Miscellaneous special pages
 'nbytes' => '$1 {{PLURAL:$1|wa bayiti|wa tibayit}}',

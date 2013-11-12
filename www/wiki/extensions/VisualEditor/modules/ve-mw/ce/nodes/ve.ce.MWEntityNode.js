@@ -12,16 +12,16 @@
  * @extends ve.ce.LeafNode
  * @constructor
  * @param {ve.dm.MWEntityNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWEntityNode = function VeCeMWEntityNode( model, config ) {
 	// Parent constructor
 	ve.ce.LeafNode.call( this, model, config );
 
-	// DOM Changes
-	this.$.addClass( 've-ce-mwEntityNode' );
+	// DOM changes
+	this.$element.addClass( 've-ce-mwEntityNode' );
 	// Need CE=false to prevent selection issues
-	this.$.attr( 'contenteditable', false );
+	this.$element.prop( 'contentEditable', 'false' );
 
 	// Events
 	this.model.connect( this, { 'update': 'onUpdate' } );
@@ -32,7 +32,7 @@ ve.ce.MWEntityNode = function VeCeMWEntityNode( model, config ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWEntityNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.MWEntityNode, ve.ce.LeafNode );
 
 /* Static Properties */
 
@@ -48,7 +48,7 @@ ve.ce.MWEntityNode.static.name = 'mwEntity';
  * @method
  */
 ve.ce.MWEntityNode.prototype.onUpdate = function () {
-	this.$.text( this.model.getAttribute( 'character' ) );
+	this.$element.text( this.model.getAttribute( 'character' ) );
 };
 
 /* Registration */

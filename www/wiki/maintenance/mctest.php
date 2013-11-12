@@ -61,8 +61,15 @@ class mcTest extends Maintenance {
 			$this->error( "MediaWiki isn't configured for Memcached usage", 1 );
 		}
 
+		# find out the longest server string to nicely align output later on
+		$maxSrvLen = $servers ? max( array_map( 'strlen', $servers ) ) : 0;
+
 		foreach ( $servers as $server ) {
-			$this->output( $server . " ", $server );
+			$this->output(
+				str_pad( $server, $maxSrvLen ),
+				$server  # output channel
+			);
+
 			$mcc = new MemCachedClientforWiki( array(
 				'persistant' => true,
 				'timeout' => $wgMemCachedTimeout
@@ -73,7 +80,7 @@ class mcTest extends Maintenance {
 			$get = 0;
 			$time_start = $this->microtime_float();
 			for ( $i = 1; $i <= $iterations; $i++ ) {
-				if ( !is_null( $mcc->set( "test$i", $i ) ) ) {
+				if ( $mcc->set( "test$i", $i ) ) {
 					$set++;
 				}
 			}
@@ -90,7 +97,7 @@ class mcTest extends Maintenance {
 			}
 			$exectime = $this->microtime_float() - $time_start;
 
-			$this->output( "set: $set   incr: $incr   get: $get time: $exectime", $server );
+			$this->output( " set: $set   incr: $incr   get: $get time: $exectime", $server );
 		}
 	}
 

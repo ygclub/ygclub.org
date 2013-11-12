@@ -113,7 +113,6 @@ $messages = array(
 'tog-shownumberswatching' => "Mostrer l' nombe d' uzeus ki shuvèt l' pådje",
 'tog-oldsig' => 'Siné pol moumint:',
 'tog-fancysig' => 'Sinateure avou do tecse wiki (sins loyén otomatike)',
-'tog-showjumplinks' => 'Mete en alaedje les loyéns di naiviaedje «potchî a» å dzeu del pådje (pol pea «Myskin» et ds ôtes)',
 'tog-uselivepreview' => "Eployî l' prévoeyaedje abeye (JavaScript) (Esperimintå)",
 'tog-forceeditsummary' => "M' advierti cwand dji lai vude on rascourti",
 'tog-watchlisthideown' => 'Èn nén mostrer les candjmints da minne',
@@ -297,7 +296,7 @@ Soeyoz vayant di ratinde ene miete divant di rsayî di vey cisse pådje ci.
 $1",
 'pool-errorunknown' => 'Aroke nén cnoxhowe',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Åd fwait di {{SITENAME}}',
 'aboutpage' => 'Project:Åd fwait',
 'copyright' => "Li contnou est dizo l' $1.",
@@ -367,17 +366,6 @@ Motoit ki vos avoz må scrît l' hårdêye ou shuvou on cron loyén.
 # General errors
 'error' => 'Aroke',
 'databaseerror' => "Åk n' a nén stî avou l' båze di dnêyes",
-'dberrortext' => "Åk n' a nén stî avou l' sintacse do cweraedje del båze di dnêyes.
-Çoula pout esse cåze d' on bug dins l' programe.
-Li dierin cweraedje del båze di dnêyes di sayî esteut:
-<blockquote><tt>$1</tt></blockquote>
-a pårti del fonccion «<tt>$2</tt>».
-Li båze di dnêyes a rtourné l' aroke «<tt>$3: $4</tt>».",
-'dberrortextcl' => "Åk n' a nén stî avou l' sintacse do cweraedje del båze di dnêyes.
-Li dierin cweraedje del båze di dnêyes di sayî esteut:
-«$1»
-a pårti del fonccion «$2».
-Li båze di dnêyes a rtourné l' aroke «$3: $4».",
 'laggedslavemode' => "Asteme: I s' pout ki l' pådje n' åye nén co les dierins candjmints.",
 'readonly' => 'Li båze di dnêyes est aclawêye',
 'missing-article' => "Li båze di dnêyes n' a nén trové l' tecse d' ene pådje k' åreut dvou esse trovêye, lomêye «$1» $2.
@@ -500,7 +488,7 @@ Por vos fini l' elodjaedje, vos dvoz defini on novea scret:",
 'newpassword' => 'Noû scret:',
 'retypenew' => "Ritapez l' noû scret:",
 'resetpass_submit' => "Defini on scret et s' elodjî",
-'resetpass_success' => "Vosse sicret a stî candjî comifåt!
+'changepassword-success' => "Vosse sicret a stî candjî comifåt!
 Asteure l' elodjaedje...",
 'resetpass_forbidden' => "Les screts n' polèt nén esse candjîs",
 'resetpass-no-info' => 'Vos dvoz esse elodjî po pleur aveur accès a cisse pådje ci.',
@@ -917,7 +905,6 @@ Vos ploz sayî di mete «all:» pa dvant l' tecse a cweri po cweri dins tot l' c
 'prefs-reset-intro' => "Vos ploz eployî ç' boton chal po rmete totes vos preferinces åzès prémetowès valixhances del waibe.
 Çoul n' pôrè nén esse disfwait.",
 'prefs-emailconfirm-label' => "Acertinaedje di l' emile:",
-'prefs-textboxsize' => 'Grandeu del boesse di tecse',
 'youremail' => 'Vost emile:',
 'username' => "No d' elodjaedje:",
 'uid' => "Limero d' l' uzeu:",
@@ -1270,12 +1257,6 @@ Rimimbrez vs di verifyî s' i n' a nén des ôtes loyéns divant delzès disface
 'statistics-pages-desc' => 'Totes les pådjes do "Wiki", minme les copinaedjes, les rdjiblaedjes, evnd.',
 'statistics-mostpopular' => 'Pådjes les pus veyowes',
 
-'disambiguations' => "Pådjes avou des loyéns viè des pådjes d' omonimeye",
-'disambiguationspage' => 'Template:omonimeye',
-'disambiguations-text' => "Ces pådjes ci loynut eviè ene '''pådje d' omonimeye'''.
-Ele divrént purade raloyî direk å mwaisse sudjet.<br />
-Ene pådje est waiteye come pådje d' omonimeye s' ele eploye on modele k' est loyî a [[MediaWiki:Disambiguationspage]].",
-
 'doubleredirects' => 'Dobes redjiblaedjes',
 'doubleredirectstext' => "Cisse pådje ci mostere les dobes redjiblaedjes (pådjes ki redjiblèt viè ene ôte pådje di redjiblaedje).
 Tchaeke roye a-st on loyén viè l' prumî eyet l' deujhinme redjiblaedje, avou on mostraedje del såme do deujhinme redjiblaedje, çou ki å pus sovint dene li «vraiy» årtike såme, ki l' prumî redjiblaedje divreut evoyî viè lu.
@@ -1458,7 +1439,6 @@ Si vos vloz bodjî l' pådje foû di vosse djivêye des shuvous, clitchîz so «
 'unwatch' => 'Èn pus shuve',
 'unwatchthispage' => 'Èn pus shuve li pådje',
 'notanarticle' => 'Nén èn årtike',
-'watchnochange' => "Nole des pådjes di vosse djivêye di pådjes a shuve n' a stî candjeye dins l' termene di tins dmandêye.",
 'watchlist-details' => 'Vos avoz {{PLURAL:$1|$1 pådje shuvowe|$1 pådjes shuvowes}} (sins conter les pådjes di copene).',
 'wlheader-enotif' => 'Li notifiaedje pa emile est en alaedje.',
 'wlheader-showupdated' => "Les pådjes k' ont candjî dispoy vosse dierinne vizite sont metowes e '''cråssès letes'''",

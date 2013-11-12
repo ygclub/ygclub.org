@@ -6,121 +6,162 @@
  */
 
 /**
- * Document dialog.
+ * Dialog for editing MediaWiki media objects.
  *
  * @class
  * @extends ve.ui.MWDialog
  *
  * @constructor
- * @param {ve.ui.Surface} surface
- * @param {Object} [config] Config options
+ * @param {ve.ui.WindowSet} windowSet Window set this dialog is part of
+ * @param {Object} [config] Configuration options
  */
-ve.ui.MWMediaEditDialog = function VeUiMWMediaEditDialog( surface, config ) {
+ve.ui.MWMediaEditDialog = function VeUiMWMediaEditDialog( windowSet, config ) {
 	// Parent constructor
-	ve.ui.MWDialog.call( this, surface, config );
+	ve.ui.MWDialog.call( this, windowSet, config );
 
 	// Properties
+	this.mediaNode = null;
 	this.captionNode = null;
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWMediaEditDialog, ve.ui.MWDialog );
+OO.inheritClass( ve.ui.MWMediaEditDialog, ve.ui.MWDialog );
 
 /* Static Properties */
+
+ve.ui.MWMediaEditDialog.static.name = 'mediaEdit';
 
 ve.ui.MWMediaEditDialog.static.titleMessage = 'visualeditor-dialog-media-title';
 
 ve.ui.MWMediaEditDialog.static.icon = 'picture';
 
-ve.ui.MWMediaEditDialog.static.toolbarTools = [
-	{ 'items': ['undo', 'redo'] },
-	{ 'items': ['bold', 'italic', 'mwLink', 'clear'] }
+ve.ui.MWMediaEditDialog.static.toolbarGroups = [
+	{ 'include': [ 'undo', 'redo' ] },
+	{ 'include': [ 'bold', 'italic', 'link', 'clear' ] },
+	{
+		'include': '*',
+		'exclude': [
+			{ 'group': 'format' },
+			{ 'group': 'structure' },
+			'referenceList'
+		]
+	}
 ];
 
 ve.ui.MWMediaEditDialog.static.surfaceCommands = [
-	'bold', 'italic', 'mwLink', 'undo', 'redo'
+	'undo', 'redo', 'bold', 'italic', 'link', 'clear',
+	'underline', 'subscript', 'superscript'
 ];
 
 /* Methods */
 
+/**
+ * @inheritdoc
+ */
 ve.ui.MWMediaEditDialog.prototype.initialize = function () {
 	// Parent method
 	ve.ui.MWDialog.prototype.initialize.call( this );
 
 	// Properties
-	this.contentFieldset = new ve.ui.FieldsetLayout( {
-		'$$': this.frame.$$,
+	this.editPanel = new OO.ui.PanelLayout( {
+		'$': this.$,
+		'padded': true,
+		'scrollable': true
+	} );
+	this.captionFieldset = new OO.ui.FieldsetLayout( {
+		'$': this.$,
 		'label': ve.msg( 'visualeditor-dialog-media-content-section' ),
 		'icon': 'parameter'
 	} );
+	this.applyButton = new OO.ui.PushButtonWidget( {
+		'$': this.$,
+		'label': ve.msg( 'visualeditor-dialog-action-apply' ),
+		'flags': ['primary']
+	} );
+
+	// Events
+	this.applyButton.connect( this, { 'click': [ 'close', { 'action': 'apply' } ] } );
 
 	// Initialization
-	this.$body.addClass( 've-ui-mwMediaEditDialog-body' );
-	this.$body.append( this.contentFieldset.$ );
+	this.editPanel.$element.append( this.captionFieldset.$element );
+	this.$body.append( this.editPanel.$element );
+	this.$foot.append( this.applyButton.$element );
 };
 
-ve.ui.MWMediaEditDialog.prototype.onOpen = function () {
-	var data, doc = this.surface.getModel().getDocument();
-
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaEditDialog.prototype.setup = function ( data ) {
 	// Parent method
-	ve.ui.MWDialog.prototype.onOpen.call( this );
+	ve.ui.MWDialog.prototype.setup.call( this, data );
 
-	// Get caption content
-	this.captionNode = this.surface.getView().getFocusedNode().getModel().getCaptionNode();
+	var newDoc, doc = this.surface.getModel().getDocument();
+
+	// Properties
+	this.mediaNode = this.surface.getView().getFocusedNode().getModel();
+	this.captionNode = this.mediaNode.getCaptionNode();
 	if ( this.captionNode && this.captionNode.getLength() > 0 ) {
-		data = doc.getData( this.captionNode.getRange(), true );
+		newDoc = doc.cloneFromRange( this.captionNode.getRange() );
 	} else {
-		data = [
+		newDoc = [
 			{ 'type': 'paragraph', 'internal': { 'generated': 'wrapper' } },
-			{ 'type': '/paragraph' }
+			{ 'type': '/paragraph' },
+			{ 'type': 'internalList' },
+			{ 'type': '/internalList' }
 		];
 	}
 
-	this.captionSurface = new ve.ui.Surface(
-		new ve.dm.ElementLinearData( doc.getStore(), data ), { '$$': this.frame.$$ }
+	this.captionSurface = new ve.ui.SurfaceWidget(
+		newDoc,
+		{
+			'$': this.$,
+			'tools': this.constructor.static.toolbarGroups,
+			'commands': this.constructor.static.surfaceCommands
+		}
 	);
-	this.captionToolbar = new ve.ui.Toolbar( this.captionSurface, { '$$': this.frame.$$ } );
 
-	this.captionToolbar.$.addClass( 've-ui-mwMediaEditDialog-toolbar' );
-	this.contentFieldset.$.append( this.captionToolbar.$, this.captionSurface.$ );
-	this.captionToolbar.addTools( this.constructor.static.toolbarTools );
-	this.captionSurface.addCommands( this.constructor.static.surfaceCommands );
+	// Initialization
+	this.captionFieldset.$element.append( this.captionSurface.$element );
 	this.captionSurface.initialize();
-	this.captionSurface.view.documentView.documentNode.$.focus();
 };
 
-ve.ui.MWMediaEditDialog.prototype.onClose = function ( action ) {
-	var data, doc, surfaceModel = this.surface.getModel();
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaEditDialog.prototype.teardown = function ( data ) {
+	var newDoc, doc,
+		surfaceModel = this.surface.getModel();
 
-	// Parent method
-	ve.ui.MWDialog.prototype.onClose.call( this );
+	// Data initialization
+	data = data || {};
 
-	if ( action === 'apply' ) {
-		data = this.captionSurface.getModel().getDocument().getData();
+	if ( data.action === 'apply' ) {
+		newDoc = this.captionSurface.getSurface().getModel().getDocument();
 		doc = surfaceModel.getDocument();
-		if ( this.captionNode ) {
-			// Replace the contents of the caption
-			surfaceModel.getFragment( this.captionNode.getRange(), true ).insertContent( data );
-		} else {
+		if ( !this.captionNode ) {
 			// Insert a new caption at the beginning of the image node
 			surfaceModel.getFragment()
 				.adjustRange( 1 )
 				.collapseRangeToStart()
-				.insertContent(
-					[ { 'type': 'mwImageCaption' } ]
-						.concat( data )
-						.concat( [ { 'type': '/mwImageCaption' } ] )
-				);
+				.insertContent( [ { 'type': 'mwImageCaption' }, { 'type': '/mwImageCaption' } ] );
+			this.captionNode = this.mediaNode.getCaptionNode();
 		}
+		// Replace the contents of the caption
+		surfaceModel.change(
+			ve.dm.Transaction.newFromDocumentReplace( doc, this.captionNode, newDoc )
+		);
 	}
 
 	// Cleanup
-	this.captionNode = null;
 	this.captionSurface.destroy();
-	this.captionToolbar.destroy();
+	this.captionSurface = null;
+	this.captionNode = null;
+
+	// Parent method
+	ve.ui.MWDialog.prototype.teardown.call( this, data );
 };
 
 /* Registration */
 
-ve.ui.dialogFactory.register( 'mwMediaEdit', ve.ui.MWMediaEditDialog );
+ve.ui.dialogFactory.register( ve.ui.MWMediaEditDialog );

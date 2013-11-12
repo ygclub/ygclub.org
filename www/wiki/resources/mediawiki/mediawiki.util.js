@@ -53,8 +53,9 @@
 							|| profile.name === 'konqueror' ) ) {
 				util.tooltipAccessKeyPrefix = 'ctrl-';
 
-			// Firefox 2.x and later
-			} else if ( profile.name === 'firefox' && profile.versionBase > '1' ) {
+			// Firefox/Iceweasel 2.x and later
+			} else if ( ( profile.name === 'firefox' || profile.name === 'iceweasel' )
+				&& profile.versionBase > '1' ) {
 				util.tooltipAccessKeyPrefix = 'alt-shift-';
 			}
 
@@ -103,8 +104,6 @@
 				// Make sure we don't unset util.$content if it was preset and we don't find anything
 				return util.$content;
 			} )();
-
-			mw.hook( 'wikipage.content' ).fire( util.$content );
 
 			// Table of contents toggle
 			$tocTitle = $( '#toctitle' );
@@ -162,11 +161,18 @@
 		 * Get the link to a page name (relative to `wgServer`),
 		 *
 		 * @param {string} str Page name to get the link for.
+		 * @param {Object} params A mapping of query parameter names to values,
+		 *     e.g. { action: 'edit' }. Optional.
 		 * @return {string} Location for a page with name of `str` or boolean false on error.
 		 */
-		wikiGetlink: function ( str ) {
-			return mw.config.get( 'wgArticlePath' ).replace( '$1',
+		wikiGetlink: function ( str, params ) {
+			var url = mw.config.get( 'wgArticlePath' ).replace( '$1',
 				util.wikiUrlencode( typeof str === 'string' ? str : mw.config.get( 'wgPageName' ) ) );
+			if ( params && !$.isEmptyObject( params ) ) {
+				url += url.indexOf( '?' ) !== -1 ? '&' : '?';
+				url += $.param( params );
+			}
+			return url;
 		},
 
 		/**
@@ -434,23 +440,27 @@
 				$link.attr( 'accesskey', accesskey );
 			}
 
-			// Where to put our node ?
-			// - nextnode is a DOM element (was the only option before MW 1.17, in wikibits.js)
-			if ( nextnode && nextnode.parentNode === $ul[0] ) {
-				$( nextnode ).before( $item );
-
-			// - nextnode is a CSS selector for jQuery
-			} else if ( typeof nextnode === 'string' && $ul.find( nextnode ).length !== 0 ) {
-				$ul.find( nextnode ).eq( 0 ).before( $item );
-
-			// If the jQuery selector isn't found within the <ul>,
-			// or if nextnode was invalid or not passed at all,
-			// then just append it at the end of the <ul> (this is the default behavior)
-			} else {
-				$ul.append( $item );
+			if ( nextnode ) {
+				if ( nextnode.nodeType || typeof nextnode === 'string' ) {
+					// nextnode is a DOM element (was the only option before MW 1.17, in wikibits.js)
+					// or nextnode is a CSS selector for jQuery
+					nextnode = $ul.find( nextnode );
+				} else if ( !nextnode.jquery || nextnode[0].parentNode !== $ul[0] ) {
+					// Fallback
+					$ul.append( $item );
+					return $item[0];
+				}
+				if ( nextnode.length === 1 ) {
+					// nextnode is a jQuery object that represents exactly one element
+					nextnode.before( $item );
+					return $item[0];
+				}
 			}
 
+			// Fallback (this is the default behavior)
+			$ul.append( $item );
 			return $item[0];
+
 		},
 
 		/**

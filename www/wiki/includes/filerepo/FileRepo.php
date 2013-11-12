@@ -965,7 +965,7 @@ class FileRepo {
 	public function storeTemp( $originalName, $srcPath ) {
 		$this->assertWritableRepo(); // fail out if read-only
 
-		$date = gmdate( "YmdHis" );
+		$date = MWTimestamp::getInstance()->format( 'YmdHis' );
 		$hashPath = $this->getHashPath( $originalName );
 		$dstUrlRel = $hashPath . $date . '!' . rawurlencode( $originalName );
 		$virtualUrl = $this->getVirtualUrl( 'temp' ) . '/' . $dstUrlRel;
@@ -1716,6 +1716,22 @@ class FileRepo {
 	 * @throws MWException
 	 */
 	protected function assertWritableRepo() {}
+
+
+	/**
+	 * Return information about the repository.
+	 *
+	 * @return array
+	 * @since 1.22
+	 */
+	public function getInfo() {
+		return array(
+			'name' => $this->getName(),
+			'displayname' => $this->getDisplayName(),
+			'rootUrl' => $this->getRootUrl(),
+			'local' => $this->isLocal(),
+		);
+	}
 }
 
 /**

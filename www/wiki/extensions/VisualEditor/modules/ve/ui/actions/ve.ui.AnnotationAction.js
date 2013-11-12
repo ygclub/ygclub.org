@@ -20,9 +20,11 @@ ve.ui.AnnotationAction = function VeUiAnnotationAction( surface ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
+OO.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
 
 /* Static Properties */
+
+ve.ui.AnnotationAction.static.name = 'annotation';
 
 /**
  * List of allowed methods for the action.
@@ -30,7 +32,7 @@ ve.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
  * @static
  * @property
  */
-ve.ui.AnnotationAction.static.methods = ['set', 'clear', 'toggle', 'clearAll'];
+ve.ui.AnnotationAction.static.methods = [ 'set', 'clear', 'toggle', 'clearAll' ];
 
 /* Methods */
 
@@ -78,7 +80,7 @@ ve.ui.AnnotationAction.prototype.toggle = function ( name, data ) {
 		);
 	} else {
 		existingAnnotations = surfaceModel
-			.getInsertionAnnotations().getComparableAnnotations( annotation );
+			.getInsertionAnnotations().getAnnotationsByName( annotation.name );
 		if ( existingAnnotations.isEmpty() ) {
 			surfaceModel.addInsertionAnnotations( annotation );
 		} else {
@@ -94,7 +96,8 @@ ve.ui.AnnotationAction.prototype.toggle = function ( name, data ) {
  */
 ve.ui.AnnotationAction.prototype.clearAll = function () {
 	var i, len, arr,
-		fragment = this.surface.getModel().getFragment(),
+		surfaceModel = this.surface.getModel(),
+		fragment = surfaceModel.getFragment(),
 		annotations = fragment.getAnnotations( true );
 
 	arr = annotations.get();
@@ -103,8 +106,9 @@ ve.ui.AnnotationAction.prototype.clearAll = function () {
 	for ( i = 0, len = arr.length; i < len; i++ ) {
 		fragment.annotateContent( 'clear', arr[i].name, arr[i].data );
 	}
+	surfaceModel.setInsertionAnnotations( null );
 };
 
 /* Registration */
 
-ve.ui.actionFactory.register( 'annotation', ve.ui.AnnotationAction );
+ve.ui.actionFactory.register( ve.ui.AnnotationAction );

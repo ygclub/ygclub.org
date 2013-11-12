@@ -29,31 +29,6 @@ ve.dm.MWTemplateSpecModel = function VeDmMWTemplateSpecModel( template ) {
 	this.fill();
 };
 
-/* Static Methods */
-
-/**
- * Get the correct value from a message property.
- *
- * @method
- * @static
- * @param {string|Object|null} val Messsage or object with messages keyed by language
- * @param {Mixed} [fallback=null] Value to use if message is not available
- * @param {string} [lang] Language to prefer, user interface language will be used by default
- * @returns {string} Message text or fallback if not available
- */
-ve.dm.MWTemplateSpecModel.getMessage = function ( val, fallback, lang ) {
-	if ( lang === undefined ) {
-		lang = ve.init.platform.getUserLanguage();
-	}
-	if ( fallback === undefined ) {
-		fallback = null;
-	}
-	if ( ve.isPlainObject( val ) ) {
-		return val[lang] || fallback;
-	}
-	return typeof val === 'string' ? val : fallback;
-};
-
 /* Methods */
 
 /**
@@ -123,7 +98,7 @@ ve.dm.MWTemplateSpecModel.prototype.fill = function () {
  */
 ve.dm.MWTemplateSpecModel.prototype.getDefaultParameterSpec = function ( name ) {
 	return {
-		'label': { 'en': name },
+		'label': name,
 		'description': null,
 		'default': '',
 		'type': 'string',
@@ -169,7 +144,7 @@ ve.dm.MWTemplateSpecModel.prototype.getLabel = function () {
  * @returns {string|null} Template description or null if not available
  */
 ve.dm.MWTemplateSpecModel.prototype.getDescription = function () {
-	return this.constructor.getMessage( this.description, null );
+	return this.description;
 };
 
 /**
@@ -204,7 +179,7 @@ ve.dm.MWTemplateSpecModel.prototype.isParameterAlias = function ( name ) {
  * @returns {string} Parameter label
  */
 ve.dm.MWTemplateSpecModel.prototype.getParameterLabel = function ( name ) {
-	return this.constructor.getMessage( this.params[name].label, name );
+	return this.params[name].label || name;
 };
 
 /**
@@ -215,7 +190,7 @@ ve.dm.MWTemplateSpecModel.prototype.getParameterLabel = function ( name ) {
  * @returns {string|null} Parameter description
  */
 ve.dm.MWTemplateSpecModel.prototype.getParameterDescription = function ( name ) {
-	return this.constructor.getMessage( this.params[name].description );
+	return this.params[name].description;
 };
 
 /**

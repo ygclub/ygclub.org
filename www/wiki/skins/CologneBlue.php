@@ -290,8 +290,8 @@ class CologneBlueTemplate extends BaseTemplate {
 		<div id="siteNotice"><?php echo $this->getSkin()->getSiteNotice() ?></div>
 		<?php } ?>
 		<h1 id="firstHeading" lang="<?php
-			$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getCode();
-			$this->html( 'pageLanguage' );
+			$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getHtmlCode();
+			$this->text( 'pageLanguage' );
 		?>"><span dir="auto"><?php echo $this->data['title'] ?></span></h1>
 		<?php if ( $this->translator->translate( 'tagline' ) ) { ?>
 		<p class="tagline"><?php echo htmlspecialchars( $this->translator->translate( 'tagline' ) ) ?></p>
@@ -541,13 +541,12 @@ class CologneBlueTemplate extends BaseTemplate {
 			$s .= wfMessage( 'qbfind' )->text() . ": ";
 		}
 
-		$s .= "<input type='text' class=\"mw-searchInput\" name=\"search\" size=\"14\" value=\""
-			. htmlspecialchars( substr( $search, 0, 256 ) ) . "\" />"
-			. ( $which == 'footer' ? " " : "<br />" )
-			. "<input type='submit' class=\"searchButton\" name=\"go\" value=\"" . wfMessage( 'searcharticle' )->escaped() . "\" />";
+		$s .= $this->makeSearchInput( array( 'class' => 'mw-searchInput', 'type' => 'text', 'size' => '14' ) );
+		$s .= ( $which == 'footer' ? " " : "<br />" );
+		$s .= $this->makeSearchButton( 'go', array( 'class' => 'searchButton' ) );
 
 		if ( $wgUseTwoButtonsSearchForm ) {
-			$s .= " <input type='submit' class=\"searchButton\" name=\"fulltext\" value=\"" . wfMessage( 'searchbutton' )->escaped() . "\" />\n";
+			$s .= $this->makeSearchButton( 'fulltext', array( 'class' => 'searchButton' ) );
 		} else {
 			$s .= '<div><a href="' . $action . '" rel="search">' . wfMessage( 'powersearch-legend' )->escaped() . "</a></div>\n";
 		}

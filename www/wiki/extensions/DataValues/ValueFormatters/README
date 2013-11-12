@@ -1,0 +1,8 @@
+These is the readme file for the ValueFormatters library.
+
+Extension page on mediawiki.org: https://www.mediawiki.org/wiki/Extension:ValueFormatters
+Latest version of the readme file: https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/extensions/DataValues.git;a=blob;f=ValueFormatters/README
+
+== About ==
+
+ValueFormatters defines a collection of formatters that take some value and format it in a certain way.

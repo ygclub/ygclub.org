@@ -286,7 +286,7 @@ class DatabaseOracle extends DatabaseBase {
 		wfSuppressWarnings();
 		if ( $this->mFlags & DBO_PERSISTENT ) {
 			$this->mConn = oci_pconnect( $this->mUser, $this->mPassword, $this->mServer, $this->defaultCharset, $session_mode );
-		} else if ( $this->mFlags & DBO_DEFAULT ) {
+		} elseif ( $this->mFlags & DBO_DEFAULT ) {
 			$this->mConn = oci_new_connect( $this->mUser, $this->mPassword, $this->mServer, $this->defaultCharset, $session_mode );
 		} else {
 			$this->mConn = oci_connect( $this->mUser, $this->mPassword, $this->mServer, $this->defaultCharset, $session_mode );
@@ -341,7 +341,7 @@ class DatabaseOracle extends DatabaseBase {
 		$union_unique = ( preg_match( '/\/\* UNION_UNIQUE \*\/ /', $sql ) != 0 );
 		// EXPLAIN syntax in Oracle is EXPLAIN PLAN FOR and it return nothing
 		// you have to select data from plan table after explain
-		$explain_id = date( 'dmYHis' );
+		$explain_id = MWTimestamp::getLocalInstance()->format( 'dmYHis' );
 
 		$sql = preg_replace( '/^EXPLAIN /', 'EXPLAIN PLAN SET STATEMENT_ID = \'' . $explain_id . '\' FOR', $sql, 1, $explain_count );
 
@@ -694,7 +694,7 @@ class DatabaseOracle extends DatabaseBase {
 				break;
 		}
 
-		return parent::tableName( strtoupper( $name ), $format );
+		return strtoupper( parent::tableName( $name, $format ) );
 	}
 
 	function tableNameInternal( $name ) {
@@ -883,7 +883,7 @@ class DatabaseOracle extends DatabaseBase {
 
 	/**
 	 * Query whether a given table exists (in the given schema, or the default mw one if not given)
-	 * @return int
+	 * @return bool
 	 */
 	function tableExists( $table, $fname = __METHOD__ ) {
 		$table = $this->tableName( $table );
@@ -891,13 +891,14 @@ class DatabaseOracle extends DatabaseBase {
 		$owner = $this->addQuotes( strtoupper( $this->mDBname ) );
 		$SQL = "SELECT 1 FROM all_tables WHERE owner=$owner AND table_name=$table";
 		$res = $this->doQuery( $SQL );
-		if ( $res ) {
-			$count = $res->numRows();
-			$res->free();
+		if ( $res && $res->numRows() > 0 ) {
+			$exists = true;
 		} else {
-			$count = 0;
+			$exists = false;
 		}
-		return $count;
+
+		$res->free();
+		return $exists;
 	}
 
 	/**

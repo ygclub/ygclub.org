@@ -1534,7 +1534,7 @@ class OutputPage extends ContextSource {
 
 		$popts = $this->parserOptions();
 		$oldTidy = $popts->setTidy( $tidy );
-		$popts->setInterfaceMessage( (bool) $interface );
+		$popts->setInterfaceMessage( (bool)$interface );
 
 		$parserOutput = $wgParser->parse(
 			$text, $title, $popts,
@@ -1721,6 +1721,7 @@ class OutputPage extends ContextSource {
 				array(
 					"{$wgCookiePrefix}Token",
 					"{$wgCookiePrefix}LoggedOut",
+					"forceHTTPS",
 					session_name()
 				),
 				$wgCacheVaryCookies
@@ -2432,14 +2433,6 @@ $templates
 	 * @param $options Options array to pass to Linker
 	 */
 	public function addReturnTo( $title, $query = array(), $text = null, $options = array() ) {
-		if ( in_array( 'http', $options ) ) {
-			$proto = PROTO_HTTP;
-		} elseif ( in_array( 'https', $options ) ) {
-			$proto = PROTO_HTTPS;
-		} else {
-			$proto = PROTO_RELATIVE;
-		}
-
 		$link = $this->msg( 'returnto' )->rawParams(
 			Linker::link( $title, $text, array(), $query, $options ) )->escaped();
 		$this->addHTML( "<p id=\"mw-returnto\">{$link}</p>\n" );
@@ -2488,10 +2481,6 @@ $templates
 
 		$userdir = $this->getLanguage()->getDir();
 		$sitedir = $wgContLang->getDir();
-
-		if ( $sk->commonPrintStylesheet() ) {
-			$this->addModuleStyles( 'mediawiki.legacy.wikiprintable' );
-		}
 
 		$ret = Html::htmlHeader( array( 'lang' => $this->getLanguage()->getHtmlCode(), 'dir' => $userdir, 'class' => 'client-nojs' ) );
 
@@ -2585,7 +2574,7 @@ $templates
 	protected function makeResourceLoaderLink( $modules, $only, $useESI = false, array $extraQuery = array(), $loadCall = false ) {
 		global $wgResourceLoaderUseESI;
 
-		$modules = (array) $modules;
+		$modules = (array)$modules;
 
 		if ( !count( $modules ) ) {
 			return '';
@@ -2977,24 +2966,24 @@ $templates
 	public function getJSVars() {
 		global $wgContLang;
 
-		$latestRevID = 0;
-		$pageID = 0;
-		$canonicalName = false; # bug 21115
+		$curRevisionId = 0;
+		$articleId = 0;
+		$canonicalSpecialPageName = false; # bug 21115
 
 		$title = $this->getTitle();
 		$ns = $title->getNamespace();
-		$nsname = MWNamespace::exists( $ns ) ? MWNamespace::getCanonicalName( $ns ) : $title->getNsText();
+		$canonicalNamespace = MWNamespace::exists( $ns ) ? MWNamespace::getCanonicalName( $ns ) : $title->getNsText();
 
 		// Get the relevant title so that AJAX features can use the correct page name
 		// when making API requests from certain special pages (bug 34972).
 		$relevantTitle = $this->getSkin()->getRelevantTitle();
 
 		if ( $ns == NS_SPECIAL ) {
-			list( $canonicalName, /*...*/ ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
+			list( $canonicalSpecialPageName, /*...*/ ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
 		} elseif ( $this->canUseWikiPage() ) {
 			$wikiPage = $this->getWikiPage();
-			$latestRevID = $wikiPage->getLatest();
-			$pageID = $wikiPage->getId();
+			$curRevisionId = $wikiPage->getLatest();
+			$articleId = $wikiPage->getId();
 		}
 
 		$lang = $title->getPageLanguage();
@@ -3016,14 +3005,16 @@ $templates
 		$user = $this->getUser();
 
 		$vars = array(
-			'wgCanonicalNamespace' => $nsname,
-			'wgCanonicalSpecialPageName' => $canonicalName,
+			'wgCanonicalNamespace' => $canonicalNamespace,
+			'wgCanonicalSpecialPageName' => $canonicalSpecialPageName,
 			'wgNamespaceNumber' => $title->getNamespace(),
 			'wgPageName' => $title->getPrefixedDBkey(),
 			'wgTitle' => $title->getText(),
-			'wgCurRevisionId' => $latestRevID,
-			'wgArticleId' => $pageID,
+			'wgCurRevisionId' => $curRevisionId,
+			'wgRevisionId' => (int)$this->getRevisionId(),
+			'wgArticleId' => $articleId,
 			'wgIsArticle' => $this->isArticle(),
+			'wgIsRedirect' => $title->isRedirect(),
 			'wgAction' => Action::getActionName( $this->getContext() ),
 			'wgUserName' => $user->isAnon() ? null : $user->getName(),
 			'wgUserGroups' => $user->getEffectiveGroups(),
@@ -3051,6 +3042,8 @@ $templates
 		if ( $wgContLang->hasVariants() ) {
 			$vars['wgUserVariant'] = $wgContLang->getPreferredVariant();
 		}
+		// Same test as SkinTemplate
+		$vars['wgIsProbablyEditable'] = $title->quickUserCan( 'edit', $user ) && ( $title->exists() || $title->quickUserCan( 'create', $user ) );
 		foreach ( $title->getRestrictionTypes() as $type ) {
 			$vars['wgRestriction' . ucfirst( $type )] = $title->getRestrictions( $type );
 		}
@@ -3215,7 +3208,7 @@ $templates
 					foreach ( $variants as $_v ) {
 						$tags["variant-$_v"] = Html::element( 'link', array(
 							'rel' => 'alternate',
-							'hreflang' => $_v,
+							'hreflang' => wfBCP47( $_v ),
 							'href' => $this->getTitle()->getLocalURL( array( 'variant' => $_v ) ) )
 						);
 					}

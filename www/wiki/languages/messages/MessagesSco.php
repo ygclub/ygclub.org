@@ -14,6 +14,7 @@
  * @author OchAyeTheNoo
  * @author Omnipaedista
  * @author Purodha
+ * @author Shirayuki
  * @author The Evil IP address
  * @author Urhixidur
  * @author Ushanka
@@ -51,7 +52,6 @@ $messages = array(
 'tog-enotifrevealaddr' => 'Shaw ma email address in notification mails',
 'tog-shownumberswatching' => 'Shaw the nummer o watching uisers',
 'tog-fancysig' => 'Raw seignaturs (athoot automatic airtin)',
-'tog-showjumplinks' => 'Enable "loup til" accessibility airtins',
 'tog-uselivepreview' => 'Uise leeve preview (JavaScript) (Prattik)',
 'tog-forceeditsummary' => 'Gie me a jottin when A dinnae put in a edit summary',
 'tog-watchlisthideown' => 'Hide yer ain edits frae yer watchleet',
@@ -230,7 +230,7 @@ $messages = array(
 'jumptonavigation' => 'navigation',
 'jumptosearch' => 'rake',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Aboot {{SITENAME}}',
 'aboutpage' => 'Project:Aboot',
 'copyright' => 'Aa text is available unner $1',
@@ -308,8 +308,6 @@ A leet o valid byordinar pages can be funnd at [[Special:SpecialPages|{{int:spec
 # General errors
 'error' => 'Error',
 'databaseerror' => 'Database error',
-'dberrortext' => 'A database query syntax error haes occurt. This micht indicate a bug in the saftware. The last attemptit database query wis: <blockquote><tt>$1</tt></blockquote> frae athin function "<tt>$2</tt>". Database returned error "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'A database query syntax error haes occurt. The last attemptit database query wis: "$1" frae athin function "$2". Database returned error "$3: $4".',
 'laggedslavemode' => 'Warning: Page micht nae contain recent updates',
 'readonly' => 'Database lockit',
 'enterlockreason' => "Enter a raeson for the lock, includin an estimate o whan the lock'll be lowsed",
@@ -355,7 +353,6 @@ Aks: $2',
 'editinginterface' => "'''Warning:''' You are editing a page which is used to provide interface text for the software.
 Changes to this page will affect the appearance of the user interface for other users.
 For translations, please consider using [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net], the MediaWiki localisation project.",
-'sqlhidden' => '(SQL query hidden)',
 'cascadeprotected' => 'This page haes been protectit fra editin, acause it is includit in the followin {{PLURAL:$1|page|pages}}, that are protectit wi the "cascading" option turnit on:
 $2',
 'namespaceprotected' => "Ye dinna hae permeession tae edit pages in the '''$1''' namespace.",
@@ -450,7 +447,7 @@ Ye dinna hae tae heed this message, if this accoont wis creatit by mistak.',
 'oldpassword' => 'Auld password',
 'newpassword' => 'New passwaird:',
 'resetpass_submit' => 'Mak passwaird an log in',
-'resetpass_success' => 'Yer passwaird chynge wis braw! Nou loggin ye in...',
+'changepassword-success' => 'Yer passwaird chynge wis braw! Nou loggin ye in...',
 'resetpass_forbidden' => 'Passwords canna be chynged',
 'resetpass-no-info' => 'Ye maun be loggit in tae access this page directly.',
 'resetpass-submit-loggedin' => 'Chynge passwaird',
@@ -847,7 +844,6 @@ Yer e-mail address insae revealed whin ither uisers contact ye.",
 'recentchangeslinked-feed' => 'Relatit chynges',
 'recentchangeslinked-toolbox' => 'Relatit chynges',
 'recentchangeslinked-title' => 'Changes related to "$1"',
-'recentchangeslinked-noresult' => "Na changes oan linked pages during th' given period.",
 'recentchangeslinked-summary' => "This is a leet o' changes made recently tae pages linked frae a specified page (or tae members o' a specified category).
 Pages on [[Special:Watchlist|your watchleet]] are '''bold'''.",
 'recentchangeslinked-page' => 'Page name:',
@@ -950,8 +946,6 @@ Th' description oan tis [$2 file description page] thare is shown below.",
 'statistics-header-users' => 'Uiser statistics',
 'statistics-header-hooks' => 'Ither statistics',
 'statistics-pages' => 'Pages',
-
-'disambiguationspage' => 'Template:disambig',
 
 'doubleredirects' => 'Dooble reguidals',
 'doubleredirectstext' => 'Ilka raw hauds airtins tae the first an saicont reguidal, as weel as the first line o the saicont reguidal text, for usual giein the "rael" tairget page, that the first reguidal shuid pynt til.',
@@ -1073,7 +1067,6 @@ Also see [[Special:WantedCategories|wanted categories]].',
 'watchthispage' => 'Leuk ower this page',
 'unwatch' => 'Unwatch',
 'notanarticle' => 'No a content page',
-'watchnochange' => 'Nane o yer watched items were edited in the time period displayed.',
 'watchlist-details' => "{{PLURAL:$1|$1 page|$1 pages}} on yer watchleet, nae countin' collogue pages.",
 'watchlistcontains' => 'Yer watchleet contains $1 {{PLURAL:$1|page|pages}}.',
 'iteminvalidname' => "Trouble wi eitem '$1', invalid name...",

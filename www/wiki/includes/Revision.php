@@ -61,6 +61,11 @@ class Revision implements IDBAccessObject {
 	 */
 	protected $mContentHandler;
 
+	/**
+	 * @var int
+	 */
+	protected $mQueryFlags = 0;
+
 	// Revision deletion constants
 	const DELETED_TEXT = 1;
 	const DELETED_COMMENT = 2;
@@ -297,6 +302,9 @@ class Revision implements IDBAccessObject {
 				$dbw = wfGetDB( DB_MASTER );
 				$rev = self::loadFromConds( $dbw, $conditions, $flags );
 			}
+		}
+		if ( $rev ) {
+			$rev->mQueryFlags = $flags;
 		}
 		return $rev;
 	}
@@ -996,6 +1004,10 @@ class Revision implements IDBAccessObject {
 	 * @return String
 	 */
 	public function getSerializedData() {
+		if ( is_null( $this->mText ) ) {
+			$this->mText = $this->loadText();
+		}
+
 		return $this->mText;
 	}
 
@@ -1205,35 +1217,7 @@ class Revision implements IDBAccessObject {
 
 		// If the text was fetched without an error, convert it
 		if ( $text !== false ) {
-			if ( in_array( 'gzip', $flags ) ) {
-				# Deal with optional compression of archived pages.
-				# This can be done periodically via maintenance/compressOld.php, and
-				# as pages are saved if $wgCompressRevisions is set.
-				$text = gzinflate( $text );
-			}
-
-			if ( in_array( 'object', $flags ) ) {
-				# Generic compressed storage
-				$obj = unserialize( $text );
-				if ( !is_object( $obj ) ) {
-					// Invalid object
-					wfProfileOut( __METHOD__ );
-					return false;
-				}
-				$text = $obj->getText();
-			}
-
-			global $wgLegacyEncoding;
-			if ( $text !== false && $wgLegacyEncoding
-				&& !in_array( 'utf-8', $flags ) && !in_array( 'utf8', $flags ) )
-			{
-				# Old revisions kept around in a legacy encoding?
-				# Upconvert on demand.
-				# ("utf8" checked for compatibility with some broken
-				#  conversion scripts 2008-12-30)
-				global $wgContLang;
-				$text = $wgContLang->iconv( $wgLegacyEncoding, 'UTF-8', $text );
-			}
+			$text = self::decompressRevisionText( $text, $flags );
 		}
 		wfProfileOut( __METHOD__ );
 		return $text;
@@ -1266,6 +1250,46 @@ class Revision implements IDBAccessObject {
 			}
 		}
 		return implode( ',', $flags );
+	}
+
+	/**
+	 * Re-converts revision text according to it's flags.
+	 *
+	 * @param $text Mixed: reference to a text
+	 * @param $flags array: compression flags
+	 * @return String|bool decompressed text, or false on failure
+	 */
+	public static function decompressRevisionText( $text, $flags ) {
+		if ( in_array( 'gzip', $flags ) ) {
+			# Deal with optional compression of archived pages.
+			# This can be done periodically via maintenance/compressOld.php, and
+			# as pages are saved if $wgCompressRevisions is set.
+			$text = gzinflate( $text );
+		}
+
+		if ( in_array( 'object', $flags ) ) {
+			# Generic compressed storage
+			$obj = unserialize( $text );
+			if ( !is_object( $obj ) ) {
+				// Invalid object
+				return false;
+			}
+			$text = $obj->getText();
+		}
+
+		global $wgLegacyEncoding;
+		if ( $text !== false && $wgLegacyEncoding
+			&& !in_array( 'utf-8', $flags ) && !in_array( 'utf8', $flags ) )
+		{
+			# Old revisions kept around in a legacy encoding?
+			# Upconvert on demand.
+			# ("utf8" checked for compatibility with some broken
+			#  conversion scripts 2008-12-30)
+			global $wgContLang;
+			$text = $wgContLang->iconv( $wgLegacyEncoding, 'UTF-8', $text );
+		}
+
+		return $text;
 	}
 
 	/**
@@ -1461,20 +1485,30 @@ class Revision implements IDBAccessObject {
 			$dbr = wfGetDB( DB_SLAVE );
 			$row = $dbr->selectRow( 'text',
 				array( 'old_text', 'old_flags' ),
-				array( 'old_id' => $this->getTextId() ),
+				array( 'old_id' => $textId ),
 				__METHOD__ );
 		}
 
-		if ( !$row && wfGetLB()->getServerCount() > 1 ) {
-			// Possible slave lag!
+		// Fallback to the master in case of slave lag. Also use FOR UPDATE if it was
+		// used to fetch this revision to avoid missing the row due to REPEATABLE-READ.
+		$forUpdate = ( $this->mQueryFlags & self::READ_LOCKING == self::READ_LOCKING );
+		if ( !$row && ( $forUpdate || wfGetLB()->getServerCount() > 1 ) ) {
 			$dbw = wfGetDB( DB_MASTER );
 			$row = $dbw->selectRow( 'text',
 				array( 'old_text', 'old_flags' ),
-				array( 'old_id' => $this->getTextId() ),
-				__METHOD__ );
+				array( 'old_id' => $textId ),
+				__METHOD__,
+				$forUpdate ? array( 'FOR UPDATE' ) : array() );
+		}
+
+		if ( !$row ) {
+			wfDebugLog( 'Revision', "No text row with ID '$textId' (revision {$this->getId()})." );
 		}
 
 		$text = self::getRevisionText( $row );
+		if ( $row && $text === false ) {
+			wfDebugLog( 'Revision', "No blob for text row '$textId' (revision {$this->getId()})." );
+		}
 
 		# No negative caching -- negative hits on text rows may be due to corrupted slave servers
 		if ( $wgRevisionCacheExpiry && $text !== false ) {

@@ -69,12 +69,17 @@ class SpecialPreferences extends SpecialPage {
 	}
 
 	private function showResetForm() {
+		if ( !$this->getUser()->isAllowed( 'editmyoptions' ) ) {
+			throw new PermissionsError( 'editmyoptions' );
+		}
+
 		$this->getOutput()->addWikiMsg( 'prefs-reset-intro' );
 
-		$htmlForm = new HTMLForm( array(), $this->getContext(), 'prefs-restore' );
+		$context = new DerivativeContext( $this->getContext() );
+		$context->setTitle( $this->getTitle( 'reset' ) ); // Reset subpage
+		$htmlForm = new HTMLForm( array(), $context, 'prefs-restore' );
 
 		$htmlForm->setSubmitTextMsg( 'restoreprefs' );
-		$htmlForm->setTitle( $this->getTitle( 'reset' ) );
 		$htmlForm->setSubmitCallback( array( $this, 'submitReset' ) );
 		$htmlForm->suppressReset();
 
@@ -82,8 +87,12 @@ class SpecialPreferences extends SpecialPage {
 	}
 
 	public function submitReset( $formData ) {
+		if ( !$this->getUser()->isAllowed( 'editmyoptions' ) ) {
+			throw new PermissionsError( 'editmyoptions' );
+		}
+
 		$user = $this->getUser();
-		$user->resetOptions( 'all' );
+		$user->resetOptions( 'all', $this->getContext() );
 		$user->saveSettings();
 
 		$url = $this->getTitle()->getFullURL( 'success' );

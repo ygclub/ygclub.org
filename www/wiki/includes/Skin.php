@@ -82,6 +82,7 @@ abstract class Skin extends ContextSource {
 	static function getSkinNameMessages() {
 		$messages = array();
 		foreach ( self::getSkinNames() as $skinKey => $skinName ) {
+			// Messages: skinname-cologneblue, skinname-monobook, skinname-modern, skinname-vector
 			$messages[] = "skinname-$skinKey";
 		}
 		return $messages;
@@ -1341,14 +1342,19 @@ abstract class Skin extends ContextSource {
 	}
 
 	/**
-	 * Should we load mediawiki.legacy.wikiprintable?  Skins that have their own
-	 * print stylesheet should override this and return false.  (This is an
-	 * ugly hack to get Monobook to play nicely with OutputPage::headElement().)
+	 * This function previously controlled whether the 'mediawiki.legacy.wikiprintable' module
+	 * should be loaded by OutputPage. That module no longer exists and the return value of this
+	 * method is ignored.
 	 *
+	 * If your skin doesn't provide its own print styles, the 'mediawiki.legacy.commonPrint' module
+	 * can be used instead (SkinTemplate-based skins do it automatically).
+	 *
+	 * @deprecated since 1.22
 	 * @return bool
 	 */
 	public function commonPrintStylesheet() {
-		return true;
+		wfDeprecated( __METHOD__, '1.22' );
+		return false;
 	}
 
 	/**
@@ -1583,31 +1589,12 @@ abstract class Skin extends ContextSource {
 			array( 'noclasses', 'known' )
 		);
 
-		# Run the old hook.  This takes up half of the function . . . hopefully
-		# we can rid of it someday.
-		$attribs = '';
-		if ( $tooltip ) {
-			$attribs = wfMessage( 'editsectionhint' )->rawParams( $tooltip )
-				->inLanguage( $lang )->escaped();
-			$attribs = " title=\"$attribs\"";
-		}
-		$result = null;
-		wfRunHooks( 'EditSectionLink', array( &$this, $nt, $section, $attribs, $link, &$result, $lang ) );
-		if ( !is_null( $result ) ) {
-			# For reverse compatibility, add the brackets *after* the hook is
-			# run, and even add them to hook-provided text.  (This is the main
-			# reason that the EditSectionLink hook is deprecated in favor of
-			# DoEditSectionLink: it can't change the brackets or the span.)
-			$result = wfMessage( 'editsection-brackets' )->rawParams( $result )
-				->inLanguage( $lang )->escaped();
-			return "<span class=\"mw-editsection\">$result</span>";
-		}
-
-		# Add the brackets and the span, and *then* run the nice new hook, with
-		# clean and non-redundant arguments.
-		$result = wfMessage( 'editsection-brackets' )->rawParams( $link )
-			->inLanguage( $lang )->escaped();
-		$result = "<span class=\"mw-editsection\">$result</span>";
+		# Add the brackets and the span and run the hook.
+		$result = '<span class="mw-editsection">'
+			. '<span class="mw-editsection-bracket">[</span>'
+			. $link
+			. '<span class="mw-editsection-bracket">]</span>'
+			. '</span>';
 
 		wfRunHooks( 'DoEditSectionLink', array( $this, $nt, $section, $tooltip, &$result, $lang ) );
 		return $result;

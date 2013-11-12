@@ -78,14 +78,16 @@ abstract class MediaHandler {
 	/**
 	 * Merge a parameter array into a string appropriate for inclusion in filenames
 	 *
-	 * @param $params array
+	 * @param $params array Array of parameters that have been through normaliseParams.
+	 * @return String
 	 */
 	abstract function makeParamString( $params );
 
 	/**
 	 * Parse a param string made with makeParamString back into an array
 	 *
-	 * @param $str string
+	 * @param $str string The parameter string without file name (e.g. 122px)
+	 * @return Array|Boolean Array of parameters or false on failure.
 	 */
 	abstract function parseParamString( $str );
 
@@ -220,6 +222,7 @@ abstract class MediaHandler {
 	 * @param string $dstPath filesystem destination path
 	 * @param string $dstUrl destination URL to use in output HTML
 	 * @param array $params arbitrary set of parameters validated by $this->validateParam()
+	 *   Note: These parameters have *not* gone through $this->normaliseParams()
 	 * @param $flags Integer: a bitfield, may contain self::TRANSFORM_LATER
 	 *
 	 * @return MediaTransformOutput
@@ -331,18 +334,28 @@ abstract class MediaHandler {
 	 * Get an associative array of page dimensions
 	 * Currently "width" and "height" are understood, but this might be
 	 * expanded in the future.
-	 * Returns false if unknown or if the document is not multi-page.
+	 * Returns false if unknown.
+	 *
+	 * It is expected that handlers for paged media (e.g. DjVuHandler)
+	 * will override this method so that it gives the correct results
+	 * for each specific page of the file, using the $page argument.
+	 *
+	 * @note For non-paged media, use getImageSize.
 	 *
 	 * @param $image File
-	 * @param $page Unused, left for backcompatibility?
-	 * @return array
+	 * @param $page What page to get dimensions of
+	 * @return array|bool
 	 */
 	function getPageDimensions( $image, $page ) {
 		$gis = $this->getImageSize( $image, $image->getLocalRefPath() );
-		return array(
-			'width' => $gis[0],
-			'height' => $gis[1]
-		);
+		if ( $gis ) {
+			return array(
+				'width' => $gis[0],
+				'height' => $gis[1]
+			);
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -479,6 +492,8 @@ abstract class MediaHandler {
 	}
 
 	/**
+	 * Used instead of getLongDesc if there is no handler registered for file.
+	 *
 	 * @param $file File
 	 * @return string
 	 */
@@ -488,6 +503,8 @@ abstract class MediaHandler {
 	}
 
 	/**
+	 * Short description. Shown on Special:Search results.
+	 *
 	 * @param $file File
 	 * @return string
 	 */
@@ -498,6 +515,8 @@ abstract class MediaHandler {
 	}
 
 	/**
+	 * Long description. Shown under image on image description page surounded by ().
+	 *
 	 * @param $file File
 	 * @return string
 	 */
@@ -507,6 +526,8 @@ abstract class MediaHandler {
 	}
 
 	/**
+	 * Used instead of getShortDesc if there is no handler registered for file.
+	 *
 	 * @param $file File
 	 * @return string
 	 */
@@ -534,12 +555,25 @@ abstract class MediaHandler {
 		}
 	}
 
+	/**
+	 * Shown in file history box on image description page.
+	 *
+	 * @param File $file
+	 * @return String Dimensions
+	 */
 	function getDimensionsString( $file ) {
 		return '';
 	}
 
 	/**
-	 * Modify the parser object post-transform
+	 * Modify the parser object post-transform.
+	 *
+	 * This is often used to do $parser->addOutputHook(),
+	 * in order to add some javascript to render a viewer.
+	 * See TimedMediaHandler or OggHandler for an example.
+	 *
+	 * @param Parser $parser
+	 * @param File $file
 	 */
 	function parserTransformHook( $parser, $file ) {}
 
@@ -587,10 +621,17 @@ abstract class MediaHandler {
 	}
 
 	/**
-	 * Remove files from the purge list
+	 * Remove files from the purge list.
+	 *
+	 * This is used by some video handlers to prevent ?action=purge
+	 * from removing a transcoded video, which is expensive to
+	 * regenerate.
+	 *
+	 * @see LocalFile::purgeThumbnails
 	 *
 	 * @param array $files
-	 * @param array $options
+	 * @param array $options Purge options. Currently will always be
+	 *  an array with a single key 'forThumbRefresh' set to true.
 	 */
 	public function filterThumbnailPurgeList( &$files, $options ) {
 		// Do nothing
@@ -604,4 +645,23 @@ abstract class MediaHandler {
 	public static function canRotate() {
 		return false;
 	}
+
+	/**
+	 * On supporting image formats, try to read out the low-level orientation
+	 * of the file and return the angle that the file needs to be rotated to
+	 * be viewed.
+	 *
+	 * This information is only useful when manipulating the original file;
+	 * the width and height we normally work with is logical, and will match
+	 * any produced output views.
+	 *
+	 * For files we don't know, we return 0.
+	 *
+	 * @param $file File
+	 * @return int 0, 90, 180 or 270
+	 */
+	public function getRotation( $file ) {
+		return 0;
+	}
+
 }

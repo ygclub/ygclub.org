@@ -753,7 +753,7 @@ class SpecialBlock extends FormSpecialPage {
 
 		# Can't watch a rangeblock
 		if ( $type != Block::TYPE_RANGE && $data['Watch'] ) {
-			$performer->addWatch( Title::makeTitle( NS_USER, $target ) );
+			WatchAction::doWatch( Title::makeTitle( NS_USER, $target ), $performer, WatchedItem::IGNORE_USER_RIGHTS );
 		}
 
 		# Block constructor sanitizes certain block options on insert
@@ -772,7 +772,8 @@ class SpecialBlock extends FormSpecialPage {
 			$logaction,
 			Title::makeTitle( NS_USER, $target ),
 			$data['Reason'][0],
-			$logParams
+			$logParams,
+			$performer
 		);
 		# Relate log ID to block IDs (bug 25763)
 		$blockIds = array_merge( array( $status['id'] ), $status['autoIds'] );

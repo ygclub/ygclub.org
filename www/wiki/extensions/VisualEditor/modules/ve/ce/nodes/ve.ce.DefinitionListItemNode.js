@@ -12,7 +12,7 @@
  * @extends ve.ce.BranchNode
  * @constructor
  * @param {ve.dm.DefinitionListItemNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.DefinitionListItemNode = function VeCeDefinitionListItemNode( model, config ) {
 	// Parent constructor
@@ -24,7 +24,7 @@ ve.ce.DefinitionListItemNode = function VeCeDefinitionListItemNode( model, confi
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.DefinitionListItemNode, ve.ce.BranchNode );
+OO.inheritClass( ve.ce.DefinitionListItemNode, ve.ce.BranchNode );
 
 /* Static Properties */
 

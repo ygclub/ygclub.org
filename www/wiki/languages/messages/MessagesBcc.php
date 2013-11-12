@@ -171,7 +171,6 @@ $messages = array(
 'tog-enotifrevealaddr' => 'منی ایمیل پیش دار ته ایمیل أن هوژاری',
 'tog-shownumberswatching' => 'پیش دار تعداد کاربرانی که چارگتن',
 'tog-fancysig' => 'امضاءَ په داب ویکی متنی بزان(بی اتوماتیکی لینک)',
-'tog-showjumplinks' => 'فعال کن "jump to" لینکان دست رسی آ',
 'tog-uselivepreview' => 'چه زنده این بازبین استفاده کن(جاوا)(تجربی)',
 'tog-forceeditsummary' => 'من آ هال دی وهدی وارد کتن یک هالیکین خلاصه ی اصلاح',
 'tog-watchlisthideown' => 'منی اصلاحات آ چه لیست چارگ پناه کن',
@@ -353,7 +352,7 @@ $messages = array(
 
 $1',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'باره {{SITENAME}}',
 'aboutpage' => 'Project:باره',
 'copyright' => 'محتوا موجودانت تحت $1.',
@@ -433,17 +432,6 @@ $1',
 # General errors
 'error' => 'حطا',
 'databaseerror' => 'حطا دیتابیس',
-'dberrortext' => 'یک اشتباه ته درخواست دیتابیس پیش آتک.
-شی شاید یک باگی ته نرم افزار پیش داریت.
-آهرین تلاش درخواست دیتابیس بوته:
-<blockquote><tt>$1</tt></blockquote>
-"<tt>$2</tt>".
-ته ای عملگر ما اس کیو ال ای حطا پیش داشتت "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'یک اشتباه ته درخواست دیتابیس پیش آتک.
-آهری تلاش درخواست دیتابیس بوتت:
-"$1"
-چه ای عملگر"$2".
-مای اس کیو ال ای حطا پیش داشتت  "$3: $4"',
 'laggedslavemode' => 'هوژاری: صفحه شاید نوکین په روچ بییگان داشته می بیت',
 'readonly' => 'دیتابیس کبلنت',
 'enterlockreason' => 'یک دلیلی په کبل وارد کنیت، شامل یک برآوردی چه وهد کبل ویل بیت',
@@ -490,7 +478,6 @@ Query: $2',
 'editinginterface' => "'''هوژاری:''' شما یک صفحه ای اصلاح کنیت که به عنوان مداخله گر متنی برنامه استفاده بیت.
 تغییرات ای صفحه کاربرد مداخله گر په دگه کابران تاثیر هلیت.
   [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net],  په ترجمه یان لطفا توجه کنیت په استفاده پروژه ملکی کتن مدیا وی کی",
-'sqlhidden' => '(SQL درخواست پناهین)',
 'cascadeprotected' => 'ای صفحه محافظت بیت چه اصلاح چرا که آیی شامل جهلیگین {{PLURAL:$1|صفحه, که|صفحات, که}} محافظتی گون the "cascading" option turned on:
 $2',
 'namespaceprotected' => "شما اجازت په اصلاح صفحات ته  '''$1'' نام فضا نیست",
@@ -598,7 +585,7 @@ $2',
 'newpassword' => 'نوکین کلمه رمز:',
 'retypenew' => 'کلمه رمز دگه بنویس',
 'resetpass_submit' => 'تنظیم کلمه رمز و ورود',
-'resetpass_success' => 'شمی کلمه رمز گون موفقیت عوض بون! هنو شما وارد بیگیت...',
+'changepassword-success' => 'شمی کلمه رمز گون موفقیت عوض بون! هنو شما وارد بیگیت...',
 'resetpass_forbidden' => 'کلمات رمز نه توننت عوض بنت.',
 'resetpass-no-info' => 'په مستقیمین دسترسی په ای صفحه شما بایدن وارد سایت بیت',
 'resetpass-submit-loggedin' => 'عوض کتن کلمه رمز',
@@ -1023,7 +1010,6 @@ $1",
 'resetprefs' => 'پاکن تغییرات ذخیره نه بوتگین',
 'restoreprefs' => 'کل پیش فرضین تنظیمات برگردین',
 'prefs-editing' => 'اصلاح',
-'prefs-edit-boxsize' => 'حد پنجره اصلاح.',
 'rows' => 'ردیفآن«',
 'columns' => 'ستون‌ان:',
 'searchresultshead' => 'گردگ',
@@ -1061,7 +1047,6 @@ $1",
 'prefs-custom-js' => 'رسمی جی‌اس',
 'prefs-reset-intro' => 'شما توانت چه ای  صفحه په واترینگ تنظیمات وت په پیش‌فرض استفاده کنیت. ای کار بازگشت‌ناپذیر انت.',
 'prefs-emailconfirm-label' => 'تایید کتن پست الکترونیک:',
-'prefs-textboxsize' => 'اندازه پنجره اصلاح',
 'youremail' => 'ایمیل:',
 'username' => 'نام کاربری:',
 'uid' => 'کاربر شناسگ:',
@@ -1277,7 +1262,6 @@ $1",
 'recentchangeslinked-feed' => 'مربوطین تغییرات',
 'recentchangeslinked-toolbox' => 'مربوطین تغییرات',
 'recentchangeslinked-title' => 'تغییراتی مربوط په "$1"',
-'recentchangeslinked-noresult' => 'هچ تغییری ته صفحات لینک بوتگین ته داتگین دوره نیست',
 'recentchangeslinked-summary' => "شی یک لیستی چه تغییراتی هستنت که نوکی اعمال بوتگنت په صفحاتی که چه یک صفحه خاصی لینک بوته( یا په اعضای یک خاصین دسته).
 صفحات ته [[Special:Watchlist| شمی لیست چارگ]] '''' پررنگنت''''",
 'recentchangeslinked-page' => 'صفحه نام:',
@@ -1537,12 +1521,6 @@ PICT # misc.
 'statistics-users-active-desc' => 'کاربرانی که ته پیشگین {{PLURAL:$1|روچ|$1 روچان}} کاری اش کتت',
 'statistics-mostpopular' => 'باز چار تگین صفحات',
 
-'disambiguations' => 'صفحات رفع ابهام',
-'disambiguationspage' => 'Template:رفع ابهام',
-'disambiguations-text' => "جهلیگین صفحه لینک انت په یک '''صفحه رفع ابهام'''.
-شما بایدن په جاه آیی په یک مناسبین موضوعی لینک دهیت.<br />
-یک صفحه ای که په داب صفحه رفع ابهام چارگ بیت اگر آیء چه یک تمپلتی که لینک بیت چه [[MediaWiki:Disambiguationspage|صفحه رفع ابهام]] استفاده کنت.",
-
 'doubleredirects' => 'دوبل غیر مستقیم',
 'doubleredirectstext' => 'ای صفحه لیست کنت صفحاتی که غیر مستقیم رونت په دگه صفحات. هر ردیف شامل لینکانی انت به اولی و دومی غیر مستقیم، و هدف دومی غیر مستقیم، که معمولا استفاده بیت "real" صفحه هدف، که بایدن اولی غیر مستقیم پیش داریت.',
 'double-redirect-fixed-move' => '[[$1]] انتقال دهگ بوتت، و الان تغییر مسیری په [[$2]] انت',
@@ -1753,7 +1731,6 @@ PICT # misc.
 'unwatchthispage' => 'چارگ بند کن',
 'notanarticle' => 'یک صفحه محتوا نهت',
 'notvisiblerev' => 'بازبینی حذف بوتت',
-'watchnochange' => 'هچ یک چه شمی چارتگین آیتم اصلاح نه بوتت ته ای دوره زمانی که پیش دارگ بیت.',
 'watchlist-details' => '{{PLURAL:$1|$1 صفحه|$1 صفحات}} چارتگ بیت صفحات گپ حساب نه بیگن',
 'wlheader-enotif' => 'اخطار ایمیل فعالنت.',
 'wlheader-showupdated' => "صفحات که عوض بوتگنت چه شمی آهری چارتن '''پررنگ''' پیش دراگ بنت.",
@@ -2883,7 +2860,6 @@ $5
 # Separators for various lists, etc.
 'semicolon-separator' => ';',
 'colon-separator' => ':&#32;',
-'autocomment-prefix' => '-',
 
 # Multipage image navigation
 'imgmultipageprev' => '← پیشگین صفحه',
@@ -3008,7 +2984,6 @@ $5
 'version-other' => 'دگر',
 'version-mediahandlers' => 'دست گروک مدیا',
 'version-hooks' => 'گیر کنت',
-'version-extension-functions' => 'عملگران الحاقی',
 'version-parser-extensiontags' => 'برچسپان الحاقی تجزیه گر',
 'version-parser-function-hooks' => 'عمل گر تجزیه کنوک گیر کت',
 'version-hook-name' => 'نام گیر',

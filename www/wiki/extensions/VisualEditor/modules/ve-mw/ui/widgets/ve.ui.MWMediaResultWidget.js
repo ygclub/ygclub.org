@@ -11,11 +11,11 @@
  * Creates an ve.ui.MWMediaResultWidget object.
  *
  * @class
- * @extends ve.ui.OptionWidget
+ * @extends OO.ui.OptionWidget
  *
  * @constructor
  * @param {Mixed} data Item data
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  * @cfg {number} [size] Media thumbnail size
  */
 ve.ui.MWMediaResultWidget = function VeUiMWMediaResultWidget( data, config ) {
@@ -23,17 +23,17 @@ ve.ui.MWMediaResultWidget = function VeUiMWMediaResultWidget( data, config ) {
 	config = config || {};
 
 	// Parent constructor
-	ve.ui.OptionWidget.call( this, data, config );
+	OO.ui.OptionWidget.call( this, data, config );
 
 	// Properties
 	this.size = config.size || 150;
 	this.$thumb = this.buildThumbnail();
-	this.$overlay = this.$$( '<div>' );
+	this.$overlay = this.$( '<div>' );
 
 	// Initialization
 	this.setLabel( new mw.Title( this.data.title ).getNameText() );
 	this.$overlay.addClass( 've-ui-mwMediaResultWidget-overlay' );
-	this.$
+	this.$element
 		.addClass( 've-ui-mwMediaResultWidget ve-ui-texture-pending' )
 		.css( { 'width': this.size, 'height': this.size } )
 		.prepend( this.$thumb, this.$overlay );
@@ -41,26 +41,24 @@ ve.ui.MWMediaResultWidget = function VeUiMWMediaResultWidget( data, config ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWMediaResultWidget, ve.ui.OptionWidget );
-
-/* Static Properties */
-
-ve.ui.MWMediaResultWidget.static.highlightable = false;
+OO.inheritClass( ve.ui.MWMediaResultWidget, OO.ui.OptionWidget );
 
 /* Methods */
 
+/** */
 ve.ui.MWMediaResultWidget.prototype.onThumbnailLoad = function () {
 	this.$thumb.first().addClass( 've-ui-texture-transparency' );
-	this.$
+	this.$element
 		.addClass( 've-ui-mwMediaResultWidget-done' )
 		.removeClass( 've-ui-texture-pending' );
 };
 
+/** */
 ve.ui.MWMediaResultWidget.prototype.onThumbnailError = function () {
 	this.$thumb.last()
 		.css( 'background-image', '' )
 		.addClass( 've-ui-texture-alert' );
-	this.$
+	this.$element
 		.addClass( 've-ui-mwMediaResultWidget-error' )
 		.removeClass( 've-ui-texture-pending' );
 };
@@ -74,9 +72,9 @@ ve.ui.MWMediaResultWidget.prototype.onThumbnailError = function () {
 ve.ui.MWMediaResultWidget.prototype.buildThumbnail = function () {
 	var info = this.data.imageinfo[0],
 		image = new Image(),
-		$image = this.$$( image ),
-		$back = this.$$( '<div>' ),
-		$front = this.$$( '<div>' ),
+		$image = this.$( image ),
+		$back = this.$( '<div>' ),
+		$front = this.$( '<div>' ),
 		$thumb = $back.add( $front );
 
 	// Preload image

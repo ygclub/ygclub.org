@@ -205,10 +205,16 @@ interface DatabaseType {
 }
 
 /**
+ * Interface for classes that implement or wrap DatabaseBase
+ * @ingroup Database
+ */
+interface IDatabase {}
+
+/**
  * Database abstraction object
  * @ingroup Database
  */
-abstract class DatabaseBase implements DatabaseType {
+abstract class DatabaseBase implements IDatabase, DatabaseType {
 	/** Number of times to re-try an operation in case of deadlock */
 	const DEADLOCK_TRIES = 4;
 	/** Minimum time to wait before retry, in microseconds */
@@ -236,6 +242,7 @@ abstract class DatabaseBase implements DatabaseType {
 
 	protected $mTablePrefix;
 	protected $mFlags;
+	protected $mForeign;
 	protected $mTrxLevel = 0;
 	protected $mErrorCount = 0;
 	protected $mLBInfo = array();
@@ -352,6 +359,8 @@ abstract class DatabaseBase implements DatabaseType {
 	 * database errors. Default is on (false). When turned off, the
 	 * code should use lastErrno() and lastError() to handle the
 	 * situation as appropriate.
+	 *
+	 * Do not use this function outside of the Database classes.
 	 *
 	 * @param $ignoreErrors bool|null
 	 *
@@ -575,7 +584,6 @@ abstract class DatabaseBase implements DatabaseType {
 	 * @param $flag Integer: DBO_* constants from Defines.php:
 	 *   - DBO_DEBUG: output some debug info (same as debug())
 	 *   - DBO_NOBUFFER: don't buffer results (inverse of bufferResults())
-	 *   - DBO_IGNORE: ignore errors (same as ignoreErrors())
 	 *   - DBO_TRX: automatically start transactions
 	 *   - DBO_DEFAULT: automatically sets DBO_TRX if not in command line mode
 	 *       and removes it in command line mode
@@ -660,9 +668,10 @@ abstract class DatabaseBase implements DatabaseType {
 	 * @param string $dbName database name
 	 * @param $flags
 	 * @param string $tablePrefix database table prefixes. By default use the prefix gave in LocalSettings.php
+	 * @param bool $foreign disable some operations specific to local databases
 	 */
 	function __construct( $server = false, $user = false, $password = false, $dbName = false,
-		$flags = 0, $tablePrefix = 'get from global'
+		$flags = 0, $tablePrefix = 'get from global', $foreign = false
 	) {
 		global $wgDBprefix, $wgCommandLineMode, $wgDebugDBTransactions;
 
@@ -689,6 +698,8 @@ abstract class DatabaseBase implements DatabaseType {
 			$this->mTablePrefix = $tablePrefix;
 		}
 
+		$this->mForeign = $foreign;
+
 		if ( $user ) {
 			$this->open( $server, $user, $password, $dbName );
 		}
@@ -706,7 +717,7 @@ abstract class DatabaseBase implements DatabaseType {
 	/**
 	 * Given a DB type, construct the name of the appropriate child class of
 	 * DatabaseBase. This is designed to replace all of the manual stuff like:
-	 *	$class = 'Database' . ucfirst( strtolower( $type ) );
+	 *	$class = 'Database' . ucfirst( strtolower( $dbType ) );
 	 * as well as validate against the canonical list of DB types we have
 	 *
 	 * This factory function is mostly useful for when you need to connect to a
@@ -721,24 +732,55 @@ abstract class DatabaseBase implements DatabaseType {
 	 *
 	 * @param string $dbType A possible DB type
 	 * @param array $p An array of options to pass to the constructor.
-	 *    Valid options are: host, user, password, dbname, flags, tablePrefix
+	 *    Valid options are: host, user, password, dbname, flags, tablePrefix, driver
 	 * @return DatabaseBase subclass or null
 	 */
 	final public static function factory( $dbType, $p = array() ) {
 		$canonicalDBTypes = array(
-			'mysql', 'postgres', 'sqlite', 'oracle', 'mssql'
+			'mysql'    => array( 'mysqli', 'mysql' ),
+			'postgres' => array(),
+			'sqlite'   => array(),
+			'oracle'   => array(),
+			'mssql'    => array(),
 		);
-		$dbType = strtolower( $dbType );
-		$class = 'Database' . ucfirst( $dbType );
 
-		if ( in_array( $dbType, $canonicalDBTypes ) || ( class_exists( $class ) && is_subclass_of( $class, 'DatabaseBase' ) ) ) {
+		$driver = false;
+		$dbType = strtolower( $dbType );
+		if ( isset( $canonicalDBTypes[$dbType] ) && $canonicalDBTypes[$dbType] ) {
+			$possibleDrivers = $canonicalDBTypes[$dbType];
+			if ( !empty( $p['driver'] ) ) {
+				if ( in_array( $p['driver'], $possibleDrivers ) ) {
+					$driver = $p['driver'];
+				} else {
+					throw new MWException( __METHOD__ .
+						" cannot construct Database with type '$dbType' and driver '{$p['driver']}'" );
+				}
+			} else {
+				foreach ( $possibleDrivers as $posDriver ) {
+					if ( extension_loaded( $posDriver ) ) {
+						$driver = $posDriver;
+						break;
+					}
+				}
+			}
+		} else {
+			$driver = $dbType;
+		}
+		if ( $driver === false ) {
+			throw new MWException( __METHOD__ .
+				" no viable database extension found for type '$dbType'" );
+		}
+
+		$class = 'Database' . ucfirst( $driver );
+		if ( class_exists( $class ) && is_subclass_of( $class, 'DatabaseBase' ) ) {
 			return new $class(
 				isset( $p['host'] ) ? $p['host'] : false,
 				isset( $p['user'] ) ? $p['user'] : false,
 				isset( $p['password'] ) ? $p['password'] : false,
 				isset( $p['dbname'] ) ? $p['dbname'] : false,
 				isset( $p['flags'] ) ? $p['flags'] : 0,
-				isset( $p['tablePrefix'] ) ? $p['tablePrefix'] : 'get from global'
+				isset( $p['tablePrefix'] ) ? $p['tablePrefix'] : 'get from global',
+				isset( $p['foreign'] ) ? $p['foreign'] : false
 			);
 		} else {
 			return null;
@@ -871,22 +913,7 @@ abstract class DatabaseBase implements DatabaseType {
 	 *     for a successful read query, or false on failure if $tempIgnore set
 	 */
 	public function query( $sql, $fname = __METHOD__, $tempIgnore = false ) {
-		$isMaster = !is_null( $this->getLBInfo( 'master' ) );
-		if ( !Profiler::instance()->isStub() ) {
-			# generalizeSQL will probably cut down the query to reasonable
-			# logging size most of the time. The substr is really just a sanity check.
-
-			if ( $isMaster ) {
-				$queryProf = 'query-m: ' . substr( DatabaseBase::generalizeSQL( $sql ), 0, 255 );
-				$totalProf = 'DatabaseBase::query-master';
-			} else {
-				$queryProf = 'query: ' . substr( DatabaseBase::generalizeSQL( $sql ), 0, 255 );
-				$totalProf = 'DatabaseBase::query';
-			}
-
-			wfProfileIn( $totalProf );
-			wfProfileIn( $queryProf );
-		}
+		global $wgUser, $wgDebugDBTransactions;
 
 		$this->mLastQuery = $sql;
 		if ( !$this->mDoneWrites && $this->isWriteQuery( $sql ) ) {
@@ -896,7 +923,6 @@ abstract class DatabaseBase implements DatabaseType {
 		}
 
 		# Add a comment for easy SHOW PROCESSLIST interpretation
-		global $wgUser;
 		if ( is_object( $wgUser ) && $wgUser->isItemLoaded( 'name' ) ) {
 			$userName = $wgUser->getName();
 			if ( mb_strlen( $userName ) > 15 ) {
@@ -920,7 +946,6 @@ abstract class DatabaseBase implements DatabaseType {
 			# is really used by application
 			$sqlstart = substr( $sql, 0, 10 ); // very much worth it, benchmark certified(tm)
 			if ( strpos( $sqlstart, "SHOW " ) !== 0 && strpos( $sqlstart, "SET " ) !== 0 ) {
-				global $wgDebugDBTransactions;
 				if ( $wgDebugDBTransactions ) {
 					wfDebug( "Implicit transaction start.\n" );
 				}
@@ -932,6 +957,22 @@ abstract class DatabaseBase implements DatabaseType {
 		# Keep track of whether the transaction has write queries pending
 		if ( $this->mTrxLevel && !$this->mTrxDoneWrites && $this->isWriteQuery( $sql ) ) {
 			$this->mTrxDoneWrites = true;
+			Profiler::instance()->transactionWritingIn( $this->mServer, $this->mDBname );
+		}
+
+		$isMaster = !is_null( $this->getLBInfo( 'master' ) );
+		if ( !Profiler::instance()->isStub() ) {
+			# generalizeSQL will probably cut down the query to reasonable
+			# logging size most of the time. The substr is really just a sanity check.
+			if ( $isMaster ) {
+				$queryProf = 'query-m: ' . substr( DatabaseBase::generalizeSQL( $sql ), 0, 255 );
+				$totalProf = 'DatabaseBase::query-master';
+			} else {
+				$queryProf = 'query: ' . substr( DatabaseBase::generalizeSQL( $sql ), 0, 255 );
+				$totalProf = 'DatabaseBase::query';
+			}
+			wfProfileIn( $totalProf );
+			wfProfileIn( $queryProf );
 		}
 
 		if ( $this->debug() ) {
@@ -1239,7 +1280,7 @@ abstract class DatabaseBase implements DatabaseType {
 			$startOpts .= ' SQL_NO_CACHE';
 		}
 
-		if ( isset( $options['USE INDEX'] ) && ! is_array( $options['USE INDEX'] ) ) {
+		if ( isset( $options['USE INDEX'] ) && is_string( $options['USE INDEX'] ) ) {
 			$useIndex = $this->useIndexClause( $options['USE INDEX'] );
 		} else {
 			$useIndex = '';
@@ -1461,28 +1502,26 @@ abstract class DatabaseBase implements DatabaseType {
 		}
 
 		$options = (array)$options;
+		$useIndexes = ( isset( $options['USE INDEX'] ) && is_array( $options['USE INDEX'] ) )
+			? $options['USE INDEX']
+			: array();
 
 		if ( is_array( $table ) ) {
-			$useIndex = ( isset( $options['USE INDEX'] ) && is_array( $options['USE INDEX'] ) )
-				? $options['USE INDEX']
-				: array();
-			if ( count( $join_conds ) || count( $useIndex ) ) {
-				$from = ' FROM ' .
-					$this->tableNamesWithUseIndexOrJOIN( $table, $useIndex, $join_conds );
-			} else {
-				$from = ' FROM ' . implode( ',', $this->tableNamesWithAlias( $table ) );
-			}
+			$from = ' FROM ' .
+				$this->tableNamesWithUseIndexOrJOIN( $table, $useIndexes, $join_conds );
 		} elseif ( $table != '' ) {
 			if ( $table[0] == ' ' ) {
 				$from = ' FROM ' . $table;
 			} else {
-				$from = ' FROM ' . $this->tableName( $table );
+				$from = ' FROM ' .
+					$this->tableNamesWithUseIndexOrJOIN( array( $table ), $useIndexes, array() );
 			}
 		} else {
 			$from = '';
 		}
 
-		list( $startOpts, $useIndex, $preLimitTail, $postLimitTail ) = $this->makeSelectOptions( $options );
+		list( $startOpts, $useIndex, $preLimitTail, $postLimitTail ) =
+			$this->makeSelectOptions( $options );
 
 		if ( !empty( $conds ) ) {
 			if ( is_array( $conds ) ) {
@@ -1597,7 +1636,8 @@ abstract class DatabaseBase implements DatabaseType {
 		$sql = preg_replace( '/\s+/', ' ', $sql );
 
 		# All numbers => N
-		$sql = preg_replace( '/-?[0-9]+/s', 'N', $sql );
+		$sql = preg_replace( '/-?\d+(,-?\d+)+/s', 'N,...,N', $sql );
+		$sql = preg_replace( '/-?\d+/s', 'N', $sql );
 
 		return $sql;
 	}
@@ -2068,6 +2108,7 @@ abstract class DatabaseBase implements DatabaseType {
 		} else {
 			list( $table ) = $dbDetails;
 			if ( $wgSharedDB !== null # We have a shared database
+				&& $this->mForeign == false # We're not working on a foreign database
 				&& !$this->isQuotedIdentifier( $table ) # Paranoia check to prevent shared tables listing '`table`'
 				&& in_array( $table, $wgSharedTables ) # A shared table is selected
 			) {
@@ -2260,11 +2301,11 @@ abstract class DatabaseBase implements DatabaseType {
 		}
 
 		// We can't separate explicit JOIN clauses with ',', use ' ' for those
-		$straightJoins = !empty( $ret ) ? implode( ',', $ret ) : "";
-		$otherJoins = !empty( $retJOIN ) ? implode( ' ', $retJOIN ) : "";
+		$implicitJoins = !empty( $ret ) ? implode( ',', $ret ) : "";
+		$explicitJoins = !empty( $retJOIN ) ? implode( ' ', $retJOIN ) : "";
 
 		// Compile our final table clause
-		return implode( ' ', array( $straightJoins, $otherJoins ) );
+		return implode( ' ', array( $implicitJoins, $explicitJoins ) );
 	}
 
 	/**
@@ -2290,8 +2331,7 @@ abstract class DatabaseBase implements DatabaseType {
 	}
 
 	/**
-	 * If it's a string, adds quotes and backslashes
-	 * Otherwise returns as-is
+	 * Adds quotes and backslashes.
 	 *
 	 * @param $s string
 	 *
@@ -2712,7 +2752,10 @@ abstract class DatabaseBase implements DatabaseType {
 		$sql = "DELETE FROM $table";
 
 		if ( $conds != '*' ) {
-			$sql .= ' WHERE ' . $this->makeList( $conds, LIST_AND );
+			if ( is_array( $conds ) ) {
+				$conds = $this->makeList( $conds, LIST_AND );
+			}
+			$sql .= ' WHERE ' . $conds;
 		}
 
 		return $this->query( $sql, $fname );
@@ -3096,10 +3139,9 @@ abstract class DatabaseBase implements DatabaseType {
 			foreach ( $callbacks as $callback ) {
 				try {
 					$this->clearFlag( DBO_TRX ); // make each query its own transaction
-					$callback();
+					call_user_func( $callback );
 					$this->setFlag( $autoTrx ? DBO_TRX : 0 ); // restore automatic begin()
-				} catch ( Exception $e ) {
-				}
+				} catch ( Exception $e ) {}
 			}
 		} while ( count( $this->mTrxIdleCallbacks ) );
 
@@ -3120,7 +3162,7 @@ abstract class DatabaseBase implements DatabaseType {
 			$this->mTrxPreCommitCallbacks = array(); // recursion guard
 			foreach ( $callbacks as $callback ) {
 				try {
-					$callback();
+					call_user_func( $callback );
 				} catch ( Exception $e ) {}
 			}
 		} while ( count( $this->mTrxPreCommitCallbacks ) );
@@ -3165,6 +3207,9 @@ abstract class DatabaseBase implements DatabaseType {
 
 			$this->runOnTransactionPreCommitCallbacks();
 			$this->doCommit( $fname );
+			if ( $this->mTrxDoneWrites ) {
+				Profiler::instance()->transactionWritingOut( $this->mServer, $this->mDBname );
+			}
 			$this->runOnTransactionIdleCallbacks();
 		}
 
@@ -3214,6 +3259,9 @@ abstract class DatabaseBase implements DatabaseType {
 
 		$this->runOnTransactionPreCommitCallbacks();
 		$this->doCommit( $fname );
+		if ( $this->mTrxDoneWrites ) {
+			Profiler::instance()->transactionWritingOut( $this->mServer, $this->mDBname );
+		}
 		$this->runOnTransactionIdleCallbacks();
 	}
 
@@ -3245,6 +3293,9 @@ abstract class DatabaseBase implements DatabaseType {
 		$this->doRollback( $fname );
 		$this->mTrxIdleCallbacks = array(); // cancel
 		$this->mTrxPreCommitCallbacks = array(); // cancel
+		if ( $this->mTrxDoneWrites ) {
+			Profiler::instance()->transactionWritingOut( $this->mServer, $this->mDBname );
+		}
 	}
 
 	/**

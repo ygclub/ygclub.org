@@ -624,7 +624,7 @@ class MovePageForm extends UnlistedSpecialPage {
 		$extraOutput = array();
 		$count = 1;
 		foreach ( $extraPages as $oldSubpage ) {
-			if ( $ot->equals( $oldSubpage ) ) {
+			if ( $ot->equals( $oldSubpage ) || $nt->equals( $oldSubpage ) ) {
 				# Already did this one.
 				continue;
 			}
@@ -646,7 +646,7 @@ class MovePageForm extends UnlistedSpecialPage {
 			$newSubpage = Title::makeTitleSafe( $newNs, $newPageName );
 			if ( !$newSubpage ) {
 				$oldLink = Linker::linkKnown( $oldSubpage );
-				$extraOutput[] = $this->msg( 'movepage-page-unmoved' )->rawParams( $oldLink	)
+				$extraOutput[] = $this->msg( 'movepage-page-unmoved' )->rawParams( $oldLink )
 					->params( Title::makeName( $newNs, $newPageName ) )->escaped();
 				continue;
 			}
@@ -690,20 +690,8 @@ class MovePageForm extends UnlistedSpecialPage {
 		}
 
 		# Deal with watches (we don't watch subpages)
-		if ( $this->watch && $user->isLoggedIn() ) {
-			$user->addWatch( $ot );
-			$user->addWatch( $nt );
-		} else {
-			$user->removeWatch( $ot );
-			$user->removeWatch( $nt );
-		}
-
-		# Re-clear the file redirect cache, which may have been polluted by
-		# parsing in messages above. See CR r56745.
-		# @todo FIXME: Needs a more robust solution inside FileRepo.
-		if ( $ot->getNamespace() == NS_FILE ) {
-			RepoGroup::singleton()->getLocalRepo()->invalidateImageRedirect( $ot );
-		}
+		WatchAction::doWatchOrUnwatch( $this->watch, $ot, $user );
+		WatchAction::doWatchOrUnwatch( $this->watch, $nt, $user );
 	}
 
 	function showLogFragment( $title ) {

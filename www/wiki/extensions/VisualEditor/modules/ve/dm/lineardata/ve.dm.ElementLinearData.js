@@ -1,5 +1,5 @@
 /*!
- * VisualEditor ElementLinearData class.
+ * VisualEditor ElementLinearData classes.
  *
  * Class containing element linear data and an index-value store.
  *
@@ -11,7 +11,7 @@
  * Element linear data storage
  *
  * @class
- * @extends ve.dm.LinearData
+ * @extends ve.dm.FlatLinearData
  * @constructor
  * @param {ve.dm.IndexValueStore} store Index-value store
  * @param {Array} [data] Linear data
@@ -22,62 +22,7 @@ ve.dm.ElementLinearData = function VeDmElementLinearData( store, data ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.ElementLinearData, ve.dm.LinearData );
-
-/* Methods */
-
-/**
- * Get the type of the element at a specified offset
- *
- * This will return the same string for close and open elements.
- *
- * @method
- * @param {number} offset Document offset
- * @returns {string} Type of the element
- */
-ve.dm.ElementLinearData.prototype.getType = function ( offset ) {
-	var item = this.getData( offset );
-	return this.isCloseElementData( offset ) ? item.type.substr( 1 ) : item.type;
-};
-
-/**
- * Check if data at a given offset is an element.
- *
- * This method assumes that any value that has a type property that's a string is an element object.
- *
- * Element data:
- *      <heading> a </heading> <paragraph> b c <img></img> </paragraph>
- *     ^         . ^          ^           . . ^     ^     ^            .
- *
- * @method
- * @param {number} offset Document offset
- * @returns {boolean} Data at offset is an element
- */
-ve.dm.ElementLinearData.prototype.isElementData = function ( offset ) {
-	var item = this.getData( offset );
-	// Data exists at offset and appears to be an element
-	return item !== undefined && typeof item.type === 'string';
-};
-
-/**
- * Checks if data at a given offset is an open element.
- * @method
- * @param {number} offset Document offset
- * @returns {boolean} Data at offset is an open element
- */
-ve.dm.ElementLinearData.prototype.isOpenElementData = function ( offset ) {
-	return this.isElementData( offset ) && this.getData( offset ).type.charAt( 0 ) !== '/';
-};
-
-/**
- * Checks if data at a given offset is a close element.
- * @method
- * @param {number} offset Document offset
- * @returns {boolean} Data at offset is a close element
- */
-ve.dm.ElementLinearData.prototype.isCloseElementData = function ( offset ) {
-	return this.isElementData( offset ) && this.getData( offset ).type.charAt( 0 ) === '/';
-};
+OO.inheritClass( ve.dm.ElementLinearData, ve.dm.FlatLinearData );
 
 /**
  * Check if content can be inserted at an offset in document data.
@@ -85,10 +30,12 @@ ve.dm.ElementLinearData.prototype.isCloseElementData = function ( offset ) {
  * This method assumes that any value that has a type property that's a string is an element object.
  *
  * Content offsets:
+ *
  *      <heading> a </heading> <paragraph> b c <img> </img> </paragraph>
  *     .         ^ ^          .           ^ ^ ^     .      ^            .
  *
  * Content offsets:
+ *
  *      <list> <listItem> </listItem> <list>
  *     .      .          .           .      .
  *
@@ -158,18 +105,22 @@ ve.dm.ElementLinearData.prototype.isContentOffset = function ( offset ) {
  * This method assumes that any value that has a type property that's a string is an element object.
  *
  * Structural offsets (unrestricted = false):
+ *
  *      <heading> a </heading> <paragraph> b c <img> </img> </paragraph>
  *     ^         . .          ^           . . .     .      .            ^
  *
  * Structural offsets (unrestricted = true):
+ *
  *      <heading> a </heading> <paragraph> b c <img> </img> </paragraph>
  *     ^         . .          ^           . . .     .      .            ^
  *
  * Structural offsets (unrestricted = false):
+ *
  *      <list> <listItem> </listItem> <list>
  *     ^      ^          ^           ^      ^
  *
  * Content branch offsets (unrestricted = true):
+ *
  *      <list> <listItem> </listItem> <list>
  *     ^      .          ^           .      ^
  *
@@ -320,7 +271,7 @@ ve.dm.ElementLinearData.prototype.getAnnotationIndexesFromOffset = function ( of
 		element = this.getData( offset );
 	}
 
-	if ( typeof element === 'string' ) {
+	if ( element === undefined || typeof element === 'string' ) {
 		return [];
 	} else {
 		return element.annotations || element[1] || [];
@@ -373,6 +324,7 @@ ve.dm.ElementLinearData.prototype.setAnnotationsAtOffset = function ( offset, an
 	}
 };
 
+/** */
 ve.dm.ElementLinearData.prototype.getCharacterData = function ( offset ) {
 	var item = this.getData( offset );
 	return ve.isArray( item ) ? item[0] : item;
@@ -445,9 +397,7 @@ ve.dm.ElementLinearData.prototype.getAnnotatedRangeFromSelection = function ( ra
  * @returns {ve.dm.AnnotationSet} All annotation objects range is covered by
  */
 ve.dm.ElementLinearData.prototype.getAnnotationsFromRange = function ( range, all ) {
-	var i,
-		left,
-		right;
+	var i, left, right;
 	// Look at left side of range for annotations
 	left = this.getAnnotationsFromOffset( range.start );
 	// Shortcut for single character and zero-length ranges
@@ -456,8 +406,8 @@ ve.dm.ElementLinearData.prototype.getAnnotationsFromRange = function ( range, al
 	}
 	// Iterator over the range, looking for annotations, starting at the 2nd character
 	for ( i = range.start + 1; i < range.end; i++ ) {
-		// Skip non character data
-		if ( this.isElementData( i ) ) {
+		// Skip non-content data
+		if ( this.isElementData( i ) && !ve.dm.nodeFactory.isNodeContent( this.getType( i ) ) ) {
 			continue;
 		}
 		// Current character annotations
@@ -786,3 +736,27 @@ ve.dm.ElementLinearData.prototype.remapInteralListIndexes = function ( mapping )
 		}
 	}
 };
+
+/**
+ * Sliced element linear data storage
+ *
+ * @class
+ * @extends ve.dm.ElementLinearData
+ * @mixins ve.dm.SlicedLinearData
+ * @constructor
+ * @param {ve.dm.IndexValueStore} store Index-value store
+ * @param {Array} [data] Linear data
+ * @param {ve.Range} [range] Original context within data
+ */
+ve.dm.ElementLinearDataSlice = function VeDmElementLinearDataSlice( store, data, range ) {
+	ve.dm.ElementLinearData.call( this, store, data );
+
+	// Mixins
+	ve.dm.SlicedLinearData.call( this, range );
+};
+
+/* Inheritance */
+
+OO.inheritClass( ve.dm.ElementLinearDataSlice, ve.dm.ElementLinearData );
+
+OO.mixinClass( ve.dm.ElementLinearDataSlice, ve.dm.SlicedLinearData );

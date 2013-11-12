@@ -10,19 +10,36 @@
  *
  * @class
  * @extends ve.dm.BranchNode
+ * @mixins ve.dm.MWImageNode
  * @constructor
  * @param {number} [length] Length of content data in document
  * @param {Object} [element] Reference to element in linear model
  */
 ve.dm.MWBlockImageNode = function VeDmMWBlockImageNode( length, element ) {
+	// Parent constructor
 	ve.dm.BranchNode.call( this, 0, element );
+
+	// Mixin constructors
+	ve.dm.MWImageNode.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.MWBlockImageNode, ve.dm.BranchNode );
+OO.inheritClass( ve.dm.MWBlockImageNode, ve.dm.BranchNode );
+
+// Need to mixin base class as well
+OO.mixinClass( ve.dm.MWBlockImageNode, ve.dm.GeneratedContentNode );
+
+OO.mixinClass( ve.dm.MWBlockImageNode, ve.dm.MWImageNode );
 
 /* Static Properties */
+
+ve.dm.MWBlockImageNode.static.rdfaToType = {
+	'mw:Image/Thumb': 'thumb',
+	'mw:Image/Frame': 'frame',
+	'mw:Image/Frameless': 'frameless',
+	'mw:Image': 'none'
+};
 
 ve.dm.MWBlockImageNode.static.name = 'mwBlockImage';
 
@@ -36,48 +53,37 @@ ve.dm.MWBlockImageNode.static.childNodeTypes = [ 'mwImageCaption' ];
 
 ve.dm.MWBlockImageNode.static.matchTagNames = [ 'figure' ];
 
-ve.dm.MWBlockImageNode.static.matchRdfaTypes = [
-	'mw:Image',
-	'mw:Image/Thumb',
-	'mw:Image/Frame',
-	'mw:Image/Frameless'
-];
+ve.dm.MWBlockImageNode.static.blacklistedAnnotationTypes = [ 'link' ];
+
+ve.dm.MWBlockImageNode.static.getMatchRdfaTypes = function () {
+	return Object.keys( this.rdfaToType );
+};
 
 ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter ) {
-	var $figure = $( domElements[0] ),
-		$a = $figure.children( 'a' ).eq( 0 ),
-		$img = $a.children( 'img' ).eq( 0 ),
+	var dataElement,
+		$figure = $( domElements[0] ),
+		// images with link='' have a span wrapper instead
+		$imgWrapper = $figure.children( 'a, span' ).eq( 0 ),
+		$img = $imgWrapper.children( 'img' ).eq( 0 ),
 		$caption = $figure.children( 'figcaption' ).eq( 0 ),
 		typeofAttr = $figure.attr( 'typeof' ),
 		classes = $figure.attr( 'class' ),
 		recognizedClasses = [],
 		attributes = {
-			href: $a.attr( 'href' ),
+			type: this.rdfaToType[typeofAttr],
+			href: $imgWrapper.attr( 'href' ) || '',
 			src: $img.attr( 'src' ),
-			width: $img.attr( 'width' ),
-			height: $img.attr( 'height' ),
 			resource: $img.attr( 'resource' ),
 			originalClasses: classes
-		};
+		},
+		width = $img.attr( 'width' ),
+		height = $img.attr( 'height' );
+
+	attributes.width = width !== undefined && width !== '' ? Number( width ) : null;
+	attributes.height = height !== undefined && height !== '' ? Number( height ) : null;
 
 	// Extract individual classes
 	classes = typeof classes === 'string' ? classes.trim().split( /\s+/ ) : [];
-
-	// Type
-	switch ( typeofAttr ) {
-		case 'mw:Image/Thumb':
-			attributes.type = 'thumb';
-			break;
-		case 'mw:Image/Frame':
-			attributes.type = 'frame';
-			break;
-		case 'mw:Image/Frameless':
-			attributes.type = 'frameless';
-			break;
-		case 'mw:Image':
-			attributes.type = 'none';
-			break;
-	}
 
 	// Horizontal alignment
 	if ( classes.indexOf( 'mw-halign-left' ) !== -1 ) {
@@ -103,19 +109,23 @@ ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter 
 	}
 
 	// Store unrecognized classes so we can restore them on the way out
-	attributes.unrecognizedClasses = ve.simpleArrayDifference( classes, recognizedClasses );
+	attributes.unrecognizedClasses = OO.simpleArrayDifference( classes, recognizedClasses );
+
+	dataElement = { 'type': this.name, 'attributes': attributes };
+
+	this.storeGeneratedContents( dataElement, dataElement.attributes.src, converter.getStore() );
 
 	if ( $caption.length === 0 ) {
 		return [
-			{ 'type': 'mwBlockImage', 'attributes': attributes },
+			dataElement,
 			{ 'type': 'mwImageCaption' },
 			{ 'type': '/mwImageCaption' },
-			{ 'type': '/mwBlockImage' }
+			{ 'type': '/' + this.name }
 		];
 	} else {
-		return [ { 'type': 'mwBlockImage', 'attributes': attributes } ].
+		return [ dataElement ].
 			concat( converter.getDataFromDomRecursionClean( $caption[0], { 'type': 'mwImageCaption' } ) ).
-			concat( [ { 'type': '/mwBlockImage' } ] );
+			concat( [ { 'type': '/' + this.name } ] );
 	}
 };
 
@@ -125,28 +135,23 @@ ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter 
 ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) {
 	var dataElement = data[0],
 		figure = doc.createElement( 'figure' ),
-		a = doc.createElement( 'a' ),
+		imgWrapper = doc.createElement( dataElement.attributes.href !== '' ? 'a' : 'span' ),
 		img = doc.createElement( 'img' ),
 		wrapper = doc.createElement( 'div' ),
 		classes = [],
 		originalClasses = dataElement.attributes.originalClasses,
-		captionData = data.slice( 1, -1 );
+		captionData = data.slice( 1, -1 ),
+		rdfa;
+
+	if ( !this.typeToRdfa ) {
+		this.typeToRdfa = {};
+		for ( rdfa in this.rdfaToType ) {
+			this.typeToRdfa[this.rdfaToType[rdfa]] = rdfa;
+		}
+	}
 
 	// Type
-	switch ( dataElement.attributes.type ) {
-		case 'thumb':
-			figure.setAttribute( 'typeof', 'mw:Image/Thumb' );
-			break;
-		case 'frame':
-			figure.setAttribute( 'typeof', 'mw:Image/Frame' );
-			break;
-		case 'frameless':
-			figure.setAttribute( 'typeof', 'mw:Image/Frameless' );
-			break;
-		case 'none':
-			figure.setAttribute( 'typeof', 'mw:Image' );
-			break;
-	}
+	figure.setAttribute( 'typeof', this.typeToRdfa[dataElement.attributes.type] );
 
 	// Default-size
 	if ( dataElement.attributes.defaultSize === true ) {
@@ -170,7 +175,7 @@ ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) 
 	}
 
 	if ( dataElement.attributes.unrecognizedClasses ) {
-		classes = ve.simpleArrayUnion( classes, dataElement.attributes.unrecognizedClasses );
+		classes = OO.simpleArrayUnion( classes, dataElement.attributes.unrecognizedClasses );
 	}
 
 	if (
@@ -181,13 +186,15 @@ ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) 
 	} else if ( classes.length > 0 ) {
 		figure.className = classes.join( ' ' );
 	}
-	a.setAttribute( 'href', dataElement.attributes.href );
+	if ( dataElement.attributes.href !== '' ) {
+		imgWrapper.setAttribute( 'href', dataElement.attributes.href );
+	}
 	img.setAttribute( 'src', dataElement.attributes.src );
 	img.setAttribute( 'width', dataElement.attributes.width );
 	img.setAttribute( 'height', dataElement.attributes.height );
 	img.setAttribute( 'resource', dataElement.attributes.resource );
-	figure.appendChild( a );
-	a.appendChild( img );
+	figure.appendChild( imgWrapper );
+	imgWrapper.appendChild( img );
 
 	// If length of captionData is smaller or equal to 2 it means that there is no caption or that
 	// it is empty - in both cases we are going to skip appending <figcaption>.
@@ -206,7 +213,7 @@ ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) 
  * Get the caption node of the image.
  *
  * @method
- * @return {ve.dm.MWImageCaptionNode|null} Caption node, if present
+ * @returns {ve.dm.MWImageCaptionNode|null} Caption node, if present
  */
 ve.dm.MWBlockImageNode.prototype.getCaptionNode = function() {
 	var node = this.children[0];

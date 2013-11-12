@@ -274,7 +274,7 @@ class ApiMain extends ApiBase {
 			return;
 		}
 
-		if ( !User::groupHasPermission( '*', 'read' ) ) {
+		if ( !User::isEveryoneAllowed( 'read' ) ) {
 			// Private wiki, only private headers
 			if ( $mode !== 'private' ) {
 				wfDebug( __METHOD__ . ": ignoring request for $mode cache mode, private wiki\n" );
@@ -714,15 +714,9 @@ class ApiMain extends ApiBase {
 		}
 		$moduleParams = $module->extractRequestParams();
 
-		// Die if token required, but not provided (unless there is a gettoken parameter)
-		if ( isset( $moduleParams['gettoken'] ) ) {
-			$gettoken = $moduleParams['gettoken'];
-		} else {
-			$gettoken = false;
-		}
-
+		// Die if token required, but not provided
 		$salt = $module->getTokenSalt();
-		if ( $salt !== false && !$gettoken ) {
+		if ( $salt !== false ) {
 			if ( !isset( $moduleParams['token'] ) ) {
 				$this->dieUsageMsg( array( 'missingparam', 'token' ) );
 			} else {
@@ -769,7 +763,7 @@ class ApiMain extends ApiBase {
 	 */
 	protected function checkExecutePermissions( $module ) {
 		$user = $this->getUser();
-		if ( $module->isReadMode() && !User::groupHasPermission( '*', 'read' ) &&
+		if ( $module->isReadMode() && !User::isEveryoneAllowed( 'read' ) &&
 			!$user->isAllowed( 'read' ) )
 		{
 			$this->dieUsageMsg( 'readrequired' );
@@ -1150,7 +1144,7 @@ class ApiMain extends ApiBase {
 		$this->setHelp();
 		// Get help text from cache if present
 		$key = wfMemcKey( 'apihelp', $this->getModuleName(),
-			SpecialVersion::getVersion( 'nodb' ) );
+			str_replace( ' ', '_', SpecialVersion::getVersion( 'nodb' ) ) );
 		if ( $wgAPICacheHelpTimeout > 0 ) {
 			$cached = $wgMemc->get( $key );
 			if ( $cached ) {

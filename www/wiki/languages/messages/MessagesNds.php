@@ -246,7 +246,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Wies de Tall vun Brukers, de op disse Siet oppasst',
 'tog-oldsig' => 'Gellen Ünnerschrift',
 'tog-fancysig' => 'Signatur as Wikitext behanneln (ahn automaatsch Lenk)',
-'tog-showjumplinks' => '„Wesseln-na“-Lenken tolaten',
 'tog-uselivepreview' => 'Live-Vörschau bruken (JavaScript) (Experimental)',
 'tog-forceeditsummary' => 'Segg mi bescheid, wenn ik keen Tosamenfaten geven heff, wat ik allens ännert heff',
 'tog-watchlisthideown' => 'Ännern vun mi sülvs op de Oppasslist nich wiesen',
@@ -445,7 +444,7 @@ $1",
 'pool-queuefull' => 'Pooltöövslang is vull',
 'pool-errorunknown' => 'Unbekannten Fehler',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Över {{SITENAME}}',
 'aboutpage' => 'Project:Över_{{SITENAME}}',
 'copyright' => 'Inholt is verfögbor ünner de $1.',
@@ -527,17 +526,6 @@ En List vun de Spezialsieden gifft dat ünner [[Special:SpecialPages|{{int:speci
 # General errors
 'error' => 'Fehler',
 'databaseerror' => 'Fehler in de Datenbank',
-'dberrortext' => 'Dor weer en Syntaxfehler in de Datenbankaffraag.
-De Grund kann en Programmeerfehler ween
-De letzte Datenbankaffraag weer:
-
-<blockquote><tt>$1</tt></blockquote>
-
-ut de Funkschoon <tt>$2</tt>.
-MySQL mell den Fehler <tt>$3: $4</tt>.',
-'dberrortextcl' => 'Dor weer en Syntaxfehler in de Datenbankaffraag.
-De letzte Datenbankaffraag weer: $1 ut de Funkschoon <tt>$2</tt>.
-MySQL mell den Fehler: <tt>$3: $4</tt>.',
 'laggedslavemode' => 'Wohrschau: Disse Siet is villicht nich mehr op den ne’esten Stand.',
 'readonly' => 'Datenbank is sparrt',
 'enterlockreason' => 'Giff den Grund an, worüm de Datenbank sparrt warrn schall un taxeer, wo lang de Sparr duert',
@@ -586,7 +574,6 @@ Query: $2',
 'editinginterface' => "'''Wohrschau:''' Disse Siet bargt Text, de vun de MediaWiki-Software för ehr Böverflach bruukt warrt.
 Wat du hier ännerst, warkt sik op dat kumplette Wiki ut.
 Wenn du Text översetten wist, de betherto noch gornich översett is, denn maak dat opbest op [//translatewiki.net/wiki/Main_Page?setlang=nds translatewiki.net], dat Översett-Projekt vun MediaWiki.",
-'sqlhidden' => '(SQL-Affraag versteken)',
 'cascadeprotected' => 'Disse Siet is sperrt un kann nich ännert warrn. Dat kummt dorvun dat se in disse {{PLURAL:$1|Siet|Sieden}} inbunnen is, de över Kaskadensperr schuult {{PLURAL:$1|is|sünd}}:
 $2',
 'namespaceprotected' => "Du hest keen Rechten, Sieden in’n Naamruum '''$1''' to ännern.",
@@ -619,7 +606,7 @@ Denk dor an, dat welk Sieden ünner Ümstänn noch jümmer so wiest warrn köön
 'logout' => 'Afmellen',
 'userlogout' => 'Afmellen',
 'notloggedin' => 'Nich anmellt',
-'nologin' => "Wenn du noch keen Brukerkonto hest, denn kannst di anmellen: '''$1'''.",
+'nologin' => 'Wenn du noch keen Brukerkonto hest, denn kannst di anmellen: $1.',
 'nologinlink' => 'Brukerkonto inrichten',
 'createaccount' => 'Nieg Brukerkonto anleggen',
 'gotaccount' => "Hest Du al en Brukerkonto? '''$1'''.",
@@ -696,7 +683,7 @@ Tööv en Stoot, ehrdat du dat noch wedder versöchst.',
 'newpassword' => 'Nee Passwoort',
 'retypenew' => 'Nee Passwoort (nochmal)',
 'resetpass_submit' => 'Passwoort instellen un inloggen',
-'resetpass_success' => 'Dien Passwoort is mit Spood ännert worrn. Warrst nu anmellt …',
+'changepassword-success' => 'Dien Passwoort is mit Spood ännert worrn. Warrst nu anmellt …',
 'resetpass_forbidden' => 'Passwöör köönt nich ännert warrn.',
 'resetpass-no-info' => 'Du musst anmellt wesen, dat du disse Sied direkt opropen kannst.',
 'resetpass-submit-loggedin' => 'Passwoord ännern',
@@ -1154,7 +1141,6 @@ de aver nich jümmer den aktuellsten Stand weerspegelt.<p>',
 'resetprefs' => 'Trüchsetten',
 'restoreprefs' => 'All Standardinstellungen wedderhalen',
 'prefs-editing' => 'Grött vun’t Textfeld',
-'prefs-edit-boxsize' => 'Grött vun dat Finster för Ännern.',
 'rows' => 'Regen',
 'columns' => 'Spalten',
 'searchresultshead' => 'Söökresultaten',
@@ -1165,9 +1151,6 @@ de aver nich jümmer den aktuellsten Stand weerspegelt.<p>',
 'recentchangesdays-max' => '(Maximal $1 {{PLURAL:$1|Dag|Daag}})',
 'recentchangescount' => 'Antall Ännern, de wiest warrt:',
 'prefs-help-recentchangescount' => 'Dor höört de Ne’esten Ännern, Versionsgeschichten un Logböker to.',
-'prefs-help-watchlist-token' => 'Wenn du in dit Feld in gehemen Slötel ingiffst, denn warrt för dien Oppasslist en RSS-Feed opstellt.
-Elkeen, de den Slötel kennt, kann denn dien Oppasslist ankieken. Söök di also en good Slötel ut.
-Hier is en Tofalls-Slötel, den du bruken kannst: $1',
 'savedprefs' => 'Allens spiekert.',
 'timezonelegend' => 'Tiedrebeed:',
 'localtime' => 'Oortstied:',
@@ -1198,7 +1181,6 @@ Hier is en Tofalls-Slötel, den du bruken kannst: $1',
 'prefs-reset-intro' => 'Du kannst disse Sied bruken, dien Instellungen al op de Standardinstellung trüchtosetten.
 Dat kann nich wedder ungeschehn maakt warrn.',
 'prefs-emailconfirm-label' => 'E-Mail-Bestätigung:',
-'prefs-textboxsize' => 'Grött vun dat Änner-Finster',
 'youremail' => 'Dien E-Mail (kene Plicht) *',
 'username' => 'Brukernaam:',
 'uid' => 'Bruker-ID:',
@@ -1423,7 +1405,6 @@ Dat kann nich wedder ungeschehn maakt warrn.',
 'recentchangeslinked-feed' => 'Ännern an lenkte Sieden',
 'recentchangeslinked-toolbox' => 'Ännern an lenkte Sieden',
 'recentchangeslinked-title' => 'Ännern an Sieden, de vun „$1“ ut lenkt sünd',
-'recentchangeslinked-noresult' => 'In disse Tiet hett nüms de lenkten Sieden ännert.',
 'recentchangeslinked-summary' => "Disse List wiest de letzten Ännern an de Sieden, de vun en bestimmte Siet ut verlenkt oder in en bestimmte Kategorie in sünd. Sieden, de op diene [[Special:Watchlist|Oppasslist]] staht, sünd '''fett''' schreven.",
 'recentchangeslinked-page' => 'Siet:',
 'recentchangeslinked-to' => 'Wies Ännern op Sieden, de hierher wiest',
@@ -1513,7 +1494,7 @@ Wenn du ehr liekers hoochladen wullt, gah trüch un laad de Datei ünner en anne
 'upload-file-error' => 'Internen Fehler',
 'upload-file-error-text' => 'Dat geev en internen Fehler bi dat Anleggen vun en temporäre Datei op’n Server. Segg man en [[Special:ListUsers/sysop|Administrater]] bescheed.',
 'upload-misc-error' => 'Unbekannt Fehler bi dat Hoochladen',
-'upload-misc-error-text' => 'Bi dat Hoochladen geev dat en unbekannten Fehler. Kiek na, wat dor en Fehler in de URL is, wat de Websteed ok löppt un versöök dat denn noch wedder. Wenn dat Problem denn noch jümmer dor is, denn vertell dat en [[Special:ListUsers/sysop|System-Administrater]].',
+'upload-misc-error-text' => 'Bi dat Hoochladen geev dat en unbekannten Fehler. Kiek na, wat dor en Fehler in de URL is, wat de Websteed ok löppt un versöök dat denn noch wedder. Wenn dat Problem denn noch jümmer dor is, denn vertell dat en [[Special:ListUsers/sysop|Administrater]].',
 
 # Some likely curl errors. More could be added from <http://curl.haxx.se/libcurl/c/libcurl-errors.html>
 'upload-curl-error6' => 'Kunn de URL nich kriegen',
@@ -1651,10 +1632,6 @@ Denk dor an, natokieken, wat nich noch annere Sieden na de Vörlagen wiest, ehrd
 'statistics-users-active' => 'Aktive Brukers',
 'statistics-users-active-desc' => 'Brukers, de {{PLURAL:$1|in de vergahn 24 Stünnen|in de vergahn $1 Daag}} wat daan hebbt',
 'statistics-mostpopular' => 'opmehrst ankekene Sieden',
-
-'disambiguations' => 'Mehrdüdige Begrepen',
-'disambiguationspage' => 'Template:Mehrdüdig_Begreep',
-'disambiguations-text' => 'Disse Sieden wist na Sieden för mehrdüdige Begrepen. Se schöölt lever op de Sieden wiesen, de egentlich meent sünd.<br />Ene Siet warrt as Siet för en mehrdüdigen Begreep ansehn, wenn [[MediaWiki:Disambiguationspage]] na ehr wiest.<br />Lenken ut annere Naamrüüm sünd nich mit in de List.',
 
 'pageswithprop-submit' => 'Los',
 
@@ -1881,7 +1858,6 @@ Mehr Informatschonen över enkelte Rechten staht ünner [[{{MediaWiki:Listgroupr
 'unwatchthispage' => 'Nich mehr oppassen',
 'notanarticle' => 'Keen Artikel',
 'notvisiblerev' => 'Version wegsmeten',
-'watchnochange' => 'Kene Siet op dien Oppasslist is in den wiesten Tietruum ännert worrn.',
 'watchlist-details' => '{{PLURAL:$1|Ene Siet is|$1 Sieden sünd}} op dien Oppasslist (ahn Diskuschoonssieden).',
 'wlheader-enotif' => 'Benarichtigen per E-Mail is anstellt.',
 'wlheader-showupdated' => "Sieden, de siet dien letzten Besöök ännert worrn sünd, warrt '''fett''' wiest.",
@@ -3023,7 +2999,6 @@ Du kannst ok de [[Special:EditWatchlist|normale Sied to’n Ännern]] bruken.',
 'version-other' => 'Annern Kraam',
 'version-mediahandlers' => 'Medien-Handlers',
 'version-hooks' => 'Hooks',
-'version-extension-functions' => 'Extension-Funkschonen',
 'version-parser-extensiontags' => "Parser-Extensions ''(Tags)''",
 'version-parser-function-hooks' => 'Parser-Funkschonen',
 'version-hook-name' => 'Hook-Naam',

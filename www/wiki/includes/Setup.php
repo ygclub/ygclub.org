@@ -293,6 +293,13 @@ if ( $wgMetaNamespace === false ) {
 	$wgMetaNamespace = str_replace( ' ', '_', $wgSitename );
 }
 
+
+// Default value is either the suhosin limit or -1 for unlimited
+if ( $wgResourceLoaderMaxQueryLength === false ) {
+	$maxValueLength = ini_get( 'suhosin.get.max_value_length' );
+	$wgResourceLoaderMaxQueryLength = $maxValueLength > 0 ? $maxValueLength : -1;
+}
+
 /**
  * Definitions of the NS_ constants are in Defines.php
  * @private
@@ -370,10 +377,6 @@ if ( $wgInvalidateCacheOnLocalSettingsChange ) {
 	$wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( "$IP/LocalSettings.php" ) ) );
 }
 
-if ( $wgAjaxUploadDestCheck ) {
-	$wgAjaxExportList[] = 'SpecialUpload::ajaxGetExistsWarning';
-}
-
 if ( $wgNewUserLog ) {
 	# Add a new log type
 	$wgLogTypes[] = 'newusers';
@@ -388,6 +391,15 @@ if ( $wgNewUserLog ) {
 
 if ( $wgCookieSecure === 'detect' ) {
 	$wgCookieSecure = ( WebRequest::detectProtocol() === 'https' );
+}
+
+if ( $wgRC2UDPAddress ) {
+	$wgRCFeeds['default'] = array(
+		'formatter' => 'IRCColourfulRCFeedFormatter',
+		'uri' => "udp://$wgRC2UDPAddress:$wgRC2UDPPort/$wgRC2UDPPrefix",
+		'add_interwiki_prefix' => &$wgRC2UDPInterwikiPrefix,
+		'omit_bots' => &$wgRC2UDPOmitBots,
+	);
 }
 
 // Disable MWDebug for command line mode, this prevents MWDebug from eating up
@@ -427,9 +439,16 @@ if ( $wgCanonicalServer === false ) {
 	$wgCanonicalServer = wfExpandUrl( $wgServer, PROTO_HTTP );
 }
 
-// Initialize $wgHTCPMulticastRouting from backwards-compatible settings
-if ( !$wgHTCPMulticastRouting && $wgHTCPMulticastAddress ) {
-	$wgHTCPMulticastRouting = array(
+// $wgHTCPMulticastRouting got renamed to $wgHTCPRouting in MediaWiki 1.22
+// ensure back compatibility.
+if ( !$wgHTCPRouting && $wgHTCPMulticastRouting ) {
+	$wgHTCPRouting = $wgHTCPMulticastRouting;
+}
+
+// Initialize $wgHTCPRouting from backwards-compatible settings that
+// comes from pre 1.20 version.
+if ( !$wgHTCPRouting && $wgHTCPMulticastAddress ) {
+	$wgHTCPRouting = array(
 		'' => array(
 			'host' => $wgHTCPMulticastAddress,
 			'port' => $wgHTCPPort,

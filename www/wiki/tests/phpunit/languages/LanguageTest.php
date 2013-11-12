@@ -1482,4 +1482,50 @@ class LanguageTest extends LanguageClassesTestCase {
 			array( 'FI', false, 'is not supported language, input should be in lower case' ),
 		);
 	}
+
+	/**
+	 * @dataProvider provideGetParentLanguage
+	 */
+	function testGetParentLanguage( $code, $expected, $comment ) {
+		$lang = Language::factory( $code );
+		if ( is_null( $expected ) ) {
+			$this->assertNull( $lang->getParentLanguage(), $comment );
+		} else {
+			$this->assertEquals( $expected, $lang->getParentLanguage()->getCode(), $comment );
+		}
+	}
+
+	public static function provideGetParentLanguage() {
+		return array(
+			array( 'zh-cn', 'zh', 'zh is the parent language of zh-cn' ),
+			array( 'zh', 'zh', 'zh is defined as the parent language of zh, because zh converter can convert zh-cn to zh' ),
+			array( 'zh-invalid', null, 'do not be fooled by arbitrarily composed language codes' ),
+			array( 'en-gb', null, 'en does not have converter' ),
+			array( 'en', null, 'en does not have converter. Although FakeConverter handles en -> en conversion but it is useless' ),
+		);
+	}
+
+	/**
+	 * @dataProvider provideGetNamespaceAliases
+	 */
+	function testGetNamespaceAliases( $languageCode, $subset ) {
+		$language = Language::factory( $languageCode );
+		$aliases = $language->getNamespaceAliases();
+		foreach ( $subset as $alias => $nsId ) {
+			$this->assertEquals( $nsId, $aliases[$alias] );
+		}
+	}
+
+	function provideGetNamespaceAliases() {
+		// TODO: Add tests for NS_PROJECT_TALK and GenderNamespaces
+		return array(
+			array(
+				'zh',
+				array(
+					'文件' => NS_FILE,
+					'檔案' => NS_FILE,
+				),
+			),
+		);
+	}
 }

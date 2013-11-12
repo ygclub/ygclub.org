@@ -122,7 +122,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Bitne küzätü isemleklärenä östägän qullanuçılar sanın kürsätelsen',
 'tog-oldsig' => 'Xäzerge imzanı aldan qaraw:',
 'tog-fancysig' => 'İmzanıñ şäxsi wiki-bilgelämäse (avtomatik sıltamasız)',
-'tog-showjumplinks' => '«Küçü» yärdämçe sıltamaları yalğansın',
 'tog-uselivepreview' => 'Tiz qarap alu qullanılsın (JavaScript, eksperimental)',
 'tog-forceeditsummary' => 'Üzgärtülärne taswirlaw yulı tutırılmağan bulsa, kisätü',
 'tog-watchlisthideown' => 'Minem üzgärtülärem küzätü isemlegennän yäşerelsen',
@@ -217,7 +216,7 @@ $messages = array(
 'index-category' => 'İndekslanğan bitlär',
 'noindex-category' => 'İndekslanmağan bitlär',
 
-'linkprefix' => '/^(.*?)([a-zA-Z\\x80-\\xff]+)$/sD',
+'linkprefix' => '/^((?>.*(?<![a-zA-Z\\x80-\\xff])))(.+)$/sD',
 
 'about' => 'Taswirlama',
 'article' => 'Mäqälä',
@@ -319,7 +318,7 @@ $1',
 'pool-queuefull' => 'Sorawlarnı saqlaw  bite tulı',
 'pool-errorunknown' => 'Bilgesez  xata',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} turında',
 'aboutpage' => 'Project:Taswirlama',
 'copyright' => 'Mäğlümat $1 buyınça taratıla.',
@@ -354,7 +353,6 @@ $1',
 'newmessagesdifflink' => 'bäxäs bitegezneñ soñğı üzgärtüe',
 'youhavenewmessagesmulti' => 'Sezgä monda yaña xäbärlär bar: $1',
 'editsection' => 'üzgärtü',
-'editsection-brackets' => '[$1]',
 'editold' => 'üzgärtü',
 'viewsourceold' => 'başlanğıç kodnı qaraw',
 'editlink' => 'üzgärtü',
@@ -402,17 +400,6 @@ Maxsus bitlär isemlegen qarağız: [[Special:SpecialPages|{{int:specialpages}}]
 # General errors
 'error' => 'Xata',
 'databaseerror' => 'Mäğlümatlar bazasında xata',
-'dberrortext' => 'Mäğlümatlar bazasına cibärelgän sorawda sintaksik xata tabıldı.
-Programmada xata bulırğa mömkin.
-Mäğlümatlar bazasına cibärelgän soñğı soraw:
-<blockquote><tt>$1</tt></blockquote>
-<tt>«$2»</tt> funksiäsennän.
-Baza <tt>«$3: $4»</tt> xatasın qaytardı.',
-'dberrortextcl' => 'Mäğlümatlar bazasına cibärelgän sorawda sintaksik xata tabıldı.
-Mäğlümatlar bazasına cibärelgän soñğı soraw:
-"$1"
-«$2» funksiäsennän.
-Baza «$3: $4» xatasın qaytardı.',
 'laggedslavemode' => 'İğtibar: bittä soñğı yañartular kürsätelmägän bulırğa mömkin.',
 'readonly' => 'Mäğlümatlar bazasına yazu yabılğan',
 'enterlockreason' => 'Yabılu säbäben häm waqıtın kürsätegez.',
@@ -457,7 +444,6 @@ Soraw: $2',
 'viewsourcetext' => 'Sez bu bitneñ başlanğıç tekstın qarıy häm küçerä alasız:',
 'protectedinterface' => 'Bu bittä programma interfeysı xäbärläre bar. Vandalizmğa qarşı köräş säbäple, bu bitne üzgärtü tıyıla.',
 'editinginterface' => "'''İğtibar:''' Sez MediaWiki sistemasınıñ interfeys biten üzgärtäsez. Bu başqa qullanuçılarğa da tä'sir itäçäk. Tärcemä öçen [//translatewiki.net/wiki/Main_Page?setlang=tt-latn translatewiki.net] lokalizatsiäläw proyektın qullanığız.",
-'sqlhidden' => '(SQL-soraw yäşerelgän)',
 'cascadeprotected' => 'Bu bit üzgärtülärdän saqlanğan, çönki ul kaskadlı saqlaw qabul itelgän {{PLURAL:$1|bitkä|bitlärgä}} östälgän:
 $2',
 'namespaceprotected' => "'''$1''' isem kiñlegendäge bitlärne üzgärtü öçen sezneñ röxsätegez yuq.",
@@ -479,7 +465,6 @@ Qayber bitlär Sez kergän kebek kürsätelergä mömkin. Monı beterü öçen b
 'yourpassword' => 'Sersüz:',
 'yourpasswordagain' => 'Sersüzne qabat kertü:',
 'remembermypassword' => 'Xisap yazmamnı bu brauzerda saqlansın (iñ küp $1 {{PLURAL:$1|kön|kön|kön}}gä qädär)',
-'securelogin-stick-https' => 'Kerüdän soñ HTTPS buyınça totaştırunı däwam itärgä',
 'yourdomainname' => 'Sezneñ domenığız:',
 'externaldberror' => 'Tışqı mäğlümat bazası yärdämendä awtentifikatsiä ütkändä xata çıqtı, yäisä tışqı xisap yazmağızğa üzgäreşlär kertü xoquqığız yuq.',
 'login' => 'Kerü',
@@ -558,7 +543,7 @@ Yañadan qabatlağançı beraz kötüegez sorala.',
 'newpassword' => 'Yaña sersüz:',
 'retypenew' => 'Yaña sersüzne qabatlağız:',
 'resetpass_submit' => 'Sersüz quyıp kerü',
-'resetpass_success' => 'Sezneñ sersüz uñışlı üzgärtelde! Sistemağa kerü başqarıla...',
+'changepassword-success' => 'Sezneñ sersüz uñışlı üzgärtelde! Sistemağa kerü başqarıla...',
 'resetpass_forbidden' => 'Sersüz üzgärtelä almıy',
 'resetpass-no-info' => 'Bu bitne qaraw öçen sez sistemağa üz xisap yazmağız yärdämendä kerergä tieş.',
 'resetpass-submit-loggedin' => 'Sersüzne üzgärtü',
@@ -963,7 +948,6 @@ Barlıq alannarda (bäxäs bitläre, ürnäklär, h.b.) ezläw öçen ''all'' s�
 'resetprefs' => 'Saqlanmağan üzgärtülärne beterü',
 'restoreprefs' => 'Baştağı köylänmälärne kire qaytaru',
 'prefs-editing' => 'Üzgärtü',
-'prefs-edit-boxsize' => 'Üzgärtü täräzäseneñ zurlığı',
 'rows' => 'Yullar:',
 'columns' => 'Bağanalar:',
 'searchresultshead' => 'Ezläw',
@@ -974,7 +958,6 @@ Barlıq alannarda (bäxäs bitläre, ürnäklär, h.b.) ezläw öçen ''all'' s�
 'recentchangesdays-max' => '( $1 {{PLURAL:$1|könnän}} dä artıq bulmasqa tieş)',
 'recentchangescount' => 'Töp bularaq qullanuçı üzgärtülär sanı:',
 'prefs-help-recentchangescount' => 'Üz öçenä üzgärtülärne, bitlärneñ tarixın häm yazlu köndälegen dä kertä.',
-'prefs-help-watchlist-token' => 'Älege yulnı sersüz belän tutıru sezneñ küzätü isemlegegezneñ RSS-tasmasın barlıqqa kiteräçäk. Mondağı sersüzne belüçe härber keşe sezneñ küzätü isemlegegezne qarıy ala, şuña kürä avtomatik räweştä yasalğan sersüzne qullanığız: $1',
 'savedprefs' => 'Köylänmäläregez saqlandı.',
 'timezonelegend' => 'Säğät poyası:',
 'localtime' => 'Cirle waqıt',
@@ -1004,7 +987,6 @@ Barlıq alannarda (bäxäs bitläre, ürnäklär, h.b.) ezläw öçen ''all'' s�
 'prefs-common-css-js' => 'Barlıq bizäleşlär öçen ğomumi CSS/JS:',
 'prefs-reset-intro' => 'Bu bit sezneñ köylänmäläregezne beterü öçen qullanıla. Bu eşne başqaru näticäsendä sez yañadan üz köylänmälärne yañadan qaytara almıysız.',
 'prefs-emailconfirm-label' => 'E-mail raslaw',
-'prefs-textboxsize' => 'Üzgärtü täräzäseneñ zurlığı',
 'youremail' => 'Elektron poçta:',
 'username' => 'Qullanuçı iseme:',
 'uid' => 'Qullanuçınıñ identifikatorı:',
@@ -1151,7 +1133,6 @@ Ul $1 {{PLURAL:$1|xäreftän}} kübräk bulırğa tieş tügel.',
 'recentchangeslinked-feed' => 'Bäyläneşle üzgärtülär',
 'recentchangeslinked-toolbox' => 'Bäyläneşle üzgärtülär',
 'recentchangeslinked-title' => '"$1" bitenä bäyläneşle üzgärtülär',
-'recentchangeslinked-noresult' => 'Kürsätelgän waqıtta sıltaşqan bitlärneñ üzgärtelmäläre yuq ide.',
 'recentchangeslinked-summary' => "Bu kürsätelgän bit belän sıltalğan (yä kürsätelgän törkemgä kertkän) bitlärneñ üzgärtelmäläre isemlege.
 [[Special:Watchlist|Küzätü isemlegegezgä]] kerä torğan bitlär '''qalın'''.",
 'recentchangeslinked-page' => 'Bitneñ iseme:',
@@ -1338,8 +1319,6 @@ PICT # törle
 'statistics-users-active' => 'Aktiv qullanuçılar',
 'statistics-users-active-desc' => '{{PLURAL:$1|$1 kön }} öçendä nindi dä bulsa üzgärtülär kertkän qullanuçılar',
 'statistics-mostpopular' => 'İñ küp qaraluçı bitlär',
-
-'disambiguations' => 'Küp mäğnäle süzlär turında bitlär',
 
 'doubleredirects' => 'İkelätä yünältülär',
 

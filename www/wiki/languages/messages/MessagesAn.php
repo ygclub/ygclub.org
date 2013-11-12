@@ -161,7 +161,6 @@ $messages = array(
 'tog-shownumberswatching' => "Amostrar o numero d'usuarios que cosiran un articlo",
 'tog-oldsig' => 'Sinyadura actual',
 'tog-fancysig' => 'Tratar as sinyaduras como wikitexto (sin de vinclo automatico)',
-'tog-showjumplinks' => 'Activar vinclos d\'accesibilidat "blincar enta"',
 'tog-uselivepreview' => 'Activar previsualización automatica (cal JavaScript) (Esperimental)',
 'tog-forceeditsummary' => 'Avisar-me quan o campo de resumen siga buedo.',
 'tog-watchlisthideown' => 'Amagar as mías edicions en a lista de seguimiento',
@@ -265,7 +264,7 @@ $messages = array(
 'cancel' => 'Cancelar',
 'moredotdotdot' => 'Más...',
 'mypage' => 'A mía pachina',
-'mytalk' => 'Pachina de descusión',
+'mytalk' => 'Pachina de discusión',
 'anontalk' => "Pachina de descusión d'ista IP",
 'navigation' => 'Navego',
 'and' => '&#32;y',
@@ -361,7 +360,7 @@ $1",
 'pool-queuefull' => 'A coda de treballo ye plena',
 'pool-errorunknown' => 'Error desconoixida',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Información sobre {{SITENAME}}',
 'aboutpage' => 'Project:Sobre',
 'copyright' => 'O conteniu ye disponible baixo a licencia $1.',
@@ -444,17 +443,6 @@ Puede trobar una lista de pachinas especials en [[Special:SpecialPages|{{int:spe
 # General errors
 'error' => 'Error',
 'databaseerror' => "Error d'a base de datos",
-'dberrortext' => 'Ha sucedito una error de sintaxi en una consulta a la base de datos.
-Isto podría marcar una error en o programa.
-A zaguera consulta estió:
-<blockquote><tt>$1</tt></blockquote>
-dende adintro d\'a función "<tt>$2</tt>".
-A error retornata por a base de datos estió "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'S\'ha producito una error de sintaxi en una consulta a la base de datos.
-A zaguera consulta estió:
-"$1"
-dende adintro d\'a función "$2".
-A base de datos retornó a error "$3: $4"',
 'laggedslavemode' => "Pare cuenta: podrían faltar as zagueras edicions d'ista pachina.",
 'readonly' => 'Base de datos bloqueyata',
 'enterlockreason' => "Esplique a causa d'o bloqueyo, incluyendo una estimación de quán se producirá o desbloqueyo",
@@ -502,7 +490,6 @@ Consulta: $2',
 'viewyourtext' => "Puet veyer y copiar o codigo d''''as suyas edicions''' en ista pachina:",
 'protectedinterface' => "Ista pachina furne o texto d'a interfaz ta o software. Ye protechita ta privar o vandalismo. Si creye que bi ha bella error, contacte con un administrador.",
 'editinginterface' => "'''Pare cuenta:''' Ye editando una pachina emplegata ta furnir o texto d'a interfaz de {{SITENAME}}. Os cambeos en ista pachina tendrán efecto en l'aparencia d'a interfaz ta os atros usuarios. Ta fer traduccions d'a interfaz, puede considerar fer servir [//translatewiki.net/wiki/Main_Page?setlang=an translatewiki.net], o prochecto de localización de MediaWiki.",
-'sqlhidden' => '(Consulta SQL amagata)',
 'cascadeprotected' => 'Ista pachina ye protechita y no se puede editar porque ye incluyita en {{PLURAL:$1|a siguient pachina|as siguients pachinas}}, que son protechitas con a opción de "cascada": $2',
 'namespaceprotected' => "No tiene premiso ta editar as pachinas d'o espacio de nombres '''$1'''.",
 'customcssprotected' => 'No tiene permisos ta editar a pachina CSS porque contién parametros personal de belatro usuario.',
@@ -524,7 +511,6 @@ Puede continar navegando por {{SITENAME}} anonimament, u puede <span class='plai
 'yourpassword' => "Clau d'acceso:",
 'yourpasswordagain' => 'Torne a escribir a clau:',
 'remembermypassword' => "Remerar o mío nombre d'usuario y a clau entre sesions en iste navegador (como muito por $1 {{PLURAL:$1|día|días}})",
-'securelogin-stick-https' => "Continar connectau con HTTPS dimpués d'encetar sesión",
 'yourdomainname' => 'Dominio:',
 'externaldberror' => "Bi habió una error d'autenticación externa d'a base de datos u bien no tiene premisos ta esviellar a suya cuenta externa.",
 'login' => 'Encetar sesión',
@@ -613,7 +599,7 @@ Si a cuenta s\'ha creyato por error, simplament ignore iste mensache.',
 'newpassword' => 'Nueva clau:',
 'retypenew' => 'Torne a escribir a nueva clau:',
 'resetpass_submit' => 'Cambiar a clau y identificar-se',
-'resetpass_success' => 'A suya clau ya ye cambiata. Agora ya puede dentrar-ie...',
+'changepassword-success' => 'A suya clau ya ye cambiata. Agora ya puede dentrar-ie...',
 'resetpass_forbidden' => "No se puede cambiar as claus d'acceso",
 'resetpass-no-info' => 'Debe identificar-se como usuario ta poder acceder dreitament ta ista pachina.',
 'resetpass-submit-loggedin' => 'Cambiar a clau',
@@ -745,8 +731,8 @@ Diferents usuarios pueden compartir una mesma adreza IP.
 Si vusté ye un usuario anonimo y creye que l'han escrito comentarios no relevants, [[Special:UserLogin/signup|creye una cuenta]] u [[Special:UserLogin/signup|identifique-se]] ta privar confusions futuras con atros usuarios anonimos.''",
 'noarticletext' => 'Por agora no bi ha garra texto en ista pachina. Puet [[Special:Search/{{PAGENAME}}|mirar o títol d\'ista pachina]] en atras pachinas, <span class="plainlinks">[{{fullurl:{{#Special:Log}}|page={{FULLPAGENAMEE}}}} mirar os rechistros relacionatos] u [{{fullurl:{{FULLPAGENAME}}|action=edit}} escribir ista pachina]</span>.',
 'noarticletext-nopermission' => 'Por l\'inte no i hai garra texto en ista pachina.
-Puet [[Special:Search/{{PAGENAME}}|mirar iste títol]] en atras páginas,
-u bien <span class="plainlinks">[{{fullurl:{{#Special:Log}}|page={{FULLPAGENAMEE}}}} mirar en os rechistros relacionatos]</span>.',
+Puede [[Special:Search/{{PAGENAME}}|mirar iste titol]] en atras pachinas,
+u bien <span class="plainlinks">[{{fullurl:{{#Special:Log}}|page={{FULLPAGENAMEE}}}} mirar en os rechistros relacionatos]</span>, pero no tien permiso ta creyar ista pachina.',
 'userpage-userdoesnotexist' => 'A cuenta d\'usuario "<nowiki>$1</nowiki>" no ye rechistrada. Piense si quiere creyar u editar ista pachina.',
 'userpage-userdoesnotexist-view' => 'A cuenta d\'usuario "$1" no ye rechistrada.',
 'blocked-notice-logextract' => "Ista cuenta d'usuario ye actualment bloqueyata.
@@ -769,7 +755,7 @@ A zaguera dentrada d'o rechistro de bloqueyos s'amuestra contino:",
 'userinvalidcssjstitle' => "'''Pare cuenta:''' No bi ha garra aparencia clamata \"\$1\". Remere que as pachinas presonalizatas .css y .js tienen un títol en minusclas, p.e. {{ns:user}}:Foo/vector.css en cuenta de {{ns:user}}:Foo/Vector.css.",
 'updated' => '(Esviellato)',
 'note' => "'''Nota:'''",
-'previewnote' => "'''Pare cuenta que isto no ye que l'anvista previa d'a pachina; os cambeos encara no s'ha alzato!'''",
+'previewnote' => "'''Pare cuenta que isto no ye que l'anvista previa.''' Os cambeos encara no s'ha alzato!",
 'previewconflict' => "L'anvista previa li amostrará l'aparencia d'o texto dimpués d'alzar os cambeos.",
 'session_fail_preview' => "'''Ya lo sentimos, pero no hemos puesto alzar a suya edición por una perda d'os datos de sesion. Por favor, prebe de fer-lo una atra vez, y si encara no funciona, [[Special:UserLogout|salga d'a sesión]] y torne a identificar-se.'''",
 'session_fail_preview_html' => "'''Ya lo sentimos, pero no s'ha puesto procesar a suya edición por haber-se trafegato os datos de sesión.'''
@@ -884,8 +870,8 @@ A razón indicada por $3 ye ''$2''",
 Leyenda: '''({{int:cur}})''' = esferencias con a versión actual, '''({{int:last}})''' = esferencias con a versión anterior, '''{{int:minoreditletter}}''' = edición menor",
 'history-fieldset-title' => 'Mirar en o historial',
 'history-show-deleted' => 'Nomás os borratos',
-'histfirst' => 'Primeras contrebucions',
-'histlast' => 'Zagueras',
+'histfirst' => 'primeras',
+'histlast' => 'zagueras',
 'historysize' => '({{PLURAL:$1|1 byte|$1 bytes}})',
 'historyempty' => '(buedo)',
 
@@ -1128,7 +1114,6 @@ Asegure-se que iste cambio no trencará a continidat de l'historial d'a pachina.
 'resetprefs' => "Tornar t'as preferencias por defecto",
 'restoreprefs' => 'Restaure todas as confeguracions por defecto',
 'prefs-editing' => 'Edición',
-'prefs-edit-boxsize' => "Grandaria d'a finestra d'edición.",
 'rows' => 'Ringleras:',
 'columns' => 'Columnas:',
 'searchresultshead' => 'Mirar',
@@ -1139,9 +1124,6 @@ Asegure-se que iste cambio no trencará a continidat de l'historial d'a pachina.
 'recentchangesdays-max' => '(masimo $1 {{PLURAL:$1|día|días}})',
 'recentchangescount' => "Numero d'edicions a amostrar, por defecto:",
 'prefs-help-recentchangescount' => 'Inclui os zaguers cambeos, historials de pachina y rechistros.',
-'prefs-help-watchlist-token' => "Si plena iste campo con una clau secreta se chenerará n filo RSS t'a suya lista de seguimeinto.
-Qui conoixca ista clau podrá leyer a suya lista de seguimiento, asinas que esliya una clau segura.
-Contino se i amuestra una calu chenerata de traza aleatoria que puede fer servir si quiere: $1",
 'savedprefs' => "S'han alzato as suyas preferencias.",
 'timezonelegend' => 'Fuso horario:',
 'localtime' => 'Hora local:',
@@ -1172,7 +1154,6 @@ Contino se i amuestra una calu chenerata de traza aleatoria que puede fer servir
 'prefs-reset-intro' => "Puet emplegar ista pachina ta restaurar as suyas preferencias a las valuras por defecto d'o sitio.
 No se podrá desfer iste cambio.",
 'prefs-emailconfirm-label' => 'Confirmación de correu electronico:',
-'prefs-textboxsize' => "Mida d'a pachina d'edición",
 'youremail' => 'Adreza de correu electronico:',
 'username' => "Nombre d'usuario:",
 'uid' => "ID d'usuario:",
@@ -1402,7 +1383,7 @@ Habría de tener menos de $1 {{PLURAL:$1|carácter|carácters}}.',
 'rc_categories_any' => 'Todas',
 'rc-change-size-new' => "$1 {{PLURAL:$1|byte|bytes}} dimpués d'o cambio",
 'newsectionsummary' => 'Nueva sección: /* $1 */',
-'rc-enhanced-expand' => 'Amostrar detalles (cal JavaScript)',
+'rc-enhanced-expand' => 'Amostrar detalles',
 'rc-enhanced-hide' => 'Amagar detalles',
 
 # Recent changes linked
@@ -1410,7 +1391,6 @@ Habría de tener menos de $1 {{PLURAL:$1|carácter|carácters}}.',
 'recentchangeslinked-feed' => 'Cambeos relacionatos',
 'recentchangeslinked-toolbox' => 'Cambios relacionatos',
 'recentchangeslinked-title' => 'Cambeos relacionatos con "$1"',
-'recentchangeslinked-noresult' => 'No bi habió cambeos en as pachinas vinculatas en o intervalo de tiempo indicato.',
 'recentchangeslinked-summary' => "Ista ye una lista d'os zaguers cambios feitos en pachinas con vinclos dende una pachina especifica (u ta miembros d'una categoría especificata).  S'amuestran en '''negreta''' as pachinas d'a suya [[Special:Watchlist|lista de seguimiento]].",
 'recentchangeslinked-page' => "Nombre d'a pachina:",
 'recentchangeslinked-to' => "En cuentas d'ixo, amostrar os cambios en pachinas con vinclos enta a pachina data",
@@ -1776,12 +1756,6 @@ Debaixo s'amuestra a descripción d'a suya [$2 pachina de descripción].",
 'statistics-users-active-desc' => 'Usuarios que han feito qualsiquier acción en {{PLURAL:$1|o zaguer día|os zaguers $1 días}}',
 'statistics-mostpopular' => 'Pachinas más vistas',
 
-'disambiguations' => 'Pachinas con vinclos enta pachinas de desambigación',
-'disambiguationspage' => 'Template:Desambigación',
-'disambiguations-text' => "As siguients pachinas tienen vinclos ta una '''pachina de desambigación'''.
-Ixos vinclos habrían de ir millor t'a pachina especifica apropiada.<br />
-Una pachina se considera pachina de desambigación si fa servir una plantilla provenient de  [[MediaWiki:Disambiguationspage]].",
-
 'doubleredirects' => 'Reendreceras dobles',
 'doubleredirectstext' => "En ista pachina s'amuestran as pachinas que son reendreceras enta atras pachinas reendrezatas.
 Cada ringlera contién o vinclo t'a primer y segunda reendreceras, y tamién o destino d'a segunda reendrecera, que ye a ormino a pachina obchectivo \"reyal\" a la que a primer pachina habría d'endrezar.",
@@ -2014,7 +1988,6 @@ L\'adreza de correu-e que endicó en as suyas [[Special:Preferences|preferencias
 'unwatchthispage' => 'Deixar de cosirar',
 'notanarticle' => 'No ye una pachina de conteniu',
 'notvisiblerev' => "S'ha borrato a revisión",
-'watchnochange' => "Dengún d'os articlos d'a suya lista de seguimiento no s'ha editato en o periodo de tiempo amostrato.",
 'watchlist-details' => '{{PLURAL:$1|$1 pachina|$1 pachinas}} en a suya lista de seguimiento, sin contar-ie as pachinas de descusión.',
 'wlheader-enotif' => 'A notificación por correu electronico ye activata',
 'wlheader-showupdated' => "Las pachinas cambiadas dende a suya zaguer vesita s'amuestran en '''negreta'''",
@@ -2239,10 +2212,10 @@ $1",
 'blanknamespace' => '(Prencipal)',
 
 # Contributions
-'contributions' => "Contrebucions de l'usuario",
+'contributions' => "Contribucions de {{GENDER:$1|l'usuario|la usuaria}}",
 'contributions-title' => "Contribucions de l'usuario $1",
-'mycontris' => 'Contrebucions',
-'contribsub2' => 'De $1 ($2)',
+'mycontris' => 'Contribucions',
+'contribsub2' => 'Ta {{GENDER:$3|$1}} ($2)',
 'nocontribs' => "No s'han trobato cambeos que concordasen con ixos criterios",
 'uctop' => '(zaguer cambeo)',
 'month' => 'Dende o mes (y anteriors):',
@@ -3422,7 +3395,6 @@ Tamién puede fer servir o [[Special:EditWatchlist|editor estándar]].",
 'version-other' => 'Atros',
 'version-mediahandlers' => 'Maneyador de fichers multimedia',
 'version-hooks' => 'Grifios (Hooks)',
-'version-extension-functions' => "Funcions d'a estensión",
 'version-parser-extensiontags' => "Etiquetas d'estensión d'o parseyador",
 'version-parser-function-hooks' => "Grifios d'as funcions d'o parseyador",
 'version-hook-name' => "Nombre d'o grifio",

@@ -57,7 +57,7 @@ class SkinVector extends SkinTemplate {
 				"/{$this->stylename}/csshover{$min}.htc\")}</style><![endif]-->"
 		);
 
-		$out->addModules( 'skins.vector.js' );
+		$out->addModules( array( 'skins.vector.js', 'skins.vector.collapsibleNav' ) );
 	}
 
 	/**
@@ -66,7 +66,10 @@ class SkinVector extends SkinTemplate {
 	 */
 	function setupSkinUserCss( OutputPage $out ) {
 		parent::setupSkinUserCss( $out );
-		$out->addModuleStyles( 'skins.vector' );
+
+		$styles = array( 'skins.vector' );
+		wfRunHooks( 'SkinVectorStyleModules', array( &$this, &$styles ) );
+		$out->addModuleStyles( $styles );
 	}
 
 	/**
@@ -161,8 +164,8 @@ class VectorTemplate extends BaseTemplate {
 			<div id="siteNotice"><?php $this->html( 'sitenotice' ) ?></div>
 			<?php } ?>
 			<h1 id="firstHeading" class="firstHeading" lang="<?php
-				$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getCode();
-				$this->html( 'pageLanguage' );
+				$this->data['pageLanguage'] = $this->getSkin()->getTitle()->getPageViewLanguage()->getHtmlCode();
+				$this->text( 'pageLanguage' );
 			?>"><span dir="auto"><?php $this->html( 'title' ) ?></span></h1>
 			<div id="bodyContent">
 				<?php if ( $this->data['isarticle'] ) { ?>
@@ -175,13 +178,11 @@ class VectorTemplate extends BaseTemplate {
 				<?php if ( $this->data['newtalk'] ) { ?>
 				<div class="usermessage"><?php $this->html( 'newtalk' ) ?></div>
 				<?php } ?>
-				<?php if ( $this->data['showjumplinks'] ) { ?>
 				<div id="jump-to-nav" class="mw-jump">
 					<?php $this->msg( 'jumpto' ) ?>
 					<a href="#mw-navigation"><?php $this->msg( 'jumptonavigation' ) ?></a><?php $this->msg( 'comma-separator' ) ?>
 					<a href="#p-search"><?php $this->msg( 'jumptosearch' ) ?></a>
 				</div>
-				<?php } ?>
 				<?php $this->html( 'bodycontent' ) ?>
 				<?php if ( $this->data['printfooter'] ) { ?>
 				<div class="printfooter">
@@ -237,24 +238,8 @@ class VectorTemplate extends BaseTemplate {
 			<?php } ?>
 			<div style="clear:both"></div>
 		</div>
-<!-- Piwik -->
-				<script type="text/javascript"> 
-				var _paq = _paq || [];
-			_paq.push(['trackPageView']);
-			_paq.push(['enableLinkTracking']);
-			(function() {
-				var u=(("https:" == document.location.protocol) ? "https" : "http") + "://cloud.ygclub.org/piwik//";
-				_paq.push(['setTrackerUrl', u+'piwik.php']);
-				_paq.push(['setSiteId', 1]);
-				var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-				g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-			})();
-
-			</script>
-<noscript><p><img src="http://cloud.ygclub.org/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
-<!-- End Piwik Code -->
-
 		<?php $this->printTrail(); ?>
+
 	</body>
 </html>
 <?php
@@ -312,8 +297,8 @@ class VectorTemplate extends BaseTemplate {
 		}
 		$msgObj = wfMessage( $msg );
 		?>
-<div class="portal" role="navigation" id='<?php echo Sanitizer::escapeId( "p-$name" ) ?>'<?php echo Linker::tooltip( 'p-' . $name ) ?>>
-	<h3<?php $this->html( 'userlangattributes' ) ?>><?php echo htmlspecialchars( $msgObj->exists() ? $msgObj->text() : $msg ); ?></h3>
+<div class="portal" role="navigation" id='<?php echo Sanitizer::escapeId( "p-$name" ) ?>'<?php echo Linker::tooltip( 'p-' . $name ) ?> aria-labelledby='<?php echo Sanitizer::escapeId( "p-$name-label" ) ?>'>
+	<h3<?php $this->html( 'userlangattributes' ) ?> id='<?php echo Sanitizer::escapeId( "p-$name-label" ) ?>'><?php echo htmlspecialchars( $msgObj->exists() ? $msgObj->text() : $msg ); ?></h3>
 	<div class="body">
 <?php
 		if ( is_array( $content ) ) { ?>
@@ -361,8 +346,8 @@ class VectorTemplate extends BaseTemplate {
 			switch ( $element ) {
 				case 'NAMESPACES':
 ?>
-<div id="p-namespaces" role="navigation" class="vectorTabs<?php if ( count( $this->data['namespace_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>">
-	<h3><?php $this->msg( 'namespaces' ) ?></h3>
+<div id="p-namespaces" role="navigation" class="vectorTabs<?php if ( count( $this->data['namespace_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>" aria-labelledby="p-namespaces-label">
+	<h3 id="p-namespaces-label"><?php $this->msg( 'namespaces' ) ?></h3>
 	<ul<?php $this->html( 'userlangattributes' ) ?>>
 		<?php foreach ( $this->data['namespace_urls'] as $link ) { ?>
 			<li <?php echo $link['attributes'] ?>><span><a href="<?php echo htmlspecialchars( $link['href'] ) ?>" <?php echo $link['key'] ?>><?php echo htmlspecialchars( $link['text'] ) ?></a></span></li>
@@ -373,7 +358,7 @@ class VectorTemplate extends BaseTemplate {
 				break;
 				case 'VARIANTS':
 ?>
-<div id="p-variants" role="navigation" class="vectorMenu<?php if ( count( $this->data['variant_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>">
+<div id="p-variants" role="navigation" class="vectorMenu<?php if ( count( $this->data['variant_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>" aria-labelledby="p-variants-label">
 	<h3 id="mw-vector-current-variant">
 	<?php foreach ( $this->data['variant_urls'] as $link ) { ?>
 		<?php if ( stripos( $link['attributes'], 'selected' ) !== false ) { ?>
@@ -381,7 +366,7 @@ class VectorTemplate extends BaseTemplate {
 		<?php } ?>
 	<?php } ?>
 	</h3>
-	<h3><span><?php $this->msg( 'variants' ) ?></span><a href="#"></a></h3>
+	<h3 id="p-variants-label"><span><?php $this->msg( 'variants' ) ?></span><a href="#"></a></h3>
 	<div class="menu">
 		<ul>
 			<?php foreach ( $this->data['variant_urls'] as $link ) { ?>
@@ -394,8 +379,8 @@ class VectorTemplate extends BaseTemplate {
 				break;
 				case 'VIEWS':
 ?>
-<div id="p-views" role="navigation" class="vectorTabs<?php if ( count( $this->data['view_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>">
-	<h3><?php $this->msg( 'views' ) ?></h3>
+<div id="p-views" role="navigation" class="vectorTabs<?php if ( count( $this->data['view_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>" aria-labelledby="p-views-label">
+	<h3 id="p-views-label"><?php $this->msg( 'views' ) ?></h3>
 	<ul<?php $this->html( 'userlangattributes' ) ?>>
 		<?php foreach ( $this->data['view_urls'] as $link ) { ?>
 			<li<?php echo $link['attributes'] ?>><span><a href="<?php echo htmlspecialchars( $link['href'] ) ?>" <?php echo $link['key'] ?>><?php
@@ -411,8 +396,8 @@ class VectorTemplate extends BaseTemplate {
 				break;
 				case 'ACTIONS':
 ?>
-<div id="p-cactions" role="navigation" class="vectorMenu<?php if ( count( $this->data['action_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>">
-	<h3><span><?php $this->msg( 'actions' ) ?></span><a href="#"></a></h3>
+<div id="p-cactions" role="navigation" class="vectorMenu<?php if ( count( $this->data['action_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>" aria-labelledby="p-cactions-label">
+	<h3 id="p-cactions-label"><span><?php $this->msg( 'actions' ) ?></span><a href="#"></a></h3>
 	<div class="menu">
 		<ul<?php $this->html( 'userlangattributes' ) ?>>
 			<?php foreach ( $this->data['action_urls'] as $link ) { ?>
@@ -425,8 +410,8 @@ class VectorTemplate extends BaseTemplate {
 				break;
 				case 'PERSONAL':
 ?>
-<div id="p-personal" role="navigation" class="<?php if ( count( $this->data['personal_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>">
-	<h3><?php $this->msg( 'personaltools' ) ?></h3>
+<div id="p-personal" role="navigation" class="<?php if ( count( $this->data['personal_urls'] ) == 0 ) { echo ' emptyPortlet'; } ?>" aria-labelledby="p-personal-label">
+	<h3 id="p-personal-label"><?php $this->msg( 'personaltools' ) ?></h3>
 	<ul<?php $this->html( 'userlangattributes' ) ?>>
 <?php
 					$personalTools = $this->getPersonalTools();

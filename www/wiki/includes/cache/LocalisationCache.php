@@ -551,7 +551,7 @@ class LocalisationCache {
 	/**
 	 * Get the plural rule types for a given language from the XML files.
 	 * Cached.
-	 * @since 1.21
+	 * @since 1.22
 	 */
 	public function getPluralRuleTypes( $code ) {
 		if ( $this->pluralRuleTypes === null ) {
@@ -928,6 +928,7 @@ class LocalisationCache {
 		unset( $this->loadedItems[$code] );
 		unset( $this->loadedSubitems[$code] );
 		unset( $this->initialisedLangs[$code] );
+		unset( $this->shallowFallbacks[$code] );
 
 		foreach ( $this->shallowFallbacks as $shallowCode => $fbCode ) {
 			if ( $fbCode === $code ) {

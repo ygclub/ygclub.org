@@ -82,7 +82,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Amorê karberunê şêrkerdoğu bıasne',
 'tog-oldsig' => 'İmza mewcude:',
 'tog-fancysig' => 'İmza rê mamelê wikimeqaley bıke (bê girewo otomatik)',
-'tog-showjumplinks' => 'Girê "so"y feal ke',
 'tog-uselivepreview' => 'Verqayto cande bıgurene (JavaScript) (hona cerrebnayene dero)',
 'tog-forceeditsummary' => 'Mı ke xulasa kerde cı vira, hay be mı ser de',
 'tog-watchlisthideown' => 'Vurnayisunê mı lista mına şêrkerdişi de wedare',
@@ -178,7 +177,7 @@ $messages = array(
 'noindex-category' => 'Pelê bêendeksıni',
 'broken-file-category' => 'Peli be gıreunê dosyeunê sıkıtau',
 
-'linkprefix' => '/^(.*?)([a-zA-Z\\x80-\\xff]+)$/sD',
+'linkprefix' => '/^((?>.*(?<![a-zA-Z\\x80-\\xff])))(.+)$/sD',
 
 'about' => 'Heqa',
 'article' => 'Pela tedeesteyu',
@@ -282,7 +281,7 @@ $1',
 'pool-queuefull' => 'Rêza hewze pırra',
 'pool-errorunknown' => 'Xeta nêzanıtiye',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Heqa {{SITENAME}} de',
 'aboutpage' => 'Project:Heqa',
 'copyright' => 'Zerrek bınê $1 dero.',
@@ -316,7 +315,6 @@ $1',
 'newmessagesdifflink' => 'vurnaiso peyên',
 'youhavenewmessagesmulti' => '$1 de mesacê sımaê newey estê',
 'editsection' => 'bıvurne',
-'editsection-brackets' => '[$1]',
 'editold' => 'bıvurne',
 'viewsourceold' => 'çımey bıvêne',
 'editlink' => 'bıvurne',
@@ -366,18 +364,6 @@ Jü lista pelunê vêrdoğu bınê [[Special:SpecialPages|{{int:specialpages}}]]
 # General errors
 'error' => 'Xeta',
 'databaseerror' => 'Xeta panga daeyu',
-'dberrortext' => 'Jü xeta persê cumla panga daeyu de amê meydan.
-Heni aseno ke na xeta nustene de esta.
-Persê panga daeyuno peyên nia bi:
-<blockquote><tt>$1</tt></blockquote>
-ebe gurê zerrê "<tt>$2</tt>"y ra.
-Panga daeyu xetawa ke asnena "<tt>$3: $4</tt>".',
-'dberrortextcl' => 'Rêza cumleunê panga daeyu de jü xeta amê meydan.
-Heni aseno ke na xeta nustene de esta.
-Persê panga daeyuno peyên nia bi:
-"$1"
-Fonksiyono ke gureniyo "$2".
-Panga daeyu xetawa ke asnena "$3: $4"',
 'laggedslavemode' => 'Teme: Beno ke vurnaisê peyêni pele de niyê.',
 'readonly' => 'Panga daeyu kılit kerdiya',
 'enterlockreason' => 'Serba kılit-kerdişi jü sebeb bıde ke, kılitkerdis texminen key beno ra',
@@ -428,7 +414,6 @@ Kerem kerê, deqêna oncia bıcerrebnê.",
 'editinginterface' => "Teme:''' Sıma hawo jü pela ke serba nustê meqalunê caunê bırnau dana, vurnenê.
 Vurnaisê na pele karberunê binu rê serpela karberi kena ke bıasno.
 Serba çarnaişi, yardımê [//translatewiki.net/wiki/Main_Page?setlang=kiu translatewiki.net]i ra procêdoskerdene rê diqet kerê.",
-'sqlhidden' => '(Persê SQLi nımıteo)',
 'cascadeprotected' => 'Na pele esterıtene ra sıtar biya, çıke na zerrê {{PLURAL:$1|pela ke|pelunê ke}} dera/derê be "cascading" opsiyoni kılit biya, $2 de bena ra.',
 'namespaceprotected' => "'''$1''' ''namespace'' de desturê sıma be vurnaisê pelu çino.",
 'ns-specialprotected' => 'Pelê xususi nêvurrinê.',
@@ -449,7 +434,6 @@ Beno ke taê peli sıma hona cıkote asnenê, hata ke sıma ''browser cache''ê 
 'yourpassword' => 'Parola:',
 'yourpasswordagain' => 'Parola tekrar ke:',
 'remembermypassword' => 'Cıkotena mı na komputeri de bia ho viri (seba tewr jêde $1 {{PLURAL:$1|roze|rozu}})',
-'securelogin-stick-https' => 'Cıkotene ra dıme HTTPS rê giredae bımane',
 'yourdomainname' => 'Bandıra sıma:',
 'externaldberror' => 'Cıfeteliyaisê naskerdene de ya xeta esta ya ki tebera vırastena hesabê sıma rê destur çino.',
 'login' => 'Cı kuye',
@@ -515,7 +499,7 @@ Kerem ke, oncia bıcerrebne.',
 'newpassword' => 'Parola newiye:',
 'retypenew' => 'Parola newiye tekrar ke:',
 'resetpass_submit' => 'Parola ayar ke u cı kuye',
-'resetpass_success' => 'Parola sıma ebe serkotene vurriye! Nıka hesabê sıma beno ra...',
+'changepassword-success' => 'Parola sıma ebe serkotene vurriye! Nıka hesabê sıma beno ra...',
 'resetpass_forbidden' => 'Paroley nêşikinê bıvurniyê',
 'resetpass-submit-loggedin' => 'Parola bıvurne',
 'resetpass-submit-cancel' => 'Bıtexelne',
@@ -946,7 +930,6 @@ Kaberê bini ke şıma de kewti irtıbat, adresa e-postey şıma eşkera nêbena
 'recentchangeslinked' => 'Ney sero vurnayene',
 'recentchangeslinked-toolbox' => 'Ney sero vurnayene',
 'recentchangeslinked-title' => 'Heqa "$1"i de vurnais',
-'recentchangeslinked-noresult' => 'Pelanê ke link biye ey vurnayîşî çino.',
 'recentchangeslinked-summary' => "Lista cêrêne, pela bêlikerdiye rê (ya ki karberunê kategoriya bêlikerdiye rê) pelunê girêdaoğu de lista de vurnaisê peyênuna.
 [[Special:Watchlist|Lista sımawa şêrkedişi de]] peli be nusto '''qolınd''' bêli kerdê.",
 'recentchangeslinked-page' => 'Namê pele:',
@@ -1047,8 +1030,6 @@ Cêr [$2 pela arezekerdena dosya de] arezekerdene asnina.',
 'statistics-header-hooks' => 'İstatistikê bini',
 'statistics-articles' => 'Pelê tedeesteu',
 'statistics-pages' => 'Peli',
-
-'disambiguationspage' => 'Template:vuriyaisê maney',
 
 'brokenredirects-edit' => 'bıvurne',
 'brokenredirects-delete' => 'bestere',

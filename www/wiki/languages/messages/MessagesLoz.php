@@ -35,7 +35,6 @@ $messages = array(
 'tog-enotifrevealaddr' => 'Kamukile zwa adress di meli di xete peson kwa melina notifikasyona',
 'tog-shownumberswatching' => 'Kamukile tali di kentezi sebelu',
 'tog-fancysig' => "Ro sebu e data (dicon ling'ki auto)",
-'tog-showjumplinks' => 'Nyembulisize "sinkumukezi" ling\'ki',
 'tog-uselivepreview' => 'Sebelize live PendiBe (bulukezi JavaScript) (yem nca)',
 'tog-watchlisthideown' => 'Cwankekile zwa afina di zwa mukoloko di kentezi',
 'tog-watchlisthidebots' => 'Cwankekile roboti di zwa mukoloko di kentezi',
@@ -179,7 +178,7 @@ $messages = array(
 'jumptonavigation' => 'muya',
 'jumptosearch' => 'fatukile',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => "Ngesi ye ng'i atulile {{SITENAME}}",
 'aboutpage' => "Project:Ngesi ye ng'i atulile",
 'copyright' => 'Bye sa ilonungi di $1.',
@@ -264,7 +263,6 @@ Fung'ksyun: $1<br />
 Query: $2",
 'viewsource' => "Kamukile ng'i",
 'viewsourcetext' => 'A sa kamukile wiki-selt di bye petulo:',
-'sqlhidden' => '(SQL query sa cwankekile)',
 
 # Login and logout pages
 'yourname' => 'Sebelu:',
@@ -526,7 +524,6 @@ Informasi: (bye) = petuho a nca selt,
 'recentchangeslinked-feed' => 'Petuho adusi',
 'recentchangeslinked-toolbox' => 'Petuho adusi',
 'recentchangeslinked-title' => 'Petuho dadusi di "$1"',
-'recentchangeslinked-noresult' => "Ni petuhoni kwa ling'ki petulo kwa bye datum.",
 'recentchangeslinked-summary' => "Bye petulo zwenti kamukile lapu-kona petuho di petulo sa ling'ki. Petulo di zwa mukoloko di kentezi sa '''ombelu'''.",
 
 # Upload
@@ -603,8 +600,6 @@ di uplodezi media.',
 # Statistics
 'statistics' => 'Mukoloko di kamukile',
 'statistics-header-users' => 'Mukoloko di kamukile di sebelu',
-
-'disambiguations' => 'Disamebigasina',
 
 'doubleredirects' => 'Petulo abezi sa dužemi',
 

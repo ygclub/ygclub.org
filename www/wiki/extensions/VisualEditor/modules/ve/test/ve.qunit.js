@@ -4,6 +4,9 @@
  * @copyright 2011-2013 VisualEditor Team and others; see AUTHORS.txt
  * @license The MIT License (MIT); see LICENSE.txt
  */
+
+/*global difflib,diffview */
+
 ( function ( QUnit ) {
 
 QUnit.config.requireExpects = true;
@@ -84,9 +87,8 @@ function getNodeSelectionSummary( selection ) {
 }
 
 /**
- * Callback for ve.copyArray/Object to convert nodes to a comparable summary
+ * Callback for ve#copy to convert nodes to a comparable summary.
  *
- * @method
  * @private
  * @param {ve.dm.Node|Object} value Value in the object/array
  * @returns {Object} Node summary if value is a node, otherwise just the value
@@ -95,6 +97,30 @@ function convertNodes( value ) {
 	return value instanceof ve.dm.Node || value instanceof ve.ce.Node ?
 		getNodeTreeSummary( value ) :
 		value;
+}
+
+/**
+ * Undo what QUnit's escapeText does.
+ *
+ * @ignore
+ * @param {string} s
+ * @returns {string}
+ */
+function unescapeText( s ) {
+	return s.replace( /&(#039|quot|lt|gt|amp);/g, function ( match, seq ) {
+		switch ( seq )  {
+		case '#039':
+			return '\'';
+		case 'quot':
+			return '"';
+		case 'lt':
+			return '<';
+		case 'gt':
+			return '>';
+		case 'amp':
+			return '&';
+		}
+	} );
 }
 
 /**
@@ -147,10 +173,12 @@ QUnit.assert.equalNodeSelection = function ( actual, expected, message ) {
  */
 QUnit.assert.equalDomElement = function ( actual, expected, message ) {
 	var actualSummary = ve.getDomElementSummary( actual ),
-		expectedSummary = ve.getDomElementSummary( expected );
+		expectedSummary = ve.getDomElementSummary( expected ),
+		actualSummaryHtml = ve.getDomElementSummary( actual, true ),
+		expectedSummaryHtml = ve.getDomElementSummary( expected, true );
 
 	QUnit.push(
-		QUnit.equiv( actualSummary, expectedSummary ), actualSummary, expectedSummary, message
+		QUnit.equiv( actualSummary, expectedSummary ), actualSummaryHtml, expectedSummaryHtml, message
 	);
 };
 
@@ -161,8 +189,8 @@ QUnit.assert.equalDomElement = function ( actual, expected, message ) {
  */
 QUnit.assert.deepEqualWithDomElements = function ( actual, expected, message ) {
 	// Recursively copy objects or arrays, converting any dom elements found to comparable summaries
-	actual = ve.isArray( actual ) ? ve.copyArray( actual, ve.convertDomElements ) : ve.copyObject( actual, ve.convertDomElements );
-	expected = ve.isArray( expected ) ? ve.copyArray( expected, ve.convertDomElements ) : ve.copyObject( expected, ve.convertDomElements );
+	actual = ve.copy( actual, ve.convertDomElements );
+	expected = ve.copy( expected, ve.convertDomElements );
 
 	QUnit.push( QUnit.equiv(actual, expected), actual, expected, message );
 };
@@ -174,8 +202,8 @@ QUnit.assert.deepEqualWithDomElements = function ( actual, expected, message ) {
  */
 QUnit.assert.deepEqualWithNodeTree = function ( actual, expected, message ) {
 	// Recursively copy objects or arrays, converting any dom elements found to comparable summaries
-	actual = ve.isArray( actual ) ? ve.copyArray( actual, convertNodes ) : ve.copyObject( actual, convertNodes );
-	expected = ve.isArray( expected ) ? ve.copyArray( expected, convertNodes ) : ve.copyObject( expected, convertNodes );
+	actual = ve.copy( actual, convertNodes );
+	expected = ve.copy( expected, convertNodes );
 
 	QUnit.push( QUnit.equiv(actual, expected), actual, expected, message );
 };
@@ -194,6 +222,29 @@ QUnit.assert.equalRange = function ( actual, expected, message ) {
 		to: expected.to
 	};
 	QUnit.push( QUnit.equiv(actual, expected), actual, expected, message );
+};
+
+QUnit.diff = function ( o, n ) {
+	// o and n are partially HTML escaped by QUnit. As difflib does
+	// its own escaping we should unescape them first.
+	var oLines = difflib.stringAsLines( unescapeText( o ) ),
+		nLines = difflib.stringAsLines( unescapeText( n ) ),
+		sm = new difflib.SequenceMatcher( oLines, nLines ),
+		/*jshint camelcase:false */
+		opcodes = sm.get_opcodes(),
+		$div = $( '<div>' );
+
+	$div.append( diffview.buildView( {
+		baseTextLines: oLines,
+		newTextLines: nLines,
+		opcodes: opcodes,
+		baseTextName: 'Expected',
+		newTextName: 'Result',
+		contextSize: 10,
+		viewType: 0
+	} ) );
+
+	return $div.html();
 };
 
 }( QUnit ) );

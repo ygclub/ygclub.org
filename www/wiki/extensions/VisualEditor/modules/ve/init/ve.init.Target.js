@@ -10,32 +10,57 @@
  *
  * @class
  * @abstract
- * @mixins ve.EventEmitter
+ * @mixins OO.EventEmitter
  *
  * @constructor
  * @param {jQuery} $container Conainter to render target into
  */
 ve.init.Target = function VeInitTarget( $container ) {
 	// Mixin constructors
-	ve.EventEmitter.call( this );
+	OO.EventEmitter.call( this );
 
 	// Properties
-	this.$ = $container;
+	this.$element = $container;
 };
 
 /* Inheritance */
 
-ve.mixinClass( ve.init.Target, ve.EventEmitter );
+OO.mixinClass( ve.init.Target, OO.EventEmitter );
 
 /* Static Properties */
 
-ve.init.Target.static.toolbarTools = [
-	{ 'items': ['undo', 'redo'] },
-	{ 'items': ['format'] },
-	{ 'items': ['bold', 'italic', 'link', 'clear'] },
-	{ 'items': ['number', 'bullet', 'outdent', 'indent'] }
+ve.init.Target.static.toolbarGroups = [
+
+	{ 'include': [ 'undo', 'redo' ] },
+	{
+		'type': 'menu',
+		'include': [ { 'group': 'format' } ],
+		'promote': [ 'paragraph' ],
+		'demote': [ 'preformatted', 'heading1' ]
+	},
+	{ 'include': [ 'bold', 'italic', 'link', 'clear' ] },
+	{ 'include': [ 'number', 'bullet', 'outdent', 'indent' ] },
+	{ 'include': '*' }
 ];
 
 ve.init.Target.static.surfaceCommands = [
-	'bold', 'italic', 'link', 'undo', 'redo', 'indent', 'outdent'
+	'undo',
+	'redo',
+	'bold',
+	'italic',
+	'link',
+	'clear',
+	'underline',
+	'subscript',
+	'superscript',
+	'indent',
+	'outdent',
+	'paragraph',
+	'heading1',
+	'heading2',
+	'heading3',
+	'heading4',
+	'heading5',
+	'heading6',
+	'preformatted'
 ];

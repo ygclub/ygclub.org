@@ -158,7 +158,7 @@ $messages = array(
 'jumptosearch' => 'Kruxyo',
 'pool-errorunknown' => 'Fawdo nuxroyo',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '3al {{SITENAME}}',
 'aboutpage' => 'Project: 3al',
 'copyrightpage' => '{{ns:project}}:Ḥaqat duKaṭowo',
@@ -502,7 +502,6 @@ Legend: '''({{int:cur}})''' = difference with latest revision, '''({{int:last}})
 'recentchangeslinked' => 'Şuḥlofe bFaṭoṭe masre',
 'recentchangeslinked-toolbox' => 'Şuḥlofe bFaṭoṭe masre',
 'recentchangeslinked-title' => 'Şuḥlofe bFaṭoṭe dkıtne masre b$1',
-'recentchangeslinked-noresult' => 'No changes on linked pages during the given period.',
 'recentchangeslinked-summary' => "This is a list of changes made recently to pages linked from a specified page (or to members of a specified category).
 Pages on [[Special:Watchlist|your watchlist]] are '''bold'''.",
 'recentchangeslinked-page' => 'Işmo diFaṭo',
@@ -540,8 +539,6 @@ The description on its [$2 file description page] there is shown below.',
 
 # Statistics
 'statistics' => 'Mardonwoṭo',
-
-'disambiguationspage' => 'Template:disambig',
 
 'brokenredirects-edit' => 'mşaḥlaf',
 'brokenredirects-delete' => 'slag',
@@ -849,8 +846,7 @@ Others will be hidden by default.
 'compare-page2' => 'Faṭo 2',
 
 # Database error messages
-'dberr-problems' => 'Şubqono!
-iFaṭaṭe u3do kitla Qaṫre.',
+'dberr-problems' => 'Şubqono! iFaṭaṭe u3do kitla Qaṫre.',
 
 # HTML forms
 'htmlform-submit' => 'Mqayad',

@@ -5,6 +5,9 @@
 		<title>VisualEditor Tests</title>
 
 		<!-- Load test framework -->
+		<link rel="stylesheet" href="../../jsdifflib/diffview.css">
+		<script src="../../jsdifflib/diffview.js"></script>
+		<script src="../../jsdifflib/difflib.js"></script>
 		<link rel="stylesheet" href="../../qunit/qunit.css">
 		<script src="../../qunit/qunit.js"></script>
 
@@ -17,10 +20,14 @@
 			) {
 				document.write(
 					'<link rel="stylesheet" ' +
+						'href="../../oojs-ui/styles/OO.ui.Icons-vector.css">' +
+					'<link rel="stylesheet" ' +
 						'href="../../ve/ui/styles/ve.ui.Icons-vector.css">'
 				);
 			} else {
 				document.write(
+					'<link rel="stylesheet" ' +
+						'href="../../oojs-ui/styles/OO.ui.Icons-raster.css">' +
 					'<link rel="stylesheet" ' +
 						'href="../../ve/ui/styles/ve.ui.Icons-raster.css">'
 				);
@@ -33,7 +40,7 @@
 		<!-- Dependencies -->
 		<script src="../../jquery/jquery.js"></script>
 		<script src="../../jquery/jquery.client.js"></script>
-		<script src="../../oojs/oo.js"></script>
+		<script src="../../oojs/oojs.js"></script>
 		<script src="../../rangy/rangy-core-1.3.js"></script>
 		<script src="../../rangy/rangy-position-1.3.js"></script>
 		<script src="../../unicodejs/unicodejs.js"></script>
@@ -42,9 +49,59 @@
 		<script src="../../unicodejs/unicodejs.graphemebreak.js"></script>
 		<script src="../../unicodejs/unicodejs.wordbreakproperties.js"></script>
 		<script src="../../unicodejs/unicodejs.wordbreak.js"></script>
+		<!-- oojs-ui -->
+		<script src="../../oojs-ui/OO.ui.js"></script>
+		<script src="../../oojs-ui/OO.ui.Element.js"></script>
+		<script src="../../oojs-ui/OO.ui.Frame.js"></script>
+		<script src="../../oojs-ui/OO.ui.Window.js"></script>
+		<script src="../../oojs-ui/OO.ui.WindowSet.js"></script>
+		<script src="../../oojs-ui/OO.ui.Dialog.js"></script>
+		<script src="../../oojs-ui/OO.ui.Layout.js"></script>
+		<script src="../../oojs-ui/OO.ui.Widget.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.ClippableElement.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.FlaggableElement.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.GroupElement.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.IconedElement.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.LabeledElement.js"></script>
+		<script src="../../oojs-ui/elements/OO.ui.PopuppableElement.js"></script>
+		<script src="../../oojs-ui/OO.ui.Tool.js"></script>
+		<script src="../../oojs-ui/OO.ui.Toolbar.js"></script>
+		<script src="../../oojs-ui/OO.ui.ToolFactory.js"></script>
+		<script src="../../oojs-ui/OO.ui.ToolGroup.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.FieldsetLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.GridLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.PagedLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.PagedOutlineLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.PanelLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.PageLayout.js"></script>
+		<script src="../../oojs-ui/layouts/OO.ui.StackPanelLayout.js"></script>
+		<script src="../../oojs-ui/tools/OO.ui.PopupTool.js"></script>
+		<script src="../../oojs-ui/toolgroups/OO.ui.BarToolGroup.js"></script>
+		<script src="../../oojs-ui/toolgroups/OO.ui.PopupToolGroup.js"></script>
+		<script src="../../oojs-ui/toolgroups/OO.ui.ListToolGroup.js"></script>
+		<script src="../../oojs-ui/toolgroups/OO.ui.MenuToolGroup.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.ButtonWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.IconButtonWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.InputWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.InputLabelWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.LookupInputWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.OptionWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.SelectWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.MenuItemWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.MenuWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.MenuSectionItemWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.OutlineWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.OutlineControlsWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.OutlineItemWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.PopupWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.PopupButtonWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.PushButtonWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.SearchWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.TextInputWidget.js"></script>
+		<script src="../../oojs-ui/widgets/OO.ui.TextInputMenuWidget.js"></script>
 		<!-- ext.visualEditor.base#standalone-init -->
 		<script src="../../ve/ve.js"></script>
-		<script src="../../ve/ve.EventEmitter.js"></script>
+		<script src="../../ve/ve.track.js"></script>
 		<script src="../../ve/init/ve.init.js"></script>
 		<script src="../../ve/init/ve.init.Platform.js"></script>
 		<script src="../../ve/init/ve.init.Target.js"></script>
@@ -60,15 +117,12 @@
 			ve.init.platform.setModulesUrl( '../..' );
 		</script>
 		<!-- ext.visualEditor.core -->
-		<script src="../../ve/ve.Registry.js"></script>
-		<script src="../../ve/ve.Factory.js"></script>
 		<script src="../../ve/ve.Range.js"></script>
 		<script src="../../ve/ve.Node.js"></script>
-		<script src="../../ve/ve.NamedClassFactory.js"></script>
 		<script src="../../ve/ve.BranchNode.js"></script>
 		<script src="../../ve/ve.LeafNode.js"></script>
-		<script src="../../ve/ve.Element.js"></script>
 		<script src="../../ve/ve.Document.js"></script>
+		<script src="../../ve/ve.EventSequencer.js"></script>
 		<script src="../../ve/dm/ve.dm.js"></script>
 		<script src="../../ve/dm/ve.dm.Model.js"></script>
 		<script src="../../ve/dm/ve.dm.ModelRegistry.js"></script>
@@ -90,10 +144,11 @@
 		<script src="../../ve/dm/ve.dm.DataString.js"></script>
 		<script src="../../ve/dm/ve.dm.Document.js"></script>
 		<script src="../../ve/dm/ve.dm.LinearData.js"></script>
-		<script src="../../ve/dm/ve.dm.DocumentSlice.js"></script>
 		<script src="../../ve/dm/ve.dm.DocumentSynchronizer.js"></script>
 		<script src="../../ve/dm/ve.dm.IndexValueStore.js"></script>
 		<script src="../../ve/dm/ve.dm.Converter.js"></script>
+		<script src="../../ve/dm/lineardata/ve.dm.SlicedLinearData.js"></script>
+		<script src="../../ve/dm/lineardata/ve.dm.FlatLinearData.js"></script>
 		<script src="../../ve/dm/lineardata/ve.dm.ElementLinearData.js"></script>
 		<script src="../../ve/dm/lineardata/ve.dm.MetaLinearData.js"></script>
 		<script src="../../ve/dm/nodes/ve.dm.GeneratedContentNode.js"></script>
@@ -165,18 +220,13 @@
 		<script src="../../ve/ui/ve.ui.js"></script>
 		<script src="../../ve/ui/ve.ui.Surface.js"></script>
 		<script src="../../ve/ui/ve.ui.Context.js"></script>
-		<script src="../../ve/ui/ve.ui.Frame.js"></script>
-		<script src="../../ve/ui/ve.ui.Window.js"></script>
-		<script src="../../ve/ui/ve.ui.WindowSet.js"></script>
-		<script src="../../ve/ui/ve.ui.Inspector.js"></script>
-		<script src="../../ve/ui/ve.ui.InspectorFactory.js"></script>
 		<script src="../../ve/ui/ve.ui.Dialog.js"></script>
-		<script src="../../ve/ui/ve.ui.DialogFactory.js"></script>
-		<script src="../../ve/ui/ve.ui.Layout.js"></script>
-		<script src="../../ve/ui/ve.ui.Widget.js"></script>
-		<script src="../../ve/ui/ve.ui.Tool.js"></script>
-		<script src="../../ve/ui/ve.ui.ToolFactory.js"></script>
+		<script src="../../ve/ui/ve.ui.Inspector.js"></script>
+		<script src="../../ve/ui/ve.ui.WindowSet.js"></script>
 		<script src="../../ve/ui/ve.ui.Toolbar.js"></script>
+		<script src="../../ve/ui/ve.ui.TargetToolbar.js"></script>
+		<script src="../../ve/ui/ve.ui.ToolFactory.js"></script>
+		<script src="../../ve/ui/ve.ui.Command.js"></script>
 		<script src="../../ve/ui/ve.ui.CommandRegistry.js"></script>
 		<script src="../../ve/ui/ve.ui.Trigger.js"></script>
 		<script src="../../ve/ui/ve.ui.TriggerRegistry.js"></script>
@@ -184,56 +234,38 @@
 		<script src="../../ve/ui/ve.ui.ActionFactory.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.AnnotationAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.ContentAction.js"></script>
+		<script src="../../ve/ui/actions/ve.ui.DialogAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.FormatAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.HistoryAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.IndentationAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.InspectorAction.js"></script>
 		<script src="../../ve/ui/actions/ve.ui.ListAction.js"></script>
-		<script src="../../ve/ui/elements/ve.ui.LabeledElement.js"></script>
-		<script src="../../ve/ui/elements/ve.ui.GroupElement.js"></script>
-		<script src="../../ve/ui/elements/ve.ui.FlaggableElement.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.PopupWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.SelectWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.OptionWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.SearchWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.ButtonWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.IconButtonWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.InputWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.InputLabelWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.TextInputWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.OutlineItemWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.OutlineWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.OutlineControlsWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.MenuItemWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.MenuSectionItemWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.MenuWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.LookupInputWidget.js"></script>
-		<script src="../../ve/ui/widgets/ve.ui.TextInputMenuWidget.js"></script>
+		<script src="../../ve/ui/widgets/ve.ui.SurfaceWidget.js"></script>
 		<script src="../../ve/ui/widgets/ve.ui.LinkTargetInputWidget.js"></script>
-		<script src="../../ve/ui/layouts/ve.ui.FieldsetLayout.js"></script>
-		<script src="../../ve/ui/layouts/ve.ui.GridLayout.js"></script>
-		<script src="../../ve/ui/layouts/ve.ui.PanelLayout.js"></script>
-		<script src="../../ve/ui/layouts/ve.ui.StackPanelLayout.js"></script>
-		<script src="../../ve/ui/dialogs/ve.ui.PagedDialog.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.ButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.AnnotationButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.DialogButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.InspectorButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.IndentationButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.ListButtonTool.js"></script>
-		<script src="../../ve/ui/tools/ve.ui.DropdownTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.BoldButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.ItalicButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.ClearButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.LinkButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.BulletButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.NumberButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.IndentButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.OutdentButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.RedoButtonTool.js"></script>
-		<script src="../../ve/ui/tools/buttons/ve.ui.UndoButtonTool.js"></script>
-		<script src="../../ve/ui/tools/dropdowns/ve.ui.FormatDropdownTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.AnnotationTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.ClearAnnotationTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.DialogTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.FormatTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.HistoryTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.IndentationTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.InspectorTool.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.ListTool.js"></script>
+		<script src="../../ve/ui/inspectors/ve.ui.AnnotationInspector.js"></script>
 		<script src="../../ve/ui/inspectors/ve.ui.LinkInspector.js"></script>
+		<!-- jquery.uls.data -->
+		<script src="../../jquery.uls/src/jquery.uls.data.js"></script>
+		<script src="../../jquery.uls/src/jquery.uls.data.utils.js"></script>
+		<!-- jquery.uls -->
+		<script src="../../jquery.uls/src/jquery.uls.core.js"></script>
+		<script src="../../jquery.uls/src/jquery.uls.lcd.js"></script>
+		<script src="../../jquery.uls/src/jquery.uls.languagefilter.js"></script>
+		<script src="../../jquery.uls/src/jquery.uls.regionfilter.js"></script>
+		<!-- ext.visualEditor.language -->
+		<script src="../../ve/dm/annotations/ve.dm.LanguageAnnotation.js"></script>
+		<script src="../../ve/ce/annotations/ve.ce.LanguageAnnotation.js"></script>
+		<script src="../../ve/ui/inspectors/ve.ui.LanguageInspector.js"></script>
+		<script src="../../ve/ui/tools/ve.ui.LanguageInspectorTool.js"></script>
+		<script src="../../ve/ui/widgets/ve.ui.LanguageInputWidget.js"></script>
 
 		<!-- Load plugins for test framework -->
 		<script src="ve.qunit.js"></script>
@@ -243,11 +275,9 @@
 		<script src="ve.test.js"></script>
 		<script src="ve.Range.test.js"></script>
 		<script src="ve.Document.test.js"></script>
-		<script src="ve.Element.test.js"></script>
 		<script src="ve.Node.test.js"></script>
 		<script src="ve.BranchNode.test.js"></script>
 		<script src="ve.LeafNode.test.js"></script>
-		<script src="ve.Factory.test.js"></script>
 		<script src="dm/ve.dm.example.js"></script>
 		<script src="dm/ve.dm.AnnotationSet.test.js"></script>
 		<script src="dm/ve.dm.NodeFactory.test.js"></script>
@@ -272,6 +302,7 @@
 		<script src="dm/lineardata/ve.dm.MetaLinearData.test.js"></script>
 		<script src="ce/ve.ce.test.js"></script>
 		<script src="ce/ve.ce.Document.test.js"></script>
+		<script src="ce/ve.ce.Surface.test.js"></script>
 		<script src="ce/ve.ce.NodeFactory.test.js"></script>
 		<script src="ce/ve.ce.Node.test.js"></script>
 		<script src="ce/ve.ce.BranchNode.test.js"></script>

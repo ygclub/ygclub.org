@@ -20,6 +20,8 @@
 				"name": "General",
 				"classes": [
 					"mw.Title",
+					"mw.inspect",
+					"mw.inspect.reports",
 					"mw.notification",
 					"mw.user",
 					"mw.util",

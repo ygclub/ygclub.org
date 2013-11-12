@@ -72,7 +72,7 @@ class SpecialRecentchangeslinked extends SpecialRecentChanges {
 		$outputPage = $this->getOutput();
 		$title = Title::newFromURL( $target );
 		if ( !$title || $title->getInterwiki() != '' ) {
-			$outputPage->wrapWikiMsg( "<div class=\"errorbox\">\n$1\n</div><br style=\"clear: both\" />", 'allpagesbadtitle' );
+			$outputPage->wrapWikiMsg( "<div class=\"errorbox\">\n$1\n</div>", 'allpagesbadtitle' );
 			return false;
 		}
 
@@ -99,7 +99,7 @@ class SpecialRecentchangeslinked extends SpecialRecentChanges {
 
 		// left join with watchlist table to highlight watched rows
 		$uid = $this->getUser()->getId();
-		if ( $uid ) {
+		if ( $uid && $this->getUser()->isAllowed( 'viewmywatchlist' ) ) {
 			$tables[] = 'watchlist';
 			$select[] = 'wl_user';
 			$join_conds['watchlist'] = array( 'LEFT JOIN', array(
@@ -263,12 +263,6 @@ class SpecialRecentchangeslinked extends SpecialRecentChanges {
 		$target = $this->getTargetTitle();
 		if ( $target ) {
 			$this->getOutput()->addBacklinkSubtitle( $target );
-		}
-	}
-
-	function setBottomText( FormOptions $opts ) {
-		if ( isset( $this->mResultEmpty ) && $this->mResultEmpty ) {
-			$this->getOutput()->addWikiMsg( 'recentchangeslinked-noresult' );
 		}
 	}
 }

@@ -156,7 +156,6 @@ $messages = array(
 'tog-shownumberswatching' => 'دمبالکرونِ سِراق هدائن',
 'tog-oldsig' => 'پیش نیمایش ایمضای موجود:',
 'tog-fancysig' => 'ایمضا ره ویکی متن نظر بیرین (بدون لینک هایتن)',
-'tog-showjumplinks' => 'فعال هکردن بپرسنی پیوندون مندرجات فهرست دله',
 'tog-uselivepreview' => 'ایستیفاده از پیش نیمایش زنده (جاوا اسکریپ) (جدیده)',
 'tog-forceeditsummary' => 'زمونی که خولاصه دچی‌ین ره ننویشتمه مه ره بائو',
 'tog-watchlisthideown' => 'دپوشنی‌ین کارای من پیگریای ِفهرست دله',
@@ -327,7 +326,7 @@ $messages = array(
 'articlepage' => 'نمایش صفحه',
 'talk' => 'گپ',
 'views' => 'هارشی‌ئون',
-'toolbox' => 'أبـزار جـا',
+'toolbox' => 'اَبزارِ جا',
 'userpage' => 'کارور صفحه ره سِراق هدائن',
 'projectpage' => 'بدی‌ین پروژه‌ی ِصفحه',
 'imagepage' => 'بدی‌ین ِعکس ِصفحه',
@@ -349,7 +348,7 @@ $2، $1',
 'pool-queuefull' => 'مخزن ِصف پر بیّه',
 'pool-errorunknown' => 'خطای ناشناخته',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => '{{SITENAME}} درباره',
 'aboutpage' => 'Project:درباره',
 'copyright' => 'این صفحه ره بَنوشته‌ئون  $1  زیر شِمه دسـت دَرنه.',
@@ -436,19 +435,6 @@ $2، $1',
 # General errors
 'error' => 'خِطا',
 'databaseerror' => 'خطای داده‌ئون پایگا',
-'dberrortext' => 'اشکال نحوی بخاستن دله برسنی‌یه بیّه به پایگاه داده.
-دلیل این مشکل بتونده ایرادی نرم‌افزار دله بائه.
-آخرین بخاسته‌یی که پایگاه وسّه برسنی‌بیَ‌بی‌یه اینتا بی‌یه:
-<blockquote style="direction:ltr;"><tt>$1</tt></blockquote>
-این بخاسته درون عملگر «<span class="ltr"><tt>$2</tt></span>» جه برسنی بیّه.
-پایگاه داده این خطا ره بردگاردنی‌یه:
-<div class="ltr"><tt>$3: $4</tt></div>',
-'dberrortextcl' => 'اشکال نحوی در درخواست فرستاده شده به پایگاه داده رخ داد.
-آخرین درخواست که برای پایگاه داده فرستاد شد این بود:
-<div class="ltr">$1</div>
-این درخواست از درون عملگر «<span class="ltr">$2</span>» فرستاده شد.
-پایگاه داده این خطا را بازگرداند:
-<div class="ltr">$3: $4</div>',
 'laggedslavemode' => "'''هشدار:''' صفحه ممکن هسته که جدید ِبه‌روزرسانی‌ئون ره شامل نواشه.",
 'readonly' => 'پایگاه داده زلفن بزه‎بیّه',
 'enterlockreason' => 'دلیلی زلفین بزوئن وسّه بارین، که حاوی تقریبی از زمونی بائه که زلفین بَیته وانه',
@@ -498,14 +484,12 @@ $2، $1',
 'viewsourcetext' => 'بتونّی متن مبدأ این صفحه ره هارشین یا ونجه نسخه بَیرین:',
 'viewyourtext' => "بتونّی '''شه بنویشته چیون''' مبدأ ره این صفحه دله هارشین و کپی هاکنین:",
 'protectedinterface' => 'این صفحه ارائه‌دهندهٔ متنی واسط کارور این نرم‌افزار هسته و به منظور پیشگیری از خرابکاری زلفین بزه‌بیّه.',
-'sqlhidden' => '(دستور اس‌کیوال دپوشنی‌یه بیّه)',
 
 # Login and logout pages
 'yourname' => 'شمه کاروری‌نوم:',
 'yourpassword' => 'شمه پسورد',
 'yourpasswordagain' => 'پسورد ره دِباره بنویس',
 'remembermypassword' => 'مه رمز ره (تا حداکثر $1 {{PLURAL:$1|روز|روز}}) این مرورگر سر یاد نکان',
-'securelogin-stick-https' => 'HTTPS دله بموئن په، متصل بموند',
 'yourdomainname' => 'شمه کاروری نوم',
 'login' => 'دله بوردن',
 'nav-login-createaccount' => 'دله بوردن / عضو بیّن',
@@ -685,6 +669,7 @@ $2، $1',
 'mypreferences' => 'مه خاستنی‌ئون',
 'prefs-edits' => 'تعداد دچی‌یه‌ئون:',
 'prefsnologin' => 'سیستم دله نمویی',
+'prefs-rc' => 'تازه دگاردسته‌ئون',
 'youremail' => 'شه مه Email:',
 'username' => 'کاروری نوم:',
 'uid' => 'کاروری إشماره:',
@@ -787,8 +772,6 @@ $2، $1',
 # Statistics
 'statistics' => 'آمار',
 
-'disambiguations' => 'گجگجی‌بَیری صفحه‌ئون',
-
 # Miscellaneous special pages
 'nbytes' => '$1 {{PLURAL:$1|بایت|بایت}}',
 'specialpage-empty' => 'این صفحه دله هچّی دَنی‌یه',
@@ -846,7 +829,6 @@ $2، $1',
 'watchthispage' => 'این صفحه ره دِمبال هاکارد‌ن',
 'unwatch' => 'ده‌مـبـال نـه‌کـارده‌ن',
 'unwatchthispage' => 'دیگه این صفحه ره دمبال نکاردن',
-'watchnochange' => 'هیچ‌کادوم از چیزایی که شِما دمبال کانـّی چن وقته عوض نینه.',
 'watchlist-details' => 'بدون حیساب گپ ولگ‌ئون، {{PLURAL:$1|$1 صفحه|$1 صفحه}} شمه دمبال‌هاکردنی‌ئون میون قرار {{PLURAL:$1|دارنه|دانه}}.',
 'wlheader-enotif' => '*تونی ایمیل جه مطلع بواشین.',
 'wlheader-showupdated' => "*صفحه‌ئونی که بعد از آخرین سربزوئنتون عوض بینه '''پر رنگ''' نشون هدائه بیّه.",

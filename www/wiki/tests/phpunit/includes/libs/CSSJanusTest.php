@@ -137,10 +137,15 @@ class CSSJanusTest extends MediaWikiTestCase {
 				'.foo { padding: 1px inherit 3px auto; }',
 				'.foo { padding: 1px auto 3px inherit; }'
 			),
+			// border-radius assigns different meanings to the values
 			array(
 				'.foo { border-radius: .25em 15px 0pt 0ex; }',
-				'.foo { border-radius: .25em 0ex 0pt 15px; }'
+				'.foo { border-radius: 15px .25em 0ex 0pt; }'
 			),
+			array(
+				'.foo { border-radius: 0px 0px 5px 5px; }',
+			),
+			// Ensure the rule doesn't break other stuff
 			array(
 				'.foo { x-unknown: a b c d; }'
 			),
@@ -149,6 +154,21 @@ class CSSJanusTest extends MediaWikiTestCase {
 			),
 			array(
 				'#settings td p strong'
+			),
+			array(
+				// Color names
+				'.foo { border-color: red green blue white }',
+				'.foo { border-color: red white blue green }',
+			),
+			array(
+				// Color name, hexdecimal, RGB & RGBA
+				'.foo { border-color: red #f00 rgb(255, 0, 0) rgba(255, 0, 0, 0.5) }',
+				'.foo { border-color: red rgba(255, 0, 0, 0.5) rgb(255, 0, 0) #f00 }',
+			),
+			array(
+				// Color name, hexdecimal, HSL & HSLA
+				'.foo { border-color: red #f00 hsl(0, 100%, 50%) hsla(0, 100%, 50%, 0.5) }',
+				'.foo { border-color: red hsla(0, 100%, 50%, 0.5) hsl(0, 100%, 50%) #f00 }',
 			),
 			array(
 				// Do not mangle 5 or more values
@@ -174,6 +194,28 @@ class CSSJanusTest extends MediaWikiTestCase {
 			// Shorthand / One notation
 			array(
 				'.foo { padding: 1px; }'
+			),
+
+			// text-shadow and box-shadow
+			array(
+				'.foo { box-shadow: -6px 3px 8px 5px rgba(0, 0, 0, 0.25); }',
+				'.foo { box-shadow: 6px 3px 8px 5px rgba(0, 0, 0, 0.25); }',
+			),
+			array(
+				'.foo { box-shadow: inset -6px 3px 8px 5px rgba(0, 0, 0, 0.25); }',
+				'.foo { box-shadow: inset 6px 3px 8px 5px rgba(0, 0, 0, 0.25); }',
+			),
+			array(
+				'.foo { text-shadow: orange 2px 0; }',
+				'.foo { text-shadow: orange -2px 0; }',
+			),
+			array(
+				'.foo { text-shadow: 2px 0 orange; }',
+				'.foo { text-shadow: -2px 0 orange; }',
+			),
+			array(
+				// Don't mangle zeroes
+				'.foo { text-shadow: orange 0 2px; }'
 			),
 
 			// Direction
@@ -372,6 +414,11 @@ class CSSJanusTest extends MediaWikiTestCase {
 				// before multiple rules
 				'/* @noflip */ div { float: left; } .foo { float: left; }',
 				'/* @noflip */ div { float: left; } .foo { float: right; }'
+			),
+			array(
+				// support parentheses in selector
+				'/* @noflip */ .test:not(:first) { margin-right: -0.25em; margin-left: 0.25em; }',
+				'/* @noflip */ .test:not(:first) { margin-right: -0.25em; margin-left: 0.25em; }'
 			),
 			array(
 				// after multiple rules

@@ -80,7 +80,6 @@ $messages = array(
 'tog-shownumberswatching' => 'Soim hamas yusa i lukautim pes',
 'tog-oldsig' => 'Olsem wanem yu raitim nem nau',
 'tog-fancysig' => 'Dispela rot yu raitim long nem stap wikitext (i no gat otomatik link)',
-'tog-showjumplinks' => ' Setap ol "Go stret long" links bilong helpim',
 'tog-uselivepreview' => 'Soim ol senis kwiktaim taim mi wokim (i nidim Javascript)',
 'tog-forceeditsummary' => 'Tokim mi long wanem taim raitim mi nating long liklik toksave bilong senis',
 'tog-watchlisthideown' => 'Haitim ol senis mi wokim long lukautbuk bilong mi',
@@ -234,7 +233,7 @@ $messages = array(
 'jumptonavigation' => 'ol bikpela pes',
 'jumptosearch' => 'painim',
 
-# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
+# All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage).
 'aboutsite' => 'Long {{SITENAME}}',
 'aboutpage' => 'Project:Long',
 'copyrightpage' => '{{ns:project}}:Ol laisens',

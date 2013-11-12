@@ -22,7 +22,7 @@ ve.dm.LinkAnnotation = function VeDmLinkAnnotation( element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.LinkAnnotation, ve.dm.Annotation );
+OO.inheritClass( ve.dm.LinkAnnotation, ve.dm.Annotation );
 
 /* Static Properties */
 
@@ -30,7 +30,7 @@ ve.dm.LinkAnnotation.static.name = 'link';
 
 ve.dm.LinkAnnotation.static.matchTagNames = ['a'];
 
-ve.dm.LinkAnnotation.static.applyToAppendedContent = false;
+ve.dm.LinkAnnotation.static.splitOnWordbreak = true;
 
 ve.dm.LinkAnnotation.static.toDataElement = function ( domElements ) {
 	return {
@@ -43,12 +43,39 @@ ve.dm.LinkAnnotation.static.toDataElement = function ( domElements ) {
 
 ve.dm.LinkAnnotation.static.toDomElements = function ( dataElement, doc ) {
 	var domElement = doc.createElement( 'a' );
-	domElement.setAttribute( 'href', dataElement.attributes.href );
+	domElement.setAttribute( 'href', this.getHref( dataElement ) );
 	return [ domElement ];
+};
+
+/**
+ * Get the link href from linear data. Helper function for toDomElements.
+ *
+ * Subclasses can override this if they provide complex href computation.
+ *
+ * @static
+ * @method
+ * @inheritable
+ * @param {Object} dataElement Linear model element
+ * @returns {string} Link href
+ */
+ve.dm.LinkAnnotation.static.getHref = function ( dataElement ) {
+	return dataElement.attributes.href;
 };
 
 /* Methods */
 
+/**
+ * Convenience wrapper for .getHref() on the current element.
+ * @see #static-getHref
+ * @returns {string} Link href
+ */
+ve.dm.LinkAnnotation.prototype.getHref = function () {
+	return this.constructor.static.getHref( this.element );
+};
+
+/**
+ * @returns {Object}
+ */
 ve.dm.LinkAnnotation.prototype.getComparableObject = function () {
 	return {
 		'type': this.getType(),

@@ -29,6 +29,10 @@
  */
 class ApiCreateAccount extends ApiBase {
 	public function execute() {
+		// If we're in JSON callback mode, no tokens can be obtained
+		if ( !is_null( $this->getMain()->getRequest()->getVal( 'callback' ) ) ) {
+			$this->dieUsage( 'Cannot create account when using a callback', 'aborted' );
+		}
 
 		// $loginForm->addNewaccountInternal will throw exceptions
 		// if wiki is read only (already handled by api), user is blocked or does not have rights.
@@ -128,17 +132,7 @@ class ApiCreateAccount extends ApiBase {
 			$result['result'] = 'needtoken';
 		} elseif ( !$status->isOK() ) {
 			// There was an error. Die now.
-			// Cannot use dieUsageMsg() directly because extensions
-			// might return custom error messages.
-			$errors = $status->getErrorsArray();
-			if ( $errors[0] instanceof Message ) {
-				$code = 'aborted';
-				$desc = $errors[0];
-			} else {
-				$code = array_shift( $errors[0] );
-				$desc = wfMessage( $code, $errors[0] );
-			}
-			$this->dieUsage( $desc, $code );
+			$this->dieStatus( $status );
 		} elseif ( !$status->isGood() ) {
 			// Status is not good, but OK. This means warnings.
 			$result['result'] = 'warning';
@@ -260,7 +254,7 @@ class ApiCreateAccount extends ApiBase {
 		$errors = parent::getPossibleErrors();
 		// All local errors are from LoginForm, which means they're actually message keys.
 		foreach ( $localErrors as $error ) {
-			$errors[] = array( 'code' => $error, 'info' => wfMessage( $error )->parse() );
+			$errors[] = array( 'code' => $error, 'info' => wfMessage( $error )->inLanguage( 'en' )->useDatabase( false )->parse() );
 		}
 
 		$errors[] = array(
@@ -284,7 +278,7 @@ class ApiCreateAccount extends ApiBase {
 		global $wgMinimalPasswordLength;
 		$errors[] = array(
 			'code' => 'passwordtooshort',
-			'info' => wfMessage( 'passwordtooshort', $wgMinimalPasswordLength )->parse()
+			'info' => wfMessage( 'passwordtooshort', $wgMinimalPasswordLength )->inLanguage( 'en' )->useDatabase( false )->parse()
 		);
 		return $errors;
 	}

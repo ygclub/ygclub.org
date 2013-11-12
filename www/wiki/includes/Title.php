@@ -492,6 +492,108 @@ class Title {
 	}
 
 	/**
+	 * Utility method for converting a character sequence from bytes to Unicode.
+	 *
+	 * Primary usecase being converting $wgLegalTitleChars to a sequence usable in
+	 * javascript, as PHP uses UTF-8 bytes where javascript uses Unicode code units.
+	 *
+	 * @param string $byteClass
+	 * @return string
+	 */
+	public static function convertByteClassToUnicodeClass( $byteClass ) {
+		$length = strlen( $byteClass );
+		// Input token queue
+		$x0 = $x1 = $x2 = '';
+		// Decoded queue
+		$d0 = $d1 = $d2 = '';
+		// Decoded integer codepoints
+		$ord0 = $ord1 = $ord2 = 0;
+		// Re-encoded queue
+		$r0 = $r1 = $r2 = '';
+		// Output
+		$out = '';
+		// Flags
+		$allowUnicode = false;
+		for ( $pos = 0; $pos < $length; $pos++ ) {
+			// Shift the queues down
+			$x2 = $x1;
+			$x1 = $x0;
+			$d2 = $d1;
+			$d1 = $d0;
+			$ord2 = $ord1;
+			$ord1 = $ord0;
+			$r2 = $r1;
+			$r1 = $r0;
+			// Load the current input token and decoded values
+			$inChar = $byteClass[$pos];
+			if ( $inChar == '\\' ) {
+				if ( preg_match( '/x([0-9a-fA-F]{2})/A', $byteClass, $m, 0, $pos + 1 ) ) {
+					$x0 = $inChar . $m[0];
+					$d0 = chr( hexdec( $m[1] ) );
+					$pos += strlen( $m[0] );
+				} elseif ( preg_match( '/[0-7]{3}/A', $byteClass, $m, 0, $pos + 1 ) ) {
+					$x0 = $inChar . $m[0];
+					$d0 = chr( octdec( $m[0] ) );
+					$pos += strlen( $m[0] );
+				} elseif ( $pos + 1 >= $length ) {
+					$x0 = $d0 = '\\';
+				} else {
+					$d0 = $byteClass[$pos + 1];
+					$x0 = $inChar . $d0;
+					$pos += 1;
+				}
+			} else {
+				$x0 = $d0 = $inChar;
+			}
+			$ord0 = ord( $d0 );
+			// Load the current re-encoded value
+			if ( $ord0 < 32 || $ord0 == 0x7f ) {
+				$r0 = sprintf( '\x%02x', $ord0 );
+			} elseif ( $ord0 >= 0x80 ) {
+				// Allow unicode if a single high-bit character appears
+				$r0 = sprintf( '\x%02x', $ord0 );
+				$allowUnicode = true;
+			} elseif ( strpos( '-\\[]^', $d0 ) !== false ) {
+				$r0 = '\\' . $d0;
+			} else {
+				$r0 = $d0;
+			}
+			// Do the output
+			if ( $x0 !== '' && $x1 === '-' && $x2 !== '' ) {
+				// Range
+				if ( $ord2 > $ord0 ) {
+					// Empty range
+				} elseif ( $ord0 >= 0x80 ) {
+					// Unicode range
+					$allowUnicode = true;
+					if ( $ord2 < 0x80 ) {
+						// Keep the non-unicode section of the range
+						$out .= "$r2-\\x7F";
+					}
+				} else {
+					// Normal range
+					$out .= "$r2-$r0";
+				}
+				// Reset state to the initial value
+				$x0 = $x1 = $d0 = $d1 = $r0 = $r1 = '';
+			} elseif ( $ord2 < 0x80 ) {
+				// ASCII character
+				$out .= $r2;
+			}
+		}
+		if ( $ord1 < 0x80 ) {
+			$out .= $r1;
+		}
+		if ( $ord0 < 0x80 ) {
+			$out .= $r0;
+		}
+		if ( $allowUnicode ) {
+			$out .= '\u0080-\uFFFF';
+		}
+		return $out;
+	}
+
+	/**
 	 * Get a string representation of a title suitable for
 	 * including in a search index
 	 *
@@ -1441,7 +1543,7 @@ class Title {
 				$url = str_replace( '$1', $dbkey, $wgArticlePath );
 				wfRunHooks( 'GetLocalURL::Article', array( &$this, &$url ) );
 			} else {
-				global $wgVariantArticlePath, $wgActionPaths;
+				global $wgVariantArticlePath, $wgActionPaths, $wgContLang;
 				$url = false;
 				$matches = array();
 
@@ -1463,6 +1565,7 @@ class Title {
 
 				if ( $url === false &&
 					$wgVariantArticlePath &&
+					$wgContLang->getCode() === $this->getPageLanguage()->getCode() &&
 					$this->getPageLanguage()->hasVariants() &&
 					preg_match( '/^variant=([^&]*)$/', $query, $matches ) )
 				{
@@ -1925,18 +2028,21 @@ class Title {
 	 */
 	private function checkPageRestrictions( $action, $user, $errors, $doExpensiveQueries, $short ) {
 		foreach ( $this->getRestrictions( $action ) as $right ) {
-			// Backwards compatibility, rewrite sysop -> protect
+			// Backwards compatibility, rewrite sysop -> editprotected
 			if ( $right == 'sysop' ) {
-				$right = 'protect';
+				$right = 'editprotected';
 			}
-			if ( $right != '' && !$user->isAllowed( $right ) ) {
-				// Users with 'editprotected' permission can edit protected pages
-				// without cascading option turned on.
-				if ( $action != 'edit' || !$user->isAllowed( 'editprotected' )
-					|| $this->mCascadeRestriction )
-				{
-					$errors[] = array( 'protectedpagetext', $right );
-				}
+			// Backwards compatibility, rewrite autoconfirmed -> editsemiprotected
+			if ( $right == 'autoconfirmed' ) {
+				$right = 'editsemiprotected';
+			}
+			if ( $right == '' ) {
+				continue;
+			}
+			if ( !$user->isAllowed( $right ) ) {
+				$errors[] = array( 'protectedpagetext', $right );
+			} elseif ( $this->mCascadeRestriction && !$user->isAllowed( 'protect' ) ) {
+				$errors[] = array( 'protectedpagetext', 'protect' );
 			}
 		}
 
@@ -1968,8 +2074,15 @@ class Title {
 			# This is only for protection restrictions, not for all actions
 			if ( isset( $restrictions[$action] ) ) {
 				foreach ( $restrictions[$action] as $right ) {
-					$right = ( $right == 'sysop' ) ? 'protect' : $right;
-					if ( $right != '' && !$user->isAllowed( $right ) ) {
+					// Backwards compatibility, rewrite sysop -> editprotected
+					if ( $right == 'sysop' ) {
+						$right = 'editprotected';
+					}
+					// Backwards compatibility, rewrite autoconfirmed -> editsemiprotected
+					if ( $right == 'autoconfirmed' ) {
+						$right = 'editsemiprotected';
+					}
+					if ( $right != '' && !$user->isAllowedAll( 'protect', $right ) ) {
 						$pages = '';
 						foreach ( $cascadingSources as $page ) {
 							$pages .= '* [[:' . $page->getPrefixedText() . "]]\n";
@@ -2006,7 +2119,10 @@ class Title {
 			$title_protection = $this->getTitleProtection();
 			if ( $title_protection ) {
 				if ( $title_protection['pt_create_perm'] == 'sysop' ) {
-					$title_protection['pt_create_perm'] = 'protect'; // B/C
+					$title_protection['pt_create_perm'] = 'editprotected'; // B/C
+				}
+				if ( $title_protection['pt_create_perm'] == 'autoconfirmed' ) {
+					$title_protection['pt_create_perm'] = 'editsemiprotected'; // B/C
 				}
 				if ( $title_protection['pt_create_perm'] == '' ||
 					!$user->isAllowed( $title_protection['pt_create_perm'] ) )
@@ -2086,34 +2202,10 @@ class Title {
 	 * @return Array list of errors
 	 */
 	private function checkReadPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
-		global $wgWhitelistRead, $wgWhitelistReadRegexp, $wgRevokePermissions;
-		static $useShortcut = null;
-
-		# Initialize the $useShortcut boolean, to determine if we can skip quite a bit of code below
-		if ( is_null( $useShortcut ) ) {
-			$useShortcut = true;
-			if ( !User::groupHasPermission( '*', 'read' ) ) {
-				# Not a public wiki, so no shortcut
-				$useShortcut = false;
-			} elseif ( !empty( $wgRevokePermissions ) ) {
-				/**
-				 * Iterate through each group with permissions being revoked (key not included since we don't care
-				 * what the group name is), then check if the read permission is being revoked. If it is, then
-				 * we don't use the shortcut below since the user might not be able to read, even though anon
-				 * reading is allowed.
-				 */
-				foreach ( $wgRevokePermissions as $perms ) {
-					if ( !empty( $perms['read'] ) ) {
-						# We might be removing the read right from the user, so no shortcut
-						$useShortcut = false;
-						break;
-					}
-				}
-			}
-		}
+		global $wgWhitelistRead, $wgWhitelistReadRegexp;
 
 		$whitelisted = false;
-		if ( $useShortcut ) {
+		if ( User::isEveryoneAllowed( 'read' ) ) {
 			# Shortcut for public wikis, allows skipping quite a bit of code
 			$whitelisted = true;
 		} elseif ( $user->isAllowed( 'read' ) ) {
@@ -2376,7 +2468,9 @@ class Title {
 			$restrictions = $this->getRestrictions( $action );
 			if ( count( $restrictions ) > 0 ) {
 				foreach ( $restrictions as $restriction ) {
-					if ( strtolower( $restriction ) != 'autoconfirmed' ) {
+					if ( strtolower( $restriction ) != 'editsemiprotected' &&
+						strtolower( $restriction ) != 'autoconfirmed' // BC
+					) {
 						return false;
 					}
 				}
@@ -3071,7 +3165,7 @@ class Title {
 			return false;
 		}
 
-		if ( false !== strpos( $dbkey, UTF8_REPLACEMENT ) ) {
+		if ( strpos( $dbkey, UTF8_REPLACEMENT ) !== false ) {
 			# Contained illegal UTF-8 sequences or forbidden Unicode chars.
 			return false;
 		}
@@ -3208,6 +3302,7 @@ class Title {
 
 		# Can't make a link to a namespace alone... "empty" local links can only be
 		# self-links with a fragment identifier.
+		# TODO: Why do we exclude NS_MAIN (bug 54044)
 		if ( $dbkey == '' && $this->mInterwiki == '' && $this->mNamespace != NS_MAIN ) {
 			return false;
 		}
@@ -3548,7 +3643,13 @@ class Title {
 			}
 		} else {
 			$tp = $nt->getTitleProtection();
-			$right = ( $tp['pt_create_perm'] == 'sysop' ) ? 'protect' : $tp['pt_create_perm'];
+			$right = $tp['pt_create_perm'];
+			if ( $right == 'sysop' ) {
+				$right = 'editprotected'; // B/C
+			}
+			if ( $right == 'autoconfirmed' ) {
+				$right = 'editsemiprotected'; // B/C
+			}
 			if ( $tp and !$wgUser->isAllowed( $right ) ) {
 				$errors[] = array( 'cantmove-titleprotected' );
 			}
@@ -3621,6 +3722,8 @@ class Title {
 		if ( $auth && !$wgUser->isAllowed( 'suppressredirect' ) ) {
 			$createRedirect = true;
 		}
+
+		wfRunHooks( 'TitleMove', array( $this, $nt, $wgUser ) );
 
 		// If it is a file, move it first.
 		// It is done before all other moving stuff is done because it's hard to revert.
@@ -3696,7 +3799,7 @@ class Title {
 				$comment .= wfMessage( 'colon-separator' )->inContentLanguage()->text() . $reason;
 			}
 			// @todo FIXME: $params?
-			$log->addEntry( 'move_prot', $nt, $comment, array( $this->getPrefixedText() ) );
+			$log->addEntry( 'move_prot', $nt, $comment, array( $this->getPrefixedText() ), $wgUser );
 		}
 
 		# Update watchlists
@@ -3738,7 +3841,8 @@ class Title {
 
 		if ( $createRedirect ) {
 			$contentHandler = ContentHandler::getForTitle( $this );
-			$redirectContent = $contentHandler->makeRedirectContent( $nt );
+			$redirectContent = $contentHandler->makeRedirectContent( $nt,
+				wfMessage( 'move-redirect-text' )->inContentLanguage()->plain() );
 
 			// NOTE: If this page's content model does not support redirects, $redirectContent will be null.
 		} else {
@@ -4531,7 +4635,7 @@ class Title {
 		if ( array_key_exists( $uid, $this->mNotificationTimestamp ) ) {
 			return $this->mNotificationTimestamp[$uid];
 		}
-		if ( !$uid || !$wgShowUpdatedMarker ) {
+		if ( !$uid || !$wgShowUpdatedMarker || !$user->isAllowed( 'viewmywatchlist' ) ) {
 			return $this->mNotificationTimestamp[$uid] = false;
 		}
 		// Don't cache too much!
@@ -4754,9 +4858,10 @@ class Title {
 	 * they will already be wrapped in paragraphs.
 	 *
 	 * @since 1.21
+	 * @param int oldid Revision ID that's being edited
 	 * @return Array
 	 */
-	public function getEditNotices() {
+	public function getEditNotices( $oldid = 0 ) {
 		$notices = array();
 
 		# Optional notices on a per-namespace and per-page basis
@@ -4783,6 +4888,8 @@ class Title {
 				$notices[$editnoticeText] = $editnoticeMsg->parseAsBlock();
 			}
 		}
+
+		wfRunHooks( 'TitleGetEditNotices', array( $this, $oldid, &$notices ) );
 		return $notices;
 	}
 }

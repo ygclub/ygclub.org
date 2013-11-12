@@ -71,7 +71,6 @@ class RebuildTextIndex extends Maintenance {
 		$wgTitle = Title::newFromText( "Rebuild text index script" );
 
 		if ( $this->db->getType() == 'mysql' ) {
-			$this->truncateMysqlTextIndex();
 			$this->dropMysqlTextIndex();
 			$this->populateSearchIndex();
 			$this->createMysqlTextIndex();
@@ -125,18 +124,6 @@ class RebuildTextIndex extends Maintenance {
 				}
 			}
 			$n += self::RTI_CHUNK_SIZE;
-		}
-	}
-
-	/**
-	 * (MySQL only) TRUNCATE table before rebuild.
-	 */
-	private function truncateMysqlTextIndex() {
-		$searchindex = $this->db->tableName( 'searchindex' );
-		if ( $this->db->indexExists( 'searchindex', 'si_title', __METHOD__ ) ) {
-			$this->output( "Truncate index...\n" );
-			$sql = "TRUNCATE TABLE $searchindex";
-			$this->db->query( $sql, __METHOD__ );
 		}
 	}
 

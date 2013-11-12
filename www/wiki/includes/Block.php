@@ -809,7 +809,7 @@ class Block {
 	}
 
 	/**
-	 * Get the IP address at the start of the range in Hex form
+	 * Get the IP address at the end of the range in Hex form
 	 * @throws MWException
 	 * @return String IP in Hex form
 	 */
@@ -1092,7 +1092,7 @@ class Block {
 	 * @param Bool $isAnon Exclude anonymous-only blocks if false
 	 * @param Bool $fromMaster Whether to query the master or slave database
 	 * @return Array of Blocks
-	 * @since 1.21
+	 * @since 1.22
 	 */
 	public static function getBlocksForIPList( array $ipChain, $isAnon, $fromMaster = false ) {
 		if ( !count( $ipChain ) ) {
