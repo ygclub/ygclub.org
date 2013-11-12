@@ -57,7 +57,7 @@
 					d = d.toFixed( 2 );
 				}
 			}
-			return mw.msg( msg, d );
+			return mw.msg( msg, mw.language.convertNumber( d ) );
 		},
 		getPages: function( location, range ) {
 			var d = $.Deferred(), self = this;
@@ -101,7 +101,7 @@
 						page.pageimageClass = 'needsPhoto';
 					}
 					page.anchor = 'item_' + i;
-					page.url = M.history.getArticleUrl( page.title );
+					page.url = mw.util.wikiGetlink( page.title );
 					if ( page.coordinates ) { // FIXME: protect against bug 47133 (remove when resolved)
 						coords = page.coordinates[0];
 						lngLat = { latitude: coords.lat, longitude: coords.lon };

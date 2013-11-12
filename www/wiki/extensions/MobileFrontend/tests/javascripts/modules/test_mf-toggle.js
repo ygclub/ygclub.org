@@ -5,7 +5,6 @@ function makeSections() {
 	$container = $( '<div id="content_wrapper">' ).appendTo( document.body );
 	$( '<h2 class="section_heading" id="section_1"><span id="First_Section">First Section</span></h2>' ).appendTo( $container );
 	$( '<div class="content_block" id="content_1"><p>Text</p></div>' ).appendTo( $container );
-	$( '<div id="anchor_1" class="section_anchors" style="display:none"><a href="#section_1" class="back_to_top">&#8593;Jump back a section</a></div>' ).appendTo( $container );
 
 	$( '<h2 class="section_heading" id="section_2">' ).appendTo( $container );
 	$( '<div class="content_block" id="content_2">' ).appendTo( $container );
@@ -25,24 +24,24 @@ QUnit.module( 'MobileFrontend toggle.js: wm_toggle_section', {
 
 QUnit.test( 'wm_toggle_section', 5, function() {
 	strictEqual($("#section_1").hasClass("openSection"), true, "openSection class present");
-	toggle.wm_toggle_section( '1' );
+	toggle.toggle( $( '#section_1' ) );
 	strictEqual($("#content_1").hasClass("openSection"), false, "check content is closed on a toggle");
 	strictEqual($("#section_1").hasClass("openSection"), false, "check section is closed");
 
 	// perform second toggle
-	toggle.wm_toggle_section( '1' );
+	toggle.toggle( $( '#section_1' ) );
 	strictEqual($("#content_1").hasClass("openSection"), true, "check content reopened");
 	strictEqual($("#section_1").hasClass("openSection"), true, "check section has reopened");
 });
 
 QUnit.test( 'clicking a hash link to reveal an already open section', 2, function() {
 	strictEqual($("#section_1").hasClass("openSection"), true, "check section is open");
-	toggle.wm_reveal_for_hash( 'First_Section' );
+	toggle.reveal( 'First_Section' );
 	strictEqual($("#section_1").hasClass("openSection"), true, "check section is still open");
 });
 
-QUnit.test( 'wm_reveal_for_hash', 2, function() {
-	toggle.wm_reveal_for_hash( '#First_Section_2' );
+QUnit.test( 'reveal', 2, function() {
+	toggle.reveal( '#First_Section_2' );
 	strictEqual($("#content_1").hasClass("openSection"), true, "check content is visible on a toggle");
 	strictEqual($("#section_1").hasClass("openSection"), true, "check section is marked as open");
 });

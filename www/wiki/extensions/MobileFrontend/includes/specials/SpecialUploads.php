@@ -34,7 +34,7 @@ class SpecialUploads extends MobileSpecialPage {
 			$attrs = array();
 			if ( $uploadCount !== false ) {
 				$threshold = $this->getUploadCountThreshold();
-				$html .= '<div class="ctaUploadPhoto">';
+				$html .= '<div class="ctaUploadPhoto content">';
 				if ( $uploadCount > $threshold ) {
 					$msg = $this->msg(
 						'mobile-frontend-photo-upload-user-count-over-limit'
@@ -81,7 +81,6 @@ class SpecialUploads extends MobileSpecialPage {
 		}
 
 		$limit = $this->getUploadCountThreshold() + 1;
-		$dbr->ignoreErrors( true );
 		// not using SQL's count(*) because it's more expensive with big number of rows
 		$res = $dbr->select(
 			'image',

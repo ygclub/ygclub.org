@@ -84,7 +84,7 @@ SearchOverlay = Overlay.extend( {
 				return {
 					heading: highlightSearchTerm( item, term ),
 					title: item,
-					url: M.history.getArticleUrl( item )
+					url: mw.util.wikiGetlink( item )
 				};
 			} );
 
@@ -117,7 +117,7 @@ searchOverlay = new SearchOverlay();
 function init() {
 	// FIXME change when micro.tap.js in stable
 	// don't use focus event (https://bugzilla.wikimedia.org/show_bug.cgi?id=47499)
-	$( '#searchInput' ).on( mw.config.get( 'wgMFMode' ) === 'alpha' ? 'tap' : 'touchend mouseup', function() {
+	$( '#searchInput' ).on( M.tapEvent( 'touchend mouseup' ), function() {
 		searchOverlay.showAndFocus();
 	} );
 }

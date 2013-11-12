@@ -1,5 +1,9 @@
 <?php
 class MinervaTemplate extends BaseTemplate {
+	public function getPersonalTools() {
+		return $this->data['personal_urls'];
+	}
+
 	public function execute() {
 		$this->getSkin()->prepareData( $this );
 		wfRunHooks( 'MinervaPreRender', array( $this ) );
@@ -15,7 +19,7 @@ class MinervaTemplate extends BaseTemplate {
 	}
 
 	public function getDiscoveryTools() {
-		return $this->data['sidebar']['navigation'];
+		return $this->data['discovery_urls'];
 	}
 
 	public function getSiteLinks() {
@@ -29,38 +33,42 @@ class MinervaTemplate extends BaseTemplate {
 	protected function renderLanguages() {
 		$languages = $this->getLanguages();
 		$variants = $this->getLanguageVariants();
-		$languageTemplateData = array(
-			'heading' => wfMessage( 'mobile-frontend-language-article-heading' )->text(),
-			'languages' => $languages,
-			'variants' => $variants,
-			'languageSummary' => wfMessage( 'mobile-frontend-language-header', count( $languages ) )->text(),
-			'variantSummary' => count( $variants ) > 1 ? wfMessage( 'mobile-frontend-language-variant-header' )->text() : '',
-		);
-		if ( $languageTemplateData['languages'] && count( $languageTemplateData['languages'] ) > 0 ) {
-		?>
-		<div class="section" id="mw-mf-language-section">
-			<h2 id="section_language" class="section_heading"><?php echo $languageTemplateData['heading']; ?></h2>
-			<div id="content_language" class="content_block">
-				<?php if ( count( $languageTemplateData['variants'] ) > 0 ) { ?>
-				<p id="mw-mf-language-variant-header"><?php echo $languageTemplateData['variantSummary']; ?></p>
-				<ul id="mw-mf-language-variant-selection">
-				<?php
-				foreach( $languageTemplateData['variants'] as $key => $val ):
-					echo $this->makeListItem( $key, $val );
-				endforeach;
-				?>
-				</ul>
-				<?php } ?>
-				<p id="mw-mf-language-header"><?php echo $languageTemplateData['languageSummary']; ?></p>
-				<ul id="mw-mf-language-selection">
-				<?php
-				foreach( $languageTemplateData['languages'] as $key => $val ):
-					echo $this->makeListItem( $key, $val );
-				endforeach;
-				?>
-				</ul>
+		$languagesCount = count( $languages );
+		$variantsCount = count( $variants );
+
+		if ( $languagesCount > 0 || $variantsCount > 1 ) {
+			$heading = wfMessage( 'mobile-frontend-language-article-heading' )->text();
+			$languageSummary = wfMessage( 'mobile-frontend-language-header', $languagesCount )->text();
+			$variantSummary = $variantsCount > 1 ? wfMessage( 'mobile-frontend-language-variant-header' )->text() : '';
+			?>
+			<div class="section" id="mw-mf-language-section">
+				<h2 id="section_language" class="section_heading"><?php echo $heading; ?></h2>
+				<div id="content_language" class="content_block">
+
+					<?php if ( $variantsCount > 1 ) { ?>
+					<p id="mw-mf-language-variant-header"><?php echo $variantSummary; ?></p>
+					<ul id="mw-mf-language-variant-selection">
+					<?php
+					foreach( $variants as $key => $val ):
+						echo $this->makeListItem( $key, $val );
+					endforeach;
+					?>
+					</ul>
+					<?php } ?>
+
+					<?php if ( $languagesCount > 0 ) { ?>
+					<p id="mw-mf-language-header"><?php echo $languageSummary; ?></p>
+					<ul id="mw-mf-language-selection">
+					<?php
+					foreach( $languages as $key => $val ):
+						echo $this->makeListItem( $key, $val );
+					endforeach;
+					?>
+					</ul>
+					<?php } ?>
+
+				</div>
 			</div>
-		</div>
 		<?php
 		}
 	}
@@ -69,22 +77,7 @@ class MinervaTemplate extends BaseTemplate {
 		if ( !$this->getSkin()->getTitle()->isSpecialPage() ) {
 		?>
 		<div id="footer">
-<!-- Piwik -->
-      <script type="text/javascript">
-        var _paq = _paq || [];
-          _paq.push(["trackPageView"]);
-          _paq.push(["enableLinkTracking"]);
-
-            (function() {
-                  var u=(("https:" == document.location.protocol) ? "https" : "http") + "://cloud.ygclub.org/piwik/";
-                      _paq.push(["setTrackerUrl", u+"piwik.php"]);
-                      _paq.push(["setSiteId", "1"]);
-                          var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-                          g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-                            })();
-          </script>
-<!-- End Piwik Code -->
-    <?php
+			<?php
 				foreach( $this->getFooterLinks() as $category => $links ):
 			?>
 				<ul class="footer-<?php echo $category; ?>">
@@ -120,13 +113,19 @@ class MinervaTemplate extends BaseTemplate {
 	protected function renderContentWrapper( $data ) {
 		$isSpecialPage = $this->getSkin()->getTitle()->isSpecialPage();
 		?>
-		<div class='show' id='content_wrapper'>
+		<div id="content_wrapper">
 			<?php
 				if ( !$isSpecialPage ) {
 					echo $data['prebodytext'];
-					$this->renderPageActions( $data );
+					// FIXME: Temporary solution until we have design
+					if ( isset( $data['_old_revision_warning'] ) ) {
+						echo $data['_old_revision_warning'];
+					} else {
+						$this->renderPageActions( $data );
+					}
 				}
 			?>
+			<?php if ( !$data[ 'unstyledContent' ] ) { ?>
 			<div id="content" class="content">
 				<?php
 					if ( isset( $data['subject-page'] ) ) {
@@ -137,6 +136,9 @@ class MinervaTemplate extends BaseTemplate {
 					$this->renderHistoryLink( $data );
 				?>
 			</div>
+			<?php } else {
+				echo $data[ 'bodytext' ];
+			} ?>
 		</div>
 		<?php
 	}
@@ -200,9 +202,12 @@ class MinervaTemplate extends BaseTemplate {
 							</form>
 							<?php
 						}
-						echo $data['userButton'];
+						echo $data['secondaryButton'];
 					?>
 				</div>
+				<script>
+					mw.mobileFrontend.emit( 'header-loaded' );
+				</script>
 				<?php
 					$this->renderContentWrapper( $data );
 					$this->renderFooter( $data );

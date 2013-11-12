@@ -3,7 +3,7 @@
 	var searchOverlay = M.require( 'search' ).overlay,
 		history = M.history,
 		// FIXME: use fuzzy link hijacking in the main namespace - core should be updated to make links more explicit
-		useFuzzyLinkHijacking = mw.config.get( 'wgNamespaceNumber' ) === mw.config.get( 'wgNamespaceIds' )[''];
+		useFuzzyLinkHijacking = M.inNamespace( '' );
 
 	if ( history.hijackLinks ) {
 		history.hijackLinks( $( '#content' ), useFuzzyLinkHijacking );
@@ -20,7 +20,7 @@
 				$( this ).attr( 'href', history.updateQueryStringParameter( href, 'returnto', title ) );
 			} );
 
-			history.hijackLinks( $( '#content_0' ), useFuzzyLinkHijacking );
+			history.hijackLinks( M.getLeadSection(), useFuzzyLinkHijacking );
 		} );
 
 		searchOverlay.on( 'write-results', function() {

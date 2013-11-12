@@ -42,11 +42,20 @@ class MobileContextTest extends MediaWikiTestCase {
 	}
 
 	public function testGetMobileUrl() {
-		global $wgMobileUrlTemplate;
+		global $wgMobileUrlTemplate, $wgHooks;
 
+		$invokes = 0;
+		$context = MobileContext::singleton();
+		$asserter = $this;
 		$wgMobileUrlTemplate = "%h0.m.%h1.%h2";
-		$this->assertEquals( 'http://en.m.wikipedia.org/wiki/Article', MobileContext::singleton()->getMobileUrl( 'http://en.wikipedia.org/wiki/Article' ) );
-		$this->assertEquals( '//en.m.wikipedia.org/wiki/Article', MobileContext::singleton()->getMobileUrl( '//en.wikipedia.org/wiki/Article' ) );
+		$wgHooks['GetMobileUrl'][] = function( &$string, $hookCtx ) use ( $asserter, &$invokes, $context ) {
+			$asserter->assertEquals( $context, $hookCtx );
+			$invokes++;
+		};
+		$context->getRequest()->setHeader( 'X-WAP', 'no' );
+		$this->assertEquals( 'http://en.m.wikipedia.org/wiki/Article', $context->getMobileUrl( 'http://en.wikipedia.org/wiki/Article' ) );
+		$this->assertEquals( '//en.m.wikipedia.org/wiki/Article', $context->getMobileUrl( '//en.wikipedia.org/wiki/Article' ) );
+		$this->assertEquals( 2, $invokes, 'Ensure that hook got the right context' );
 	}
 
 	public function testParseMobileUrlTemplate() {
@@ -438,13 +447,9 @@ class MobileContextTest extends MediaWikiTestCase {
 	public function optInProvider() {
 		return array(
 			array( array(), false, false ),
-			array( array( 'optin' => '1' ), false, true ),
 			array( array( 'optin' => 'beta' ), false, true ),
 			array( array( 'optin' => 'alpha' ), true, true ),
 			array( array( 'optin' => 'foobar' ), false, false ),
-			array( array( 'optin' => '1', 'mf_alpha' => '1' ), true, true ),
-			array( array( 'mf_alpha' => '1' ), true, true ),
-			array( array( 'mf_alpha' => 'foobar' ), false, false ),
 		);
 	}
 }

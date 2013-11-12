@@ -2,8 +2,7 @@
 	M.assertMode( [ 'alpha' ] );
 
 	var
-		Page = M.require( 'page' ),
-		isSpecialPage = mw.config.get( 'wgNamespaceNumber' ) === mw.config.get( 'wgNamespaceIds' ).special,
+		Page = M.require( 'Page' ),
 		History = window.History;
 
 		/**
@@ -24,16 +23,21 @@
 
 	// do not run more than once
 	function init() {
+		var title = mw.config.get( 'wgTitle' ),
+			currentUrl = mw.util.wikiGetlink( title, M.query );
 		// initial history state does not contain title
 		// run before binding to avoid nasty surprises
-		History.replaceState( null, mw.config.get( 'wgTitle' ) );
+		History.replaceState( null, title, currentUrl );
 
 		// Bind to future StateChange Events
 		History.Adapter.bind( window, 'statechange', function(){
 			var s = History.getState();
-			new Page( { title: s.title, el: $( '#content_wrapper' ) } ).on( 'error', function() {
-				window.location.reload(); // the page either doesn't exist or was a Special:Page so force a refresh
-			} );
+			if ( currentUrl !== s.url ) {
+				new Page( { title: s.title, el: $( '#content_wrapper' ) } ).on( 'error', function() {
+					window.location.reload(); // the page either doesn't exist or was a Special:Page so force a refresh
+				} ).on( 'ready', M.reloadPage );
+			}
+			currentUrl = s.url;
 		} );
 
 		/**
@@ -42,7 +46,7 @@
 		 * @param {String} pageTitle String representing the title of a page that should be loaded in the browser
 		 */
 		function navigateToPage( title ) {
-			History.pushState( null, title, M.history.getArticleUrl( title ) );
+			History.pushState( null, title, mw.util.wikiGetlink( title ) );
 		}
 
 		/**
@@ -85,12 +89,13 @@
 		};
 	}
 
-	if ( History.enabled && !isSpecialPage ) {
+	// FIXME: use M.define()
+	M.history = {
+		updateQueryStringParameter: updateQueryStringParameter
+	};
+
+	if ( History.enabled && !M.inNamespace( 'special' ) ) {
 		$.extend( M.history, init() );
 	}
-
-	$.extend( M.history, {
-		updateQueryStringParameter: updateQueryStringParameter
-	} );
 
 } ( mw.mobileFrontend, jQuery ) );

@@ -24,17 +24,20 @@ class MobileFormatterTest extends MediaWikiTestCase {
 			$mf->enableExpandableSections();
 		};
 		$longLine = "\n" . str_repeat( 'A', 5000 );
-		$summarySection = '<div id="content_0" class="content_block openSection"></div>';
-		$anchor = '<a id="anchor_1" href="#section_1" class="section_anchors">&#8593;Jump back a section</a>';
+		$removeImages = function( MobileFormatter $f ) {
+			$f->setRemoveMedia();
+		};
 
 		return array(
-			// remove magnifying glass
 			array(
-				'<div class="thumb tright"><div class="thumbinner" style="width:222px;"><a href="/wiki/File:Foo.jpg" class="image">
-<img alt="" src="/foo.jpg" width="220" height="165" class="thumbimage"/></a><div class="thumbcaption">
-<div class="magnify"><a href="/wiki/File:Foo.jpg" class="internal" title="Enlarge"></div>
-Foobar!</div></div></div>',
-				'<div class="thumb tright"><div class="thumbinner" style="width:222px;"><a href="/wiki/File:Foo.jpg" class="image"><img alt="" src="/foo.jpg" width="220" height="165" class="thumbimage"></a><div class="thumbcaption">Foobar!</div></div></div>',
+				'<img src="/foo/bar.jpg">Blah</img>',
+				'<span class="mw-mf-image-replacement">['. wfMessage( 'mobile-frontend-missing-image' ) .']</span>Blah',
+				$removeImages,
+			),
+			array(
+				'<img src="/foo/bar.jpg" alt="Blah"/>',
+				'<span class="mw-mf-image-replacement">[Blah]</span>',
+				$removeImages,
 			),
 			array(
 				'fooo
@@ -45,25 +48,41 @@ Foobar!</div></div></div>',
 			),
 			// \n</h2> in headers
 			array(
-				'<h2><span class="editsection">[<a href="/w/index.php?title=California_Gold_Rush&amp;action=edit&amp;section=2" title="Edit section: Forty-niners">edit</a>]</span> <span class="mw-headline" id="Forty-niners">Forty-niners</span>
-
- 	 </h2>' . $longLine,
-				$summarySection.
-				'<div class="section"><h2 class="section_heading" id="section_1"><span id="Forty-niners">Forty-niners</span></h2><div class="content_block" id="content_1">'
-					. $longLine . '</div>'
-					. $anchor . '</div>',
+				'<h2><span class="mw-headline" id="Forty-niners">Forty-niners</span><a class="edit-page" href="#editor/2">Edit</a></h2>'
+				. $longLine,
+				'<div></div>' .
+				'<h2><span class="mw-headline" id="Forty-niners">Forty-niners</span><a class="edit-page" href="#editor/2">Edit</a></h2>' .
+				'<div>' . $longLine . '</div>',
 				$enableSections
 			),
 			// Bug 36670
 			array(
-				'<h2><span class="editsection">[<a href="/w/index.php?title=California_Gold_Rush&amp;action=edit&amp;section=1" title="Edit section: History">edit</a>]</span> <span class="mw-headline" id="History"><span id="Overview"></span>History</span></h2>'
+				'<h2><span class="mw-headline" id="History"><span id="Overview"></span>History</span><a class="edit-page" href="#editor/2">Edit</a></h2>'
 					. $longLine,
-				$summarySection.
-				'<div class="section"><h2 class="section_heading" id="section_1"><span id="History"><span id="Overview"></span>History</span></h2><div class="content_block" id="content_1">'
-					. $longLine . '</div>'
-					. $anchor
-					. '</div>',
+				'<div></div><h2><span class="mw-headline" id="History"><span id="Overview"></span>History</span><a class="edit-page" href="#editor/2">Edit</a></h2><div>'
+					. $longLine . '</div>',
 				$enableSections
+			),
+			array(
+				'<img alt="picture of kitty" src="kitty.jpg">',
+				'<span class="mw-mf-image-replacement">[picture of kitty]</span>',
+				$removeImages,
+			),
+			array(
+				'<img src="kitty.jpg">',
+				'<span class="mw-mf-image-replacement">[' . wfMessage( 'mobile-frontend-missing-image' ) . ']</span>',
+				$removeImages,
+			),
+			array(
+				'<img alt src="kitty.jpg">',
+				'<span class="mw-mf-image-replacement">[' . wfMessage( 'mobile-frontend-missing-image' ) . ']</span>',
+				$removeImages,
+			),
+			array(
+				'<img alt src="kitty.jpg">look at the cute kitty!<img alt="picture of angry dog" src="dog.jpg">',
+				'<span class="mw-mf-image-replacement">[' . wfMessage( 'mobile-frontend-missing-image' ) . ']</span>look at the cute kitty!'.
+					'<span class="mw-mf-image-replacement">[picture of angry dog]</span>',
+				$removeImages,
 			),
 		);
 	}

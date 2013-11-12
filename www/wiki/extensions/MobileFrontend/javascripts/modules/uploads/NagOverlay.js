@@ -8,7 +8,7 @@
 			learnMore: mw.msg( 'parentheses', mw.msg( 'mobile-frontend-learn-more' ) )
 		},
 
-		template: M.template.get( 'photoNag' ),
+		template: M.template.get( 'uploads/NagOverlay' ),
 
 		initialize: function( options ) {
 			this.learnMoreOverlay = new LearnMoreOverlay( {
@@ -50,6 +50,7 @@
 				$next = $checkboxes.not( ':checked' ).eq( 0 );
 				disable( $checkbox );
 				if ( !$next.length ) {
+					self.hide();
 					self.emit( 'confirm' );
 				} else {
 					enable( $next );

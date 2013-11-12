@@ -268,12 +268,19 @@ class MobileFrontendHooks {
 	 * @return boolean hook return value
 	 */
 	public static function onSpecialPage_initList( &$list ) {
-		if ( MobileContext::singleton()->shouldDisplayMobileView() ) {
+		$ctx = MobileContext::singleton();
+		if ( $ctx->shouldDisplayMobileView() ) {
 			// Replace the standard watchlist view with our custom one
 			$list['Watchlist'] = 'SpecialMobileWatchlist';
 			// FIXME: Make uploads work on desktop
 			$list['Uploads'] = 'SpecialUploads';
 			$list['Userlogin'] = 'SpecialMobileUserlogin';
+
+			if ( class_exists( 'MWEchoNotifUser' ) ) {
+				$list['Notifications'] = 'SpecialMobileNotifications';
+			}
+
+			$list['UserProfile'] = 'SpecialUserProfile';
 		}
 		return true;
 	}
@@ -416,7 +423,8 @@ class MobileFrontendHooks {
 		$watch = $context->getRequest()->getVal( 'watch' );
 		if ( !is_null( $watch ) ) {
 			$title = Title::newFromText( $watch );
-			if ( !is_null( $title ) ) {
+			// protect against watching special pages (these cannot be watched!)
+			if ( !is_null( $title ) && !$title->isSpecialPage() ) {
 				WatchAction::doWatch( $title, $currentUser );
 			}
 		}
@@ -491,11 +499,6 @@ class MobileFrontendHooks {
 			$request->response()->header( "X-WAP: $xWap" );
 		}
 		$out->addVaryHeader( 'Cookie' );
-		// @todo: these should be set by Zero
-		$out->addVaryHeader( 'X-CS' );
-		$out->addVaryHeader( 'X-Subdomain' );
-		$out->addVaryHeader( 'X-Images' );
-
 
 		wfProfileOut( __METHOD__ );
 		return true;
@@ -512,10 +515,16 @@ class MobileFrontendHooks {
 	public static function onCustomEditor( $article, $user ) {
 		$context = MobileContext::singleton();
 
-		// redirect instead of showing the desktop editor
+		// redirect to mobile editor instead of showing desktop editor
 		if ( $context->shouldDisplayMobileView() ) {
-			$articleUrl = $context->getMobileUrl( $article->getTitle()->getFullURL() );
-			$context->getOutput()->redirect( $articleUrl );
+			$output = $context->getOutput();
+			$data = $output->getRequest()->getValues();
+			// Unset these to avoid a redirect loop but make sure we pass other parameters to edit e.g. undo actions
+			unset( $data['action'] );
+			unset( $data['title'] );
+			$articleUrl = $context->getMobileUrl( $article->getTitle()->getFullURL( $data ) );
+			$section = (int)$output->getRequest()->getVal( 'section', 0 );
+			$output->redirect( $articleUrl . '#editor/' . $section );
 			return false;
 		}
 
@@ -564,7 +573,6 @@ class MobileFrontendHooks {
 		$files[] = "$dir/ApiParseExtenderTest.php";
 		$files[] = "$dir/DeviceDetectionTest.php";
 		$files[] = "$dir/ExtractFormatterTest.php";
-		$files[] = "$dir/HtmlFormatterTest.php";
 		$files[] = "$dir/MobileContextTest.php";
 		$files[] = "$dir/MobileFormatterTest.php";
 		$files[] = "$dir/MobileFrontendHooksTest.php";
@@ -624,10 +632,53 @@ class MobileFrontendHooks {
 	 */
 	public static function onUserRequiresHTTPS( $user, &$https ) {
 		// WAP phones allegedly can't handle HTTPS, don't redirect them there
-		if ( MobileContext::singleton()->getDevice()->format() === 'wml' ) {
+		$context = MobileContext::singleton();
+		if ( $context->shouldDisplayMobileView() && $context->getDevice()->format() === 'wml' ) {
 			$https = false;
 			return false; // Stop further hook processing
 		}
+		return true;
+	}
+
+	/**
+	 * Handler for ResourceLoaderRegisterModules hook
+	 * Registering our EventLogging schema modules
+	 * @param ResourceLoader &$resourceLoader The ResourceLoader object
+	 * @return bool Always true
+	 */
+	public static function onResourceLoaderRegisterModules( ResourceLoader &$resourceLoader ) {
+		global $wgResourceModules;
+
+		$mobileEventLoggingSchemas = array(
+			'mobile.uploads.schema' => array(
+				'schema' => 'MobileWebUploads',
+				'revision' => 5383883,
+			),
+			'mobile.watchlist.schema' => array(
+				'schema' => 'MobileBetaWatchlist',
+				'revision' => 5281061,
+			),
+			'mobile.editing.schema' => array(
+				'schema' => 'MobileWebEditing',
+				'revision' => 5644223,
+			),
+			'schema.MobileWebClickTracking' => array(
+				'schema' => 'MobileWebClickTracking',
+				'revision' => 5929948,
+			),
+		);
+
+		if ( class_exists( 'ResourceLoaderSchemaModule' ) ) {
+			foreach ( $mobileEventLoggingSchemas as $module => $properties ) {
+				$wgResourceModules[ $module ] = array(
+					'class'  => 'ResourceLoaderSchemaModule',
+					'schema' => $properties['schema'],
+					'revision' => $properties['revision'],
+					'targets' => 'mobile',
+				);
+			}
+		}
+
 		return true;
 	}
 }

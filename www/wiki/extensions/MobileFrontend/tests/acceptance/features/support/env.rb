@@ -44,7 +44,7 @@ def local_browser(user_agent)
   # see http://code.google.com/p/selenium/issues/detail?id=1953
   browser.goto HomePage.url
   # set a cookie forcing mobile mode
-  browser.cookies.add 'mf_mobileFormat', 'true'
+  browser.cookies.add 'mf_useformat', 'true'
   browser
 end
 
@@ -121,5 +121,5 @@ After do |scenario|
     sauce_api(%Q{{"passed": #{scenario.passed?}}}, saucelabs_username, saucelabs_key)
     sauce_api(%Q{{"public": true}}, saucelabs_username, saucelabs_key)
   end
-  @browser.close
+  @browser.close unless ENV['KEEP_BROWSER_OPEN'] == 'true'
 end

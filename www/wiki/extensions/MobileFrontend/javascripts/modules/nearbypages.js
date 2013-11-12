@@ -1,42 +1,28 @@
 ( function( M, $ ) {
 	var latLng, lat, lng,
-		Overlay = M.require( 'Overlay' ),
-		overlay,
-		Nearby = M.require( 'modules/nearby/Nearby' ),
-		NearbyOverlay;
-
-	NearbyOverlay = Overlay.extend( {
-			active: false,
-			className: 'mw-mf-overlay list-overlay',
-			template: M.template.get( 'overlays/nearby' ),
-			defaults: {
-				heading: 'Nearby'
-			},
-			initialize: function( options ) {
-				options.pretext = mw.message( 'mobile-frontend-nearby-to-page', options.title );
-				this._super( options );
-				this.latLngString = options.latitude + ',' + options.longitude;
-			},
-			postRender: function( options ) {
-				var widget;
-
-				this._super( options );
-				widget = new Nearby( {
-					range: 2000,
-					location: { longitude: options.longitude, latitude: options.latitude },
-					el: this.$( '.container' )
-				} );
-			}
-	} );
-
+		MobileWebClickTracking = M.require( 'loggingSchemas/MobileWebClickTracking' ),
+		overlay;
 
 	function initNearbyButton( title, latitude, longitude ) {
-		$( '<button class="nearby">' ).on( 'click', function() {
-			if ( !overlay ) {
-				overlay = new NearbyOverlay( { title: title, latitude: latitude, longitude: longitude } );
-			}
-			overlay.show();
-		} ).appendTo( '#section_0' );
+		function loadGeoNotAHack() {
+			mw.loader.using( 'mobile.nearby.beta', function() {
+				var NearbyOverlay = M.require( 'modules/nearby/NearbyOverlay' );
+				if ( !overlay ) {
+					MobileWebClickTracking.log( 'geonotahack-clicked' );
+					overlay = new NearbyOverlay( { title: title, latitude: latitude, longitude: longitude, source: 'geonotahack' } );
+				}
+				overlay.show();
+			} );
+		}
+
+		var $btn;
+		if ( M.router.isSupported() ) {
+			$btn = $( '<a class="button nearby">' ).attr( 'href', '#geonotahack' );
+			M.router.route( /^geonotahack$/, loadGeoNotAHack );
+		} else {
+			$btn = $( '<button class="nearby">' ).on( 'click', loadGeoNotAHack );
+		}
+		$btn.text( mw.msg( 'mobile-frontend-geonotahack' ) ).appendTo( '#page-secondary-actions' );
 	}
 
 	function init( page ) {

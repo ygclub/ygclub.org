@@ -20,13 +20,10 @@ class ExtractFormatter extends HtmlFormatter {
 		parent::__construct( HtmlFormatter::wrapHTML( $text ) );
 		$this->plainText = $plainText;
 
-		$this->removeImages();
-		$this->useImgAlt( false );
-		// @fixme: use rules from MobileFormatter?
-		$this->remove( array( 'table', 'div', '.editsection', '.mw-editsection', 'sup.reference', 'span.coordinates',
-				'span.geo-multi-punct', 'span.geo-nondefault', '.noexcerpt', '.error' )
-		);
-		$this->remove( $wgMFRemovableClasses );
+		$this->setRemoveMedia( true );
+		$this->remove( $wgMFRemovableClasses['base'] );
+		$this->remove( $wgMFRemovableClasses['extracts'] );
+
 		if ( $plainText ) {
 			$this->flattenAllTags();
 		} else {

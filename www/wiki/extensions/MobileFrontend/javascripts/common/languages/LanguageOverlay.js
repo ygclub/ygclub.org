@@ -5,14 +5,14 @@
 
 	LanguageOverlay = Overlay.extend( {
 		defaults: {
-			languagesLink: M.history.getArticleUrl( 'Special:MobileOptions/Language' ),
+			languagesLink: mw.util.wikiGetlink( 'Special:MobileOptions/Language' ),
 			languagesText: mw.msg( 'mobile-frontend-language-footer' ),
 			placeholder: mw.msg( 'mobile-frontend-language-site-choose' )
 		},
 		className: 'language-overlay mw-mf-overlay list-overlay',
 		template: M.template.get( 'overlays/languages' ),
 		initialize: function( options ) {
-			if ( options.languages ) {
+			if ( options.languages && options.languages.length ) {
 				options.header = mw.msg( 'mobile-frontend-language-header', options.languages.length );
 			}
 			if ( options.variants && options.variants.length ) {

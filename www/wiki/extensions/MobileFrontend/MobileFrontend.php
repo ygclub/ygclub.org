@@ -15,6 +15,13 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( -1 );
 }
 
+// Too many people are trying to use master MF with stable MediaWiki releases
+if ( version_compare( $wgVersion, '1.22c', '<' ) ) {
+	echo( "This version of MobileFrontend requires MediaWiki 1.22, you have $wgVersion.
+You can download a more appropriate version from https://www.mediawiki.org/wiki/Special:ExtensionDistributor/MobileFrontend\n" );
+	die( -1 );
+}
+
 // Define the extension; allows us make sure the extension is used correctly
 define( 'MOBILEFRONTEND', 'MobileFrontend' );
 
@@ -22,7 +29,7 @@ define( 'MOBILEFRONTEND', 'MobileFrontend' );
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'MobileFrontend',
-	'author' => array( 'Patrick Reilly', 'Max Semenik', 'Jon Robson', 'Arthur Richards' ),
+	'author' => array( 'Patrick Reilly', 'Max Semenik', 'Jon Robson', 'Arthur Richards', 'Brion Vibber', 'Juliusz Gonera', 'Ryan Kaldari' ),
 	'descriptionmsg' => 'mobile-frontend-desc',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:MobileFrontend',
 );
@@ -37,14 +44,13 @@ $autoloadClasses = array (
 	'MobileFrontendHooks' => 'MobileFrontend.hooks',
 
 	'DeviceDetection' => 'DeviceDetection',
-  'Mobile_Detect' => 'Mobile_Detect',
-  'HtmlDeviceProperties' => 'DeviceDetection',
+	'HtmlDeviceProperties' => 'DeviceDetection',
 	'MobileContext' => 'MobileContext',
+	'MobileUserInfo' => 'MobileUserInfo',
 	'WmlContext' => 'WmlContext',
 	'WmlDeviceProperties' => 'DeviceDetection',
 
 	'ExtractFormatter' => 'formatters/ExtractFormatter',
-	'HtmlFormatter' => 'formatters/HtmlFormatter',
 	'MobileFormatter' => 'formatters/MobileFormatter',
 	'MobileFormatterHTML' => 'formatters/MobileFormatterHTML',
 	'MobileFormatterWML' => 'formatters/MobileFormatterWML',
@@ -57,12 +63,14 @@ $autoloadClasses = array (
 	'MobileSiteModule' => 'modules/MobileSiteModule',
 
 	'SpecialUploads' => 'specials/SpecialUploads',
+	'SpecialUserProfile' => 'specials/SpecialUserProfile',
 	'SpecialMobileUserlogin' => 'specials/SpecialMobileUserlogin',
 	'SpecialMobileDiff' => 'specials/SpecialMobileDiff',
 	'SpecialMobileOptions' => 'specials/SpecialMobileOptions',
 	'SpecialMobileMenu' => 'specials/SpecialMobileMenu',
 	'SpecialMobileWatchlist' => 'specials/SpecialMobileWatchlist',
 	'SpecialNearby' => 'specials/SpecialNearby',
+	'SpecialMobileNotifications' => 'specials/SpecialMobileNotifications',
 	'MobileSpecialPage' => 'specials/MobileSpecialPage',
 
 	'MinervaTemplate' => 'skins/MinervaTemplate',
@@ -120,6 +128,7 @@ $wgHooks['UnitTestsList'][] = 'MobileFrontendHooks::onUnitTestsList';
 $wgHooks['CentralAuthLoginRedirectData'][] = 'MobileFrontendHooks::onCentralAuthLoginRedirectData';
 $wgHooks['CentralAuthSilentLoginRedirect'][] = 'MobileFrontendHooks::onCentralAuthSilentLoginRedirect';
 $wgHooks['UserRequiresHTTPS'][] = 'MobileFrontendHooks::onUserRequiresHTTPS';
+$wgHooks['ResourceLoaderRegisterModules'][] = 'MobileFrontendHooks::onResourceLoaderRegisterModules';
 
 $wgSpecialPages['MobileDiff'] = 'SpecialMobileDiff';
 $wgSpecialPages['MobileOptions'] = 'SpecialMobileOptions';
@@ -136,6 +145,12 @@ function efMobileFrontend_Setup() {
 
 // ResourceLoader modules
 require_once( "$cwd/includes/Resources.php" );
+
+$wgMFDeviceWidthTablet = 768;
+
+// Set LESS global variables
+$wgResourceLoaderLESSVars['wgMFDeviceWidthTablet'] = $wgMFDeviceWidthTablet . 'px';
+$wgResourceLoaderLESSVars['wgMFDeviceWidthMobileSmall'] = '280px';
 
 unset( $cwd );
 
@@ -228,9 +243,26 @@ $wgMobileFrontendFormatCookieExpiry = null;
 /**
  * Make the classes, tags and ids stripped from page content configurable.
  * Each item will be stripped from the page.
- * See $itemsToRemove for more information.
  */
-$wgMFRemovableClasses = array();
+$wgMFRemovableClasses = array(
+	// These rules will be used for all transformations
+	'base' => array(
+		'.toc',
+	),
+	// HTML view
+	'HTML' => array(),
+	// WML view
+	'WML' => array(
+		'sup.reference', // References generally don't work in WML due to per-section views
+		'div.magnify',
+		'.nomobile',
+	),
+	// Text extracts
+	'extracts' => array(
+		'table', 'div', '.mw-editsection', 'sup.reference', 'span.coordinates',
+		'span.geo-multi-punct', 'span.geo-nondefault', '.noexcerpt', '.error', '.nomobile'
+	),
+);
 
 /**
  * Make the logos configurable.
@@ -377,3 +409,10 @@ $wgMFNoMobileCategory = false;
  * Prefixed names of pages that will never display mobile view
  */
 $wgMFNoMobilePages = array();
+
+/**
+ * Temporary boolean variable to enable/disable progress bars in the photo uploader
+ * FIXME: This should be set to true by default (see bug 41731)
+ * @var bool
+ */
+$wgMFAjaxUploadProgressSupport = false;

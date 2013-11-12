@@ -7,9 +7,6 @@ class SpecialMobileWatchlist extends SpecialWatchlist {
 	const FILTER_OPTION_NAME = 'mfWatchlistFilter';
 
 	private $filter,
-		$seenTitles,
-		$seenDays,
-		$today,
 		$usePageImages,
 		$optionsChanged = false;
 
@@ -39,7 +36,7 @@ class SpecialMobileWatchlist extends SpecialWatchlist {
 			wfProfileOut( __METHOD__ );
 			return;
 		} else {
-			$output->setProperty( 'bodyClassName', 'no-margins' );
+			$output->setProperty( 'unstyledContent', true );
 		}
 
 		if ( $view === 'feed' ) {
@@ -311,12 +308,6 @@ class SpecialMobileWatchlist extends SpecialWatchlist {
 		wfProfileIn( __METHOD__ );
 
 		$empty = $res->numRows() === 0;
-		$this->seenTitles = array();
-
-		if ( $feed ) {
-			$this->today = $this->day( wfTimestamp() );
-			$this->seenDays = array( $this->today => true );
-		}
 
 		$output = $this->getOutput();
 
@@ -399,18 +390,12 @@ class SpecialMobileWatchlist extends SpecialWatchlist {
 		$output->addHtml(
 				Html::openElement( 'div', array( 'class' => 'info' ) ) .
 				$msg .
-				Html::openElement( 'div' ) .
 				Html::element( 'a',
 					array( 'class' => 'button', 'href' => Title::newMainPage()->getLocalUrl() ),
 					wfMessage( 'mobile-frontend-watchlist-back-home' )->plain()
 				) .
-				Html::closeElement( 'div' ) .
 				Html::closeElement( 'div' )
 		);
-	}
-
-	private function day( $ts ) {
-		return $this->getLanguage()->date( $ts, true );
 	}
 
 	private function renderThumb( $row ) {
@@ -449,22 +434,22 @@ class SpecialMobileWatchlist extends SpecialWatchlist {
 	private function showFeedResultRow( $row ) {
 		wfProfileIn( __METHOD__ );
 
+		if ( $row->rc_deleted ) {
+			wfProfileOut( __METHOD__ );
+			return;
+		}
+
 		$output = $this->getOutput();
 
 		$title = Title::makeTitle( $row->rc_namespace, $row->rc_title );
 		$titleText = $title->getPrefixedText();
-		if ( array_key_exists( $titleText, $this->seenTitles ) ) {
-			// todo: skip seen titles and show only the latest?
-			// return;
-		}
-		$this->seenTitles[$titleText] = true;
 
 		$comment = $row->rc_comment;
 		$ts = new MWTimestamp( $row->rc_timestamp );
 		$revId = $row->rc_this_oldid;
 
 		if ( $revId ) {
-			$diffTitle = Title::makeTitle( NS_SPECIAL, 'MobileDiff/' . $revId ); // @fixme this seems lame
+			$diffTitle = SpecialPage::getTitleFor( 'MobileDiff', $revId );
 			$diffLink = $diffTitle->getLocalUrl();
 		} else {
 			// hack -- use full log entry display

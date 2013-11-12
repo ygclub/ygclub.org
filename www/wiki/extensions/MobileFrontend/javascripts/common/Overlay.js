@@ -10,13 +10,31 @@ var View = M.require( 'view' ),
 		template: M.template.get( 'overlay' ),
 		className: 'mw-mf-overlay',
 		closeOnBack: false,
-		// use document.body rather than 'body' - for some reasons this has odd consequences on Opera Mobile (see bug 52361)
-		appendTo: document.body,
+		fullScreen: true,
+		// use '#mw-mf-viewport' rather than 'body' - for some reasons this has
+		// odd consequences on Opera Mobile (see bug 52361)
+		appendTo: '#mw-mf-viewport',
 		initialize: function( options ) {
-			var self = this;
 			options = options || {};
 			this.parent = options.parent;
 			this.isOpened = false;
+			this._super( options );
+		},
+		postRender: function() {
+			var self = this;
+			// FIXME change when micro.tap.js in stable
+			this.$( '.cancel, .confirm' ).on( M.tapEvent( 'click' ), function( ev ) {
+				ev.preventDefault();
+				ev.stopPropagation();
+				if ( self.closeOnBack ) {
+					window.history.back();
+				} else {
+					self.hide();
+				}
+			} );
+		},
+		show: function() {
+			var self = this;
 
 			function hideOnRoute() {
 				M.router.one( 'route', function( ev ) {
@@ -31,44 +49,33 @@ var View = M.require( 'view' ),
 				hideOnRoute();
 			}
 
-			this._super( options );
-		},
-		postRender: function() {
-			var self = this;
-			// FIXME change when micro.tap.js in stable
-			this.$( '.cancel, .confirm' ).on( mw.config.get( 'wgMFMode' ) === 'alpha' ? 'tap' : 'click', function( ev ) {
-				ev.preventDefault();
-				if ( self.closeOnBack ) {
-					window.history.back();
-				} else {
-					self.hide();
-				}
-			} );
-		},
-		show: function() {
 			// FIXME: prevent zooming within overlays but don't break the rendering!
 			// M.lockViewport();
 			if ( this.parent ) {
 				this.parent.hide();
 			}
+
 			this.$el.appendTo( this.appendTo );
 			this.scrollTop = document.body.scrollTop;
-			$( 'html' ).addClass( 'overlay-enabled' );
+			if ( this.fullScreen ) {
+				$( 'html' ).addClass( 'overlay-enabled' );
+				// skip the URL bar if possible
+				window.scrollTo( 0, 1 );
+			} else {
+				$( '#mw-mf-page-center' ).one( M.tapEvent( 'click' ), $.proxy( this, 'hide' ) );
+			}
 			$( 'body' ).removeClass( 'navigation-enabled' );
-
-			// skip the URL bar if possible
-			window.scrollTo( 0, 1 );
 		},
 		hide: function() {
 			// FIXME: allow zooming outside the overlay again
 			// M.unlockViewport();
 			this.$el.detach();
-			if ( !this.parent ) {
+			if ( this.parent ) {
+				this.parent.show();
+			} else if ( this.fullScreen ) {
 				$( 'html' ).removeClass( 'overlay-enabled' );
 				// return to last known scroll position
 				window.scrollTo( document.body.scrollLeft, this.scrollTop );
-			} else {
-				this.parent.show();
 			}
 			return true;
 		}

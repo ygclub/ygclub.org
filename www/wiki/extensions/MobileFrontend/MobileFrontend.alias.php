@@ -5,6 +5,7 @@
  * @file
  * @ingroup Extensions
  */
+// @codingStandardsIgnoreFile
 
 $specialPageAliases = array();
 
@@ -15,6 +16,7 @@ $specialPageAliases['en'] = array(
 	'MobileDiff' => array( 'MobileDiff' ),
 	'MobileMenu' => array( 'MobileMenu' ),
 	'Nearby' => array( 'Nearby' ),
+	'UserProfile' => array( 'UserProfile' ),
 );
 
 /** Arabic (العربية) */
@@ -48,6 +50,7 @@ $specialPageAliases['de'] = array(
 	'MobileDiff' => array( 'Mobiler_Unterschied' ),
 	'MobileMenu' => array( 'Mobiles_Menü' ),
 	'Nearby' => array( 'In_der_Nähe' ),
+	'UserProfile' => array( 'Benutzerprofil' ),
 );
 
 /** Zazaki (Zazaki) */
@@ -70,6 +73,26 @@ $specialPageAliases['eo'] = array(
 /** Estonian (eesti) */
 $specialPageAliases['et'] = array(
 	'MobileOptions' => array( 'Mobiili_suvandid' ),
+	'Uploads' => array( 'Üleslaaditud_failid' ),
+	'MobileDiff' => array( 'Mobiilierinevus' ),
+	'MobileMenu' => array( 'Mobiili_menüü' ),
+	'Nearby' => array( 'Lähikond' ),
+);
+
+/** Persian (فارسی) */
+$specialPageAliases['fa'] = array(
+	'MobileOptions' => array( 'گزینه‌های_تلفن_همراه' ),
+	'Uploads' => array( 'بارگذاری‌ها' ),
+	'MobileDiff' => array( 'تفاوت_تلفن_همراه' ),
+	'MobileMenu' => array( 'گزینگان_تلفن_همراه' ),
+	'Nearby' => array( 'درنزدیکی', 'در_نزدیکی' ),
+	'UserProfile' => array( 'شناسنامهٔ_کاربری', 'شناسنامه_کاربری' ),
+);
+
+/** Galician (galego) */
+$specialPageAliases['gl'] = array(
+	'Uploads' => array( 'Cargas' ),
+	'UserProfile' => array( 'Perfil_de_usuario' ),
 );
 
 /** Hebrew (עברית) */
@@ -102,6 +125,7 @@ $specialPageAliases['ko'] = array(
 	'MobileDiff' => array( '모바일차이점' ),
 	'MobileMenu' => array( '모바일메뉴' ),
 	'Nearby' => array( '근처' ),
+	'UserProfile' => array( '사용자프로필' ),
 );
 
 /** Luxembourgish (Lëtzebuergesch) */
@@ -120,11 +144,16 @@ $specialPageAliases['mk'] = array(
 	'MobileDiff' => array( 'МобилнаРазлика' ),
 	'MobileMenu' => array( 'МобилноМени' ),
 	'Nearby' => array( 'ВоБлизина' ),
+	'UserProfile' => array( 'КорисничкиПрофил' ),
 );
 
 /** Malayalam (മലയാളം) */
 $specialPageAliases['ml'] = array(
 	'MobileOptions' => array( 'മൊബൈൽഐച്ഛികങ്ങൾ' ),
+	'Uploads' => array( 'അപ്‌ലോഡുകൾ' ),
+	'MobileDiff' => array( 'മൊബൈൽവ്യത്യാസം' ),
+	'MobileMenu' => array( 'മൊബൈൽമെനു' ),
+	'Nearby' => array( 'സമീപസ്ഥം' ),
 );
 
 /** Dutch (Nederlands) */
@@ -133,6 +162,7 @@ $specialPageAliases['nl'] = array(
 	'MobileDiff' => array( 'MobielVerschillen' ),
 	'MobileMenu' => array( 'MobielMenu' ),
 	'Nearby' => array( 'InDeBuurt' ),
+	'UserProfile' => array( 'Gebruikersprofiel' ),
 );
 
 /** Norwegian Nynorsk (norsk nynorsk) */
