@@ -1,4 +1,5 @@
 # For ygclub #
+config.global.php
 answer/config.php
 
 bbs/config/config_ucenter.php
