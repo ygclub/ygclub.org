@@ -1073,8 +1073,8 @@ $2
 'previewnote' => "'''请记住这只是预览。'''你的更改还没有保存！",
 'continue-editing' => '往编辑框',
 'previewconflict' => '该预览反映了上面文字编辑区中的文字在你保存后的显示状况。',
-'session_fail_preview' => "'''对不起！由于会话数据丢失，我们无法处理你的编辑。'''请重试。如果仍然失败，请尝试[[Special:UserLogout|退出登录]]后重新登录。",
-'session_fail_preview_html' => "'''对不起！由于会话数据丢失，我们无法处理你的编辑。'''
+'session_fail_preview' => "'''复制所有数据到剪贴板，然后请再按一次保存按钮，别瞎点！by 混沌。由于会话数据丢失，我们无法处理你的编辑。'''请重试。如果仍然失败，请尝试[[Special:UserLogout|退出登录]]后重新登录。",
+'session_fail_preview_html' => "'''复制所有数据到剪贴板，然后请再按一次保存按钮，别瞎点！by 混沌。对不起！由于会话数据丢失，我们无法处理你的编辑。'''
 
 ''因为{{SITENAME}}已启用原始HTML，为了预防JavaScript攻击，预览被隐藏。''
 
