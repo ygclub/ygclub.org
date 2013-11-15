@@ -117,8 +117,8 @@ class ActiveUsersPager extends UsersPager {
 				'recentedits' => 'COUNT(*)'
 			),
 			'options' => array(
-				'SORT BY' => array( 'rc_user_text' ),
-				'GROUP BY' => array( 'recentedits' ),
+				'GROUP BY' => array( 'rc_user_text' ),
+				'ORDER BY' => array( 'recentedits' ),
 				'USE INDEX' => array( 'recentchanges' => 'rc_user_text' )
 			),
 			'conds' => $conds
