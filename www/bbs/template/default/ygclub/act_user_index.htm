@@ -28,7 +28,7 @@
 
             <!--{if $total_count > 0}-->
         <span>
-            <strong><a href="home.php?mod=space&uid=$uid&from=act_f" style="color:#690;">$user_name</a></strong> 从 $starttime_template 到 $endtime_template 共报名参加了 $total_count 次活动，已确认参加 $total_checkin_count 次。
+		<strong><cite><a href="home.php?mod=space&uid=$uid&from=act_f" c="1" style="color:#690;">$user_name</a></cite></strong> 从 $starttime_template 到 $endtime_template 共报名参加了 $total_count 次活动，已确认参加 $total_checkin_count 次。
         </span>
             <!--{loop $partyClass  $ck $cv}-->
             <!--{if $party_class_count[$cv] > 0}-->
