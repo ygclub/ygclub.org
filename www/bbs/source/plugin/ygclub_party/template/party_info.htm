@@ -132,12 +132,12 @@ global $party;
             <!--{elseif $party['_current_user_verified'] == 1}-->
             你已申请参加活动，请耐心等待召集人或管理员的审核。审核前你可以  <a href="plugin.php?id=ygclub_party&act=editp&pid={$party['_current_user_pid']}" class="pn pnc">[编辑报名信息]</a>
             <!--{elseif $party['_current_user_verified'] == 2}-->
-            你已被取消参加此次活动
+            你已被取消参加此次活动。
             <!--{elseif $party['_current_user_verified'] == 4}-->
             你已成功申请参加活动。如遇特殊原因不能继续参加活动，请提前取消。<br />若需要取消，请点击：
             <button onclick="showDialog($('single_partyer_operate').innerHTML,'info','下次参加',null,1);return false;" class="pn pnc"><span>下次参加</span></button>
             <!--{elseif $party['_current_user_verified'] == 5}-->
-            你已退出本次活动
+            你已退出本次活动。
             <!--{/if}-->
         </dd>
     </dl>

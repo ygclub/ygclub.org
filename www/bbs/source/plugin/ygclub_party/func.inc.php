@@ -2,7 +2,7 @@
 
 // 自定义部分排序
 function ygclub_party_order_fields($a){
-    global $SF_CONFIG_VALUES;
+    global $YGCLUB_SF_CONFIG_VALUES;
     $b = $a['field'];
 	if ($b){
 		foreach($b as $c=>$d){
@@ -16,8 +16,8 @@ function ygclub_party_order_fields($a){
 				$e[$o]['color']		= $a['color'][$c];
 				$e[$o]['must']		= $a['must'][$c];
 				$e[$o]['order']		= $a['order'][$c];
-				$e[$o]['html']		= ygclub_party_form($d,$a['type'][$c],$a['default'][$c],$SF_CONFIG_VALUES[$d]);
-				$e[$o]['value']		= is_array($SF_CONFIG_VALUES[$d]) ? implode(',',$SF_CONFIG_VALUES[$d]) : nl2br($SF_CONFIG_VALUES[$d]) ;
+				$e[$o]['html']		= ygclub_party_form($d,$a['type'][$c],$a['default'][$c],$YGCLUB_SF_CONFIG_VALUES[$d]);
+				$e[$o]['value']		= is_array($YGCLUB_SF_CONFIG_VALUES[$d]) ? implode(',',$YGCLUB_SF_CONFIG_VALUES[$d]) : nl2br($YGCLUB_SF_CONFIG_VALUES[$d]) ;
 			}
 		}
 		ksort($e,SORT_NUMERIC);

@@ -6,7 +6,6 @@
  *   @author leeyupeng
  *   @email  leeyupeng@gmail.com
  */
-
 if(!defined('IN_DISCUZ')) {
         exit('Access Denied');
 }
@@ -41,8 +40,33 @@ class mobileplugin_ygclub_party_forum extends mobileplugin_ygclub_party {
         return array(tpl_ygclub_party_partyers_list() . tpl_ygclub_party_sign());
     }
 
-    function viewthread_title_extra() {
-        return 'fffffffffffffffffffff';
+    function viewthread_top_mobile() {
+        global $_G;
+        $tmp = C::t('#ygclub_party#party')->fetch_by_ctid($_G['tid']);
+        if($tmp['tid'] > 0)
+        {
+            return "<a href='forum.php?mod=viewthread&tid={$tmp[tid]}' style='color:#C30A00'>[相关召集帖]</a>";
+        }
+        else
+        {
+            $tmp = C::t('#ygclub_party#party')->fetch_ctid($_G['tid']);
+            if($tmp['ctid'] > 0)
+            {
+                return "<a href='forum.php?mod=viewthread&tid={$tmp[ctid]}' style='color:#2d6e00'>[相关总结帖]</a>";
+            }
+        }
+        return '';
+    }
+
+    function viewthread_posttop_mobile() {
+        if($_GET['page']  > 1) return array(0=>'');
+        global $_G;
+        $party_thread = new threadplugin_ygclub_party();
+        $party = $party_thread->_getpartyinfo($_G['tid']);
+        if(!$party['tid']) return array('');
+        include_once template('ygclub_party:party_info');
+
+        return array(tpl_ygclub_party_info());
     }
 }
 ?>

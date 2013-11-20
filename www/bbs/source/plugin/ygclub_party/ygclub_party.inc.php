@@ -34,6 +34,10 @@ if($_POST['action'] == 'partyapplies')
         if(!$party){
             showmessage('ygclub_party:party_not_valid');
         }
+        if($party['starttimeto'] < time())
+        {
+            showmessage('报名截止时间已过，下次抓紧哦。');
+        }
         if($party['closed']==1){
             showmessage("此活动已结束.");
         }
@@ -231,6 +235,7 @@ elseif($_POST['action'] == 'partyer_edit')
             'usertask' => $_POST['usertask'],
             'marks' => $_POST['marks'],
             'followed' => $_POST['followed'],
+            'config' => serialize($_POST['SFDC']),
         );
 
         C::t('#ygclub_party#partyers')->update($pid, $updateData);
@@ -486,10 +491,12 @@ elseif($_GET['act'] == 'print'){
 
             $marks_list = explode('|', $party['marks']);
             $count = 0;
+            $follow_count = 0;
             $email_list = array();
             foreach($apply_list as $key => $partyer)
             {
                 $count ++;
+                $follow_count += $partyer['followed'];
                 $print_list[$partyer['pid']]['no'] = $count;
                 $print_list[$partyer['pid']]['username'] = $partyer['username'];
                 $print_list[$partyer['pid']]['phone'] = $partyer['phone'];
@@ -528,7 +535,9 @@ elseif($_GET['act'] == 'editp')
         $party = $party_thread->_getpartysummary($partyer['tid']);
         if($partyer && (ygclub_party_isadmin($party) || ($partyer['verified'] == 1 && $partyer['uid'] == $_G['uid'])))
         {
-            $partyer['_config'] = unserialize($partyer['confi']);
+            $partyer['_config'] = unserialize($partyer['config']);
+	        $partyer['_signfield_list'] = ygclub_party_order_fields($condata['signfield']);
+            $YGCLUB_SF_CONFIG_VALUES = $partyer['_config'];
             $condata = $party_thread->_load_forumparty_condata($party['fid']);
             $partyer['_dateline'] = dgmdate($partyer['dateline'], 'u');
             $partyer['_avatar'] = avatar($partyer[uid], 'small');

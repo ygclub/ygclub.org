@@ -22,9 +22,9 @@ global $party, $partyer, $condata;
         <input type="hidden" name="handlekey" value="partyapplies" />
         <input type="hidden" name="action" value="partyapplies" />
         <input type="hidden" name="tid" value="{$party[tid]}" />
-        <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" class="dt">
+        <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" style="margin-left:5px">
             <tr>
-                <td>{lang ygclub_party:party_join_phone}(仅限数字)<span class="rq y">*</span></td>
+                <td>{lang ygclub_party:party_join_phone}(仅限数字)<span class="rq">*</span></td>
             </tr>
             <tr>
                 <td>
@@ -32,7 +32,7 @@ global $party, $partyer, $condata;
                 </td>
             </tr>
             <tr>
-                <td>{lang ygclub_party:party_join_usrexplain}<span class="rq y">*</span></td>
+                <td>{lang ygclub_party:party_join_usrexplain}<span class="rq">*</span></td>
             </tr>
             <tr>
                 <td>
@@ -42,7 +42,7 @@ global $party, $partyer, $condata;
 
             <!--{if !empty($party['_doworker_list'])}-->
             <tr>
-                <td>{lang ygclub_party:party_join_usertask}<span class="rq y">*</span></td>
+                <td>{lang ygclub_party:party_join_usertask}<span class="rq">*</span></td>
             </tr>
             <tr>
                 <td>
@@ -55,7 +55,7 @@ global $party, $partyer, $condata;
 
             <!--{if !empty($party['_marks_list'])}-->
             <tr>
-                <td>{lang ygclub_party:party_join_marks}<span class="rq y">*</span></td>
+                <td>{lang ygclub_party:party_join_marks}<span class="rq">*</span></td>
             </tr>
             <tr>
                 <td>
@@ -68,7 +68,7 @@ global $party, $partyer, $condata;
 
             <!--{if $party['followed']}-->
             <tr>
-                <td>{lang ygclub_party:party_join_followed}<span class="rq y">*</span></td>
+                <td>{lang ygclub_party:party_join_followed}<span class="rq">*</span></td>
             </tr>
             <tr>
                 <td>
@@ -82,7 +82,7 @@ global $party, $partyer, $condata;
             <tr>
                 <td>
                     <input type="hidden" name="SFDC_LIST[{$v[field]}][name]" value="$v[name]" />
-                    $v[name] <!--{if $v['must']=='on'}--><span class="rq y">*</span>
+                    $v[name] <!--{if $v['must']=='on'}--><span class="rq">*</span>
                     <input type="hidden" name="SFDC_LIST[{$v[field]}][must]" value="1" />
                     <!--{/if}-->
                 </td>

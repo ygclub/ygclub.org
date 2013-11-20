@@ -61,9 +61,21 @@
             <tr>
                 <th>{lang ygclub_party:party_join_followed}<span class="rq y">*</span></th>
                 <td>
-                    <input type='text' name='followed' class='ps' onkeyup="value=value.replace(/[^0123456789]/g,'')" value='{$party[followed]}' maxlength='4' size='4'>
+                    <input type='text' name='followed' class='ps' onkeyup="value=value.replace(/[^0123456789]/g,'')" value='{$partyer[followed]}' maxlength='4' size='4'>
                 </td>
             </tr>
+            <!--{/if}-->
+            <!--{if $condata['_signfield_list'] && $condata['signform'] == 1}-->
+            <!--{loop $condata['_signfield_list'] $v}-->
+            <tr>
+                <th>
+                    <input type="hidden" name="SFDC_LIST[{$v[field]}][name]" value="$v[name]" />
+                    $v[name] <!--{if $v['must']=='on'}--><span class="rq y">*</span>
+                    <input type="hidden" name="SFDC_LIST[{$v[field]}][must]" value="1" />
+                    <!--{/if}--></th>
+                <td>$v[html]</td>
+            </tr>
+            <!--{/loop}-->
             <!--{/if}-->
 
             <tr>

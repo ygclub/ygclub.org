@@ -22,23 +22,29 @@ global $party, $partyer, $condata;
         <input type="hidden" name="handlekey" value="partyapplies" />
         <input type="hidden" name="action" value="partyapplies" />
         <input type="hidden" name="tid" value="{$party[tid]}" />
-        <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" class="dt">
+        <table summary="{lang ygclub_party:party_join}" cellpadding="0" cellspacing="0" style="margin-left:5px">
             <tr>
-                <th style="width:120px">{lang ygclub_party:party_join_phone}<span class="rq y">*</span></th>
+                <td>{lang ygclub_party:party_join_phone}(仅限数字)<span class="rq">*</span></td>
+            </tr>
+            <tr>
                 <td>
-                    <input type="text" class="px" name="phone" size="20" maxlength="20" value="" onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> (仅限数字)
+                    <input type="text" class="px" name="phone" size="15" maxlength="20" value="" onkeyup="value=value.replace(/[^\+0123456789-]/g,'')"> 
                 </td>
             </tr>
             <tr>
-                <th>{lang ygclub_party:party_join_usrexplain}<span class="rq y">*</span></th>
+                <td>{lang ygclub_party:party_join_usrexplain}<span class="rq">*</span></td>
+            </tr>
+            <tr>
                 <td>
-                    <textarea name="message" maxlength="200" cols="38" rows="2" class="pt"></textarea>
+                    <input type="text" class="px" name="message" size="30" value="" />
                 </td>
             </tr>
 
             <!--{if !empty($party['_doworker_list'])}-->
             <tr>
-                <th>{lang ygclub_party:party_join_usertask}<span class="rq y">*</span></th>
+                <td>{lang ygclub_party:party_join_usertask}<span class="rq">*</span></td>
+            </tr>
+            <tr>
                 <td>
                     <!--{loop $party['_doworker_list'] $k $v}-->
                     <label for="usertask_{$k}"><input class="pr" type="radio" value="$v" name="usertask" id="usertask_{$k}" />$v</label>
@@ -49,7 +55,9 @@ global $party, $partyer, $condata;
 
             <!--{if !empty($party['_marks_list'])}-->
             <tr>
-                <th>{lang ygclub_party:party_join_marks}<span class="rq y">*</span></th>
+                <td>{lang ygclub_party:party_join_marks}<span class="rq">*</span></td>
+            </tr>
+            <tr>
                 <td>
                     <!--{loop $party['_marks_list'] $k $v}-->
                     <label for="marks_{$k}"><input class="pr" type="radio" name="marks" id="marks_{$k}" value="$k" />$v</label>
@@ -60,7 +68,9 @@ global $party, $partyer, $condata;
 
             <!--{if $party['followed']}-->
             <tr>
-                <th>{lang ygclub_party:party_join_followed}<span class="rq y">*</span></th>
+                <td>{lang ygclub_party:party_join_followed}<span class="rq">*</span></td>
+            </tr>
+            <tr>
                 <td>
                     <input type='text' name='followed' class='ps' onkeyup="value=value.replace(/[^0123456789]/g,'')" value='0' maxlength='4' size='4'>
                 </td>
@@ -70,23 +80,24 @@ global $party, $partyer, $condata;
             <!--{if $condata['_signfield_list'] && $condata['signform'] == 1}-->
             <!--{loop $condata['_signfield_list'] $v}-->
             <tr>
-                <th>
+                <td>
                     <input type="hidden" name="SFDC_LIST[{$v[field]}][name]" value="$v[name]" />
-                    $v[name] <!--{if $v['must']=='on'}--><span class="rq y">*</span>
+                    $v[name] <!--{if $v['must']=='on'}--><span class="rq">*</span>
                     <input type="hidden" name="SFDC_LIST[{$v[field]}][must]" value="1" />
-                    <!--{/if}--></th>
+                    <!--{/if}-->
+                </td>
+            </tr>
+            <tr>
                 <td>$v[html]</td>
             </tr>
             <!--{/loop}-->
             <!--{/if}-->
             <tr>
-                <td></td>
                 <td>
                     免责声明：本活动为非赢利目的网友活动，活动中可能存在意外的因素，参加者纯属自愿行为，一旦报名参加，则视为愿意自行承担活动中可能出现的意外伤害及经济损失，组织者及其他成员概不承担任何法律或者经济上的责任，请慎重报名参加。
                 </td>
             </tr>
             <tr>
-                <td  style="border-bottom:0"></td>
                 <td  style="border-bottom:0">
                     <button type="submit" id="partysubmit" name="partysubmit" value="partysubmit" class="pn pnc" value="true"><span>{lang ygclub_party:join_party}</span></button>
                 </td>

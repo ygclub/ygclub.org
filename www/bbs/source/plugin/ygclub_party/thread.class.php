@@ -27,6 +27,9 @@ class threadplugin_ygclub_party {
 
 
     function newthread($fid) { 
+        $party['fid'] = $fid;
+        if(!ygclub_party_isadmin($party))
+            showmessage('没有权限在本版发起阳光活动。');
         global $_G;
         if($_G['mobile'])
             showmessage('移动版暂不支持发起/编辑阳光活动。');
@@ -128,10 +131,6 @@ class threadplugin_ygclub_party {
     } 
 
     function viewthread($tid) {
-        global $_G;
-        include_once template('ygclub_party:party_info');
-        $party = $this->_getpartyinfo($tid);
-        return tpl_ygclub_party_info();
     } 
 
     public function _load_forumparty_condata($fid) {
@@ -140,7 +139,7 @@ class threadplugin_ygclub_party {
         $cachename_party = "{$this->identifier}_forum_{$fid}_config";
         include(DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php');
         $condata['_classes_list'] = explode(',', $condata['classes']);
-	$condata['_signfield_list'] = ygclub_party_order_fields($condata['signfield']);
+	    $condata['_signfield_list'] = ygclub_party_order_fields($condata['signfield']);
         return $condata;
     }
 
@@ -207,7 +206,10 @@ class threadplugin_ygclub_party {
             if($partyer['verified'] == 4){
                 $party['_verified']['4']['count'] ++;
                 $party['_verified']['4']['followed'] += $partyer['followed'];
-                $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
+                if($partyer['followed'] > 0)
+                    $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a><i> (+' . $partyer['followed'] . ')</i>';
+                else
+                    $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
                 $party['_marks_count'][$partyer['marks']] ++;
             }
             else{

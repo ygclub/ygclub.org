@@ -11,13 +11,18 @@ global $party, $partyer;
     #party_info {font-size:14px}
     #party_info tr th {text-align:center;width:200px;}
 </style>
-
 <div class="pbm cl">
     <table id="party_info" cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
-                <td>{lang ygclub_party:inviter_phone}</td>
-                <td>{$party[phone]}</td>
+                <td width="40%">{lang ygclub_party:inviter_phone}</td>
+                <td>
+                    <!--{if $party['_current_user_verified'] == 4}-->
+                    {$party[phone]}
+                    <!--{else}-->
+                    (已通过人员可见)
+                    <!--{/if}-->
+                </td>
             </tr>
             <tr>
                 <td>{lang ygclub_party:class}</td>
@@ -58,8 +63,14 @@ global $party, $partyer;
         </tbody>
     </table>
 </div>
-   <!--{if $partyer[verified] == 4}-->
+   <!--{if $party['_current_user_verified'] == 0}-->
+   <!--{elseif $party['_current_user_verified'] == 1}-->
+   你已申请参加活动，请耐心等待召集人或管理员的审核。
+   <!--{elseif $party['_current_user_verified'] == 2}-->
+   你已被取消参加此次活动。
+   <!--{elseif $partyer[verified] == 4}-->
     <div id="single_partyer_operate">
+    你已成功申请参加活动。如遇特殊原因不能继续参加活动，请提前取消。<br />
     <form name="partyer_operate_form" id="partyer_operate_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$partyer[tid]}&act=operate" onsubmit="ajaxpost('partyer_operate_form', 'return_partyer_operate', 'return_partyer_operate', 'onerror');return false;">
         <input type="hidden" name="formhash" value="{FORMHASH}" />
         <input type="hidden" name="handlekey" value="partyer_operate" />
@@ -75,6 +86,8 @@ global $party, $partyer;
         </div>
     </form>
     </div>
+    <!--{elseif $party['_current_user_verified'] == 5}-->
+    你已退出本次活动
     <!--{/if}-->
 
 <!--{if $party[_mPerm] == '1'}-->
