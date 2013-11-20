@@ -109,6 +109,7 @@ class threadplugin_ygclub_party {
         
         $_POST['doworker'] = str_replace('，',',', $_POST['doworker']);
         $updateData = array(
+            'fid'      => $fid,
             'showtime'      =>strtotime($_POST['showtime']),
             'starttimefrom' =>strtotime($_POST['starttimefrom']),
             'starttimeto'   =>strtotime($_POST['starttimeto']),
