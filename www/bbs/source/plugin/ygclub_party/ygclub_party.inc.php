@@ -499,6 +499,8 @@ elseif($_GET['act'] == 'print'){
                 $follow_count += $partyer['followed'];
                 $print_list[$partyer['pid']]['no'] = $count;
                 $print_list[$partyer['pid']]['username'] = $partyer['username'];
+                if($partyer['followed'] > 0)
+                    $print_list[$partyer['pid']]['username'] .= "(+{$partyer[followed]})";
                 $print_list[$partyer['pid']]['phone'] = $partyer['phone'];
                 if($_GET['info'] =='all')
                 {
