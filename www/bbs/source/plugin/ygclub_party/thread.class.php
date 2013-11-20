@@ -208,9 +208,9 @@ class threadplugin_ygclub_party {
                 $party['_verified']['4']['count'] ++;
                 $party['_verified']['4']['followed'] += $partyer['followed'];
                 if($partyer['followed'] > 0)
-                    $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a><i> (+' . $partyer['followed'] . ')</i>';
+                    $party['_approved_username_list_html'][] = '<a c="1" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a><i> (+' . $partyer['followed'] . ')</i>';
                 else
-                    $party['_approved_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
+                    $party['_approved_username_list_html'][] = '<a c="1" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
                 $party['_marks_count'][$partyer['marks']] ++;
             }
             else{
@@ -219,7 +219,7 @@ class threadplugin_ygclub_party {
             }
             if($partyer['checkin'] == 1){
                 $party['_checkin']['count'] ++;
-                $party['_checkin_username_list_html'][] = '<a target="_blank" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
+                $party['_checkin_username_list_html'][] = '<a c="1" href="home.php?mod=space&uid=' . $partyer[uid] . '">' . $partyer[username] . '</a>';
             }
             $party['_verified']['all']['count'] ++;
             $party['_verified']['all']['followed'] += $partyer['followed'];
