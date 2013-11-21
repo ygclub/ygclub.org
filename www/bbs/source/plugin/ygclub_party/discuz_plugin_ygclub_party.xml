@@ -132,7 +132,7 @@
 				<item id="starttimefrom"><![CDATA[发起时间]]></item>
 				<item id="starttimeto"><![CDATA[报名截至时间]]></item>
 				<item id="already_confirmed"><![CDATA[已确认]]></item>
-				<item id="applied"><![CDATA[报名]]></item>
+				<item id="applied"><![CDATA[已报名]]></item>
 				<item id="status"><![CDATA[状态]]></item>
 				<item id="approved_partyers"><![CDATA[通过人员]]></item>
 				<item id="marks_stat"><![CDATA[通过人员统计]]></item>
