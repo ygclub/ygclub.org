@@ -26,6 +26,7 @@ class mobileplugin_ygclub_party_forum extends mobileplugin_ygclub_party {
     function viewthread_postbottom_mobile() {
         global $_G;
         if($_GET['page']  > 1) return array(0=>'');
+        if($_GET['ajaxtarget']  == 'post_new') return array(0=>'');
         include_once template('ygclub_party:party_info');
         include_once template('ygclub_party:party_sign');
 
@@ -60,6 +61,7 @@ class mobileplugin_ygclub_party_forum extends mobileplugin_ygclub_party {
 
     function viewthread_posttop_mobile() {
         if($_GET['page']  > 1) return array(0=>'');
+        if($_GET['ajaxtarget']  == 'post_new') return array(0=>'');
         global $_G;
         $party_thread = new threadplugin_ygclub_party();
         $party = $party_thread->_getpartyinfo($_G['tid']);
