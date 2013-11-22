@@ -1,0 +1,88 @@
+<!--{template common/header}-->
+<style type="text/css">
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:99%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+    table.tableline td.ut1 {background-color:#777;color:#fff;font-weight:bold;}
+    table.tableline td.ut2 {background-color:yellow}
+</style>
+
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+        <div id="content">
+        <!--{loop $param_list  $k $v}-->
+        <a href="act.php?type=project&typeid={$typeid}{$v[param]}">$v[name]</a> | 
+        <!--{/loop}-->
+        <br />
+        <br />
+        <!--{if $project_act_list_count == 0}-->
+        <h2>无活动统计信息。</h2>
+        <!--{else}-->
+        <h2>{$current_year}年{$season}{$project_name}项目活动统计</h2>
+        <table class="tableline">
+            <tr>
+                <th style="width:50px">#</th>
+                <th style="width:100px">日期</th>
+                <th style="width:20%">主讲人</th>
+                <th>助教</th>
+                <th>旁听</th>
+                <th>项目负责人</th>
+                <th>总数</th>
+            </tr>
+            <!--{eval $size=0;}-->
+            <!--{loop $project_act $k $v}-->
+            <!--{eval $size++;}-->
+            <tr class='t1'>
+                <th>第{$size}次</th>
+                <td>$v[date_time]</td>
+                <td>$v[usertask]['主讲人']</td>
+                <td>$v[usertask]['助教']</td>
+                <td>$v[usertask]['旁听']</td>
+                <td>$v[usertask]['项目负责人']</td>
+                <th>$v[user_act_count]</th>
+            </tr>
+            <!--{/loop}-->
+        </table>
+        <table class="tableline">
+            <tr>
+                <th style="width:35px">#</th>
+                <th>用户名</th>
+                <!--{eval $size=0;}-->
+                <!--{loop $project_act $k $v}-->
+                <!--{eval $size++;}-->
+                <th>第{$size}次活动</th>
+                <!--{/loop}-->
+                <th>总数</th>
+            </tr>
+            <tr class='t1'>
+                <!--{eval $size2=0;}-->
+                <!--{loop $member_act_total_count $k $v}-->
+                <!--{eval $size2++;}-->
+                <!--{eval $uid = $v[uid];}-->
+                <th>$size2</th>
+                <td>$member_act[$uid]['username']</td>
+                <!--{loop $project_act $m $n}-->
+                <td class="$member_act[$uid]['act'][$m]['html_class']">$member_act[$uid]['act'][$m]['usertask']</td>
+                <!--{/loop}-->
+                <th>$v[user_act_count]</th>
+            </tr>
+            <!--{/loop}-->
+            <tr>
+                <th style="width:35px">#</th>
+                <th>用户名</th>
+                <!--{eval $size=0;}-->
+                <!--{loop $project_act $k $v}-->
+                <!--{eval $size++;}-->
+                <th>第{$size}次活动</th>
+                <!--{/loop}-->
+                <th>总数</th>
+            </tr>
+        </table>
+        <!--{/if}-->
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{$_G[setting][jspath]}calendar.js?{VERHASH}"></script>
+<!--{template common/footer}-->

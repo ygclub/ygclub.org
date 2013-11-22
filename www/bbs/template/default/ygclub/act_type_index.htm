@@ -1,0 +1,33 @@
+<!--{template common/header}-->
+<style type="text/css">
+    h4 {color:#666;font-weight:normal;}
+    table.tableline{border-collapse: collapse; width:30%; font-size: 12px; margin-top:10px; }
+    table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
+    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
+    table.tableline caption{font-size:14px; font-weight:bold; }
+</style>
+
+<div id="wrap" class="wrap s_clear">
+    <div class="main">
+    <div id="content">
+        <table class="tableline">
+            <tr>
+                <th style="width:35px">#</th>
+                <th>活动分类</th>
+                <th>总活动数</th>
+            </tr>
+            <!--{eval $size=0;}-->
+            <!--{loop $result $k $v}-->
+            <!--{eval $size++;}-->
+            <tr class='t1'>
+                <th>$size</th>
+                <td><a href="act.php?type=project&typeid=$v[typeid]">$v[name]</a></td>
+                <td>$v[p_count]</td>
+            </tr>
+            <!--{/loop}-->
+        </table>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{$_G[setting][jspath]}calendar.js?{VERHASH}"></script>
+<!--{template common/footer}-->
