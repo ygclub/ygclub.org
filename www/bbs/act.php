@@ -192,6 +192,7 @@ if($list_type == 'project')
         $sql .= "ORDER BY c.displayorder, p_year desc, p_month desc ";
         $result = DB::fetch_all($sql);
         $project_act_list = array();
+        $project_act_total_list = array();
         foreach($result as $key => $value)
         {
             if($value['p_month'] >=2 && $value['p_month'] <=7)
@@ -218,6 +219,8 @@ if($list_type == 'project')
             $project_act_list[$value['typeid']][$value['p_year'] . $half]['half'] = $half;
             $title_list[$value['p_year'] . $half] = $value['p_year']  . $half_cn; 
             $project_act_list[$value['typeid']]['total_count']  += $value['p_count'];
+            $project_act_total_list[$value['p_year'] . $half]  += $value['p_count']; 
+            $project_act_total_list['total_count']  += $value['p_count']; 
         }
         include template("ygclub/act_type_index");
         exit;

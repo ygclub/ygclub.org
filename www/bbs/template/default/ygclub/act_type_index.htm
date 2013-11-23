@@ -12,17 +12,21 @@
 <div id="wrap" class="wrap s_clear">
     <div class="main">
 	<div id="content">
-		    点击数字查看详情
+        <h2>点击数字查看详情</h2>
         <table class="tableline">
             <tr>
+                <th style="width:35px">#</th>
                 <th style="width:120px">项目点</th>
                 <!--{loop $title_list $k $v}-->
                 <th>$v</th>
                 <!--{/loop}-->
-                <th style="width:50px">总数</th>
+                <th style="width:50px">总计</th>
             </tr>
+            <!--{eval $size=0;}-->
             <!--{loop $project_act_list $k $v}-->
+            <!--{eval $size++;}-->
             <tr class='t1'>
+                <th>$size</th>
                 <th>$v[name]</th>
                 <!--{loop $title_list $k2 $v2}-->
                 <!--{if $v[$k2][p_total_count] >0}-->
@@ -34,6 +38,16 @@
                 <th>$v[total_count]</th>
             </tr>
             <!--{/loop}-->
+            <tr class='t1'>
+                <th>#</th>
+                <th>总计</th>
+                <!--{loop $title_list $k2 $v2}-->
+                <th style="text-align:center">
+                    $project_act_total_list[$k2]
+                </th>
+                <!--{/loop}-->
+                <th>$project_act_total_list[total_count]</th>
+            </tr>
         </table>
     </div>
 </div>
