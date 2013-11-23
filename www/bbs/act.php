@@ -295,7 +295,7 @@ else
         $sql .= "AND pe.verified = 4 ";
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= $starttime != '' ? "AND p.showtime>'".$starttime."' " : '';
-        $sql .= $endtime != '' ? "AND pe.dateline<='".$endtime."' " : '';
+        $sql .= $endtime != '' ? "AND p.showtime<='".$endtime."' " : '';
         $sql .= "ORDER BY p.showtime DESC";
         $act_user_list = array();
         $user_name = '';
