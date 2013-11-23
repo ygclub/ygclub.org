@@ -155,13 +155,15 @@ if($list_type == 'project')
             }
             if($act_info['usertask'] == '主讲人')
             {
-                $weight = 3;
                 $act_info['html_class'] = "ut1";
+            }
+            elseif($act_info['usertask'] == '项目负责人')
+            {
+                $act_info['html_class'] = "ut2";
             }
             elseif($act_info['usertask'] == '助教')
             {
-                $weight = 1;
-                $act_info['html_class'] = "ut2";
+                $act_info['html_class'] = "ut3";
             }
             $member_act_total_count[$act_info['uid']]['uid'] = $act_info['uid'];
             $member_act_total_count[$act_info['uid']]['user_act_count'] ++; 
