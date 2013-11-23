@@ -1,10 +1,12 @@
 <!--{template common/header}-->
 <style type="text/css">
     h4 {color:#666;font-weight:normal;}
-    table.tableline{border-collapse: collapse; width:30%; font-size: 12px; margin-top:10px; }
+    table.tableline{border-collapse: collapse; width:100%; font-size: 12px; margin-top:10px; }
     table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
-    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
+    table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;text-align:center;}
     table.tableline caption{font-size:14px; font-weight:bold; }
+    a.count {display:block;background-color:#e6ffbf;margin:0;color:#111}
+    a.count:onhov {display:block}
 </style>
 
 <div id="wrap" class="wrap s_clear">
@@ -12,17 +14,23 @@
     <div id="content">
         <table class="tableline">
             <tr>
-                <th style="width:35px">#</th>
-                <th>活动分类</th>
-                <th>总活动数</th>
+                <th style="width:120px">项目点</th>
+                <!--{loop $title_list $k $v}-->
+                <th>$v</th>
+                <!--{/loop}-->
+                <th style="width:50px">总数</th>
             </tr>
-            <!--{eval $size=0;}-->
-            <!--{loop $result $k $v}-->
-            <!--{eval $size++;}-->
+            <!--{loop $project_act_list $k $v}-->
             <tr class='t1'>
-                <th>$size</th>
-                <td><a href="act.php?type=project&typeid=$v[typeid]">$v[name]</a></td>
-                <td>$v[p_count]</td>
+                <th>$v[name]</th>
+                <!--{loop $title_list $k2 $v2}-->
+                <!--{if $v[$k2][p_total_count] >0}-->
+                <td style="text-align:center"><a href="act.php?type=project&typeid=$k&year={$v[$k2][p_year]}&half={$v[$k2][half]}" class="count" >$v[$k2]['p_total_count']</a></td>
+                <!--{else}-->
+                <td></td>
+                <!--{/if}-->
+                <!--{/loop}-->
+                <th>$v[total_count]</th>
             </tr>
             <!--{/loop}-->
         </table>

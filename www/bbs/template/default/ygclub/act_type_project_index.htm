@@ -7,13 +7,31 @@
     table.tableline caption{font-size:14px; font-weight:bold; }
     table.tableline td.ut1 {background-color:#777;color:#fff;font-weight:bold;}
     table.tableline td.ut2 {background-color:yellow}
+    a.count {border:1px solid #eee;
+        float: left;
+        margin-right: 5px;
+        padding: 4px 8px 3px;
+        height: 18px;
+        border: 1px solid #CDCDCD;
+        background: white;
+       white-space: nowrap; 
+   }
+   span.num {
+       background: #999;
+       padding: 0 5px;
+       margin-left: 5px;
+       border-radius: 3px;
+       color: white;
+   }
+
 </style>
 
 <div id="wrap" class="wrap s_clear">
     <div class="main">
         <div id="content">
-        <!--{loop $param_list  $k $v}-->
-        <a href="act.php?type=project&typeid={$typeid}{$v[param]}">$v[name]</a> | 
+            <!--{loop $param_list  $k $v}-->
+            
+        <a href="act.php?type=project&typeid={$typeid}{$v[param]}" class="count" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#e6ffbf;"{/if} >$v[name] <span class="num" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#690;color:#fff"{/if}>$v[count]</span></a> 
         <!--{/loop}-->
         <br />
         <br />
@@ -29,14 +47,14 @@
                 <th>助教</th>
                 <th>旁听</th>
                 <th>项目负责人</th>
-                <th>总数</th>
+                <th style="width:30px">总数</th>
             </tr>
             <!--{eval $size=0;}-->
             <!--{loop $project_act $k $v}-->
             <!--{eval $size++;}-->
             <tr class='t1'>
                 <th>第{$size}次</th>
-                <td>$v[date_time]</td>
+                <td><a href="forum.php?mod=viewthread&tid=$k" title="$v[subject]">$v[date_time]</a></td>
                 <td>$v[usertask]['主讲人']</td>
                 <td>$v[usertask]['助教']</td>
                 <td>$v[usertask]['旁听']</td>
@@ -44,17 +62,41 @@
                 <th>$v[user_act_count]</th>
             </tr>
             <!--{/loop}-->
+            <tr>
+                <th style="width:50px">总计</th>
+                <th style="width:100px"></th>
+                <th style="width:20%">
+                    $project_act_total['usertask']['主讲人']['uniq_count']人 / 
+                    $project_act_total['usertask']['主讲人']['total_count']人次
+                </th>
+                <th>
+                    $project_act_total['usertask']['助教']['uniq_count']人 / 
+                    $project_act_total['usertask']['助教']['total_count']人次
+                </th>
+                <th>
+                    $project_act_total['usertask']['旁听']['uniq_count']人 / 
+                    $project_act_total['usertask']['旁听']['total_count']人次
+                </th>
+                <th>
+                    $project_act_total['usertask']['项目负责人']['uniq_count']人 
+                </th>
+                <th>
+                    $project_act_total['usertask']['total_count']
+                </th>
+            </tr>
+
         </table>
+        <br />
         <table class="tableline">
             <tr>
                 <th style="width:35px">#</th>
-                <th>用户名</th>
+                <th style="width:100px">用户名</th>
                 <!--{eval $size=0;}-->
                 <!--{loop $project_act $k $v}-->
                 <!--{eval $size++;}-->
                 <th>第{$size}次活动</th>
                 <!--{/loop}-->
-                <th>总数</th>
+                <th style="width:30px">总数</th>
             </tr>
             <tr class='t1'>
                 <!--{eval $size2=0;}-->
@@ -62,7 +104,7 @@
                 <!--{eval $size2++;}-->
                 <!--{eval $uid = $v[uid];}-->
                 <th>$size2</th>
-                <td>$member_act[$uid]['username']</td>
+                <td><a href="act.php?uid=$uid" style="color:#690">$member_act[$uid]['username']</a></td>
                 <!--{loop $project_act $m $n}-->
                 <td class="$member_act[$uid]['act'][$m]['html_class']">$member_act[$uid]['act'][$m]['usertask']</td>
                 <!--{/loop}-->

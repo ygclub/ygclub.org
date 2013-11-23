@@ -5,6 +5,15 @@
     table.tableline th, table.tableline td{margin:0px; padding:5px; border:1px solid #EFEFEF;}
     table.tableline th{color:#333; font-weight:bold; background-color:whiteSmoke;}
     table.tableline caption{font-size:14px; font-weight:bold; }
+    a.projectcount {border:1px solid #eee;
+        margin-right: 5px;
+        padding: 4px 10px;
+        height: 18px;
+        border: 1px solid #ccc;
+        background: #690;
+        color:#fff;
+        white-space: nowrap; 
+   }
 </style>
 
 <div id="wrap" class="wrap s_clear">
@@ -17,6 +26,7 @@
             <input type="text" name="endtime" id="endtime" onclick="showcalendar(event, this)" onfocus="showcalendar(event, this);" value="$endtime_template" readonly="readonly"  class="txt"/>
             输入用户名查找 <input type="text" name="username" id="username" value="$username" class="txt" />
             <input type="submit" value="查询">
+           <a href="act.php?type=project" class="projectcount">项目活动统计</a>
         </form>
         <br />
         <br />

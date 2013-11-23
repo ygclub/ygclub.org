@@ -20,35 +20,44 @@ $today = strtotime(date('Y-m-d')) + 86399;
 
 if($list_type == 'project')
 {
-    $navigation .= ' <em>&rsaquo;</em> <a href="act.php?type=project">项目活动统计<a/>';
+    $navigation .= ' <em>&rsaquo;</em> <a href="act.php?type=project">项目活动统计</a>';
     if($typeid > 0)
     {
-        $this_year = date('Y');
+        $sql = "SELECT count(p.tid) as p_count,FROM_UNIXTIME(p.showtime, '%Y') as p_year, FROM_UNIXTIME(p.showtime, '%m') as p_month  FROM ";
+        $sql .= DB::table('ygclub_party') . " as p ";
+        $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
+        $sql .= "LEFT JOIN " . DB::table('forum_threadclass') . " as c on t.typeid = c.typeid where 1 ";
+        $sql .= "AND t.fid=2 ";
+        $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
+        $sql .= "AND p.class = '阳光公益活动' ";
+        $sql .= "AND t.typeid = '$typeid' ";
+        $sql .= "GROUP BY FROM_UNIXTIME(p.showtime, '%Y'), FROM_UNIXTIME(p.showtime, '%m') ";
+        $sql .= "ORDER BY p_year DESC, p_month DESC";
+        $result = DB::fetch_all($sql);
         $param_list = array();
         $index = 0;
-        for($i=$this_year; $i>=2010; $i --)
+        foreach($result as $key => $value)
         {
-            if($i == $this_year)
+            if($value['p_month'] >=2 && $value['p_month'] <=8)
             {
-                if(date('m') > 9)
-                {
-                    $param_list[$index]['param'] = "&year=$i&half=f";
-                    $param_list[$index]['name'] = "{$i}年秋季学期";
-                }
-                $index ++;
-                $param_list[$index]['param'] = "&year=$i&half=s";
-                $param_list[$index]['name'] = "{$i}年春季学期";
-                $index ++;
+                $half = 's';
+                $half_cn = '春';
             }
             else
             {
-                $index ++;
-                $param_list[$index]['param'] = "&year=$i&half=f";
-                $param_list[$index]['name'] = "{$i}年秋季学期";
-                $index ++;
-                $param_list[$index]['param'] = "&year=$i&half=s";
-                $param_list[$index]['name'] = "{$i}年春季学期";
+                if($value['p_month'] == 1)
+                {
+                    $value['p_year'] = $value['p_year']-1;
+                }
+                $half = 'f';
+                $half_cn = '秋';
             }
+
+            $param_list[$value['p_year'].$half]['year'] = $value['p_year'];
+            $param_list[$value['p_year'].$half]['half'] = $half;
+            $param_list[$value['p_year'].$half]['param'] = "&year=$value[p_year]&half=$half";
+            $param_list[$value['p_year'].$half]['name'] = "{$value[p_year]}年{$half_cn}季学期";
+            $param_list[$value['p_year'].$half]['count'] += $value['p_count'];
         }
         if($_GET['year'] == '')
         {
@@ -58,7 +67,7 @@ if($list_type == 'project')
         {
             if($_GET['half'] == 's')
             {
-                $current_time = strtotime($_GET['year'] . '-03-01');
+                $current_time = strtotime($_GET['year'] . '-02-01');
             }
             else
             {
@@ -66,10 +75,10 @@ if($list_type == 'project')
             }
         }
         $current_month = date('m', $current_time);
-        $spring_half_start = strtotime(date('Y',$current_time).'-03-01');
+        $spring_half_start = strtotime(date('Y',$current_time).'-02-01');
         $spring_half_end = strtotime(date('Y',$current_time).'-08-31');
         $fall_half_start = strtotime(date('Y',$current_time).'-09-01');
-        $fall_half_end = strtotime(date('Y',$current_time).'-02-28' . ' +1 year');
+        $fall_half_end = strtotime(date('Y',$current_time).'-02-01' . ' +1 year');
         $sql = 'SELECT p.tid, p.showtime, t.typeid, t.subject, c.name  FROM ';
         $sql .= DB::table('ygclub_party') . " as p ";
         $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
@@ -79,7 +88,7 @@ if($list_type == 'project')
         $sql .= "AND p.class = '阳光公益活动' ";
         $sql .= "AND t.typeid = '$typeid' ";
 
-        if($current_month  >=3 && $current_month <= 8) 
+        if($current_month  >=2 && $current_month <= 8) 
         {
             $season = '春季';
             $sql .= "AND p.showtime >= $spring_half_start ";
@@ -98,6 +107,7 @@ if($list_type == 'project')
 
         $result = DB::fetch_all($sql);
         $project_act = array();
+        $project_act_total = array('total'=>'总计');
         $party_tid_array = array(0);
         $project_name = '';
         foreach($result as $act_info)
@@ -109,6 +119,7 @@ if($list_type == 'project')
         }
         $party_tids = join(',', $party_tid_array);
         $project_act_list_count = count($project_act);
+        $navigation .= " <em>&rsaquo;</em> $project_name";
         
         $sql = 'SELECT uid, username, usertask, tid FROM ';
         $sql .= DB::table('ygclub_partyers') . ' WHERE 1 ';
@@ -158,6 +169,10 @@ if($list_type == 'project')
             $r1[$act_info['uid']] ++;
             $r2[$act_info['uid']] += $weight;
             $member_act[$act_info['uid']]['act'][$act_info['tid']]= $act_info;
+            $project_act_total['usertask'][$act_info['usertask']]['total_count'] ++;
+            $project_act_total['usertask'][$act_info['usertask']]['username'][$act_info['username']] = 1;
+            $project_act_total['usertask'][$act_info['usertask']]['uniq_count'] = count($project_act_total['usertask'][$act_info['usertask']]['username']);
+            $project_act_total['usertask']['total_count'] ++;
         }
         $member_act_list_count = count($member_act);
         array_multisort($r1, SORT_DESC, $r2, SORT_DESC, $member_act_total_count);
@@ -166,17 +181,44 @@ if($list_type == 'project')
     }
     else
     {
-        $sql = 'SELECT count(p.tid) as p_count, p.class, t.typeid, c.name, c.displayorder  FROM ';
+        $sql = "SELECT count(p.tid) as p_count,FROM_UNIXTIME(p.showtime, '%Y') as p_year, FROM_UNIXTIME(p.showtime, '%m') as p_month, p.class, t.typeid, c.name, c.displayorder  FROM ";
         $sql .= DB::table('ygclub_party') . " as p ";
         $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
         $sql .= "LEFT JOIN " . DB::table('forum_threadclass') . " as c on t.typeid = c.typeid where 1 ";
         $sql .= "AND t.fid=2 ";
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= "AND p.class = '阳光公益活动' ";
-        $sql .= "GROUP BY c.typeid ";
-        $sql .= "ORDER BY c.displayorder, p_count desc ";
+        $sql .= "GROUP BY c.typeid, FROM_UNIXTIME(p.showtime, '%Y'), FROM_UNIXTIME(p.showtime, '%m')";
+        $sql .= "ORDER BY c.displayorder, p_year desc, p_month desc ";
         $result = DB::fetch_all($sql);
-        
+        $project_act_list = array();
+        foreach($result as $key => $value)
+        {
+            if($value['p_month'] >=2 && $value['p_month'] <=7)
+            {
+                $half = 's';
+                $half_cn = '春';
+            }
+            else
+            {
+                if($value['p_month'] == 1)
+                {
+                    $value['p_year'] = $value['p_year']-1;
+                }
+                $half = 'f';
+                $half_cn = '秋';
+            }
+            $project_act_list[$value['typeid']]['name'] = $value['name'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['typeid'] = $value['typeid'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['name'] = $value['name'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['p_count'] += $value['p_count'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['p_total_count'] += $value['p_count'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['total_count'] += $value['p_count'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['p_year'] = $value['p_year'];
+            $project_act_list[$value['typeid']][$value['p_year'] . $half]['half'] = $half;
+            $title_list[$value['p_year'] . $half] = $value['p_year']  . $half_cn; 
+            $project_act_list[$value['typeid']]['total_count']  += $value['p_count'];
+        }
         include template("ygclub/act_type_index");
         exit;
     }
