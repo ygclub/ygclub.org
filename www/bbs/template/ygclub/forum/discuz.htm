@@ -4,6 +4,20 @@
 <!--{if empty($gid)}-->
 	<!--{ad/text/wp a_t}-->
 <!--{/if}-->
+	<!--{if empty($gid) && $announcements}-->
+	<div id="anbox" class="mtm" style="border:0;margin-top:0 !important">
+<div id="an" class="bm bw0">
+			<dl class="cl">
+				<dt class="z xw1">{lang announcements}:&nbsp;</dt>
+				<dd>
+					<div id="anc" class="xi2"><ul id="ancl">$announcements</ul></div>
+				</dd>
+			</dl>
+		</div>
+		<script type="text/javascript">announcement();</script>
+		<div class="y"><!--{hook/index_status_extra}--></div>
+	</div>
+	<!--{/if}-->
 
 	<style id="diy_style" type="text/css"></style>
 
@@ -23,20 +37,6 @@
 			</div>
 		</div>
 		<!--{/if}-->
-		<!--
-	<div id="anbox" class="mtm">
-<div id="an" class="bm bw0">
-			<dl class="cl">
-				<dt class="z xw1">{lang announcements}:&nbsp;</dt>
-				<dd>
-					<div id="anc" class="xi2"><ul id="ancl">$announcements</ul></div>
-				</dd>
-			</dl>
-		</div>
-		<script type="text/javascript">announcement();</script>
-		<div class="y"><!--{hook/index_status_extra}--></div>
-	</div>
-	-->
 	<!--[diy=diy_chart]--><div id="diy_chart" class="area"></div><!--[/diy]-->
 	<div id="ct" class="wp cl mtm">
 
