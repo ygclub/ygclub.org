@@ -10,6 +10,8 @@ global $party;
 <style type="text/css">
     #party_info {font-size:14px}
     #party_info tr th {text-align:center;width:200px;}
+    .party_admin, .party_admin:link, .party_admin:visited
+    {font-weight:bold;color:#dc143c}
 </style>
 
 <div class="pbm cl">
@@ -17,20 +19,21 @@ global $party;
         <tbody>
             <!--{if $party[_mPerm] == '1'}-->
             <tr>
-                <th><strong style="color:#8b0a00">活动管理</strong></th>
+                <th class="party_admin">活动管理</th>
                 <td colspan="3">
-                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=print" target="_blank" title="打印名单">[打印名单]</a></span>
-                    <!--{if $party[closed] == '1'}-->
-                    <button onclick="showDialog($('close_open_party').innerHTML,'info','开启活动',null,1);return false;" class="pn pnc"><span>开启活动</span></button>
-                    <!--{else}-->
-                    <button onclick="showDialog($('close_open_party').innerHTML,'info','关闭活动',null,1);return false;" class="pn"><span>关闭活动</span></button>
-                    <!--{/if}-->
+                    <span class="xi2">
+                        <a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=print" target="_blank" title="打印名单" class="party_admin"><img src="static/image/common/print.png" alt="打印" class="vm">[打印名单]</a></span>
                     <!--{if $party['_notshow']}-->
                     <span style="color:#aaa">[编辑签到信息]</span>
                     <span style="color:#aaa">[关联总结帖]</span>
                     <!--{else}-->
-                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=checkin" title="编辑签到信息">[编辑签到信息]</a></span>
-                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=relec" title="关联总结帖">[关联总结帖]</a></span>
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=checkin" title="编辑签到信息" class="party_admin">[编辑签到信息]</a></span>
+                    <span class="xi2"><a href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=relec" title="关联总结帖" class="party_admin">[关联总结帖]</a></span>
+                    <!--{/if}-->
+                    <!--{if $party[closed] == '1'}-->
+                    <button onclick="showDialog($('close_open_party').innerHTML,'info','开启活动',null,1);return false;" class="pn pnc"><span>开启活动</span></button>
+                    <!--{else}-->
+                    <button onclick="showDialog($('close_open_party').innerHTML,'info','关闭活动',null,1);return false;" class="pn"><span>关闭活动</span></button>
                     <!--{/if}-->
                     <div id="close_open_party" style="display:none">
                         <form name="close_open_party_form" id="close_open_party_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$party[tid]}&act=onoff&for=<!--{if $party[closed] == '0'}-->off<!--{else}-->on<!--{/if}-->" onsubmit="ajaxpost(this.id, 'return_close_open_party', 'return_close_open_party', 'onerror');return false;">
