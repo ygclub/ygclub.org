@@ -34,6 +34,11 @@ if($_POST['action'] == 'partyapplies')
         if(!$party){
             showmessage('ygclub_party:party_not_valid');
         }
+        $condata = $party_thread->_load_forumparty_condata($party['fid']);
+        if(isset($condata['bgroup']) && !in_array($_G['groupid'], $condata['bgroup']))
+        {
+            showmessage('您所在的用户组暂时不能报名');
+        }
         if($party['starttimeto'] < time())
         {
             showmessage('报名截止时间已过，下次抓紧哦。');

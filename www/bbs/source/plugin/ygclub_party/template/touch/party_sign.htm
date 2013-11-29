@@ -2,7 +2,7 @@
 
 global $party, $partyer, $condata;
 function tpl_ygclub_party_sign () {
-global $party, $partyer, $condata;
+global $party, $partyer, $condata, $_G;
 
 }
 
@@ -99,7 +99,11 @@ global $party, $partyer, $condata;
             </tr>
             <tr>
                 <td  style="border-bottom:0">
+                    <!--{if isset($condata['bgroup']) && !in_array($_G['groupid'], $condata['bgroup'])}-->
+                    <button disabled="disabled"><span>您所在的用户组暂时不能报名</span></button>
+                    <!--{else}-->
                     <button type="submit" id="partysubmit" name="partysubmit" value="partysubmit" class="pn pnc" value="true"><span>{lang ygclub_party:join_party}</span></button>
+                    <!--{/if}-->
                 </td>
             </tr>
         </table>
