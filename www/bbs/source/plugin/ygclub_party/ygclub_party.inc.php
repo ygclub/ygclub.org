@@ -750,9 +750,33 @@ elseif($_GET['act']=='checkin'){
         include template('ygclub_party:party_checkin');
     }
 }
+elseif($_GET['act'] == 'repair'){
+    $tid = $_GET['tid'];
+    $party_thread = new threadplugin_ygclub_party();
+    $party = $party_thread->_getpartyinfo($tid);
+    
+    if(!ygclub_party_isadmin($party)) {
+        showmessage('没有权限修复活动');
+    }
+
+    $tmp = DB::fetch_first("SELECT pid, tid,first,message FROM %t where tid=%d and first=1 ", array('forum_post', $tid));
+    if($tmp['pid'])
+    {
+        $message = str_replace(chr(0), '', $tmp['message']);
+        $message = str_replace('ygclub_party', '', $message);
+        $message = addslashes($message) . chr(0).chr(0).chr(0) . 'ygclub_party';
+        C::t('forum_thread')->update($tid, array('special'=>'127'));
+        DB::query("UPDATE " . DB::table('forum_post'). " set message='$message' WHERE pid=$tmp[pid]");
+        showmessage('完成修复!');
+    }
+    else
+    {
+        showmessage('post not exists!');
+    }
+}
 else{
     showmessage('参数不合法');
-    die('over');
+    /*
     $tmp = DB::fetch_all("SELECT tid FROM %t", array('ygclub_party'));
     foreach($tmp as $v)
     {
@@ -767,6 +791,7 @@ else{
         }
     }
     showmessage('upgrade complete!');
+     */
 }
 
 function ygclub_party_getstatus_txt($verified)
