@@ -767,7 +767,7 @@ elseif($_GET['act'] == 'repair'){
         $message = addslashes($message) . chr(0).chr(0).chr(0) . 'ygclub_party';
         C::t('forum_thread')->update($tid, array('special'=>'127'));
         DB::query("UPDATE " . DB::table('forum_post'). " set message='$message' WHERE pid=$tmp[pid]");
-        showmessage('完成修复!');
+        showmessage('完成修复！', 'forum.php?mod=viewthread&tid='.$tid);
     }
     else
     {
