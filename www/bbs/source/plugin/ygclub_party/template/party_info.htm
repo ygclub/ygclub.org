@@ -35,6 +35,7 @@ global $party;
                     <!--{else}-->
                     <button onclick="showDialog($('close_open_party').innerHTML,'info','关闭活动',null,1);return false;" class="pn"><span>关闭活动</span></button>
                     <!--{/if}-->
+                    <span style="color:#fff"><a style="color:#fff" href="plugin.php?id=ygclub_party&tid={$party[tid]}&act=repair" title="修复活动贴" onclick="return confirm('确认修复该活动贴吗？');" >[修复活动贴]</a></span>
                     <div id="close_open_party" style="display:none">
                         <form name="close_open_party_form" id="close_open_party_form" method="post" autocomplete="off" action="plugin.php?id=ygclub_party&tid={$party[tid]}&act=onoff&for=<!--{if $party[closed] == '0'}-->off<!--{else}-->on<!--{/if}-->" onsubmit="ajaxpost(this.id, 'return_close_open_party', 'return_close_open_party', 'onerror');return false;">
                             <input type="hidden" name="formhash" value="{FORMHASH}" />
