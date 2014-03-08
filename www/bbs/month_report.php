@@ -28,7 +28,7 @@ if ($_G['uid']){
     $starttime = strtotime($starttime);
     $endtime = strtotime($endtime);
 
-    if($endtime - $starttime > 31*24*3600) showmessage('选择时间不能超过一个月');
+    if($endtime - $starttime > 31*12*24*3600) showmessage('选择时间不能超过十二个月');
 
     $sql = '1';
     $sql .= $starttime != '' ? " AND dateline>'".$starttime."'" : '';
