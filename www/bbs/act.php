@@ -192,7 +192,7 @@ if($list_type == 'project')
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= "AND p.class = '阳光公益活动' ";
         $sql .= "GROUP BY c.typeid, FROM_UNIXTIME(p.showtime, '%Y'), FROM_UNIXTIME(p.showtime, '%m')";
-        $sql .= "ORDER BY c.displayorder, p_year desc, p_month desc ";
+        $sql .= "ORDER BY p_year desc, p_month desc, c.displayorder";
         $result = DB::fetch_all($sql);
         $project_act_list = array();
         $project_act_total_list = array();
