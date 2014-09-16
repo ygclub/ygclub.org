@@ -17,6 +17,7 @@ $username = $_GET['username'];
 $list_type = $_GET['type'];
 $typeid = $_GET['typeid'];
 $today = strtotime(date('Y-m-d')) + 86399;
+$fids = "(2,38,39,40,41,42,43,44,45)";
 
 if($list_type == 'project')
 {
@@ -27,7 +28,7 @@ if($list_type == 'project')
         $sql .= DB::table('ygclub_party') . " as p ";
         $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
         $sql .= "LEFT JOIN " . DB::table('forum_threadclass') . " as c on t.typeid = c.typeid where 1 ";
-        $sql .= "AND t.fid=2 ";
+        $sql .= "AND t.fid IN " . $fids;
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= "AND p.class = '阳光公益活动' ";
         $sql .= "AND t.typeid = '$typeid' ";
@@ -83,7 +84,7 @@ if($list_type == 'project')
         $sql .= DB::table('ygclub_party') . " as p ";
         $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
         $sql .= "LEFT JOIN " . DB::table('forum_threadclass') . " as c on t.typeid = c.typeid where 1 ";
-        $sql .= "AND t.fid=2 ";
+        $sql .= "AND t.fid IN " . $fids;
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= "AND p.class = '阳光公益活动' ";
         $sql .= "AND t.typeid = '$typeid' ";
@@ -187,7 +188,7 @@ if($list_type == 'project')
         $sql .= DB::table('ygclub_party') . " as p ";
         $sql .= "LEFT JOIN " . DB::table('forum_thread') . " as t on p.tid = t.tid ";
         $sql .= "LEFT JOIN " . DB::table('forum_threadclass') . " as c on t.typeid = c.typeid where 1 ";
-        $sql .= "AND t.fid=2 ";
+        $sql .= "AND t.fid IN " . $fids;
         $sql .= "AND t.subject NOT LIKE '%活动取消%' ";
         $sql .= "AND p.class = '阳光公益活动' ";
         $sql .= "GROUP BY c.typeid, FROM_UNIXTIME(p.showtime, '%Y'), FROM_UNIXTIME(p.showtime, '%m')";
