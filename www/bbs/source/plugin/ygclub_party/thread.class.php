@@ -140,6 +140,8 @@ class threadplugin_ygclub_party {
         $cachename_party = "{$this->identifier}_forum_{$fid}_config";
         include(DISCUZ_ROOT . $cachedir_party . $cachename_party . '.php');
         $condata['_classes_list'] = explode(',', $condata['classes']);
+        $condata['_classes_list'] = array('1'=>'阳光公益活动', '2'=>'培训交流', '3'=>'阳光例会', '4'=>'外部公益活动', '5'=>'休闲活动');
+
 	    $condata['_signfield_list'] = ygclub_party_order_fields($condata['signfield']);
         return $condata;
     }

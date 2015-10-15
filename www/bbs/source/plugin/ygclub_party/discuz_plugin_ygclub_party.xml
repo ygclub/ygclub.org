@@ -147,6 +147,15 @@
 				<item id="party_join_followed"><![CDATA[随行人员]]></item>
 				<item id="join_party"><![CDATA[同意以上声明并确认报名]]></item>
 				<item id="you_already_applied"><![CDATA[你已经报名了此次活动。]]></item>
+				<item id="post_error_message_showtime"><![CDATA[请选择活动时间]]></item>
+				<item id="post_error_message_starttimefrom"><![CDATA[请选择报名开始时间]]></item>
+				<item id="post_error_message_starttimeto"><![CDATA[请选择报名结束时间]]></item>
+				<item id="post_error_message_starttimeto_more_than_showtime"><![CDATA[报名结束时间需要早于活动开始时间]]></item>
+				<item id="post_error_message_starttimefrom_more_than_starttimeto"><![CDATA[报名结束时间需要早于报名开始时间]]></item>
+				<item id="post_error_message_class"><![CDATA[请选择活动类型]]></item>
+				<item id="digit_input_invalid"><![CDATA[请填写有效的数字]]></item>
+				<item id="post_error_phone"><![CDATA[请填写召集人电话]]></item>
+				<item id="post_error_doworker"><![CDATA[请填写分工类型]]></item>
 			</item>
 		</item>
 	</item>

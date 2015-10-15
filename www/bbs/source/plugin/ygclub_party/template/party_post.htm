@@ -116,7 +116,7 @@ function validateextra() {
     var starttimeto = new Date($('postform').starttimeto.value).getTime();
     if( starttimefrom > starttimeto )
     {
-      showDialog('活动开始时间需要早于活动结束时间', 'alert', '', function () { $('postform').starttimefrom.focus() });
+	showDialog('{lang ygclub_party:post_error_message_starttimefrom_more_than_starttimeto}', 'alert', '', function () { $('postform').starttimefrom.focus() });
         return false;
     }
     if( showtime < starttimeto)
