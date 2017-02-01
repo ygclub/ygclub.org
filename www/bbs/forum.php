@@ -1,5 +1,14 @@
 <?php
 
+/* NOTE: THIS CODE IS VERY UGLY FOR MOBILE  */
+
+if (isset($_GET["mod"]) && isset($_GET["fid"]) && isset($_GET["mobile"])) {
+  if (($_GET['mod'] == 'forumdisplay') && ($_GET['fid'] == '2') && ($_GET['mobile'] == '2')) {
+    Header("Location: http://www.ygclub.org/bbs/archiver/?fid-2.html");
+    exit();
+  }
+}
+
 /**
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
@@ -16,6 +25,7 @@ require './source/class/class_core.php';
 
 
 require './source/function/function_forum.php';
+
 
 
 $modarray = array('ajax','announcement','attachment','forumdisplay',
