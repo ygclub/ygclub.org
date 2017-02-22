@@ -52,6 +52,10 @@ test.php
 piwik
 to_be_deleted
 
+#symbolic link
+bbs/uc_server
+wiki/extensions/extensions
+
 # Repository management
 .svn
 
