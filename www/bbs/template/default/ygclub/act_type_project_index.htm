@@ -33,7 +33,7 @@
         <div id="content">
             <!--{loop $param_list  $k $v}-->
             
-        <a href="act.php?type=project&typeid={$typeid}{$v[param]}" class="count" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#e6ffbf;"{/if} >$v[name] <span class="num" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#690;color:#fff"{/if}>$v[count]</span></a> 
+	    <a href="act.php?type=project&fid={$fid}&typeid={$typeid}{$v[param]}" class="count" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#e6ffbf;"{/if} >$v[name] <span class="num" {if $v[year] == $_GET[year] and  $v[half] == $_GET[half]} style="background:#690;color:#fff"{/if}>$v[count]</span></a> 
         <!--{/loop}-->
         <br />
         <br />

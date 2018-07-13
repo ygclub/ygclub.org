@@ -30,7 +30,7 @@
                 <th>$v[name]</th>
                 <!--{loop $title_list $k2 $v2}-->
                 <!--{if $v[$k2][p_total_count] >0}-->
-                <td style="text-align:center"><a href="act.php?type=project&typeid=$k&year={$v[$k2][p_year]}&half={$v[$k2][half]}" class="count" >$v[$k2]['p_total_count']</a></td>
+		<td style="text-align:center"><a href="act.php?type=project&fid={$v[$k2][fid]}&typeid={$v[$k2][typeid]}&year={$v[$k2][p_year]}&half={$v[$k2][half]}" class="count" >$v[$k2]['p_total_count']</a></td>
                 <!--{else}-->
                 <td></td>
                 <!--{/if}-->
