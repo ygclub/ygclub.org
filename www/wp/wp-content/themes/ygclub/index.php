@@ -1,4 +1,4 @@
-﻿<?php get_header(); ?>
+<?php get_header(); ?>
 		<div id="banner"></div>
         
     	<div id="content">
@@ -11,14 +11,14 @@
             <div id="ygclub_projects">
             	<h3>阳光项目</h3>
                 <ul>
-                	<li><a href="http://www.ygclub.org/wiki/index.php?doc-view-511.html"><span class="project_add">昌平</span><span class="project_name">经纬学校</span></a></li>
-                	<li><a href="http://www.ygclub.org/wiki/index.php?doc-view-517.html"><span class="project_add">怀柔</span><span class="project_name">育才学校</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=26"><span class="project_add">朝阳</span><span class="project_name">东坝社区中心</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/thread-5632-1-1.html"><span class="project_add">海淀</span><span class="project_name">朱房村社区中心</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/thread-5364-1-1.html"><span class="project_add">昌平</span><span class="project_name">爱加倍社区中心</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=98"><span class="project_add">石景山</span><span class="project_name">梁公庵水厂大院</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=25"><span class="project_add">昌平</span><span class="project_name">燕京小天鹅学校</span></a></li>
-                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">昌平</span><span class="project_name">定福小学</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">东城</span><span class="project_name">东四童缘中心</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">朝阳</span><span class="project_name">小店童缘中心</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">海淀</span><span class="project_name">朱房村社区中心</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">海淀</span><span class="project_name">新世纪图书馆</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">昌平</span><span class="project_name">暖暖爱心之家</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=98"><span class="project_add">海淀</span><span class="project_name">四季青童缘中心</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=25"><span class="project_add">大兴</span><span class="project_name">霍村新市民生活馆</span></a></li>
+                	<li><a href="http://www.ygclub.org/bbs/forum.php?mod=forumdisplay&fid=2&filter=typeid&typeid=99"><span class="project_add">大兴</span><span class="project_name">寿宝庄一砖一瓦</span></a></li>
                 	<!--li><a href="#"><span class="project_name project_more">其它项目&raquo;</span></a></li-->
                 </ul>
             </div>
