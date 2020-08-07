@@ -11,6 +11,7 @@ bbs/data/threadcache/*
 bbs/data/cache/*
 bbs/data/template/*
 bbs/attachments
+bbs/source/plugin/xigua_login/cache
 
 uc/data/config.inc.php
 uc/data/install.lock
