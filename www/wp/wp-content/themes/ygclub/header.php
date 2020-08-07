@@ -1,8 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script>document.title='北京(LEAD)阳光志愿者俱乐部';</script>
+<meta name="keywords" content="志愿者,ygclub,北京,流动儿童,阳光志愿者,阳光志愿者俱乐部,阳光义教,阳光义教俱乐部,打工子弟,留守儿童,爱心,非营利性组织,NGO,农民工,支教,志教,志愿教育" />
+<meta name="description" content="北京阳光志愿者俱乐部（简称“阳光志愿者”或LEAD）是一个独立运作、专注于为流动儿童教育提供志愿教育机会的纯“草根”志愿者组织。" />
+<title>
 <?php if (is_home()) {
 	bloginfo('name');
 } 
@@ -18,6 +20,7 @@
 }
 ?>
 </title>
+
 <link rel="stylesheet" type="text/css" href="<?php bloginfo('stylesheet_url'); ?>" />
 <link rel="alternate" type="application/atom+xml" title="<?php bloginfo('name'); ?> Atom" href="<?php bloginfo('atom_url'); ?>" />
 <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS" href="<?php bloginfo('rss2_url'); ?>" />
@@ -50,3 +53,4 @@
                 <div id="nav_r"></div>
             </div>
         </div>
+
