@@ -54,11 +54,11 @@
         <div class="login_from">
             <ul>
                 <li>
-                    <input type="text" value="<!--{if $_GET[rb]==1}-->{$reg_nickname}<!--{/if}-->" tabindex="2" class="px p_fre" size="30" autocomplete="off" name="username" placeholder="{lang inputyourname}" >
+                    <input type="text" value="<!--{if $_GET[rb]!=0}-->{$reg_nickname}<!--{/if}-->" tabindex="2" class="px p_fre" size="30" autocomplete="off" name="username" placeholder="{lang inputyourname}" >
                     {if $config[showborder]}<div class="border"></div>{/if}
                 </li>
 
-                <!--{if $_GET[rb]!=1}-->
+                <!--{if $_GET[rb]==0}-->
                 <li class="btn_login"><input type="password" tabindex="1" class="px p_fre" size="30" value="" name="password" placeholder="{lang login_password}" >
                     {if $config[showborder]}<div class="border"></div>{/if}
                 </li>
@@ -86,7 +86,7 @@
                 <!--{/if}-->
             </ul>
         </div>
-        <div class="btn_login"><button tabindex="3" value="true" name="submit" type="submit" class="btn btn-outline"><span><!--{if $_GET[rb]==1}-->{$config['newbtn']}<!--{else}-->$config[bindexbtn]<!--{/if}--></span></button></div>
+        <div class="btn_login"><button tabindex="3" value="true" name="submit" type="submit" class="btn btn-outline"><span><!--{if $_GET[rb]!=0}-->{$config['newbtn']}<!--{else}-->$config[bindexbtn]<!--{/if}--></span></button></div>
 
     </form>
 </div>
